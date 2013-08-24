@@ -22,7 +22,7 @@ static Extension *extension;
  *  @param  name        Name of the extension
  *  @param  version     Version number
  */
-Extension::Extension(const char *name, const char *version) : _name(name), _version(version), _entry(NULL)
+Extension::Extension(const char *name, const char *version) : _name(name), _version(version), _entry(NULL), _request(NULL)
 {
     // store pointer to the one and only extension
     extension = this;
@@ -41,11 +41,11 @@ Extension::~Extension()
  *  Function that is called when the extension initializes
  *  @param  type        Module type
  *  @param  number      Module number
- *  @param  tsrm_ls     Optional thread safety thing
  *  @return int         0 on success
  */
 static int extension_startup(INIT_FUNC_ARGS)
 {
+    // initialize the extension
     return BOOL2SUCCESS(extension->initialize());
 }
 
@@ -57,7 +57,32 @@ static int extension_startup(INIT_FUNC_ARGS)
  */
 static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 {
+    // finalize the extension
     return BOOL2SUCCESS(extension->finalize());
+}
+
+/**
+ *  Function that is called when a request starts
+ *  @param  type        Module type
+ *  @param  number      Module number
+ *  @return int         0 on success
+ */
+static int request_startup(INIT_FUNC_ARGS)
+{
+    // create the request
+    return BOOL2SUCCESS(extension->startRequest());
+}
+
+/**
+ *  Function that is called when a request is ended
+ *  @param  type        Module type
+ *  @param  number      Module number
+ *  @return int         0 on success
+ */
+static int request_shutdown(INIT_FUNC_ARGS)
+{
+    // end the request
+    return BOOL2SUCCESS(extension->endRequest());
 }
 
 /**
@@ -83,16 +108,12 @@ zend_module_entry *Extension::entry()
     _entry->functions = NULL;                               // functions supported by this module
     _entry->module_startup_func = extension_startup;        // startup function for the whole extension
     _entry->module_shutdown_func = extension_shutdown;      // shutdown function for the whole extension
-    _entry->request_startup_func = NULL;         // startup function per request
-    _entry->request_shutdown_func = NULL;       // shutdown function per request
+    _entry->request_startup_func = request_startup;         // startup function per request
+    _entry->request_shutdown_func = request_shutdown;       // shutdown function per request
     _entry->info_func = NULL;                               // information for retrieving info
     _entry->version = _version;                             // version string
-    _entry->globals_size = 0;                               // number of global variables
-#ifdef ZTS
-    _entry->globals_id_ptr = NULL;                          // pointer to the globals, thread safe
-#else
+    _entry->globals_size = 0;                               // size of the global variables
     _entry->globals_ptr = NULL;                             // pointer to the globals
-#endif
     _entry->globals_ctor = NULL;                            // constructor for global variables
     _entry->globals_dtor = NULL;                            // destructor for global variables
     _entry->post_deactivate_func = NULL;                    // unknown function

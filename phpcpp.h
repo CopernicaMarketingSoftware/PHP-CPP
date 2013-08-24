@@ -10,6 +10,7 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/request.h>
 #include <phpcpp/extension.h>
 
 /**

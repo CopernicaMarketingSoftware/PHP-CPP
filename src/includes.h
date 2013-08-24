@@ -25,5 +25,6 @@
 /**
  *  Include other files from this library
  */
+#include "../include/request.h"
 #include "../include/extension.h"
 

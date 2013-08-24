@@ -15,6 +15,29 @@
 using namespace std;
 
 /**
+ *  Override the request class
+ */
+class SimpleRequest : public PhpCpp::Request
+{
+public:
+    SimpleRequest(PhpCpp::Extension *extension) : PhpCpp::Request(extension)
+    {
+    }
+
+    virtual bool initialize()
+    {
+        cout << "Request::initialize" << endl;
+        return true;
+    }
+    
+    virtual bool finalize()
+    {
+        cout << "Request::finalize" << endl;
+        return true;
+    }
+};
+
+/**
  *  Override the extension class
  */
 class SimpleExtension : public PhpCpp::Extension
@@ -29,16 +52,20 @@ public:
     
     virtual bool initialize()
     {
-        cout << "initialize" << endl;
+        cout << "Extension::initialize" << endl;
         return true;
     }
     
     virtual bool finalize()
     {
-        cout << "finalize" << endl;
+        cout << "Extension::finalize" << endl;
         return true;
     }
     
+    virtual PhpCpp::Request *request()
+    {
+        return new SimpleRequest(this);
+    }
 };
 
 // create the object for the PHP extension
