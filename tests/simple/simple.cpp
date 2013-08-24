@@ -7,6 +7,12 @@
  *  @copyright 2013 Copernica BV
  */
 #include <phpcpp.h>
+#include <iostream>
+
+/**
+ *  Namespace to use
+ */
+using namespace std;
 
 /**
  *  Override the extension class
@@ -17,19 +23,23 @@ public:
     /**
      *  Constructor
      */
-    SimpleExtension() : Extension(
-        "simple", 
-        "1.0", 
-        "Emiel Bruijntjes <emiel.bruijntjes@copernica.com>", 
-        "http://www.copernica.com", 
-        "Copyright 2013 Copernica BV")
+    SimpleExtension() : Extension("simple", "1.0")
     {
     }
+    
+    virtual bool initialize()
+    {
+        cout << "initialize" << endl;
+        return true;
+    }
+    
+    virtual bool finalize()
+    {
+        cout << "finalize" << endl;
+        return true;
+    }
+    
 };
-
-extern "C" {
 
 // create the object for the PHP extension
 PHP_CPP_EXTENSION(SimpleExtension);
-
-}

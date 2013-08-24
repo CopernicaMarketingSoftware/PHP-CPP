@@ -5,9 +5,13 @@ LIBRARY_DIR	=	${PREFIX}/lib
 all:
 		cd src; $(MAKE)
 
+tests:
+		cd tests; $(MAKE)
+
 clean:
 		cd src; $(MAKE) clean
-		
+		cd tests; $(MAKE) clean
+
 install:
 		mkdir -p ${INCLUDE_DIR}/phpcpp
 		mkdir -p ${LIBRARY_DIR}

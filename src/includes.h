@@ -11,11 +11,19 @@
  *  Include standard C and C++ libraries
  */
 #include <stdlib.h>
-#include <php5/main/php.h>
-#include <php5/main/php_ini.h>
+
+/**
+ *  PHP includes
+ */
+#include "php.h"
+
+/**
+ *  Macro to convert results to success status
+ */
+#define BOOL2SUCCESS(b) ((b) ? SUCCESS : FAILURE)
 
 /**
  *  Include other files from this library
- */  
+ */
 #include "../include/extension.h"
 

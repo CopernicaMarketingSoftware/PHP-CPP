@@ -13,10 +13,14 @@
  */
 
 /**
+ *  Forward declarations
+ */
+struct _zend_module_entry;
+
+/**
  *  Set up namespace
  */
-namespace PhpCpp 
-{
+namespace PhpCpp {
 
 /**
  *  Class definition
@@ -26,15 +30,15 @@ class Extension
 public:
     /**
      *  Constructor
+     *  @param  name        Extension name
+     *  @param  version     EXtension version
      */
-    Extension();
+    Extension(const char *name, const char *version);
     
     /**
      *  Destructor
      */
-    virtual ~Extension()
-    {
-    }
+    virtual ~Extension();
     
     /**
      *  Initialize the extension.
@@ -46,7 +50,7 @@ public:
      *  The method should return true on success, and false on failure (in which
      *  case the extension will not be used)
      * 
-     *  @return boolean
+     *  @return bool
      */
     virtual bool initialize()
     {
@@ -59,12 +63,41 @@ public:
      *  This method gets called after all requests were handled, and right before 
      *  the Apache module or CLI script will exit. You can override it to add
      *  your own cleanup code.
+     * 
+     *  @return bool
      */
-    virtual void finalize()
+    virtual bool finalize()
     {
+        return true;
     }
-
+    
+    /**
+     *  Internal method to get access to the entry
+     *  @return zend_module_entry
+     */
+    _zend_module_entry *entry();
+    
 private:
+    /**
+     *  Extension name
+     *  @var char*
+     */
+    const char *_name;
+    
+    /**
+     *  Extension version
+     *  @var char*
+     */
+    const char *_version;
+
+    /**
+     *  The information that is passed to the Zend engine
+     *  @var zend_module_entry
+     */
+    _zend_module_entry *_entry;
+
+
+
     
 };
 
