@@ -23,7 +23,7 @@ public:
      *  Constructor
      *  @param  functions   The functions to parse
      */
-    Functions(const std::initializer_list<Function> &functions)
+    Functions(const std::initializer_list<Function> &functions) : _functions(functions)
     {
         // allocate the function entries
         _entries = new zend_function_entry[functions.size() + 1];
@@ -69,6 +69,13 @@ private:
      *  @var zend_function_entry*
      */
     zend_function_entry *_entries;
+    
+    /**
+     *  Vector of functions (we need this because the function objects must
+     *  remain in memory)
+     *  @var vector
+     */
+    std::vector<Function> _functions;
 };
 
 /**
@@ -76,5 +83,3 @@ private:
  */
 }
 
-
- 

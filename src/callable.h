@@ -31,8 +31,22 @@ public:
      *  @param  flags           Optional flags to be passed to the function
      */
     Callable(const std::string &classname, const std::string &function, Type type = nullType, const std::initializer_list<Argument> &arguments = {}, int flags = 0) :
-        _classname(classname), _function(function), _type(type), _flags(flags)
+        _classname(classname), _type(type), _flags(flags)
     {
+        // somehow "&this" is not accepted by the compiler, so we make a copy
+        Callable *callable = this;
+
+        // append function name to the data (the data contains a pointer
+        // to this object, appended with the function name. this is a trick
+        // so that we have the pointer to this function available in the 
+        // function name by going back a number of bytes)
+        _data.reserve(function.size() + sizeof(this));
+        _data.assign(std::string((const char *)&callable, sizeof(callable)));
+        _data.append(function);
+        
+        // find the name
+        _name = _data.c_str() + sizeof(this);
+        
         // process the arguments
         process(arguments);
     }
@@ -91,10 +105,16 @@ private:
     std::string _classname;
     
     /**
-     *  Function name
+     *  Pointer to current object, appended with function name
      *  @var string
      */
-    std::string _function;
+    std::string _data;
+    
+    /**
+     *  Pointer to the function name
+     *  @var char*
+     */
+    const char *_name;
     
     /**
      *  The return type

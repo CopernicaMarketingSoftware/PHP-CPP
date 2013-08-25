@@ -63,6 +63,8 @@ static int extension_startup(INIT_FUNC_ARGS)
  */
 static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 {
+    std::cout << "extension_shutdown" << std::endl;
+    
     // finalize the extension
     return BOOL2SUCCESS(extension->finalize());
 }

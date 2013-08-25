@@ -7,8 +7,8 @@
  *  @copyright 2013 Copernica BV
  */
 #include <string>
-#include <phpcpp.h>
 #include <iostream>
+#include <phpcpp.h>
 
 /**
  *  Namespace to use
