@@ -26,17 +26,23 @@ struct _zend_module_entry;
 namespace PhpCpp {
 
 /**
+ *  Forward definitions
+ */
+class Functions;
+
+/**
  *  Class definition
  */
 class Extension
 {
 public:
     /**
-     *  Constructor
+     *  Extension that defines a number of functions right away
      *  @param  name        Extension name
-     *  @param  version     EXtension version
+     *  @param  version     Extension version string
+     *  @param  functions   The functions that are defined
      */
-    Extension(const char *name, const char *version);
+    Extension(const char *name, const char *version, const std::initializer_list<Function> &functions = {});
     
     /**
      *  Destructor
@@ -151,18 +157,24 @@ private:
      *  @var char*
      */
     const char *_version;
+    
+    /**
+     *  The functions that are defined
+     *  @var vector
+     */
+    Functions *_functions;
 
     /**
      *  The information that is passed to the Zend engine
      *  @var zend_module_entry
      */
-    _zend_module_entry *_entry;
+    _zend_module_entry *_entry = NULL;
 
     /**
      *  The current request being processed
      *  @var Request
      */
-    Request *_request;
+    Request *_request = NULL;
 
     
 };

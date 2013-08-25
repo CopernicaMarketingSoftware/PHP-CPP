@@ -1,6 +1,6 @@
 CPP             = g++
 RM              = rm -f
-CPP_FLAGS       = -Wall -c -I. -O2
+CPP_FLAGS       = -Wall -c -I. -O2 -std=c++11
 
 LD              = g++
 LD_FLAGS        = -Wall -shared -O2 

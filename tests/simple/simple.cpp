@@ -6,6 +6,7 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
+#include <string>
 #include <phpcpp.h>
 #include <iostream>
 
@@ -46,7 +47,9 @@ public:
     /**
      *  Constructor
      */
-    SimpleExtension() : Extension("simple", "1.0")
+    SimpleExtension() : Extension("simple", "1.0", {
+        PhpCpp::Function("hallo")
+    })
     {
     }
     
@@ -67,6 +70,9 @@ public:
         return new SimpleRequest(this);
     }
 };
+
+
+
 
 // create the object for the PHP extension
 PHP_CPP_EXTENSION(SimpleExtension);

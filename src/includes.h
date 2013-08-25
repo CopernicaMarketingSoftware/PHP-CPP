@@ -11,6 +11,12 @@
  *  Include standard C and C++ libraries
  */
 #include <stdlib.h>
+#include <string>
+#include <initializer_list>
+#include <vector>
+
+// for debugging
+#include <iostream>
 
 /**
  *  PHP includes
@@ -25,6 +31,17 @@
 /**
  *  Include other files from this library
  */
+#include "../include/type.h"
 #include "../include/request.h"
+#include "../include/argument.h"
+#include "../include/variable.h"
+#include "../include/function.h"
 #include "../include/extension.h"
+
+/**
+ *  Interface files for internal use only
+ */
+#include "callable.h"
+#include "arginfo.h"
+#include "functions.h"
 

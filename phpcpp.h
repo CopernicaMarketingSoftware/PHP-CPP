@@ -8,9 +8,20 @@
  */
 
 /**
+ *  Other C and C++ libraries that PhpCpp depends on
+ */
+#include <string>
+#include <initializer_list>
+#include <vector>
+
+/**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/type.h>
 #include <phpcpp/request.h>
+#include <phpcpp/argument.h>
+#include <phpcpp/variable.h>
+#include <phpcpp/function.h>
 #include <phpcpp/extension.h>
 
 /**

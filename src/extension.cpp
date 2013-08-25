@@ -22,8 +22,11 @@ static Extension *extension;
  *  @param  name        Name of the extension
  *  @param  version     Version number
  */
-Extension::Extension(const char *name, const char *version) : _name(name), _version(version), _entry(NULL), _request(NULL)
+Extension::Extension(const char *name, const char *version, const std::initializer_list<Function> &functions) : _name(name), _version(version)
 {
+    // allocate functions
+    _functions = new Functions(functions);
+    
     // store pointer to the one and only extension
     extension = this;
 }
@@ -33,6 +36,9 @@ Extension::Extension(const char *name, const char *version) : _name(name), _vers
  */
 Extension::~Extension()
 {
+    // deallocate functions
+    delete _functions;
+    
     // deallocate entry
     if (_entry) delete _entry;
 }
@@ -105,7 +111,7 @@ zend_module_entry *Extension::entry()
     _entry->ini_entry = NULL;                               // the php.ini record
     _entry->deps = NULL;                                    // dependencies on other modules
     _entry->name = _name;                                   // extension name
-    _entry->functions = NULL;                               // functions supported by this module
+    _entry->functions = _functions->internal();             // functions supported by this module
     _entry->module_startup_func = extension_startup;        // startup function for the whole extension
     _entry->module_shutdown_func = extension_shutdown;      // shutdown function for the whole extension
     _entry->request_startup_func = request_startup;         // startup function per request
@@ -131,5 +137,4 @@ zend_module_entry *Extension::entry()
  *  End of namespace
  */
 }
-
 
