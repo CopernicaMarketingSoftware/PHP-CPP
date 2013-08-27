@@ -8,6 +8,11 @@
  */
 
 /**
+ *  Forward definitions
+ */
+struct _zval_struct;
+
+/**
  *  Set up namespace
  */
 namespace PhpCpp {
@@ -48,6 +53,12 @@ public:
     Variable(double value);
     
     /**
+     *  Wrap object around zval
+     *  @param  zval
+     */
+    Variable(struct _zval_struct *zval);
+    
+    /**
      *  Copy constructor
      *  @param  value
      */
@@ -64,54 +75,100 @@ public:
      *  @return Variable
      */
     virtual Variable &operator=(const Variable &value);
+    
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Variable
+     */
+    Variable &operator=(int value);
+
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Variable
+     */
+    Variable &operator=(bool value);
+
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Variable
+     */
+    Variable &operator=(const std::string &value);
+    
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Variable
+     */
+    Variable &operator=(double value);
+    
+    /**
+     *  The type of object
+     *  @return Type
+     */
+    Type type();
+    
+    /**
+     *  Change the internal type of the variable
+     *  @param  Type
+     */
+    void setType(Type type);
+
+    /**
+     *  Is this a NULL value?
+     *  @return bool
+     */
+    bool isNull();
 
     /**
      *  Is this an integer value?
      *  @return bool
      */
-    virtual bool isInt();
+    bool isInt();
     
     /**
      *  Is this a boolean value?
      *  @return bool
      */
-    virtual bool isBool();
+    bool isBool();
     
     /**
      *  Is this a string value?
      *  @return bool
      */
-    virtual bool isString();
+    bool isString();
     
     /**
      *  Is this a decimal value?
      *  @return bool
      */
-    virtual bool isDecimal();
+    bool isDecimal();
     
     /**
      *  Is this an object value?
      *  @return bool
      */
-    virtual bool isObject();
+    bool isObject();
     
     /**
      *  Is this an array value?
      *  @return bool
      */
-    virtual bool isArray();
+    bool isArray();
     
     /**
      *  Retrieve the value as integer
      *  @return int
      */
-    virtual int intValue();
+    int intValue();
     
     /**
      *  Retrieve the value as boolean
      *  @return bool
      */
-    virtual bool boolValue();
+    bool boolValue();
     
     /**
      *  Retrieve the value as string
@@ -123,7 +180,51 @@ public:
      *  Retrieve the value as decimal
      *  @return double
      */
-    virtual double decimalValue();
+    double decimalValue();
+    
+    /**
+     *  Cast to an int
+     *  @return int
+     */
+    operator int ()
+    {
+        return intValue();
+    }
+    
+    /**
+     *  Cast to a boolean
+     *  @return boolean
+     */
+    operator bool ()
+    {
+        return boolValue();
+    }
+    
+    /**
+     *  Cast to a string
+     *  @return string
+     */
+    operator std::string ()
+    {
+        return stringValue();
+    }
+    
+    /**
+     *  Cast to a floating point
+     *  @return double
+     */
+    operator double ()
+    {
+        return decimalValue();
+    }
+
+protected:
+    /**
+     *  The wrapped zval
+     *  @var struct zval
+     */
+    struct _zval_struct *_val;
+
 };
 
 /**

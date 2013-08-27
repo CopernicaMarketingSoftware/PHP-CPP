@@ -17,5 +17,4 @@ PHP-CPP is an initiave from Copernica BV.
 For more information, contact me at emiel.bruijntjes@copernica.com.
 
 
-
 Emiel Bruijntjes (25 August 2013)
