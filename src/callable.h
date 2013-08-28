@@ -96,6 +96,20 @@ public:
      */
     void fill(zend_function_entry *entry);
     
+    /**
+     *  Invoke the method
+     *  @param  ht      
+     *  @param  return_value
+     *  @param  return_value_ptr
+     *  @param  this_ptr
+     *  @param  return_value_used
+     *  @param  tsrm_ls
+     *  @return integer
+     */
+    int invoke(INTERNAL_FUNCTION_PARAMETERS);
+
+
+int ht, zval *return_value, zval **return_value_ptr, zval *this_ptr, int return_value_used TSRMLS_DC    
 
 private:
     /**

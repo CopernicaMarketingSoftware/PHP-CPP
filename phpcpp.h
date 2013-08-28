@@ -20,7 +20,7 @@
 #include <phpcpp/type.h>
 #include <phpcpp/request.h>
 #include <phpcpp/argument.h>
-#include <phpcpp/variable.h>
+#include <phpcpp/value.h>
 #include <phpcpp/function.h>
 #include <phpcpp/extension.h>
 

@@ -15,7 +15,13 @@ namespace PhpCpp {
 
 /**
  *  Function that is called by the Zend engine every time that a function gets called
- *  @param  mixed
+ *  @param  ht      
+ *  @param  return_value
+ *  @param  return_value_ptr
+ *  @param  this_ptr
+ *  @param  return_value_used
+ *  @param  tsrm_ls
+ *  @return integer
  */
 void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
 {
@@ -26,14 +32,16 @@ void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
     // callable right in front of the function name - we retrieve it back
     Callable *callable = *((Callable **)(function - sizeof(Callable *)));
 
-    std::cout << "callable: " << callable << std::endl;
-
-
-    return;
+    // call the appropriate object
+    callable->invoke(INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 
 /**
  *  Fill a function entry
+ * 
+ *  This method is called when the extension is registering itself, when the 
+ *  function or method introces himself
+ * 
  *  @param  entry
  */
 void Callable::fill(zend_function_entry *entry)
@@ -48,6 +56,10 @@ void Callable::fill(zend_function_entry *entry)
 
 /**
  *  Another attempt to fill internal function info
+ * 
+ *  This method is called when the extension is registering itself, when the 
+ *  function or method introces himself
+ * 
  *  @param  entry
  */
 void Callable::fill(zend_internal_function_info *info)
@@ -64,6 +76,9 @@ void Callable::fill(zend_internal_function_info *info)
 
 /**
  *  Process the arguments
+ * 
+ *  The arguments are called by the user of the PhpCpp library when he 
+ * 
  *  @param  arguments
  */
 void Callable::process(const std::initializer_list<Argument> &arguments)
@@ -87,6 +102,23 @@ void Callable::process(const std::initializer_list<Argument> &arguments)
         // fill the argument structure
         it->internal()->fill(&_argv[++i]);
     }
+}
+
+/**
+ *  Invoke the method
+ *  @param  ht      
+ *  @param  return_value
+ *  @param  return_value_ptr
+ *  @param  this_ptr
+ *  @param  return_value_used
+ *  @param  tsrm_ls
+ *  @return integer
+ */
+int Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
+{
+    
+    
+    
 }
 
 /**

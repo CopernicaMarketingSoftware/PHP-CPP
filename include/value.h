@@ -1,7 +1,18 @@
 /**
- *  Variable.h
+ *  Value.h
  *
- *  Base class for variables that are stored in the Zend engine.
+ *  Base class for values that are stored in the Zend engine. One instance
+ *  of the value class represents a variable that exists in user space in
+ *  the PHP environment, for example as global variable, local variable
+ *  inside a function or as a member of an object or an array.
+ * 
+ *  A value can be a scalar or a more complicated structure like an object
+ *  or an array.
+ * 
+ *  Internally, the Zend engine works with "zval" objects for this. These "zval"
+ *  object hold a reference counter and a reference setting. The PHP-CPP Value
+ *  class takes care of doing this, so all you need to do is use objects of
+ *  this class.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -20,89 +31,89 @@ namespace PhpCpp {
 /**
  *  Class definition
  */
-class Variable
+class Value
 {
 public:
     /**
      *  Empty constructor (value = NULL)
      */
-    Variable();
+    Value();
     
     /**
      *  Constructor based on integer value
      *  @param  value
      */
-    Variable(int value);
+    Value(int value);
     
     /**
      *  Constructor based on boolean value
      *  @param  value
      */
-    Variable(bool value);
+    Value(bool value);
     
     /**
      *  Constructor based on string value
      *  @param  value
      */
-    Variable(const std::string &value);
+    Value(const std::string &value);
     
     /**
      *  Constructor based on decimal value
      *  @param  value
      */
-    Variable(double value);
+    Value(double value);
     
     /**
      *  Wrap object around zval
      *  @param  zval
      */
-    Variable(struct _zval_struct *zval);
+    Value(struct _zval_struct *zval);
     
     /**
      *  Copy constructor
      *  @param  value
      */
-    Variable(const Variable &that);
+    Value(const Value &that);
     
     /**
      *  Destructor
      */
-    virtual ~Variable();
+    virtual ~Value();
 
     /**
      *  Assignment operator
      *  @param  value
-     *  @return Variable
+     *  @return Value
      */
-    virtual Variable &operator=(const Variable &value);
+    virtual Value &operator=(const Value &value);
     
     /**
      *  Assignment operator
      *  @param  value
-     *  @return Variable
+     *  @return Value
      */
-    Variable &operator=(int value);
+    Value &operator=(int value);
 
     /**
      *  Assignment operator
      *  @param  value
-     *  @return Variable
+     *  @return Value
      */
-    Variable &operator=(bool value);
+    Value &operator=(bool value);
 
     /**
      *  Assignment operator
      *  @param  value
-     *  @return Variable
+     *  @return Value
      */
-    Variable &operator=(const std::string &value);
+    Value &operator=(const std::string &value);
     
     /**
      *  Assignment operator
      *  @param  value
-     *  @return Variable
+     *  @return Value
      */
-    Variable &operator=(double value);
+    Value &operator=(double value);
     
     /**
      *  The type of object
@@ -224,7 +235,6 @@ protected:
      *  @var struct zval
      */
     struct _zval_struct *_val;
-
 };
 
 /**
