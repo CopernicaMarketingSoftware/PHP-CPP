@@ -31,11 +31,19 @@ public:
     /**
      *  Constructor if this argument can be anything
      *  @param  name        Name of the argument
-     *  @param  type        Type hint
+     *  @param  type        Type hint (arrayType or callableType)
      *  @param  ref         Is this a pass-by-reference argument?
      */
     ArgInfo(const std::string &name, Type type = nullType, bool ref = false) :
         _name(name), _type(type), _null(false), _ref(ref) {}
+
+    /**
+     *  Constructor if this argument can be anything
+     *  @param  name        Name of the argument
+     *  @param  ref         Is this a pass-by-reference argument?
+     */
+    ArgInfo(const std::string &name, bool ref = false) :
+        _name(name), _type(nullType), _null(false), _ref(ref) {}
     
     /**
      *  Destructor

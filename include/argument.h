@@ -35,11 +35,19 @@ public:
 
     /**
      *  Constructor if the argument can be anything
+     *  Note that only arrayType and callableType are supported type-hints
      *  @param  name        Name of the argument
-     *  @param  type        Type hint
+     *  @param  type        Type hint (arrayType or callableType)
      *  @param  ref         Is this a pass-by-reference argument?
      */
     Argument(const std::string &name, Type type = nullType, bool ref = false);
+
+    /**
+     *  Constructor if the argument can be anything
+     *  @param  name        Name of the argument
+     *  @param  ref         Is this a pass-by-reference argument?
+     */
+    Argument(const std::string &name, bool ref = false);
     
     /**
      *  Copy constructor

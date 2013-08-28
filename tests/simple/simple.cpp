@@ -48,7 +48,9 @@ public:
      *  Constructor
      */
     SimpleExtension() : Extension("simple", "1.0", {
-        PhpCpp::Function("hallo")
+        PhpCpp::Function("hallo", {
+            PhpCpp::Argument("arg1", true)
+        })
     })
     {
     }

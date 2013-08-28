@@ -28,14 +28,26 @@ Argument::Argument(const std::string &name, const std::string &classname, bool n
 
 /**
  *  Constructor if the argument can be anything
+ *  Note that only arrayType and callableType are supported type-hints
  *  @param  name        Name of the argument
- *  @param  type        Type hint
+ *  @param  type        Type hint (arrayType or callableType)
  *  @param  ref         Is this a pass-by-reference argument?
  */
 Argument::Argument(const std::string &name, Type type, bool ref)
 {
     _refcount = new int[1];
     _info = new ArgInfo(name, type, ref);
+}
+
+/**
+ *  Constructor if the argument can be anything
+ *  @param  name        Name of the argument
+ *  @param  ref         Is this a pass-by-reference argument?
+ */
+Argument::Argument(const std::string &name, bool ref)
+{
+    _refcount = new int[1];
+    _info = new ArgInfo(name, ref);
 }
 
 /**

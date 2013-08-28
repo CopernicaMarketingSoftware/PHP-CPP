@@ -104,6 +104,13 @@ void Callable::process(const std::initializer_list<Argument> &arguments)
     }
 }
 
+int do_test(int a, int b)
+{
+    std::cout << "do_test: " << a << " " << b << std::endl;
+    
+    return 77;
+}
+
 /**
  *  Invoke the method
  *  @param  ht      
@@ -116,10 +123,45 @@ void Callable::process(const std::initializer_list<Argument> &arguments)
  */
 int Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 {
+    std::cout << "args: " << ZEND_NUM_ARGS() << std::endl;
+    std::cout << "required: " << _required << std::endl;
+    std::cout << "argc: " << _argc << std::endl;
     
+    // number of arguments should be sufficient // @todo show error message
+//    if (ZEND_NUM_ARGS() < _required) return FAILURE;
     
+    // and not be too much // @todo show error message
+//    if (ZEND_NUM_ARGS() > _argc) return FAILURE;
     
+    // number of arguments on the stack
+    int arg_count = (int)(zend_uintptr_t) *(zend_vm_stack_top(TSRMLS_C) - 1);
+    
+    // loop through the arguments
+    Arguments args(ZEND_NUM_ARGS());
+    
+    for (auto iter = args.begin(); iter != args.end(); iter++)
+    {
+        Value val = *iter;
+        
+        val = 1234;
+        
+        std::cout << "argument: " << iter->stringValue() << std::endl;
+    }
+    
+    int result = do_test(args[1], args[2]);
+    
+    return SUCCESS;
+
+    Value ret(return_value, true);
+    
+    ret = result;
+
+    // done
+    return SUCCESS;
 }
+
+
+
 
 /**
  *  End of namespace

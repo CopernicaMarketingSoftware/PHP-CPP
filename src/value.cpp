@@ -87,15 +87,19 @@ Value::Value(double value)
 
 /**
  *  Wrap object around zval
- *  @param  zval
+ *  @param  zval        Value to wrap
+ *  @param  ref         Force this to be a reference
  */
-Value::Value(struct _zval_struct *zval)
+Value::Value(struct _zval_struct *zval, bool ref)
 {
     // just copy the zval into this object
     _val = zval;
     
     // we see ourselves as reference too
     Z_ADDREF_P(_val);
+    
+    // should this be a forced reference
+    if (ref) Z_SET_ISREF_P(zval);
 }
 
 /**

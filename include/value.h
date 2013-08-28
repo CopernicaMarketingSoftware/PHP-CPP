@@ -65,9 +65,10 @@ public:
     
     /**
      *  Wrap object around zval
-     *  @param  zval
+     *  @param  zval        Zval to wrap
+     *  @param  ref         Force this to be a reference
      */
-    Value(struct _zval_struct *zval);
+    Value(struct _zval_struct *zval, bool ref = false);
     
     /**
      *  Copy constructor

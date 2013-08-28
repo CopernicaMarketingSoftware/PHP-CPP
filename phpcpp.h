@@ -21,6 +21,7 @@
 #include <phpcpp/request.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/value.h>
+#include <phpcpp/arguments.h>
 #include <phpcpp/function.h>
 #include <phpcpp/extension.h>
 
