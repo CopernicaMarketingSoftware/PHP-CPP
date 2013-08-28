@@ -108,9 +108,6 @@ public:
      */
     int invoke(INTERNAL_FUNCTION_PARAMETERS);
 
-
-int ht, zval *return_value, zval **return_value_ptr, zval *this_ptr, int return_value_used TSRMLS_DC    
-
 private:
     /**
      *  Classname

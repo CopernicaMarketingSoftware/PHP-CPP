@@ -95,7 +95,7 @@ Value::Value(struct _zval_struct *zval)
     _val = zval;
     
     // we see ourselves as reference too
-    ZVAL_ADDREF_P(_val);
+    Z_ADDREF_P(_val);
 }
 
 /**
@@ -108,7 +108,7 @@ Value::Value(const Value &that)
     _val = that._val;
 
     // and we have one more reference
-    ZVAL_ADDREF_P(_val);
+    Z_ADDREF_P(_val);
 }
 
 /**
@@ -118,7 +118,7 @@ Value::~Value()
 {
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
-    zval_ptr_dtor(_val);
+    zval_ptr_dtor(&_val);
 }
 
 /**
@@ -133,13 +133,13 @@ Value &Value::operator=(const Value &value)
 
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
-    zval_ptr_dtor(_val);
+    zval_ptr_dtor(&_val);
 
     // just copy the zval, and the refcounter
-    _val = that._val;
+    _val = value._val;
 
     // and we have one more reference
-    ZVAL_ADDREF_P(_val);
+    Z_ADDREF_P(_val);
 
     // done
     return *this;
@@ -248,14 +248,10 @@ void Value::setType(Type type)
     case nullType:              convert_to_null(_val); break;
     case intType:               convert_to_long(_val); break;
     case decimalType:           convert_to_double(_val); break;
-    case boolType:              convert_to_bool(_val); break;
+    case boolType:              convert_to_boolean(_val); break;
     case arrayType:             convert_to_array(_val); break;
     case objectType:            convert_to_object(_val); break;
     case stringType:            convert_to_string(_val); break;
-    case resourceType:          convert_to_resource(_val); break;
-    case constantType:          convert_to_constant(_val); break;
-    case constantArrayType:     convert_to_constant_array(_val); break;
-    case callableType:          convert_to_callable(_val); break;
     }
 }
 
@@ -367,7 +363,7 @@ bool Value::boolValue()
 std::string Value::stringValue()
 {
     // already a string?
-    if (isString()) return std::string(Z_STRVAL_P(_val), Z_STRLEN_T(_val));
+    if (isString()) return std::string(Z_STRVAL_P(_val), Z_STRLEN_P(_val));
 
     // make a copy
     Value copy(*this);
