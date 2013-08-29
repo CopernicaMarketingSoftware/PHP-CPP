@@ -195,6 +195,24 @@ public:
     double decimalValue();
     
     /**
+     *  The number of members in case of an array or object
+     *  @return int
+     */
+    int size();
+    
+    /**
+     *  The number of members in case of an array or object
+     *  @return int
+     */
+    int count();
+    
+    /**
+     *  The number of members in case of an array or object
+     *  @return int
+     */
+    int length();
+    
+    /**
      *  Cast to an int
      *  @return int
      */
@@ -229,6 +247,24 @@ public:
     {
         return decimalValue();
     }
+    
+    /**
+     *  Array access operator
+     *  This can be used for accessing arrays
+     *  Be aware: if the 'this' object is not already an array, it will be converted into one!
+     *  @param  index
+     *  @return Value
+     */
+    Value &operator[](int index);
+    
+    /**
+     *  Array access operator
+     *  This can be used for accessing associative arrays
+     *  Be aware: if the 'this' object is not already an array, it will be converted into one!
+     *  @param  key
+     *  @return Value
+     */
+    Value &operator[](const std::string &key);
 
 protected:
     /**
