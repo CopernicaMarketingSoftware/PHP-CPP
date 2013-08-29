@@ -35,6 +35,7 @@
 #include "../include/request.h"
 #include "../include/argument.h"
 #include "../include/value.h"
+#include "../include/member.h"
 #include "../include/arguments.h"
 #include "../include/function.h"
 #include "../include/extension.h"

@@ -10,6 +10,7 @@
 /**
  *  Other C and C++ libraries that PhpCpp depends on
  */
+#include <string.h>
 #include <string>
 #include <initializer_list>
 #include <vector>
@@ -21,6 +22,7 @@
 #include <phpcpp/request.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/value.h>
+#include <phpcpp/member.h>
 #include <phpcpp/arguments.h>
 #include <phpcpp/function.h>
 #include <phpcpp/extension.h>

@@ -29,6 +29,11 @@ struct _zval_struct;
 namespace PhpCpp {
 
 /**
+ *  Forward definitions
+ */
+template <class Type> class Member;
+
+/**
  *  Class definition
  */
 class Value
@@ -38,12 +43,18 @@ public:
      *  Empty constructor (value = NULL)
      */
     Value();
-    
+
     /**
      *  Constructor based on integer value
      *  @param  value
      */
     Value(int value);
+    
+    /**
+     *  Constructor based on integer value
+     *  @param  value
+     */
+    Value(long value);
     
     /**
      *  Constructor based on boolean value
@@ -56,6 +67,13 @@ public:
      *  @param  value
      */
     Value(const std::string &value);
+    
+    /**
+     *  Constructor based on byte buffer
+     *  @param  value
+     *  @param  size
+     */
+    Value(const char *value, int size = -1);
     
     /**
      *  Constructor based on decimal value
@@ -93,6 +111,13 @@ public:
      *  @param  value
      *  @return Value
      */
+    Value &operator=(long value);
+
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Value
+     */
     Value &operator=(int value);
 
     /**
@@ -114,13 +139,20 @@ public:
      *  @param  value
      *  @return Value
      */
+    Value &operator=(const char *value);
+    
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Value
+     */
     Value &operator=(double value);
     
     /**
      *  The type of object
      *  @return Type
      */
-    Type type();
+    Type type() const;
     
     /**
      *  Change the internal type of the variable
@@ -132,79 +164,87 @@ public:
      *  Is this a NULL value?
      *  @return bool
      */
-    bool isNull();
+    bool isNull() const;
 
     /**
      *  Is this an integer value?
      *  @return bool
      */
-    bool isInt();
+    bool isLong() const;
     
     /**
      *  Is this a boolean value?
      *  @return bool
      */
-    bool isBool();
+    bool isBool() const;
     
     /**
      *  Is this a string value?
      *  @return bool
      */
-    bool isString();
+    bool isString() const;
     
     /**
      *  Is this a decimal value?
      *  @return bool
      */
-    bool isDecimal();
+    bool isDecimal() const;
     
     /**
      *  Is this an object value?
      *  @return bool
      */
-    bool isObject();
+    bool isObject() const;
     
     /**
      *  Is this an array value?
      *  @return bool
      */
-    bool isArray();
+    bool isArray() const;
     
     /**
      *  Retrieve the value as integer
      *  @return int
      */
-    int intValue();
+    long longValue() const;
     
     /**
      *  Retrieve the value as boolean
      *  @return bool
      */
-    bool boolValue();
+    bool boolValue() const;
     
     /**
-     *  Retrieve the value as string
+     *  Retrieve the raw string value
+     *  Warning: Only use this for NULL terminated strings, or use it in combination 
+     * 	with the string size to prevent that you access data outside the buffer
+     *  @return const char *
+     */
+    const char *rawValue() const;
+    
+    /**
+     *  Retrieve the value as a string
      *  @return string
      */
-    std::string stringValue();
+    std::string stringValue() const;
     
     /**
      *  Retrieve the value as decimal
      *  @return double
      */
-    double decimalValue();
+    double decimalValue() const;
     
     /**
      *  The number of members in case of an array or object
      *  @return int
      */
-    int size();
+    int size() const;
     
     /**
      *  The number of members in case of an array or object
      *  @return int
      */
-    int count()
+    int count() const
     {
         return size();
     }
@@ -213,25 +253,47 @@ public:
      *  The number of members in case of an array or object
      *  @return int
      */
-    int length()
+    int length() const
     {
         return size();
     }
     
     /**
-     *  Cast to an int
-     *  @return int
+     *  Is a certain index set in the array
+     *  @param  index
+     *  @return bool
      */
-    operator int ()
+    bool contains(int index) const;
+
+    /**
+     *  Is a certain key set in the array
+     *  @param  key
+     *  @return bool
+     */
+    bool contains(const std::string &key) const;
+    
+    /**
+     *  Is a certain key set in the array
+     *  @param  key
+     *  @param	size
+     *  @return bool
+     */
+    bool contains(const char *key, int size) const;
+    
+    /**
+     *  Cast to a long
+     *  @return long
+     */
+    operator long () const
     {
-        return intValue();
+        return longValue();
     }
     
     /**
      *  Cast to a boolean
      *  @return boolean
      */
-    operator bool ()
+    operator bool () const
     {
         return boolValue();
     }
@@ -240,46 +302,112 @@ public:
      *  Cast to a string
      *  @return string
      */
-    operator std::string ()
+    operator std::string () const
     {
         return stringValue();
     }
     
     /**
+     *  Cast to byte array
+     *  @return const char *
+     */
+    operator const char * () const
+    {
+		return rawValue();
+	}
+    
+    /**
      *  Cast to a floating point
      *  @return double
      */
-    operator double ()
+    operator double () const
     {
         return decimalValue();
     }
     
     /**
-     *  Array access operator
-     *  This can be used for accessing arrays
-     *  Be aware: if the 'this' object is not already an array, it will be converted into one!
-     *  @param  index
+     *  Get access to a certain array member
+     *  @param	index
      *  @return Value
      */
-    Value operator[](int index);
+    Value get(int index) const;
+    
+    /**
+     *  Get access to a certain assoc member
+     *  @param	key
+     *  @param	size
+     *  @return	Value
+     */
+    Value get(const char *key, int size=-1) const;
+    
+    /**
+     *  Get access to a certain assoc member
+     *  @param	key
+     *  @return	Value
+     */
+    Value get(const std::string &key) const
+    {
+		return get(key.c_str(), key.size());
+	}
+    
+    /**
+     *  Set a certain property
+     *  @param	index
+     *  @param	value
+     */
+    void set(int index, const Value &value);
+    
+    /**
+     *  Set a certain property
+     *  @param	key
+     *  @param	value
+     */
+    void set(const char *key, int size, const Value &value);
+
+    /**
+     *  Set a certain property
+     *  @param	key
+     *  @param	size
+     *  @param	value
+     */
+    void set(const char *key, const Value &value)
+    {
+		set(key, strlen(key), value);
+	}
+    
+    /**
+     *  Set a certain property
+     *  @param	key
+     *  @param	value
+     */
+    void set(const std::string &key, const Value &value)
+    {
+		set(key.c_str(), key.size(), value);
+	}
+    
+    /**
+     *  Array access operator
+     *  This can be used for accessing arrays
+     *  @param  index
+     *  @return Member
+     */
+    Member<int> operator[](int index);
     
     /**
      *  Array access operator
      *  This can be used for accessing associative arrays
-     *  Be aware: if the 'this' object is not already an array, it will be converted into one!
      *  @param  key
-     *  @return Value
+     *  @return Member
      */
-    Value operator[](const std::string &key);
+    Member<std::string> operator[](const std::string &key);
 
-    /**
-     *  Array access operator
-     *  This can be used for adding a record to the array
-     *  Be aware: if the 'this' object is not already an array, it will be converted into one!
-     *  @param  key
-     *  @return Value
-     */
-    //Value operator[]();
+	/**
+	 *  Array access operator
+	 *  This can be used for accessing associative arrays
+	 *  @param	key
+	 *  @return	Member
+	 */
+	Member<std::string> operator[](const char *key);
 
 
 protected:

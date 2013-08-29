@@ -53,6 +53,17 @@ Value::Value(int value)
 }
 
 /**
+ *  Constructor based on long value
+ *  @param  value
+ */
+Value::Value(long value)
+{
+    // create an integer zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_LONG(_val, value);
+}
+
+/**
  *  Constructor based on boolean value
  *  @param  value
  */
@@ -72,6 +83,18 @@ Value::Value(const std::string &value)
     // create a string zval
     MAKE_STD_ZVAL(_val);
     ZVAL_STRINGL(_val, value.c_str(), value.size(), 1);
+}
+
+/**
+ *  Constructor based on a byte array
+ *  @param  value
+ *  @param  size
+ */
+Value::Value(const char *value, int size)
+{
+    // create a string zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_STRINGL(_val, value, size < 0 ? strlen(value) : size, 1);
 }
 
 /**
@@ -177,6 +200,26 @@ Value &Value::operator=(int value)
  *  @param  value
  *  @return Value
  */
+Value &Value::operator=(long value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+    
+    // set new value
+    ZVAL_LONG(_val, value);
+    
+    // done
+    return *this;
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
 Value &Value::operator=(bool value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
@@ -217,6 +260,26 @@ Value &Value::operator=(const std::string &value)
  *  @param  value
  *  @return Value
  */
+Value &Value::operator=(const char *value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+
+    // set new value
+    ZVAL_STRING(_val, value, 1);
+    
+    // done
+    return *this;
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
 Value &Value::operator=(double value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
@@ -236,7 +299,7 @@ Value &Value::operator=(double value)
  *  The type of object
  *  @return Type
  */
-Type Value::type()
+Type Value::type() const
 {
     return (Type)Z_TYPE_P(_val);
 }
@@ -249,6 +312,9 @@ void Value::setType(Type type)
 {
     // skip if nothing changes
     if (this->type() == type) return;
+
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
     
     // run the conversion
     switch (type) {
@@ -266,16 +332,16 @@ void Value::setType(Type type)
  *  Is this a NULL value?
  *  @return bool
  */
-bool Value::isNull()
+bool Value::isNull() const
 {
     return Z_TYPE_P(_val) == IS_NULL;
 }
 
 /**
- *  Is this an integer value?
+ *  Is this a long value?
  *  @return bool
  */
-bool Value::isInt()
+bool Value::isLong() const
 {
     return Z_TYPE_P(_val) == IS_LONG;
 }
@@ -284,7 +350,7 @@ bool Value::isInt()
  *  Is this a boolean value?
  *  @return bool
  */
-bool Value::isBool()
+bool Value::isBool() const
 {
     return Z_TYPE_P(_val) == IS_BOOL;
 }
@@ -293,7 +359,7 @@ bool Value::isBool()
  *  Is this a string value?
  *  @return bool
  */
-bool Value::isString()
+bool Value::isString() const
 {
     return Z_TYPE_P(_val) == IS_STRING;
 }
@@ -302,7 +368,7 @@ bool Value::isString()
  *  Is this a decimal value?
  *  @return bool
  */
-bool Value::isDecimal()
+bool Value::isDecimal() const
 {
     return Z_TYPE_P(_val) == IS_DOUBLE;
 }
@@ -311,7 +377,7 @@ bool Value::isDecimal()
  *  Is this an object value?
  *  @return bool
  */
-bool Value::isObject()
+bool Value::isObject() const
 {
     return Z_TYPE_P(_val) == IS_OBJECT;
 }
@@ -320,19 +386,19 @@ bool Value::isObject()
  *  Is this an array value?
  *  @return bool
  */
-bool Value::isArray()
+bool Value::isArray() const
 {
     return Z_TYPE_P(_val) == IS_ARRAY;
 }
 
 /**
  *  Retrieve the value as integer
- *  @return int
+ *  @return long
  */
-int Value::intValue()
+long Value::longValue() const
 {
-    // already an int?
-    if (isInt()) return Z_LVAL_P(_val);
+    // already a long?
+    if (isLong()) return Z_LVAL_P(_val);
     
     // make a copy
     Value copy(*this);
@@ -340,15 +406,15 @@ int Value::intValue()
     // convert the copy to an int
     copy.setType(intType);
     
-    // return the int value
-    return copy.intValue();
+    // return the long value
+    return copy.longValue();
 }
 
 /**
  *  Retrieve the value as boolean
  *  @return bool
  */
-bool Value::boolValue()
+bool Value::boolValue() const
 {
     // already a bool?
     if (isBool()) return Z_BVAL_P(_val);
@@ -359,15 +425,15 @@ bool Value::boolValue()
     // convert the copy to an int
     copy.setType(boolType);
     
-    // return the int value
-    return copy.intValue();
+    // return the bool value
+    return copy.boolValue();
 }
 
 /**
  *  Retrieve the value as string
  *  @return string
  */
-std::string Value::stringValue()
+std::string Value::stringValue() const
 {
     // already a string?
     if (isString()) return std::string(Z_STRVAL_P(_val), Z_STRLEN_P(_val));
@@ -383,10 +449,29 @@ std::string Value::stringValue()
 }
 
 /**
+ *  Retrieve raw string value
+ *  @return const char *
+ */
+const char *Value::rawValue() const
+{
+    // already a string?
+    if (isString()) return Z_STRVAL_P(_val);
+    
+    // make a copy
+    Value copy(*this);
+    
+    // convert the copy to an string
+    copy.setType(stringType);
+    
+    // return the string value
+    return copy.rawValue();
+}
+
+/**
  *  Retrieve the value as decimal
  *  @return double
  */
-double Value::decimalValue()
+double Value::decimalValue() const
 {
     // already a double
     if (isDecimal()) return Z_DVAL_P(_val);
@@ -405,99 +490,193 @@ double Value::decimalValue()
  *  The number of members in case of an array or object
  *  @return int
  */
-int Value::size()
+int Value::size() const
 {
     // is it an array
     if (isArray()) return zend_hash_num_elements(Z_ARRVAL_P(_val));
+
+    // not an array, return string size if this is a string
+    if (isString()) return Z_STRLEN_P(_val);
     
-    // not an array
-    return 0;
+    // make a copy
+    Value copy(*this);
+    
+    // convert the copy to a string
+    copy.setType(decimalType);
+    
+    // return the string size
+    return copy.size();
 }
+
+/**
+ *  Does the array contain a certain index?
+ *  @param  index
+ *  @return bool
+ */
+bool Value::contains(int index) const
+{
+    // must be an array
+    if (!isArray()) return false;
+    
+    // unused variable
+    zval **result;
+    
+    // check if this index is already in the array
+    return zend_hash_index_find(Z_ARRVAL_P(_val), index, (void**)&result) != FAILURE;
+}
+
+/**
+ *  Does the array contain a certain key
+ *  @param  key
+ *  @return bool
+ */
+bool Value::contains(const std::string &key) const
+{
+    // must be an array
+    if (!isArray()) return false;
+    
+    // unused variable
+    zval **result;
+    
+    // check if index is already in the array
+    return zend_hash_find(Z_ARRVAL_P(_val), key.c_str(), key.size() + 1, (void **)&result) != FAILURE;
+}
+
+/**
+ *  Does the array contain a certain key
+ *  @param  key
+ *  @param  size
+ *  @return boolean
+ */
+bool Value::contains(const char *key, int size) const
+{
+    // must be an array
+    if (!isArray()) return false;
+    
+    // calculate size
+    if (size < 0) size = strlen(key);
+
+    // unused variable
+    zval **result;
+ 
+    // check if index is already in the array
+    return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
+}
+
+/**
+ *  Get access to a certain array member
+ *  @param	index
+ *  @return Value
+ */
+Value Value::get(int index) const
+{
+	// must be an array
+	if (!isArray()) return Value();
+	
+    // zval to retrieve
+    zval **result;
+ 
+    // check if index is in the array
+    if (zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&result) == FAILURE) return Value();
+    
+    // wrap the value
+    return Value(*result);
+}
+
+/**
+ *  Get access to a certain assoc member
+ *  @param	key
+ *  @param	size
+ *  @return	Value
+ */
+Value Value::get(const char *key, int size) const
+{
+    // calculate size
+    if (size < 0) size = strlen(key);
+
+    // the result value
+    zval **result;
+    
+    // check if this index is already in the array, otherwise we return NULL
+    if (zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
+    
+    // wrap the value
+    return Value(*result);
+}
+
+/**
+ *  Set a certain property
+ *  @param	index
+ *  @param	value
+ */
+void Value::set(int index, const Value &value)
+{
+    // must be an array
+    setType(arrayType);
+
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    
+    // add the value
+    add_index_zval(_val, index, value._val);
+
+    // the variable has one more reference (the array entry)
+    Z_ADDREF_P(value._val);
+}
+
+/**
+ *  Set a certain property
+ *  @param	key
+ *  @param	size
+ *  @param	value
+ */
+void Value::set(const char *key, int size, const Value &value)
+{
+    // must be an array
+    setType(arrayType);
+    
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    
+    // add the value
+    add_assoc_zval_ex(_val, key, size+1, value._val);
+    
+    // the variable has one more reference (the array entry)
+    Z_ADDREF_P(value._val);
+}
+
 
 /**
  *  Array access operator
  *  This can be used for accessing arrays
- *  Be aware: if the 'this' object is not already an array, it will be converted into one!
  *  @param  index
- *  @return Value
+ *  @return Member
  */
-Value Value::operator[](int index)
+Member<int> Value::operator[](int index) 
 {
-    // must be an array
-    if (!isArray()) setType(arrayType);
-    
-    // the result value
-    zval **result;
-    
-    // check if this index is already in the array
-    if (zend_hash_index_find(Z_ARRVAL_P(_val), index, &result) == FAILURE)
-    {
-        // construct a new vale
-        Value val;
-        
-        // we want to add a new record
-        add_index_zval(Z_ARRVAL_P(_val), index, val._val);
-
-        // make the value a reference, so that changing the value will also update the array
-        Z_SET_ISREF_P(val._val);
-        
-        // done
-        return val;
-    }
-    else
-    {
-        // the index is already in the array, if multiple variables all use this
-        // zval, then we want to seperate it, because the other values should
-        // not be updated when the member gets updated
-        SEPARATE_ZVAL_IF_NOT_REF(result);
-        
-        // wrap it into a value, and force this to be a reference, so that
-        // changing the value will also change the array member
-        return Value(*result, true);
-    }
+	return Member<int>(this, index);
 }
 
 /**
  *  Array access operator
  *  This can be used for accessing associative arrays
- *  Be aware: if the 'this' object is not already an array, it will be converted into one!
  *  @param  key
- *  @return Value
+ *  @return Member
  */
-Value Value::operator[](const std::string &key)
+Member<std::string> Value::operator[](const std::string &key) 
 {
-    // must be an array
-    if (!isArray()) setType(arrayType);
-    
-    // the result value
-    zval **result;
-    
-    // check if this index is already in the array
-    if (zend_hash_find(Z_ARRVAL_P(_val), key.c_str(), key.size() + 1, &result) == FAILURE)
-    {
-        // construct a new vale
-        Value val;
-        
-        // we want to add a new record
-        add_assoc_zval_ex(Z_ARRVAL_P(_val), key.c_str(), key.size()+1, val._val);
+	return Member<std::string>(this, key);
+}
 
-        // make the value a reference, so that changing the value will also update the array
-        Z_SET_ISREF_P(val._val);
-        
-        // done
-        return val;
-    }
-    else
-    {
-        // the index is already in the array, if multiple variables all use this
-        // zval, then we want to seperate it, because the other values should
-        // not be updated when the member gets updated
-        SEPARATE_ZVAL_IF_NOT_REF(result);
-        
-        // wrap it into a value, and force this to be a reference, so that
-        // changing the value will also change the array member
-        return Value(*result, true);
-    }
+/**
+ *  Array access operator
+ *  This can be used for accessing associative arrays
+ *  @param	key
+ *  @return	Member
+ */
+Member<std::string> Value::operator[](const char *key) 
+{
+	return Member<std::string>(this, key);
 }
 
 /**

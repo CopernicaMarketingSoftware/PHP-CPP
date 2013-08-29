@@ -150,14 +150,22 @@ int Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     
     int result = do_test(args[1], args[2]);
     
-    return SUCCESS;
-
     Value ret(return_value, true);
     
-    ret = result;
+    std::cout << "set property 1" << std::endl;
+    
+    ret["a"] = 1;
 
-    // done
-    return SUCCESS;
+    std::cout << "set property 2" << std::endl;
+
+    ret["2"] = 3;
+    
+    std::cout << "done setting properties" << std::endl;
+    
+    
+//
+//    // done
+//    return SUCCESS;
 }
 
 

@@ -16,4 +16,6 @@ echo("myvar = $myvar\n");
 
 echo("resultaat: $result\n");
 
+print_r($result);
+
 ?>
