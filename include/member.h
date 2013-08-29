@@ -36,68 +36,22 @@ public:
 	virtual ~Member() {}
 
 	/**
-	 *  Assign a numeric value
-	 *  @param	value
-	 *  @return	Member
-	 */
-	Member &operator=(long value)
-	{
-		_value->set(_index, value);
-		return *this;
-	}
-
-	/**
-	 *  Assign a numeric value
-	 *  @param	value
-	 *  @return	Member
-	 */
-	Member &operator=(int value)
-	{
-		_value->set(_index, value);
-		return *this;
-	}
-	
-	/**
-	 *  Assign a double value
+	 *  Assign a value object to the array
 	 *  @param	value
 	 *  @return Member
 	 */
-	Member &operator=(double value)
+	Member &operator=(const Value &value)
 	{
+		// set property in parent array
 		_value->set(_index, value);
-		return *this;
-	}
-	
-	/**
-	 *  Assign a boolean value
-	 * 	@param	value
-	 *  @return Member
-	 */
-	Member &operator=(bool value)
-	{
-		_value->set(_index, value);
-		return *this;
-	}
-	
-	/**
-	 *  Assign a string value
-	 *  @param	value
-	 *  @return	Member
-	 */
-	Member &operator=(const std::string &value)
-	{
-		_value->set(_index, value);
-		return *this;
-	}
-	
-	/**
-	 *  Assign a byte array value
-	 *  @param	value
-	 * 	@return	Member
-	 */
-	Member &operator=(const char *value)
-	{
-		_value->set(_index, value);
+		
+		// leap out if this is not a nested array access
+		//if (!_parent) return *this;
+		
+		// nested array access, we need to update the parent too
+		//_parent->operator=(*_value);
+		
+		// done
 		return *this;
 	}
 
@@ -174,7 +128,7 @@ public:
     {
 		return _value->get(_index)[index];
 	}
-    
+
     /**
      *  Array access operator
      *  This can be used for accessing associative arrays
@@ -212,6 +166,16 @@ private:
 	Member(const Member<Type> &member) : _value(member._value), _index(member._index) {}
 	
 	/**
+	 *  Set the member
+	 *  @param	member
+	 */
+	Member<Type> &add(Member *parent)
+	{
+		_parent = parent;
+		return *this;
+	}
+	
+	/**
 	 *  The array of which this is a member
 	 *	@var Value
 	 */
@@ -222,6 +186,18 @@ private:
 	 *  @var Type
 	 */
 	Type _index;
+	
+	/**
+	 *  Parent member
+	 * 
+	 *  When accessing nested arrays a["a"]["b"] = 'true', the member
+	 *  object that represents the "b" entry holds a pointer to the member
+	 *  object that represents "a", so that it can tell its parent to
+	 *  store itself in the top array too
+	 * 
+	 *  @var Member
+	 */
+	Member *_parent = nullptr;
 	
 	/**
 	 *  Value objects may create members

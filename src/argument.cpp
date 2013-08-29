@@ -22,7 +22,7 @@ namespace PhpCpp {
  */
 Argument::Argument(const std::string &name, const std::string &classname, bool null, bool ref)
 {
-    _refcount = new int[1];
+    _refcount = new int(1);
     _info = new ArgInfo(name, classname, null, ref);
 }
 
@@ -35,7 +35,7 @@ Argument::Argument(const std::string &name, const std::string &classname, bool n
  */
 Argument::Argument(const std::string &name, Type type, bool ref)
 {
-    _refcount = new int[1];
+    _refcount = new int(1);
     _info = new ArgInfo(name, type, ref);
 }
 
@@ -46,7 +46,7 @@ Argument::Argument(const std::string &name, Type type, bool ref)
  */
 Argument::Argument(const std::string &name, bool ref)
 {
-    _refcount = new int[1];
+    _refcount = new int(1);
     _info = new ArgInfo(name, ref);
 }
 

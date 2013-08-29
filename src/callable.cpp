@@ -160,6 +160,13 @@ int Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 
     ret["2"] = 3;
     
+//    ret["hmm"]["s"] = 456;
+    
+    Value sub;
+    sub["something"] = "yes";
+    
+    ret["b"] = sub;
+    
     std::cout << "done setting properties" << std::endl;
     
     
