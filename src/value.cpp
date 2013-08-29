@@ -98,8 +98,11 @@ Value::Value(struct _zval_struct *zval, bool ref)
     // we see ourselves as reference too
     Z_ADDREF_P(_val);
     
-    // should this be a forced reference
-    if (ref) Z_SET_ISREF_P(zval);
+    // we're ready if we do not have to force it as a reference
+    if (!ref || Z_ISREF_P(zval)) return;
+    
+    // make this a reference
+    Z_SET_ISREF_P(zval);
 }
 
 /**
@@ -397,6 +400,118 @@ double Value::decimalValue()
     // return the decimal value
     return copy.decimalValue();
 }
+
+/**
+ *  The number of members in case of an array or object
+ *  @return int
+ */
+int Value::size()
+{
+    // is it an array
+    if (isArray()) return zend_hash_num_elements(Z_ARRVAL_P(_val));
+    
+    // not an array
+    return 0;
+}
+
+/**
+ *  Array access operator
+ *  This can be used for accessing arrays
+ *  Be aware: if the 'this' object is not already an array, it will be converted into one!
+ *  @param  index
+ *  @return Value
+ */
+Value Value::operator[](int index)
+{
+    // must be an array
+    if (!isArray()) setType(arrayType);
+    
+    // the result value
+    zval **result;
+    
+    // check if this index is already in the array
+    if (zend_hash_index_find(Z_ARRVAL_P(_val), index, &result) == FAILURE)
+    {
+        // construct a new vale
+        Value val;
+        
+        // we want to add a new record
+        add_index_zval(Z_ARRVAL_P(_val), index, val._val);
+
+        // make the value a reference, so that changing the value will also update the array
+        Z_SET_ISREF_P(val._val);
+        
+        // done
+        return val;
+    }
+    else
+    {
+        // the index is already in the array, if multiple variables all use this
+        // zval, then we want to seperate it, because the other values should
+        // not be updated when the member gets updated
+        SEPARATE_ZVAL_IF_NOT_REF(result);
+        
+        // wrap it into a value, and force this to be a reference, so that
+        // changing the value will also change the array member
+        return Value(*result, true);
+    }
+}
+
+/**
+ *  Array access operator
+ *  This can be used for accessing associative arrays
+ *  Be aware: if the 'this' object is not already an array, it will be converted into one!
+ *  @param  key
+ *  @return Value
+ */
+Value Value::operator[](const std::string &key)
+{
+    // must be an array
+    if (!isArray()) setType(arrayType);
+    
+    // the result value
+    zval **result;
+    
+    // check if this index is already in the array
+    if (zend_hash_find(Z_ARRVAL_P(_val), key.c_str(), key.size() + 1, &result) == FAILURE)
+    {
+        // construct a new vale
+        Value val;
+        
+        // we want to add a new record
+        add_assoc_zval_ex(Z_ARRVAL_P(_val), key.c_str(), key.size()+1, val._val);
+
+        // make the value a reference, so that changing the value will also update the array
+        Z_SET_ISREF_P(val._val);
+        
+        // done
+        return val;
+    }
+    else
+    {
+        // the index is already in the array, if multiple variables all use this
+        // zval, then we want to seperate it, because the other values should
+        // not be updated when the member gets updated
+        SEPARATE_ZVAL_IF_NOT_REF(result);
+        
+        // wrap it into a value, and force this to be a reference, so that
+        // changing the value will also change the array member
+        return Value(*result, true);
+    }
+}
+
+/**
+ *  Array access operator
+ *  This can be used for adding a record to the array
+ *  Be aware: if the 'this' object is not already an array, it will be converted into one!
+ *  @param  key
+ *  @return Value
+ */
+//Value Value::operator[]()
+//{
+//    
+//    
+//}
 
 /**
  *  End of namespace

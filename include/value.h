@@ -204,13 +204,19 @@ public:
      *  The number of members in case of an array or object
      *  @return int
      */
-    int count();
+    int count()
+    {
+        return size();
+    }
     
     /**
      *  The number of members in case of an array or object
      *  @return int
      */
-    int length();
+    int length()
+    {
+        return size();
+    }
     
     /**
      *  Cast to an int
@@ -255,7 +261,7 @@ public:
      *  @param  index
      *  @return Value
      */
-    Value &operator[](int index);
+    Value operator[](int index);
     
     /**
      *  Array access operator
@@ -264,7 +270,17 @@ public:
      *  @param  key
      *  @return Value
      */
-    Value &operator[](const std::string &key);
+    Value operator[](const std::string &key);
+
+    /**
+     *  Array access operator
+     *  This can be used for adding a record to the array
+     *  Be aware: if the 'this' object is not already an array, it will be converted into one!
+     *  @param  key
+     *  @return Value
+     */
+    //Value operator[]();
+
 
 protected:
     /**
