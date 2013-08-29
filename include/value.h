@@ -63,6 +63,12 @@ public:
     Value(bool value);
     
     /**
+     *  Constructor based on single character
+     *  @param  value
+     */
+    Value(char value);
+    
+    /**
      *  Constructor based on string value
      *  @param  value
      */
@@ -93,6 +99,12 @@ public:
      *  @param  value
      */
     Value(const Value &that);
+    
+    /**
+     *  Move constructor
+     *  @param  value
+     */
+    Value(Value &&that);
     
     /**
      *  Destructor
@@ -132,6 +144,13 @@ public:
      *  @param  value
      *  @return Value
      */
+    Value &operator=(char value);
+
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Value
+     */
     Value &operator=(const std::string &value);
     
     /**
@@ -158,49 +177,83 @@ public:
      *  Change the internal type of the variable
      *  @param  Type
      */
-    void setType(Type type);
+    Value &setType(Type type);
+
+    /**
+     *  Make a clone of the value with the same type
+     *  @return Value
+     */
+    Value clone() const;
+
+    /**
+     *  Make a clone of the value with a different type
+     *  @param  type
+     *  @return Value
+     */
+    Value clone(Type type) const;
 
     /**
      *  Is this a NULL value?
      *  @return bool
      */
-    bool isNull() const;
+    bool isNull() const
+    {
+        return type() == nullType;
+    }
 
     /**
      *  Is this an integer value?
      *  @return bool
      */
-    bool isLong() const;
+    bool isLong() const
+    {
+        return type() == longType;
+    }
     
     /**
      *  Is this a boolean value?
      *  @return bool
      */
-    bool isBool() const;
+    bool isBool() const
+    {
+        return type() == boolType;
+    }
     
     /**
      *  Is this a string value?
      *  @return bool
      */
-    bool isString() const;
+    bool isString() const
+    {
+        return type() == stringType;
+    }
     
     /**
      *  Is this a decimal value?
      *  @return bool
      */
-    bool isDecimal() const;
+    bool isDecimal() const
+    {
+        return type() == decimalType;
+    }
     
     /**
      *  Is this an object value?
      *  @return bool
      */
-    bool isObject() const;
+    bool isObject() const
+    {
+        return type() == objectType;
+    }
     
     /**
      *  Is this an array value?
      *  @return bool
      */
-    bool isArray() const;
+    bool isArray() const
+    {
+        return type() == arrayType;
+    }
     
     /**
      *  Retrieve the value as integer
@@ -217,7 +270,7 @@ public:
     /**
      *  Retrieve the raw string value
      *  Warning: Only use this for NULL terminated strings, or use it in combination 
-     * 	with the string size to prevent that you access data outside the buffer
+     *  with the string size to prevent that you access data outside the buffer
      *  @return const char *
      */
     const char *rawValue() const;
@@ -270,12 +323,15 @@ public:
      *  @param  key
      *  @return bool
      */
-    bool contains(const std::string &key) const;
+    bool contains(const std::string &key) const
+    {
+        return contains(key.c_str(), key.size());
+    }
     
     /**
      *  Is a certain key set in the array
      *  @param  key
-     *  @param	size
+     *  @param  size
      *  @return bool
      */
     bool contains(const char *key, int size) const;
@@ -313,8 +369,8 @@ public:
      */
     operator const char * () const
     {
-		return rawValue();
-	}
+        return rawValue();
+    }
     
     /**
      *  Cast to a floating point
@@ -327,63 +383,71 @@ public:
     
     /**
      *  Get access to a certain array member
-     *  @param	index
+     *  @param  index
      *  @return Value
      */
     Value get(int index) const;
     
     /**
      *  Get access to a certain assoc member
-     *  @param	key
-     *  @param	size
-     *  @return	Value
+     *  @param  key
+     *  @param  size
+     *  @return Value
      */
     Value get(const char *key, int size=-1) const;
     
     /**
      *  Get access to a certain assoc member
-     *  @param	key
-     *  @return	Value
+     *  @param  key
+     *  @return Value
      */
     Value get(const std::string &key) const
     {
-		return get(key.c_str(), key.size());
-	}
+        return get(key.c_str(), key.size());
+    }
     
     /**
      *  Set a certain property
-     *  @param	index
-     *  @param	value
+     *  Calling this method will turn the value into an array
+     *  @param  index       Index of the property to set
+     *  @param  value       Value to set
+     *  @return Value       The value that was set
      */
-    void set(int index, const Value &value);
+    const Value &set(int index, const Value &value);
     
     /**
      *  Set a certain property
-     *  @param	key
-     *  @param	value
+     *  Calling this method will turn the value into an array
+     *  @param  key         Key of the property to set
+     *  @param  size        Size of the key
+     *  @param  value       Value to set
+     *  @return Value       The value that was set
      */
-    void set(const char *key, int size, const Value &value);
+    const Value &set(const char *key, int size, const Value &value);
 
     /**
      *  Set a certain property
-     *  @param	key
-     *  @param	size
-     *  @param	value
+     *  Calling this method will turn the object into an array
+     *  @param  key         Key to set
+     *  @param  value       Value to set
+     *  @return Value       The value that was set
      */
-    void set(const char *key, const Value &value)
+    const Value &set(const char *key, const Value &value)
     {
-		set(key, strlen(key), value);
-	}
+        return set(key, strlen(key), value);
+    }
     
     /**
      *  Set a certain property
-     *  @param	key
-     *  @param	value
+     *  Calling this method will turn the object into an array
+     *  @param  key         Key to set
+     *  @param  value       Value to set
+     *  @return Value       The value that was set
      */
-    void set(const std::string &key, const Value &value)
+    const Value &set(const std::string &key, const Value &value)
     {
-		set(key.c_str(), key.size(), value);
-	}
+        return set(key.c_str(), key.size(), value);
+    }
     
     /**
      *  Array access operator
@@ -401,13 +465,13 @@ public:
      */
     Member<std::string> operator[](const std::string &key);
 
-	/**
-	 *  Array access operator
-	 *  This can be used for accessing associative arrays
-	 *  @param	key
-	 *  @return	Member
-	 */
-	Member<std::string> operator[](const char *key);
+    /**
+     *  Array access operator
+     *  This can be used for accessing associative arrays
+     *  @param  key
+     *  @return Member
+     */
+    Member<std::string> operator[](const char *key);
 
 
 protected:

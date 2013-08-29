@@ -3,14 +3,14 @@ INCLUDE_DIR = 	${PREFIX}/include
 LIBRARY_DIR	=	${PREFIX}/lib
 
 all:
-		cd src; $(MAKE)
+		cd src; $(MAKE) -j
 
 tests:
 		cd tests; $(MAKE)
 
 clean:
 		cd src; $(MAKE) clean
-		cd tests; $(MAKE) clean
+#		cd tests; $(MAKE) clean
 
 install:
 		mkdir -p ${INCLUDE_DIR}/phpcpp

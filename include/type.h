@@ -19,7 +19,7 @@ namespace PhpCpp {
  */
 typedef enum _Type {
     nullType            =   0,
-    intType             =   1,
+    longType            =   1,
     decimalType         =   2,
     boolType            =   3,
     arrayType           =   4,

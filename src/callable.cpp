@@ -136,43 +136,32 @@ int Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     // number of arguments on the stack
     int arg_count = (int)(zend_uintptr_t) *(zend_vm_stack_top(TSRMLS_C) - 1);
     
-    // loop through the arguments
-    Arguments args(ZEND_NUM_ARGS());
-    
-    for (auto iter = args.begin(); iter != args.end(); iter++)
-    {
-        Value val = *iter;
-        
-        val = 1234;
-        
-        std::cout << "argument: " << iter->stringValue() << std::endl;
-    }
-    
-    int result = do_test(args[1], args[2]);
-    
+//    // loop through the arguments
+//    Arguments args(ZEND_NUM_ARGS());
+//    
+//    for (auto iter = args.begin(); iter != args.end(); iter++)
+//    {
+//        Value val = *iter;
+//        
+//        val = 1234;
+//    }
+//    
+//    int result = do_test(args[1], args[2]);
+//    
     Value ret(return_value, true);
     
     std::cout << "set property 1" << std::endl;
     
-    ret["a"] = 1;
+//    ret["b"] = "hallo";
+    
+    ret["x"]["c"]["d"] = "test 123";
 
-    std::cout << "set property 2" << std::endl;
-
-    ret["2"] = 3;
-    
-//    ret["hmm"]["s"] = 456;
-    
-    Value sub;
-    sub["something"] = "yes";
-    
-    ret["b"] = sub;
-    
     std::cout << "done setting properties" << std::endl;
     
     
 //
 //    // done
-//    return SUCCESS;
+    return SUCCESS;
 }
 
 

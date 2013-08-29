@@ -31,9 +31,9 @@
  *  Macro to export a function
  */
 #if defined(__GNUC__) && __GNUC__ >= 4
-#	define PHPCPP_EXPORT __attribute__ ((visibility("default")))
+#   define PHPCPP_EXPORT __attribute__ ((visibility("default")))
 #else
-#	define PHPCPP_EXPORT
+#   define PHPCPP_EXPORT
 #endif
 
 /**
