@@ -74,6 +74,12 @@ protected:
      *  @var Extension*
      */
     Extension *_extension;
+    
+    /**
+     *  Optional extra data
+     *	@var Type
+     */
+    Type _data;
 };
 
 /**

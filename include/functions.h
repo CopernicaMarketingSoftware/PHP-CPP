@@ -23,47 +23,23 @@ public:
      *  Constructor
      *  @param  functions   The functions to parse
      */
-    Functions(const std::initializer_list<Function> &functions) : _functions(functions)
-    {
-        // allocate the function entries
-        _entries = new zend_function_entry[functions.size() + 1];
-        
-        // keep iterator counter
-        int i = 0;
-        
-        // loop through the functions
-        for (auto it = begin(functions); it != functions.end(); it++)
-        {
-            // let the callable fill the array
-            it->internal()->fill(&_entries[i++]);
-        }
-        
-        // last entry should be set to all zeros
-        zend_function_entry *last = &_entries[i];
-        
-        // all should be set to zero
-        memset(last, 0, sizeof(zend_function_entry));
-    }
+    Functions(const std::initializer_list<Function> &functions);
 
     /**
      *  Destructor
      */
-    virtual ~Functions()
-    {
-        delete[] _entries;
-    }
-    
+    virtual ~Functions();
+
+private:    
     /**
      *  Retrieve the internal data
      *  @return zend_function_entry*
      */
-    zend_function_entry *internal()
+    zend_function_entry *internal() const
     {
         return _entries;
     }
 
-
-private:
     /**
      *  The internal entries
      *  @var zend_function_entry*
@@ -72,10 +48,15 @@ private:
     
     /**
      *  Vector of functions (we need this because the function objects must
-     *  remain in memory)
+     *  remain in memory, so that we can call the invoke methods on them)
      *  @var vector
      */
     std::vector<Function> _functions;
+    
+    /**
+     *  The extension has access to the private elements
+     */
+    friend class Extension;
 };
 
 /**

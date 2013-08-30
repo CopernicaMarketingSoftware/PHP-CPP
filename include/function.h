@@ -91,9 +91,7 @@ public:
      *  @param  arguments   The actual arguments that were passed
      *  @return Variable    Return value
      */
-    virtual Value invoke(const Request *request, const std::initializer_list<Value> &arguments)
-    {
-    }
+    virtual Value invoke(const Request *request, const std::initializer_list<Value> &arguments);
     
     /**
      *  Get access to the internal object

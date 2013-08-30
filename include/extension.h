@@ -11,24 +11,18 @@
  *  as module in a webserver) many requests are handled by the same extension
  *  instance.
  * 
+ * 	This is a template class. You need to pass in the type of an object
+ * 	that you use for storing request specific state information.
+ * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
-
-/**
- *  Forward declarations
- */
-struct _zend_module_entry;
+#include <php5/Zend/zend_modules.h>
 
 /**
  *  Set up namespace
  */
 namespace PhpCpp {
-
-/**
- *  Forward definitions
- */
-class Functions;
 
 /**
  *  Class definition
@@ -37,17 +31,23 @@ class Extension
 {
 public:
     /**
-     *  Extension that defines a number of functions right away
+     *  Constructor that defines a number of functions right away
      *  @param  name        Extension name
      *  @param  version     Extension version string
      *  @param  functions   The functions that are defined
      */
-    Extension(const char *name, const char *version, const std::initializer_list<Function> &functions = {});
+    Extension(const char *name, const char *version, const Functions &functions);
+    
+    /**
+     *  No copy'ing and no moving
+     */
+    Extension(const Extension &extension) = delete;
+    Extension(Extension &&extension) = delete;
     
     /**
      *  Destructor
      */
-    virtual ~Extension();
+    virtual ~Extension() {}
     
     /**
      *  Initialize the extension.
@@ -105,14 +105,14 @@ public:
      */
     bool startRequest()
     {
-        // failure if we already have a request
-        if (_request) return false;
-        
-        // create the request
-        _request = request();
-    
-        // and initialize it
-        return _request->initialize();
+//        // failure if we already have a request
+//        if (_request) return false;
+//        
+//        // create the request
+//        _request = request();
+//    
+//        // and initialize it
+//        return _request->initialize();
     }
     
     /**
@@ -125,57 +125,25 @@ public:
      */
     bool endRequest()
     {
-        // request must exist
-        if (!_request) return false;
-    
-        // finalize the request
-        bool result = _request->finalize();
-        
-        // destruct the request object
-        delete _request;
-        
-        // done
-        return result;
+//        // request must exist
+//        if (!_request) return false;
+//    
+//        // finalize the request
+//        bool result = _request->finalize();
+//        
+//        // destruct the request object
+//        delete _request;
+//        
+//        // done
+//        return result;
     }
     
-    /**
-     *  Internal method to get access to the entry
-     *  @return zend_module_entry
-     *  @internal
-     */
-    _zend_module_entry *entry();
-    
 private:
-    /**
-     *  Extension name
-     *  @var char*
-     */
-    const char *_name;
-    
-    /**
-     *  Extension version
-     *  @var char*
-     */
-    const char *_version;
-    
-    /**
-     *  The functions that are defined
-     *  @var vector
-     */
-    Functions *_functions;
-
     /**
      *  The information that is passed to the Zend engine
      *  @var zend_module_entry
      */
-    _zend_module_entry *_entry = NULL;
-
-    /**
-     *  The current request being processed
-     *  @var Request
-     */
-    Request *_request = NULL;
-
+    zend_module_entry _entry;
     
 };
 

@@ -38,6 +38,7 @@
 #include "../include/member.h"
 #include "../include/arguments.h"
 #include "../include/function.h"
+#include "../include/functions.h"
 #include "../include/extension.h"
 
 /**
@@ -45,5 +46,4 @@
  */
 #include "callable.h"
 #include "arginfo.h"
-#include "functions.h"
-
+#include "hiddenpointer.h"
