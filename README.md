@@ -12,7 +12,7 @@ much more straightforward than code of extensions written in C.
 This library is currently a work in progress, and can not yet be used to build real extensions.
 You can however keep an eye on the progress we're making.
 
-PHP-CPP is an initiave from Copernica BV.
+PHP-CPP is an initiative from Copernica BV.
 
 For more information, contact me at emiel.bruijntjes@copernica.com.
 
