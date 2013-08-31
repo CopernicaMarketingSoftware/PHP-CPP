@@ -9,6 +9,11 @@
  */
 
 /**
+ *  Define structures
+ */
+struct _zend_function_entry;
+
+/**
  *  Set up namespace
  */
 namespace PhpCpp {
@@ -35,7 +40,7 @@ private:
      *  Retrieve the internal data
      *  @return zend_function_entry*
      */
-    zend_function_entry *internal() const
+    _zend_function_entry *internal() const
     {
         return _entries;
     }
@@ -44,7 +49,7 @@ private:
      *  The internal entries
      *  @var zend_function_entry*
      */
-    zend_function_entry *_entries;
+    _zend_function_entry *_entries;
     
     /**
      *  Vector of functions (we need this because the function objects must

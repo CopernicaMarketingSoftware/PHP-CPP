@@ -17,7 +17,11 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
-#include <php5/Zend/zend_modules.h>
+
+/**
+ *  Structures referenced in this class
+ */
+struct _zend_module_entry;
 
 /**
  *  Set up namespace
@@ -47,7 +51,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Extension() {}
+    virtual ~Extension() { delete _entry; }
     
     /**
      *  Initialize the extension.
@@ -141,9 +145,14 @@ public:
 private:
     /**
      *  The information that is passed to the Zend engine
+     * 
+     *  Although it would be slightly faster to not make this a pointer, this
+     *  would require that client code also includes the PHP header files, which
+     *  we try to prevent with the PHP-CPP library, so we allocate it dynamically.
+     * 
      *  @var zend_module_entry
      */
-    zend_module_entry _entry;
+    _zend_module_entry *_entry;
     
 };
 

@@ -39,51 +39,32 @@ public:
     Function(const char *name) : Function(name, {}) {}
     
     /**
-     *  Copy constructor
+     *  No copy constructor
      *  @param  function    The other function
      */
-    Function(const Function &function)
+    Function(const Function &function) = delete;
+
+    /**
+     *  Move constructor
+     *  @param  function    The other function
+     */
+    Function(Function &&function)
     {
-        // copy other object
-        _refcount = function._refcount;
         _callable = function._callable;
-        
-        // increate number of references
-        (*_refcount)++;
+        function._callable = nullptr;
     }
     
     /**
      *  Destructor
      */
-    virtual ~Function()
-    {
-        // cleanup the object
-        cleanup();
-    }
+    virtual ~Function();
     
     /**
-     *  Assignment operator
+     *  No assignment operator
      *  @param  function    The other function
      *  @return Function
      */
-    Function &operator=(const Function &function)
-    {
-        // skip self assignment
-        if (&function == this) return *this;
-        
-        // cleanup the object
-        cleanup();
-        
-        // copy other object
-        _refcount = function._refcount;
-        _callable = function._callable;
-        
-        // increate number of references
-        (*_refcount)++;
-        
-        // done
-        return *this;
-    }
+    Function &operator=(const Function &function) {}
 
     /**
      *  Method that gets called every time the function is executed
@@ -109,18 +90,6 @@ protected:
      *  @var smart_ptr
      */
     Callable *_callable;
-    
-    /**
-     *  Counter with the number of references
-     *  @var integer
-     */
-    int *_refcount;
-
-
-    /**
-     *  Remove one reference
-     */
-    void cleanup();
 };
 
 /**

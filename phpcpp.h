@@ -25,6 +25,7 @@
 #include <phpcpp/member.h>
 #include <phpcpp/arguments.h>
 #include <phpcpp/function.h>
+#include <phpcpp/functions.h>
 #include <phpcpp/extension.h>
 
 /**
@@ -35,9 +36,4 @@
 #else
 #   define PHPCPP_EXPORT
 #endif
-
-/**
- *  Macro to activate the extension
- */
-#define PHP_CPP_EXTENSION(classname)    extern "C" { PHPCPP_EXPORT void *get_module() { static classname extension; return extension.entry(); } }
 

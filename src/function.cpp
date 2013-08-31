@@ -20,25 +20,16 @@ namespace PhpCpp {
  */
 Function::Function(const std::string &name, const std::initializer_list<Argument> &arguments)
 {
-    // one reference to the callable
-    _refcount = new int(1);
+    // create callable object
     _callable = new Callable(name, arguments);
 }
 
 /**
- *  Remove one reference
+ *  Destructor
  */
-void Function::cleanup()
+Function::~Function()
 {
-    // decrease number of references
-    (*_refcount)--;
-    
-    // leap out if there are still other references
-    if (*_refcount > 0) return;
-    
-    // release memory
-    delete _refcount;
-    delete _callable;
+    if (_callable) delete _callable;
 }
 
 /**
