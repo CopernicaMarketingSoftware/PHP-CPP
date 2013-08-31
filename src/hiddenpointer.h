@@ -23,7 +23,7 @@ class HiddenPointer
 public:
 	/**
 	 *	Constructor to hide the pointer in a buffer
-	 *	@param	pointer		The hidden pointer
+	 *	@param	pointer		The pointer to hide
 	 *	@param	text		The visible text
 	 *	@param	size		Optional text size
 	 */
@@ -45,7 +45,14 @@ public:
 		_pointer = pointer;
 		_text = _data.c_str() + sizeof(Type *);
 	}
-	
+    
+    /**
+     *  Hide pointer in buffer
+     *  @param  pointer
+     *  @param  text
+     */
+    HiddenPointer(Type *pointer, const std::string &text) : HiddenPointer(pointer, text.c_str(), text.size()) {}
+
 	/**
 	 *  Constructor to retrieve the object given a buffer
 	 *  @param	text		The visible text

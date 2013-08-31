@@ -28,9 +28,8 @@ void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
     // find the function name
     const char *function = get_active_function_name(TSRMLS_C);
     
-    // when we registered the function name, we have hidden the pointer to the 
-    // callable right in front of the function name - we retrieve it back
-    Callable *callable = *((Callable **)(function - sizeof(Callable *)));
+    // uncover the hidden pointer inside the function name
+    Callable *callable = HiddenPointer<Callable>(function);
 
     // call the appropriate object
     callable->invoke(INTERNAL_FUNCTION_PARAM_PASSTHRU);
@@ -46,8 +45,8 @@ void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
  */
 void Callable::fill(zend_function_entry *entry)
 {
-    // fill the members of the entity
-    entry->fname = _name;
+    // fill the members of the entity, and hide a pointer to the current object in the name
+    entry->fname = HiddenPointer<Callable>(this, _name);
     entry->handler = invoke_callable;
     entry->arg_info = _argv;
     entry->num_args = _argc;
@@ -64,9 +63,11 @@ void Callable::fill(zend_function_entry *entry)
  */
 void Callable::fill(zend_internal_function_info *info)
 {
-    // fill in all the members, not that the returning by reference is not used
-    info->_name = _name;
-    info->_name_len = _data.size() - sizeof(this);
+    // fill in all the members, note that return reference is false by default,
+    // because we do want to return references, inside the name we hide a pointer
+    // to the current object
+    info->_name = HiddenPointer<Callable>(this, _name);
+    info->_name_len = _name.size();
     info->_class_name = _classname.size() ? _classname.c_str() : NULL;
     info->required_num_args = _required;
     info->_type_hint = _type;
