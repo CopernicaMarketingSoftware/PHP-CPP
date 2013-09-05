@@ -11,28 +11,28 @@ are not difficult to develop at all. In fact, the only thing you need to do is w
 C++, and the PHP-CPP library uses all the power offered by C++11 to convert the parameters and return
 values from your functions to/and from PHP:
 
-<pre>
+```c
 std::string hello_word()
 {
     return std::string("hello world!");
 }
-</pre>
+```
 
 The function above is a native C++ function. With PHP-CPP you can export this function
 to PHP with only one single C++ method call:
 
-<pre>
+```c
 extension.function("hello_world", hello_world);
-</pre>
+```
 
 Working with parameters and return values is just as easy:
 
-<pre>
+```c
 int my_plus(int a, int b)
 {
     return a+b;
 }
-</pre>
+```
 
 The PHP-CPP library ensures that the variables
 from PHP (which internally are complicated C structures), are automatically converted into 
@@ -47,7 +47,7 @@ The return value of your function is also transformed by PHP-CPP into PHP.
 More complicated structured can be handled by PHP-CPP as well. If you would like to return
 a nested associative array from your function, you can do so too:
 
-<pre>
+```c
 PhpCpp::Value get_complex_array()
 {
     PhpCpp::Value r;
@@ -57,11 +57,11 @@ PhpCpp::Value get_complex_array()
     r["c"][1] = "example";
     return r;
 }
-</pre>
+```
 
 The C++ function above is equivalent to the following function in PHP:
 
-<pre>
+```c
 function get_complex_array()
 {
     return array(
@@ -70,14 +70,13 @@ function get_complex_array()
         "c" => array("nested_value","example")
     );
 }
-</pre>
+```
 
 However, this library is currently a work in progress, and it is an open
 source project. We are looking for people who'd like to contribute to it.
 
 PHP-CPP is an initiative from Copernica BV.
 
-For more information, contact me at emiel.bruijntjes@copernica.com.
-
+For more information, contact me at [emiel.bruijntjes@copernica.com](mailto:emiel.bruijntjes@copernica.com?Subject=PHP-CPP).
 
 Emiel Bruijntjes (1 September 2013)
