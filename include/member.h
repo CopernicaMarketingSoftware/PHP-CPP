@@ -16,7 +16,7 @@
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
     
 /**
  *  Forward definitions

@@ -29,7 +29,7 @@
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  Constructor (value = NULL)

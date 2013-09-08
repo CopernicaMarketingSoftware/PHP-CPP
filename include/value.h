@@ -26,7 +26,7 @@ struct _zval_struct;
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  Forward definitions

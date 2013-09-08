@@ -14,6 +14,8 @@
 #include <string>
 #include <initializer_list>
 #include <vector>
+#include <map>
+#include <memory>
 
 // for debugging
 #include <iostream>
@@ -31,12 +33,14 @@
 /**
  *  Include other files from this library
  */
+#include "../include/hiddenpointer.h"
 #include "../include/type.h"
 #include "../include/request.h"
 #include "../include/argument.h"
 #include "../include/value.h"
 #include "../include/member.h"
 #include "../include/arguments.h"
+#include "../include/parameters.h"
 #include "../include/function.h"
 #include "../include/functions.h"
 #include "../include/extension.h"
@@ -46,4 +50,3 @@
  */
 #include "callable.h"
 #include "arginfo.h"
-#include "hiddenpointer.h"

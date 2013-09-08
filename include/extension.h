@@ -26,7 +26,7 @@ struct _zend_module_entry;
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  Class definition
@@ -40,7 +40,7 @@ public:
      *  @param  version     Extension version string
      *  @param  functions   The functions that are defined
      */
-    Extension(const char *name, const char *version, const Functions &functions);
+    Extension(const char *name = NULL, const char *version = NULL);
     
     /**
      *  No copy'ing and no moving
@@ -51,7 +51,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Extension() { delete _entry; }
+    virtual ~Extension();
     
     /**
      *  Initialize the extension.
@@ -117,6 +117,8 @@ public:
 //    
 //        // and initialize it
 //        return _request->initialize();
+
+        return true;
     }
     
     /**
@@ -140,9 +142,46 @@ public:
 //        
 //        // done
 //        return result;
+
+        return true;
     }
     
+    /**
+     *  Add a function to the extension
+     *  
+     *  It is only possible to create functions during the initialization of
+     *  the library, before the Extension::module() method is called.
+     * 
+     *  @param  name        Name of the function
+     *  @param  function    The function to add
+     *  @return Function    The added function
+     */
+    Function &add(const char *name, const Function &function);
+    
+    /**
+     *  Retrieve the module entry
+     * 
+     *  This is the memory address that should be exported by the get_module()
+     *  function.
+     *
+     *  @return _zend_module_entry
+     */
+    _zend_module_entry *module();
+    
+    
 private:
+    /**
+     *  Map of function objects defined in the library
+     *  @var    map
+     */
+    std::map<const char *,Function> _functions;
+
+    /**
+     *  Hidden pointer to self
+     *  @var    HiddenPointer
+     */
+    HiddenPointer<Extension> _ptr;
+
     /**
      *  The information that is passed to the Zend engine
      * 

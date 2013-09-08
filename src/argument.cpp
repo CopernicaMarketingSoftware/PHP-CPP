@@ -11,59 +11,65 @@
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
- *  Constructor if this argument should be an instance of a certain class
- *  @param  name        Name of the argument
- *  @param  classname   If a specific class is required, the class type
- *  @param  null        Are NULL values allowed in stead of an instance?
- *  @param  ref         Is this a pass-by-reference argument?
+ *  Move constructor
+ *  @param  argument
  */
-Argument::Argument(const std::string &name, const std::string &classname, bool null, bool ref)
+Argument::Argument(Argument &&argument)
 {
-    _refcount = new int(1);
-    _info = new ArgInfo(name, classname, null, ref);
+    // copy data
+    _info = argument._info;
 }
 
 /**
- *  Constructor if the argument can be anything
- *  Note that only arrayType and callableType are supported type-hints
- *  @param  name        Name of the argument
- *  @param  type        Type hint (arrayType or callableType)
- *  @param  ref         Is this a pass-by-reference argument?
+ *  Change the name
+ *  @param  name
+ *  @return Argument
  */
-Argument::Argument(const std::string &name, Type type, bool ref)
+Argument &Argument::name(const char *name)
 {
-    _refcount = new int(1);
-    _info = new ArgInfo(name, type, ref);
+    _info->name = name;
+    _info->name_len = strlen(name);
+    return *this;
 }
 
 /**
- *  Constructor if the argument can be anything
- *  @param  name        Name of the argument
- *  @param  ref         Is this a pass-by-reference argument?
+ *  Change the type
+ *  @param  type
+ *  @return Argument
  */
-Argument::Argument(const std::string &name, bool ref)
+Argument &Argument::type(Type type)
 {
-    _refcount = new int(1);
-    _info = new ArgInfo(name, ref);
+    _info->type_hint = type;
+    return *this;
 }
 
 /**
- *  Clean up the object
+ *  Require the parameter to be a certain class
+ *  @param  name        Name of the class
+ *  @param  null        Are null values allowed?
+ *  @return Argument
  */
-void Argument::cleanup()
+Argument &Argument::object(const char *classname, bool null)
 {
-    // one reference less
-    (*_refcount)--;
-    
-    // leap out if still in use
-    if (*_refcount > 0) return;
-    
-    // release memory
-    delete _refcount;
-    delete _info;
+    _info->type_hint = objectType;
+    _info->class_name = classname;
+    _info->class_name_len = strlen(classname);
+    _info->allow_null = null;
+    return *this;
+}
+
+/**
+ *  Is this a by-ref argument?
+ *  @param  bool        Mark as by-ref variable
+ *  @return Argument
+ */
+Argument &Argument::byref(bool value)
+{
+    _info->pass_by_reference = value;
+    return *this;
 }
 
 /**

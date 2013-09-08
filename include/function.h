@@ -8,16 +8,17 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
- 
-/**
- *  Set up namespace
- */
-namespace PhpCpp {
 
 /**
  *  Forward definitions
  */
-class Callable;
+struct _zend_function_entry;
+struct _zend_internal_function_info;
+ 
+/**
+ *  Set up namespace
+ */
+namespace Php {
 
 /** 
  *  Class definition
@@ -27,22 +28,25 @@ class Function
 public:
     /**
      *  Constructor
-     *  @param  name        Name of the function
-     *  @param  arguments   The arguments that can be passed to the function
+     *  @param  min     Min number of arguments
+     *  @param  max     Max number of arguments
      */
-    Function(const std::string &name, const std::initializer_list<Argument> &arguments);
-
-    /**
-     *  Constructor
-     *  @param  name        Name of the function
-     */
-    Function(const char *name) : Function(name, {}) {}
+    Function(int min = 0, int max = 0)
+    {
+        // construct the arguments
+        _arguments = std::shared_ptr<Arguments>(new Arguments(min, max));
+    }
     
     /**
      *  No copy constructor
      *  @param  function    The other function
      */
-    Function(const Function &function) = delete;
+    Function(const Function &function)
+    {
+        // copy members
+        _arguments = function._arguments;
+        _type = function._type;
+    }
 
     /**
      *  Move constructor
@@ -50,46 +54,80 @@ public:
      */
     Function(Function &&function)
     {
-        _callable = function._callable;
-        function._callable = nullptr;
+        // copy arguments
+        _arguments = function._arguments;
+        _type = function._type;
+
+        // no longer need the other arguments
+        function._arguments.reset();
     }
     
     /**
      *  Destructor
      */
-    virtual ~Function();
+    virtual ~Function() {}
     
     /**
-     *  No assignment operator
+     *  Assignment operator
      *  @param  function    The other function
      *  @return Function
      */
-    Function &operator=(const Function &function) {}
+    Function &operator=(const Function &function)
+    {
+        // skip self reference
+        if (this == &function) return *this;
+        
+        // copy members
+        _arguments = function._arguments;
+        _type = function._type;
+        
+        // done
+        return *this;
+    }
 
     /**
      *  Method that gets called every time the function is executed
-     *  @param  request     The request during which the call was made
-     *  @param  arguments   The actual arguments that were passed
+     *  @param  params      The parameters that were passed
      *  @return Variable    Return value
      */
-    virtual Value invoke(const Request *request, const std::initializer_list<Value> &arguments);
-    
-    /**
-     *  Get access to the internal object
-     *  @return Callable
-     *  @internal
-     */
-    Callable *internal() const
+    virtual Value invoke(Parameters &params)
     {
-        return _callable;
+        return 0;
     }
 
 protected:
     /**
-     *  Pointer to the callable object
-     *  @var smart_ptr
+     *  Suggestion for the return type
+     *  @var    Type
      */
-    Callable *_callable;
+    Type _type = nullType;
+
+    /**
+     *  Pointer to the arguments
+     *  @var    shared_ptr
+     */
+    std::shared_ptr<Arguments> _arguments;
+
+private:
+    /**
+     *  Fill a function entry
+     *  @param  name        Name of the function
+     *  @param  entry       Entry to be filled
+     */
+    void fill(const char *name, struct _zend_function_entry *entry);
+
+    /**
+     *  Fill function info
+     *  @param  name        Name of the function
+     *  @param  info        Info object to be filled
+     */
+    void fill(const char *name, struct _zend_internal_function_info *info);
+    
+    /**
+     *  Extension has access to the private members
+     */
+    friend class Extension;
+
 };
 
 /**

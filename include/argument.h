@@ -9,14 +9,14 @@
  */
 
 /**
- *  Set up namespace
+ *  Forward declaration
  */
-namespace PhpCpp {
+struct _zend_arg_info;
 
 /**
- *  Forward definitions
+ *  Set up namespace
  */
-class ArgInfo;
+namespace Php {
 
 /**
  *  Class definition
@@ -25,105 +25,72 @@ class Argument
 {
 public:
     /**
-     *  Constructor if this argument should be an instance of a certain class
-     *  @param  name        Name of the argument
-     *  @param  classname   If a specific class is required, the class type
-     *  @param  null        Are NULL values allowed in stead of an instance?
-     *  @param  ref         Is this a pass-by-reference argument?
+     *  Prevent copying
+     *  @param  argument
      */
-    Argument(const std::string &name, const std::string &classname, bool null = true, bool ref = false);
-
-    /**
-     *  Constructor if the argument can be anything
-     *  Note that only arrayType and callableType are supported type-hints
-     *  @param  name        Name of the argument
-     *  @param  type        Type hint (arrayType or callableType)
-     *  @param  ref         Is this a pass-by-reference argument?
-     */
-    Argument(const std::string &name, Type type = nullType, bool ref = false);
-
-    /**
-     *  Constructor if the argument can be anything
-     *  @param  name        Name of the argument
-     *  @param  ref         Is this a pass-by-reference argument?
-     */
-    Argument(const std::string &name, bool ref = false);
+    Argument(const Argument &argument) = delete;
     
     /**
-     *  Copy constructor
-     *  @param  argument    The argument to copy
+     *  Move constructor
+     *  @param  argument
      */
-    Argument(const Argument &argument)
-    {
-        // copy members
-        _refcount = argument._refcount;
-        _info = argument._info;
-        
-        // increase references
-        (*_refcount)++;
-    }
+    Argument(Argument &&argument);
     
     /**
      *  Destructor
      */
-    virtual ~Argument()
-    {
-        // cleanup current object
-        cleanup();
-    }
-
+    virtual ~Argument() {};
+    
     /**
-     *  Copy operator
+     *  Change the name
+     *  @param  name
+     *  @return Argument
+     */
+    Argument &name(const char *name);
+    
+    /**
+     *  Change the type
+     *  @param  type
+     *  @return Argument
+     */
+    Argument &type(Type type = nullType);
+    
+    /**
+     *  Require the parameter to be a certain class
+     *  @param  name        Name of the class
+     *  @param  null        Are null values allowed?
+     *  @return Argument
+     */
+    Argument &object(const char *classname, bool null = true);
+    
+    /**
+     *  Is this a by-ref argument?
+     *  @param  bool        Mark as by-ref variable
+     *  @return Argument
+     */
+    Argument &byref(bool value = true);
+    
+    /**
+     *  Prevent copy
      *  @param  argument    The argument to copy
      *  @return Argument
      */
-    Argument &operator=(const Argument &argument)
-    {
-        // skip self assignment
-        if (this == &argument) return *this;
-        
-        // clean up current object
-        cleanup();
-        
-        // copy members
-        _refcount = argument._refcount;
-        _info = argument._info;
-        
-        // increase references
-        (*_refcount)++;
-        
-        // done
-        return *this;
-    }
-    
+    Argument &operator=(const Argument &argument) = delete;
+
+protected:
     /**
-     *  Retrieve argument info
-     *  @return ArgInfo
-     *  @internal
+     *  Protected constructor, to prevent that users can instantiate the
+     *  argument object themselves
+     *  @param  info
      */
-    ArgInfo *internal() const
-    {
-        return _info;
-    }
+    Argument(struct _zend_arg_info *info) : _info(info) {}
 
 private:
     /**
-     *  Number of references
-     *  @var int
+     *  The argument info
+     *  @var    zend_arg_info
      */
-    int *_refcount;
-    
-    /**
-     *  Pointer to the implementation
-     *  @var ArgInfo
-     */
-    ArgInfo *_info;
-    
-    /**
-     *  Remove one reference from the object
-     */
-    void cleanup();
-    
+    struct _zend_arg_info *_info;
 };
     
 /**

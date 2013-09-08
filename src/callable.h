@@ -14,7 +14,7 @@
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  Class definition

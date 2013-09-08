@@ -14,16 +14,20 @@
 #include <string>
 #include <initializer_list>
 #include <vector>
+#include <map>
+#include <memory>
 
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/hiddenpointer.h>
 #include <phpcpp/type.h>
 #include <phpcpp/request.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/value.h>
 #include <phpcpp/member.h>
 #include <phpcpp/arguments.h>
+#include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/functions.h>
 #include <phpcpp/extension.h>

@@ -11,7 +11,7 @@
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  Supported types for variables

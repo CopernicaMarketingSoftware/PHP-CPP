@@ -11,7 +11,7 @@
 /**
  *  Namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  Function that is called by the Zend engine every time that a function gets called
@@ -101,7 +101,7 @@ void Callable::process(const std::initializer_list<Argument> &arguments)
     for (auto it = begin(arguments); it != arguments.end(); it++)
     {
         // fill the argument structure
-        it->internal()->fill(&_argv[++i]);
+//        it->internal()->fill(&_argv[++i]);
     }
 }
 

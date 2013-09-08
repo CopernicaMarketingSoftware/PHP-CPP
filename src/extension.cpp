@@ -9,7 +9,7 @@
 /**
  *  Set up namespace
  */
-namespace PhpCpp {
+namespace Php {
 
 /**
  *  If this extension is compiled for a PHP version with multi
@@ -142,43 +142,109 @@ static int request_shutdown(INIT_FUNC_ARGS)
  *  @param  name        Name of the extension
  *  @param  version     Version number
  */
-Extension::Extension(const char *name, const char *version, const Functions &functions)
+Extension::Extension(const char *name, const char *version) : _ptr(this, name)
 {
-    // allocate memory
+    // allocate memory (we allocate this on the heap so that the size of the
+    // entry does not have to be defined in the .h file. We pay a performance
+    // price for this, but we pay this price becuase the design goal of the
+    // PHP-C++ library is to have an interface that is as simple as possible
     _entry = new zend_module_entry;
     
-	// assign all members (apart from the globals)
-	_entry->size = sizeof(zend_module_entry);               // size of the data
-	_entry->zend_api = ZEND_MODULE_API_NO;                  // api number
-	_entry->zend_debug = ZEND_DEBUG;                        // debug mode enabled?
-	_entry->zts = USING_ZTS;                                // is thread safety enabled?
-	_entry->ini_entry = NULL;                               // the php.ini record
-	_entry->deps = NULL;                                    // dependencies on other modules
-	_entry->name = HiddenPointer<Extension>(this, name);    // extension name, with a hidden pointer to the extension object
-	_entry->functions = functions.internal();               // functions supported by this module
-	_entry->module_startup_func = extension_startup;        // startup function for the whole extension
-	_entry->module_shutdown_func = extension_shutdown;      // shutdown function for the whole extension
-	_entry->request_startup_func = request_startup;         // startup function per request
-	_entry->request_shutdown_func = request_shutdown;       // shutdown function per request
-	_entry->info_func = NULL;                               // information for retrieving info
-	_entry->version = version;                              // version string
-	_entry->globals_size = 0;                               // size of the global variables
-	_entry->globals_ptr = NULL;                             // pointer to the globals
-	_entry->globals_ctor = NULL;                            // constructor for global variables
-	_entry->globals_dtor = NULL;                            // destructor for global variables
-	_entry->post_deactivate_func = NULL;                    // unknown function
-	_entry->module_started = 0;                             // module is not yet started
-	_entry->type = 0;                                       // temporary or persistent module, will be filled by Zend engine
-	_entry->handle = NULL;                                  // dlopen() handle, will be filled by Zend engine
-	_entry->module_number = 0;                              // module number will be filled in by Zend engine
-	_entry->build_id = ZEND_MODULE_BUILD_ID;                // check if extension and zend engine are compatible
+    // assign all members (apart from the globals)
+    _entry->size = sizeof(zend_module_entry);               // size of the data
+    _entry->zend_api = ZEND_MODULE_API_NO;                  // api number
+    _entry->zend_debug = ZEND_DEBUG;                        // debug mode enabled?
+    _entry->zts = USING_ZTS;                                // is thread safety enabled?
+    _entry->ini_entry = NULL;                               // the php.ini record
+    _entry->deps = NULL;                                    // dependencies on other modules
+    _entry->name = _ptr;                                    // extension name, with a hidden pointer to the extension object
+    _entry->functions = NULL;                               // functions supported by this module (none for now)
+    _entry->module_startup_func = extension_startup;        // startup function for the whole extension
+    _entry->module_shutdown_func = extension_shutdown;      // shutdown function for the whole extension
+    _entry->request_startup_func = request_startup;         // startup function per request
+    _entry->request_shutdown_func = request_shutdown;       // shutdown function per request
+    _entry->info_func = NULL;                               // information for retrieving info
+    _entry->version = version;                              // version string
+    _entry->globals_size = 0;                               // size of the global variables
+    _entry->globals_ptr = NULL;                             // pointer to the globals
+    _entry->globals_ctor = NULL;                            // constructor for global variables
+    _entry->globals_dtor = NULL;                            // destructor for global variables
+    _entry->post_deactivate_func = NULL;                    // unknown function
+    _entry->module_started = 0;                             // module is not yet started
+    _entry->type = 0;                                       // temporary or persistent module, will be filled by Zend engine
+    _entry->handle = NULL;                                  // dlopen() handle, will be filled by Zend engine
+    _entry->module_number = 0;                              // module number will be filled in by Zend engine
+    _entry->build_id = ZEND_MODULE_BUILD_ID;                // check if extension and zend engine are compatible
 
-	// things that only need to be initialized
+    // things that only need to be initialized
 #ifdef ZTS
-	_entry->globals_id_ptr = NULL;
+    _entry->globals_id_ptr = NULL;
 #else
-	_entry->globals_ptr = NULL;
+    _entry->globals_ptr = NULL;
 #endif
+
+}
+
+/**
+ *  Destructor
+ */
+Extension::~Extension()
+{
+    // deallocate functions
+    if (_entry->functions) delete[] _entry->functions;
+    
+    // deallocate entry
+    delete _entry;
+}
+
+/**
+ *  Add a function to the library
+ *  @param  name        Function name
+ *  @param  function    Function object
+ *  @return Function
+ */
+Function &Extension::add(const char *name, const Function &function)
+{
+    // add the function to the map
+    return _functions[name] = function;
+}
+
+/**
+ *  Retrieve the module entry
+ *  @return zend_module_entry
+ */
+zend_module_entry *Extension::module()
+{
+    // check if functions we're already defined
+    if (_entry->functions || _functions.size() == 0) return _entry;
+
+    // allocate memory for the functions
+    zend_function_entry *functions = new zend_function_entry[_functions.size() + 1];
+
+    // keep iterator counter
+    int i = 0;
+
+    // loop through the functions
+    for (auto it = begin(_functions); it != _functions.end(); it++)
+    {
+        // retrieve entry
+        zend_function_entry *entry = &functions[i];
+
+        // let the function fill the entry
+        it->second.fill(it->first, entry);
+    }
+
+    // last entry should be set to all zeros
+    zend_function_entry *last = &functions[i];
+
+    // all should be set to zero
+    memset(last, 0, sizeof(zend_function_entry));
+
+    // store functions in entry object
+    _entry->functions = functions;
+
+    // return the entry
+    return _entry;
 }
 
 /**
