@@ -29,7 +29,6 @@
 #include <phpcpp/arguments.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
-#include <phpcpp/functions.h>
 #include <phpcpp/extension.h>
 
 /**

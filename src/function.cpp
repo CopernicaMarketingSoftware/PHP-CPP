@@ -37,8 +37,11 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     // construct parameters
     Parameters params(ZEND_NUM_ARGS());
 
+    // @todo get the appropriate request (or environment)
+    Request request(NULL);
+
     // call the appropriate object
-    ret = function->invoke(params);
+    ret = function->invoke(request, params);
 }
 
 /**

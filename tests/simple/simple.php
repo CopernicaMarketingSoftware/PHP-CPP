@@ -10,7 +10,7 @@ class XXX
 
 $myvar = "hoi";
 
-$result = hallo($myvar, 1, 2, 3, "blabla", new XXX());
+$result = my_plus($myvar, 1, 2, 3, "blabla", new XXX());
 
 echo("myvar = $myvar\n");
 

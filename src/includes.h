@@ -42,11 +42,9 @@
 #include "../include/arguments.h"
 #include "../include/parameters.h"
 #include "../include/function.h"
-#include "../include/functions.h"
 #include "../include/extension.h"
 
 /**
  *  Interface files for internal use only
  */
-#include "callable.h"
-#include "arginfo.h"
+#include "nativefunction.h"

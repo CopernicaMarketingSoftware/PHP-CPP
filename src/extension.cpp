@@ -23,13 +23,13 @@ namespace Php {
  *  The way how PHP C API deals with "global" variables is stupid.
  * 
  *  This is supposed to turn into a structure that is going to be 
- * 	instantiated for each parallel running request, and for which the 
- * 	PHP engine allocates a certain amount of memory, and a magic
+ *  instantiated for each parallel running request, and for which the 
+ *  PHP engine allocates a certain amount of memory, and a magic
  *  pointer that is passed and should be forwarded to every thinkable 
- * 	PHP function.
+ *  PHP function.
  * 
- * 	We don't like this architecture. We have our own request object
- * 	that makes much more sense, and that we use. However, we need
+ *  We don't like this architecture. We have our own request object
+ *  that makes much more sense, and that we use. However, we need
  *  to assign this object somewhere, so that's what we do in this
  *  one and only global variable
  */
@@ -39,7 +39,7 @@ ZEND_END_MODULE_GLOBALS(phpcpp)
 
 /**
  *  And now we're going to define a macro. This also is a ridiculous
- * 	architecture from PHP to get access to a variable from the 
+ *  architecture from PHP to get access to a variable from the 
  *  structure above.
  */
 #ifdef ZTS
@@ -61,7 +61,7 @@ static ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
  *  Function that must be defined to initialize the "globals"
  *  We do not have to initialize anything, but PHP needs to call this
  *  method (crazy)
- * 	@param	globals
+ *  @param  globals
  */
 static void php_phpcpp_init_globals(zend_phpcpp_globals *globals) {}
 
@@ -69,17 +69,17 @@ static void php_phpcpp_init_globals(zend_phpcpp_globals *globals) {}
 
 /**
  *  Helper method to get back the current extension object
- *  @return	Extension
+ *  @return Extension
  */
 static Extension *get_extension()
 {
-	// retrieve the extension or module name (because PHP of course does
-	// not pass such extremely useful information as they've no clue how
-	// to make a decent API
-	zend_module_entry *module = EG(current_module);
+    // retrieve the extension or module name (because PHP of course does
+    // not pass such extremely useful information as they've no clue how
+    // to make a decent API
+    zend_module_entry *module = EG(current_module);
 
-	// the pointer to the extension is hidden in front of the name
-	return HiddenPointer<Extension>(module->name);
+    // the pointer to the extension is hidden in front of the name
+    return HiddenPointer<Extension>(module->name);
 }
 
 /**
@@ -90,12 +90,12 @@ static Extension *get_extension()
  */
 static int extension_startup(INIT_FUNC_ARGS)
 {
-	
-	
-	
-	// initialize and allocate the "global" variables
-//	ZEND_INIT_MODULE_GLOBALS(hello, php_phpcpp_init_globals, NULL);	
-	
+    
+    
+    
+    // initialize and allocate the "global" variables
+//  ZEND_INIT_MODULE_GLOBALS(hello, php_phpcpp_init_globals, NULL); 
+    
     // initialize the extension
     return BOOL2SUCCESS(get_extension()->initialize());
 }
@@ -108,6 +108,11 @@ static int extension_startup(INIT_FUNC_ARGS)
  */
 static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 {
+    std::cout << "extension_shutdown" << std::endl;
+    
+    // @todo the get_extension() call crashes, we need a different way to find the extension
+    return 0;
+
     // finalize the extension
     return BOOL2SUCCESS(get_extension()->finalize());
 }
@@ -132,6 +137,11 @@ static int request_startup(INIT_FUNC_ARGS)
  */
 static int request_shutdown(INIT_FUNC_ARGS)
 {
+    std::cout << "request_shutdown" << std::endl;
+    
+    // @todo the get_extension() call crashes, we need a different way to find the extension
+    return 0;
+    
     // end the request
     return BOOL2SUCCESS(get_extension()->endRequest());
 }
@@ -190,6 +200,8 @@ Extension::Extension(const char *name, const char *version) : _ptr(this, name)
  */
 Extension::~Extension()
 {
+    std::cout << "destruct extension" << std::endl;
+    
     // deallocate functions
     if (_entry->functions) delete[] _entry->functions;
     
@@ -208,6 +220,21 @@ Function &Extension::add(const char *name, const Function &function)
     // add the function to the map
     return _functions[name] = function;
 }
+
+/**
+ *  Add a native function directly to the extension
+ *  @param  name        Name of the function
+ *  @param  function    The function to add
+ *  @return Function    The added function
+ */
+Function &Extension::add(const char *name, native_callback_0 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_1 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_2 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_3 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_4 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_5 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_6 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_7 function) { add(name, NativeFunction(function)); }
 
 /**
  *  Retrieve the module entry

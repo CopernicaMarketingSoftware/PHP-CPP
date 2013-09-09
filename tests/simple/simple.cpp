@@ -15,14 +15,12 @@
  */
 using namespace std;
 
-static int my_plus(int a, int b)
+static Php::Value my_plus(Php::Parameters &params)
 {
-    return a + b;
-}
-
-static std::string my_concat(std::string &a, std::string &b)
-{
-    return a + b;
+    string p1 = params[0];
+    string p2 = params[1];
+    
+    return p1 + p2;
 }
 
 class MyCustomFunction : public Php::Function
@@ -45,7 +43,7 @@ extern "C"
         cout << "b" << endl;
         
         // define the functions
-//        extension.add("my_plus", my_plus);
+        extension.add("my_plus", my_plus);
 //        extension.add("my_concat", my_concat);
         extension.add("my_custom", MyCustomFunction());
 

@@ -11,8 +11,8 @@
  *  as module in a webserver) many requests are handled by the same extension
  *  instance.
  * 
- * 	This is a template class. You need to pass in the type of an object
- * 	that you use for storing request specific state information.
+ *  This is a template class. You need to pass in the type of an object
+ *  that you use for storing request specific state information.
  * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -27,6 +27,20 @@ struct _zend_module_entry;
  *  Set up namespace
  */
 namespace Php {
+
+/**
+ *  A couple of predefined native callback functions that can be registered.
+ *  These are functions that optional accept a Request and/or Parameters object,
+ *  and that either return void or a Value object. 
+ */
+typedef void    (*native_callback_0)();
+typedef void    (*native_callback_1)(Parameters &);
+typedef void    (*native_callback_2)(Request &);
+typedef void    (*native_callback_3)(Request &, Parameters &);
+typedef Value   (*native_callback_4)();
+typedef Value   (*native_callback_5)(Parameters &);
+typedef Value   (*native_callback_6)(Request &);
+typedef Value   (*native_callback_7)(Request &, Parameters &);
 
 /**
  *  Class definition
@@ -157,6 +171,21 @@ public:
      *  @return Function    The added function
      */
     Function &add(const char *name, const Function &function);
+    
+    /**
+     *  Add a native function directly to the extension
+     *  @param  name        Name of the function
+     *  @param  function    The function to add
+     *  @return Function    The added function
+     */
+    Function &add(const char *name, native_callback_0 function);
+    Function &add(const char *name, native_callback_1 function);
+    Function &add(const char *name, native_callback_2 function);
+    Function &add(const char *name, native_callback_3 function);
+    Function &add(const char *name, native_callback_4 function);
+    Function &add(const char *name, native_callback_5 function);
+    Function &add(const char *name, native_callback_6 function);
+    Function &add(const char *name, native_callback_7 function);
     
     /**
      *  Retrieve the module entry

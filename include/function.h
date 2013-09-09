@@ -26,6 +26,18 @@ namespace Php {
 class Function
 {
 public:
+
+//    Function(std::function<Value()> &function);
+//    Function(std::function<Value(Value&)> &function);
+//    Function(std::function<Value(Value&,Value&)> &function);
+//    Function(std::function<Value(Value&,Value&,Value&)> &function);
+//    Function(std::function<Value(Value&,Value&,Value&,Value&)> &function);
+//    Function(std::function<void()> &function);
+//    Function(std::function<void(Value&)> &function);
+//    Function(std::function<void(Value&,Value&)> &function);
+//    Function(std::function<void(Value&,Value&,Value&)> &function);
+//    Function(std::function<void(Value&,Value&,Value&,Value&)> &function);
+
     /**
      *  Constructor
      *  @param  min     Min number of arguments
@@ -87,10 +99,11 @@ public:
 
     /**
      *  Method that gets called every time the function is executed
+     *  @param  request     Request object
      *  @param  params      The parameters that were passed
      *  @return Variable    Return value
      */
-    virtual Value invoke(Parameters &params)
+    virtual Value invoke(Request &request, Parameters &params)
     {
         return 0;
     }

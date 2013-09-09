@@ -77,7 +77,7 @@ protected:
     
     /**
      *  Optional extra data
-     *	@var Type
+     *  @var Type
      */
     Type _data;
 };
