@@ -42,6 +42,16 @@ Value::Value()
 }
 
 /**
+ *  Constructor for null ptr
+ */
+Value::Value(std::nullptr_t value)
+{
+    // create a null zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_NULL(_val);
+}
+
+/**
  *  Constructor based on integer value
  *  @param  value
  */
@@ -197,15 +207,37 @@ Value &Value::operator=(const Value &value)
     // skip self assignment
     if (this == &value) return *this;
 
-    // destruct the zval (this function will decrement the reference counter,
-    // and only destruct if there are no other references left)
-    zval_ptr_dtor(&_val);
+	// is the object a reference?
+	if (Z_ISREF_P(_val))
+	{
+		// the current object is a reference, this means that we should
+		// keep the zval object, and copy the other value into it, get
+		// the current refcount
+		int refcount = Z_REFCOUNT_P(_val);
+		
+		// clean up the current zval (but keep the zval structure)
+		zval_dtor(_val);
+		
+		// make the copy
+		*_val = *value._val;
+		zval_copy_ctor(_val);
+		
+		// restore refcount and reference setting
+		Z_SET_ISREF_TO_P(_val, true);
+		Z_SET_REFCOUNT_P(_val, refcount);
+	}
+	else
+	{
+		// destruct the zval (this function will decrement the reference counter,
+		// and only destruct if there are no other references left)
+		zval_ptr_dtor(&_val);
 
-    // just copy the zval, and the refcounter
-    _val = value._val;
+		// just copy the zval, and the refcounter
+		_val = value._val;
 
-    // and we have one more reference
-    Z_ADDREF_P(_val);
+		// and we have one more reference
+		Z_ADDREF_P(_val);
+	}
 
     // done
     return *this;

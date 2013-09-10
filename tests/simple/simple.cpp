@@ -17,14 +17,23 @@ using namespace std;
 
 static Php::Value my_plus(Php::Parameters &params)
 {
+	cout << "my_plus called" << endl;
+	
+	cout << "params: " << params.size() << endl;
+	
     string p1 = params[0];
     string p2 = params[1];
+    
+    cout << "p1: " << p1 << endl;
+    cout << "p2: " << p2 << endl;
     
     return p1 + p2;
 }
 
 class MyCustomFunction : public Php::Function
 {
+public:
+	MyCustomFunction(const char *name) : Function(name) {}
     
     
 };
@@ -35,20 +44,14 @@ extern "C"
     // export the "get_module" function that will be called by the Zend engine
     PHPCPP_EXPORT void *get_module() 
     { 
-        cout << "a" << endl;
-        
         // create extension
         static Php::Extension extension("simple","1.0");
 
-        cout << "b" << endl;
-        
         // define the functions
         extension.add("my_plus", my_plus);
-//        extension.add("my_concat", my_concat);
-        extension.add("my_custom", MyCustomFunction());
+        extension.add("my_concat", my_concat);
+        extension.add(new MyCustomFunction("my_custom"));
 
-        cout << "c" << endl;
-        
         // define classes
 //        extension.add("my_class", MyCustomClass());
         

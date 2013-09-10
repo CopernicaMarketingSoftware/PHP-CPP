@@ -106,25 +106,64 @@ public:
      *  Retrieve the pointer
      *  @return Type*
      */
-    Type *pointer()
+    Type *pointer() const
     {
         return _pointer;
     }
     
     /**
+     *  Change the pointer
+     *  @param	Type*
+     */
+    void setPointer(Type *pointer)
+    {
+		// store pointer
+		_pointer = pointer;
+    
+		// overwrite in data
+		_data.replace(0, sizeof(Type *), (const char *)&_pointer, sizeof(Type *));
+		
+        // for safety reasons, we recalculate text pointer
+        _text = _data.c_str() + sizeof(Type *);
+	}
+    
+    /**
      *  Retrieve the text
      *  @return const char *
      */
-    const char *text()
+    const char *text() const
     {
         return _text;
     }
     
     /**
+     *  Change the text
+     *  @param	text
+     * 	@param	size
+     */
+    void setText(const char *text, int size=-1)
+    {
+		// check if size was set
+		if (size < 0) size = strlen(text);
+		
+        // reserve enough room for the text and the pointer
+        _data.reserve(size + sizeof(Type *));
+        
+        // store the pointer
+        _data.assign(std::string((const char *)&_pointer, sizeof(Type *)));
+        
+        // append the text
+        _data.append(text, size);
+        
+        // store new text
+        _text = _data.c_str() + sizeof(Type *);
+	}
+    
+    /**
      *  Cast to the pointer
      *  @return Type*
      */
-    operator Type* ()
+    operator Type* () const
     {
         return _pointer;
     }
@@ -133,10 +172,19 @@ public:
      *  Cast to text
      *  @return const char *
      */
-    operator const char * ()
+    operator const char * () const
     {
         return _text;
     }
+    
+    /**
+     *  Length of the text
+     *  @return int
+     */
+    int length() const
+    {
+		return _data.size() - sizeof(Type *);
+	}
 
 private:
     /**

@@ -32,7 +32,7 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     Function *function = HiddenPointer<Function>(name);
 
     // wrap the return value
-    Value ret(return_value, true);
+    Value result(return_value, true);
 
     // construct parameters
     Parameters params(ZEND_NUM_ARGS());
@@ -40,8 +40,8 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     // @todo get the appropriate request (or environment)
     Request request(NULL);
 
-    // call the appropriate object
-    ret = function->invoke(request, params);
+	// get the result
+	result = function->invoke(request, params);
 }
 
 /**
@@ -50,13 +50,12 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
  *  This method is called when the extension is registering itself, when the 
  *  function or method introces himself
  * 
- *  @param  name        Name of the function
  *  @param  entry       Entry to be filled
  */
-void Function::fill(const char *name, zend_function_entry *entry)
+void Function::fill(zend_function_entry *entry) const
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
-    entry->fname = HiddenPointer<Function>(this, name);
+    entry->fname = _ptr;
     entry->handler = invoke_function;
     entry->arg_info = _arguments->internal();
     entry->num_args = _arguments->argc();
@@ -65,21 +64,20 @@ void Function::fill(const char *name, zend_function_entry *entry)
     entry->flags = 0;
     
     // we should fill the first argument as well
-    fill(name, (zend_internal_function_info *)entry->arg_info);
+    fill((zend_internal_function_info *)entry->arg_info);
 }
 
 /**
  *  Fill a function entry
- *  @param  name        Name of the function
  *  @param  info        Info to be filled
  */
-void Function::fill(const char *name, zend_internal_function_info *info)
+void Function::fill(zend_internal_function_info *info) const
 {
     // fill in all the members, note that return reference is false by default,
     // because we do want to return references, inside the name we hide a pointer
     // to the current object
-    info->_name = HiddenPointer<Function>(this, name);
-    info->_name_len = strlen(name);
+    info->_name = _ptr;
+    info->_name_len = _ptr.length();
     info->_class_name = NULL;
     
     // number of required arguments, and the expected return type

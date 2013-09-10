@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <set>
 
 // for debugging
 #include <iostream>

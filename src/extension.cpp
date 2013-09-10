@@ -108,8 +108,6 @@ static int extension_startup(INIT_FUNC_ARGS)
  */
 static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 {
-    std::cout << "extension_shutdown" << std::endl;
-    
     // @todo the get_extension() call crashes, we need a different way to find the extension
     return 0;
 
@@ -137,8 +135,6 @@ static int request_startup(INIT_FUNC_ARGS)
  */
 static int request_shutdown(INIT_FUNC_ARGS)
 {
-    std::cout << "request_shutdown" << std::endl;
-    
     // @todo the get_extension() call crashes, we need a different way to find the extension
     return 0;
     
@@ -200,8 +196,6 @@ Extension::Extension(const char *name, const char *version) : _ptr(this, name)
  */
 Extension::~Extension()
 {
-    std::cout << "destruct extension" << std::endl;
-    
     // deallocate functions
     if (_entry->functions) delete[] _entry->functions;
     
@@ -211,14 +205,16 @@ Extension::~Extension()
 
 /**
  *  Add a function to the library
- *  @param  name        Function name
  *  @param  function    Function object
  *  @return Function
  */
-Function &Extension::add(const char *name, const Function &function)
+Function &Extension::add(Function *function)
 {
     // add the function to the map
-    return _functions[name] = function;
+    _functions.insert(std::unique_ptr<Function>(function));
+    
+    // the result is a pair with an iterator
+    return *function;
 }
 
 /**
@@ -227,14 +223,14 @@ Function &Extension::add(const char *name, const Function &function)
  *  @param  function    The function to add
  *  @return Function    The added function
  */
-Function &Extension::add(const char *name, native_callback_0 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_1 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_2 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_3 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_4 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_5 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_6 function) { add(name, NativeFunction(function)); }
-Function &Extension::add(const char *name, native_callback_7 function) { add(name, NativeFunction(function)); }
+Function &Extension::add(const char *name, native_callback_0 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_1 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_2 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_3 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_4 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_5 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_6 function) { return add(new NativeFunction(name, function)); }
+Function &Extension::add(const char *name, native_callback_7 function) { return add(new NativeFunction(name, function)); }
 
 /**
  *  Retrieve the module entry
@@ -255,10 +251,10 @@ zend_module_entry *Extension::module()
     for (auto it = begin(_functions); it != _functions.end(); it++)
     {
         // retrieve entry
-        zend_function_entry *entry = &functions[i];
+        zend_function_entry *entry = &functions[i++];
 
         // let the function fill the entry
-        it->second.fill(it->first, entry);
+        (*it)->fill(entry);
     }
 
     // last entry should be set to all zeros

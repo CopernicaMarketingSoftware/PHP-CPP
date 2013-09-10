@@ -26,24 +26,13 @@ namespace Php {
 class Function
 {
 public:
-
-//    Function(std::function<Value()> &function);
-//    Function(std::function<Value(Value&)> &function);
-//    Function(std::function<Value(Value&,Value&)> &function);
-//    Function(std::function<Value(Value&,Value&,Value&)> &function);
-//    Function(std::function<Value(Value&,Value&,Value&,Value&)> &function);
-//    Function(std::function<void()> &function);
-//    Function(std::function<void(Value&)> &function);
-//    Function(std::function<void(Value&,Value&)> &function);
-//    Function(std::function<void(Value&,Value&,Value&)> &function);
-//    Function(std::function<void(Value&,Value&,Value&,Value&)> &function);
-
     /**
      *  Constructor
+     * 	@param	name	Name of the function
      *  @param  min     Min number of arguments
      *  @param  max     Max number of arguments
      */
-    Function(int min = 0, int max = 0)
+    Function(const char *name, int min = 0, int max = 0) : _ptr(this, name)
     {
         // construct the arguments
         _arguments = std::shared_ptr<Arguments>(new Arguments(min, max));
@@ -53,7 +42,7 @@ public:
      *  No copy constructor
      *  @param  function    The other function
      */
-    Function(const Function &function)
+    Function(const Function &function) : _ptr(this, function.name())
     {
         // copy members
         _arguments = function._arguments;
@@ -64,7 +53,7 @@ public:
      *  Move constructor
      *  @param  function    The other function
      */
-    Function(Function &&function)
+    Function(Function &&function) : _ptr(this, function.name())
     {
         // copy arguments
         _arguments = function._arguments;
@@ -90,12 +79,52 @@ public:
         if (this == &function) return *this;
         
         // copy members
+        _ptr.setText(function.name());
         _arguments = function._arguments;
         _type = function._type;
         
         // done
         return *this;
     }
+    
+    /**
+     *  Comparison
+     *  @param	function	The other function
+     * 	@return	bool
+     */
+    bool operator<(const Function &function) const
+    {
+		return strcmp(name(), function.name()) < 0;
+	}
+
+    /**
+     *  Comparison
+     *  @param	function	The other function
+     * 	@return	bool
+     */
+    bool operator>(const Function &function) const
+    {
+		return strcmp(name(), function.name()) > 0;
+	}
+
+    /**
+     *  Comparison
+     *  @param	function	The other function
+     * 	@return	bool
+     */
+    bool operator==(const Function &function) const
+    {
+		return strcmp(name(), function.name()) == 0;
+	}
+
+	/**
+	 *  Function name
+	 *  @return	const char *
+	 */
+	const char *name() const
+	{
+		return _ptr.text();
+	}
 
     /**
      *  Method that gets called every time the function is executed
@@ -105,7 +134,7 @@ public:
      */
     virtual Value invoke(Request &request, Parameters &params)
     {
-        return 0;
+        return nullptr;
     }
 
 protected:
@@ -121,20 +150,24 @@ protected:
      */
     std::shared_ptr<Arguments> _arguments;
 
+    /**
+     *  The name is stored in a hidden pointer, so that we have access to the function
+     *  @var	HiddenPointer
+     */
+    HiddenPointer<Function> _ptr;
+
 private:
     /**
      *  Fill a function entry
-     *  @param  name        Name of the function
      *  @param  entry       Entry to be filled
      */
-    void fill(const char *name, struct _zend_function_entry *entry);
+    void fill(struct _zend_function_entry *entry) const;
 
     /**
      *  Fill function info
-     *  @param  name        Name of the function
      *  @param  info        Info object to be filled
      */
-    void fill(const char *name, struct _zend_internal_function_info *info);
+    void fill(struct _zend_internal_function_info *info) const;
     
     /**
      *  Extension has access to the private members

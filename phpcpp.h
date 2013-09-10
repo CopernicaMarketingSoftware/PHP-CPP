@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <memory>
+#include <set>
 
 /**
  *  Include all headers files that are related to this library

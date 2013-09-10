@@ -18,4 +18,3 @@ echo("resultaat: $result\n");
 
 print_r($result);
 
-?>

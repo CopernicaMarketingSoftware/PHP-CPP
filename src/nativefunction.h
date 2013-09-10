@@ -21,16 +21,17 @@ class NativeFunction : public Function
 public:
     /**
      *  Constructor
-     *  @param  function
+     * 	@param	name			Function name
+     *  @param  function		The native C function
      */
-    NativeFunction(native_callback_0 function) : _type(0) { _function.f0 = function; }
-    NativeFunction(native_callback_1 function) : _type(1) { _function.f1 = function; }
-    NativeFunction(native_callback_2 function) : _type(2) { _function.f2 = function; }
-    NativeFunction(native_callback_3 function) : _type(3) { _function.f3 = function; }
-    NativeFunction(native_callback_4 function) : _type(4) { _function.f4 = function; }
-    NativeFunction(native_callback_5 function) : _type(5) { _function.f5 = function; }
-    NativeFunction(native_callback_6 function) : _type(6) { _function.f6 = function; }
-    NativeFunction(native_callback_7 function) : _type(7) { _function.f7 = function; }
+    NativeFunction(const char *name, native_callback_0 function) : Function(name), _type(0) { _function.f0 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_1 function) : Function(name), _type(1) { _function.f1 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_2 function) : Function(name), _type(2) { _function.f2 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_3 function) : Function(name), _type(3) { _function.f3 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_4 function) : Function(name), _type(4) { _function.f4 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_5 function) : Function(name), _type(5) { _function.f5 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_6 function) : Function(name), _type(6) { _function.f6 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_7 function) : Function(name), _type(7) { _function.f7 = function; _ptr.setPointer(this); }
 
     /**
      *  Destructor
@@ -43,7 +44,7 @@ public:
      *  @param  params      The parameters that were passed
      *  @return Variable    Return value
      */
-    virtual Value invoke(Request &request, Parameters &params)
+    virtual Value invoke(Request &request, Parameters &params) override
     {
         switch (_type) {
         case 0:     _function.f0(); return Value();

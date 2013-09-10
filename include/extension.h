@@ -166,11 +166,15 @@ public:
      *  It is only possible to create functions during the initialization of
      *  the library, before the Extension::module() method is called.
      * 
-     *  @param  name        Name of the function
+     * 	Note that the function must have been allocated on the HEAP (using
+     *  "new") and that the object will be destructed (using "delete")
+     *  by the extension object (you thus do not have to destruct it
+     *  yourself!) 
+     * 
      *  @param  function    The function to add
      *  @return Function    The added function
      */
-    Function &add(const char *name, const Function &function);
+    Function &add(Function *function);
     
     /**
      *  Add a native function directly to the extension
@@ -200,10 +204,10 @@ public:
     
 private:
     /**
-     *  Map of function objects defined in the library
+     *  Set of function objects defined in the library
      *  @var    map
      */
-    std::map<const char *,Function> _functions;
+    std::set<std::unique_ptr<Function>> _functions;
 
     /**
      *  Hidden pointer to self

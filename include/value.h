@@ -45,6 +45,11 @@ public:
     Value();
 
     /**
+     *  Constructor for null ptr
+     */
+    Value(std::nullptr_t value);
+
+    /**
      *  Constructor based on integer value
      *  @param  value
      */
