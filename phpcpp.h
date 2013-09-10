@@ -25,9 +25,10 @@
 #include <phpcpp/type.h>
 #include <phpcpp/request.h>
 #include <phpcpp/argument.h>
+#include <phpcpp/byval.h>
+#include <phpcpp/byref.h>
 #include <phpcpp/value.h>
 #include <phpcpp/member.h>
-#include <phpcpp/arguments.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/extension.h>

@@ -10,7 +10,15 @@ class XXX
 
 $myvar = "hoi";
 
-$result = my_plus($myvar, 1, 2, 3, "blabla", new XXX());
+class MyClass {
+
+	public function __toString()
+	{
+		return "aksjdfhsdfkj";
+	}
+}
+
+$result = my_plus(new MyClass(), array(), new MyClass(), $myvar, "blabla", new XXX());
 
 echo("myvar = $myvar\n");
 

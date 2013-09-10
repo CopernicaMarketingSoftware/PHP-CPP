@@ -24,7 +24,7 @@
 /**
  *  PHP includes
  */
-#include "php.h"
+#include <php.h>
 
 /**
  *  Macro to convert results to success status
@@ -38,9 +38,10 @@
 #include "../include/type.h"
 #include "../include/request.h"
 #include "../include/argument.h"
+#include "../include/byval.h"
+#include "../include/byref.h"
 #include "../include/value.h"
 #include "../include/member.h"
-#include "../include/arguments.h"
 #include "../include/parameters.h"
 #include "../include/function.h"
 #include "../include/extension.h"

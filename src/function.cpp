@@ -45,6 +45,40 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
 }
 
 /**
+ *  Constructor
+ * 	@param	name	Name of the function
+ *  @param  min     Min number of arguments
+ *  @param  max     Max number of arguments
+ */
+Function::Function(const char *name, const std::initializer_list<Argument> &arguments) : _ptr(this, name)
+{
+	// construct vector for arguments
+	_argc = arguments.size();
+	_argv = new zend_arg_info[_argc+1];
+	
+	// counter
+	int i=1;
+	
+	// loop through the arguments
+	for (auto it = arguments.begin(); it != arguments.end(); it++)
+	{
+		// fill the arg info
+		it->fill(&_argv[i++]);
+	}
+	
+	// @todo find out number of required arguments
+	_required = _argc;
+}
+
+/**
+ *  Destructor
+ */
+Function::~Function()
+{
+	delete[] _argv;
+}
+
+/**
  *  Fill a function entry
  * 
  *  This method is called when the extension is registering itself, when the 
@@ -57,8 +91,8 @@ void Function::fill(zend_function_entry *entry) const
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _ptr;
     entry->handler = invoke_function;
-    entry->arg_info = _arguments->internal();
-    entry->num_args = _arguments->argc();
+    entry->arg_info = _argv;
+    entry->num_args = _argc;
 
     // there are no flags like deprecated, private or protected
     entry->flags = 0;
@@ -81,7 +115,7 @@ void Function::fill(zend_internal_function_info *info) const
     info->_class_name = NULL;
     
     // number of required arguments, and the expected return type
-    info->required_num_args = _arguments->required();
+    info->required_num_args = _required;
     info->_type_hint = _type;
     
     // we do not support return-by-reference

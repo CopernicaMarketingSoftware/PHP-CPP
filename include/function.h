@@ -32,60 +32,26 @@ public:
      *  @param  min     Min number of arguments
      *  @param  max     Max number of arguments
      */
-    Function(const char *name, int min = 0, int max = 0) : _ptr(this, name)
-    {
-        // construct the arguments
-        _arguments = std::shared_ptr<Arguments>(new Arguments(min, max));
-    }
+    Function(const char *name, const std::initializer_list<Argument> &arguments = {});
     
     /**
-     *  No copy constructor
+     *  No copy and move constructors
      *  @param  function    The other function
      */
-    Function(const Function &function) : _ptr(this, function.name())
-    {
-        // copy members
-        _arguments = function._arguments;
-        _type = function._type;
-    }
-
-    /**
-     *  Move constructor
-     *  @param  function    The other function
-     */
-    Function(Function &&function) : _ptr(this, function.name())
-    {
-        // copy arguments
-        _arguments = function._arguments;
-        _type = function._type;
-
-        // no longer need the other arguments
-        function._arguments.reset();
-    }
+    Function(const Function &function) = delete;
+    Function(Function &&function) = delete;
     
     /**
      *  Destructor
      */
-    virtual ~Function() {}
+    virtual ~Function();
     
     /**
-     *  Assignment operator
+     *  No assignment operator
      *  @param  function    The other function
      *  @return Function
      */
-    Function &operator=(const Function &function)
-    {
-        // skip self reference
-        if (this == &function) return *this;
-        
-        // copy members
-        _ptr.setText(function.name());
-        _arguments = function._arguments;
-        _type = function._type;
-        
-        // done
-        return *this;
-    }
+    Function &operator=(const Function &function) = delete;
     
     /**
      *  Comparison
@@ -136,6 +102,7 @@ public:
     {
         return nullptr;
     }
+    
 
 protected:
     /**
@@ -144,11 +111,23 @@ protected:
      */
     Type _type = nullType;
 
+	/**
+	 *  Required number of arguments
+	 *  @var	integer
+	 */
+	int _required;
+	
+	/**
+	 *  Total number of arguments
+	 *  @var	integer
+	 */
+	int _argc;
+
     /**
-     *  Pointer to the arguments
-     *  @var    shared_ptr
+     *  The arguments
+     *  @var zend_arg_info[]
      */
-    std::shared_ptr<Arguments> _arguments;
+    struct _zend_arg_info *_argv;
 
     /**
      *  The name is stored in a hidden pointer, so that we have access to the function

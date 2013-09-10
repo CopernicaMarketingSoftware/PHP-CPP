@@ -4,6 +4,9 @@
  *  Class holds information about an argument that is passed to a function.
  *  You'll need this class when you're defining your own functions.
  *
+ *  The constructor of the argument is protected. Use the ByVal or ByRef
+ *  classes instead.
+ * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
@@ -25,65 +28,49 @@ class Argument
 {
 public:
     /**
-     *  Prevent copying
+     *  Copy constructor
      *  @param  argument
      */
-    Argument(const Argument &argument) = delete;
-    
+    Argument(const Argument &argument);
+
     /**
      *  Move constructor
      *  @param  argument
      */
     Argument(Argument &&argument);
-    
+
     /**
      *  Destructor
      */
-    virtual ~Argument() {};
+    virtual ~Argument();
     
-    /**
-     *  Change the name
-     *  @param  name
-     *  @return Argument
-     */
-    Argument &name(const char *name);
-    
-    /**
-     *  Change the type
-     *  @param  type
-     *  @return Argument
-     */
-    Argument &type(Type type = nullType);
-    
-    /**
-     *  Require the parameter to be a certain class
-     *  @param  name        Name of the class
-     *  @param  null        Are null values allowed?
-     *  @return Argument
-     */
-    Argument &object(const char *classname, bool null = true);
-    
-    /**
-     *  Is this a by-ref argument?
-     *  @param  bool        Mark as by-ref variable
-     *  @return Argument
-     */
-    Argument &byref(bool value = true);
-    
-    /**
-     *  Prevent copy
-     *  @param  argument    The argument to copy
-     *  @return Argument
-     */
-    Argument &operator=(const Argument &argument) = delete;
-
 protected:
     /**
-     *  Protected constructor, to prevent that users can instantiate the
-     *  argument object themselves
-     *  @param  info
+     *  Constructor
+     *  @param  name        Name of the argument
+     *  @param  type        Argument type
+     *  @param  required    Is this argument required?
+     *  @param  byref       Is this a reference argument
      */
-    Argument(struct _zend_arg_info *info) : _info(info) {}
+    Argument(const char *name, Type type, bool required = true, bool byref = false);
+    
+    /**
+     *  Constructor
+     *  @param  name        Name of the argument
+     *  @param  classname   Name of the class
+     *  @param  nullable    Can it be null?
+     *  @param  required    Is this argument required?
+     *  @param  byref       Is this a reference argument?
+     */
+    Argument(const char *name, const char *classname, bool nullable = true, bool required = true, bool byref = false);
+    
+public:
+    /**
+     *  Fill an arg_info structure with data
+     *  @param  info
+     *  @internal
+     */
+    void fill(struct _zend_arg_info *info) const;
 
 private:
     /**
@@ -91,6 +78,12 @@ private:
      *  @var    zend_arg_info
      */
     struct _zend_arg_info *_info;
+    
+    /**
+     *  Is this a required argument
+     *  @var    bool
+     */
+    bool _required;
 };
     
 /**

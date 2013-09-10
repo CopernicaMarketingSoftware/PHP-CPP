@@ -20,6 +20,12 @@ namespace Php {
 #endif
 
 /**
+ *  Pointer to the one and only extension object
+ *	@var	Extension
+ */
+static Extension *extension = nullptr;
+
+/**
  *  The way how PHP C API deals with "global" variables is stupid.
  * 
  *  This is supposed to turn into a structure that is going to be 
@@ -68,21 +74,6 @@ static void php_phpcpp_init_globals(zend_phpcpp_globals *globals) {}
 
 
 /**
- *  Helper method to get back the current extension object
- *  @return Extension
- */
-static Extension *get_extension()
-{
-    // retrieve the extension or module name (because PHP of course does
-    // not pass such extremely useful information as they've no clue how
-    // to make a decent API
-    zend_module_entry *module = EG(current_module);
-
-    // the pointer to the extension is hidden in front of the name
-    return HiddenPointer<Extension>(module->name);
-}
-
-/**
  *  Function that is called when the extension initializes
  *  @param  type        Module type
  *  @param  number      Module number
@@ -97,7 +88,7 @@ static int extension_startup(INIT_FUNC_ARGS)
 //  ZEND_INIT_MODULE_GLOBALS(hello, php_phpcpp_init_globals, NULL); 
     
     // initialize the extension
-    return BOOL2SUCCESS(get_extension()->initialize());
+    return BOOL2SUCCESS(extension->initialize());
 }
 
 /**
@@ -108,11 +99,8 @@ static int extension_startup(INIT_FUNC_ARGS)
  */
 static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 {
-    // @todo the get_extension() call crashes, we need a different way to find the extension
-    return 0;
-
     // finalize the extension
-    return BOOL2SUCCESS(get_extension()->finalize());
+    return BOOL2SUCCESS(extension->finalize());
 }
 
 /**
@@ -124,7 +112,7 @@ static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 static int request_startup(INIT_FUNC_ARGS)
 {
     // create the request
-    return BOOL2SUCCESS(get_extension()->startRequest());
+    return BOOL2SUCCESS(extension->startRequest());
 }
 
 /**
@@ -135,11 +123,8 @@ static int request_startup(INIT_FUNC_ARGS)
  */
 static int request_shutdown(INIT_FUNC_ARGS)
 {
-    // @todo the get_extension() call crashes, we need a different way to find the extension
-    return 0;
-    
     // end the request
-    return BOOL2SUCCESS(get_extension()->endRequest());
+    return BOOL2SUCCESS(extension->endRequest());
 }
 
 
@@ -148,8 +133,11 @@ static int request_shutdown(INIT_FUNC_ARGS)
  *  @param  name        Name of the extension
  *  @param  version     Version number
  */
-Extension::Extension(const char *name, const char *version) : _ptr(this, name)
+Extension::Extension(const char *name, const char *version)
 {
+	// store extension variable
+	extension = this;
+	
     // allocate memory (we allocate this on the heap so that the size of the
     // entry does not have to be defined in the .h file. We pay a performance
     // price for this, but we pay this price becuase the design goal of the
@@ -163,7 +151,7 @@ Extension::Extension(const char *name, const char *version) : _ptr(this, name)
     _entry->zts = USING_ZTS;                                // is thread safety enabled?
     _entry->ini_entry = NULL;                               // the php.ini record
     _entry->deps = NULL;                                    // dependencies on other modules
-    _entry->name = _ptr;                                    // extension name, with a hidden pointer to the extension object
+    _entry->name = name;                                    // extension name
     _entry->functions = NULL;                               // functions supported by this module (none for now)
     _entry->module_startup_func = extension_startup;        // startup function for the whole extension
     _entry->module_shutdown_func = extension_shutdown;      // shutdown function for the whole extension
@@ -208,13 +196,13 @@ Extension::~Extension()
  *  @param  function    Function object
  *  @return Function
  */
-Function &Extension::add(Function *function)
+Function *Extension::add(Function *function)
 {
     // add the function to the map
     _functions.insert(std::unique_ptr<Function>(function));
     
     // the result is a pair with an iterator
-    return *function;
+    return function;
 }
 
 /**
@@ -223,14 +211,14 @@ Function &Extension::add(Function *function)
  *  @param  function    The function to add
  *  @return Function    The added function
  */
-Function &Extension::add(const char *name, native_callback_0 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_1 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_2 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_3 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_4 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_5 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_6 function) { return add(new NativeFunction(name, function)); }
-Function &Extension::add(const char *name, native_callback_7 function) { return add(new NativeFunction(name, function)); }
+Function *Extension::add(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_4 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_5 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_6 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+Function *Extension::add(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
 
 /**
  *  Retrieve the module entry

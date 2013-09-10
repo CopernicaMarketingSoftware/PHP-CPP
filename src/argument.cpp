@@ -14,62 +14,102 @@
 namespace Php {
 
 /**
+ *  Constructor
+ *  @param  name        Name of the argument
+ *  @param  type        Argument type
+ *  @param  required    Is this argument required?
+ *  @param  byref       Is this a reference argument
+ */
+Argument::Argument(const char *name, Type type, bool required, bool byref)
+{
+    // construct object
+    _info = new zend_arg_info;
+    
+    // fill members
+    _info->name = name;
+    _info->name_len = strlen(name);
+    _info->type_hint = type == arrayType || type == callableType ? type : 0;
+    _info->class_name = NULL;
+    _info->class_name_len = 0;
+    _info->allow_null = false;
+    _info->pass_by_reference = byref;
+    
+    // store if required
+    _required = required;
+}
+
+/**
+ *  Constructor
+ *  @param  name        Name of the argument
+ *  @param  classname   Name of the class
+ *  @param  nullable    Can it be null?
+ *  @param  required    Is this argument required?
+ *  @param  byref       Is this a reference argument?
+ */
+Argument::Argument(const char *name, const char *classname, bool nullable, bool required, bool byref)
+{
+    // construct object
+    _info = new zend_arg_info;
+    
+    // fill members
+    _info->name = name;
+    _info->name_len = strlen(name);
+    _info->type_hint = objectType;
+    _info->class_name = classname;
+    _info->class_name_len = strlen(classname);
+    _info->allow_null = nullable;
+    _info->pass_by_reference = byref;
+    
+    // store if required
+    _required = required;
+}
+
+/**
+ *  Copy constructor
+ *  @param  argument
+ */
+Argument::Argument(const Argument &argument)
+{
+    // construct object
+    _info = new zend_arg_info;
+    
+    // fill members
+    *_info = *argument._info;
+    
+    // store if required
+    _required = argument._required;
+}
+
+/**
  *  Move constructor
  *  @param  argument
  */
 Argument::Argument(Argument &&argument)
 {
-    // copy data
+    // copy memory pointer
     _info = argument._info;
+    
+    // forget in other object
+    argument._info = nullptr;
 }
 
 /**
- *  Change the name
- *  @param  name
- *  @return Argument
+ *  Destructor
  */
-Argument &Argument::name(const char *name)
+Argument::~Argument()
 {
-    _info->name = name;
-    _info->name_len = strlen(name);
-    return *this;
+    if (_info) delete _info;
 }
 
 /**
- *  Change the type
- *  @param  type
- *  @return Argument
+ *  Fill an arg_info structure with data
+ *  @param  info
+ *  @internal
  */
-Argument &Argument::type(Type type)
+void Argument::fill(struct _zend_arg_info *info) const
 {
-    _info->type_hint = type;
-    return *this;
-}
-
-/**
- *  Require the parameter to be a certain class
- *  @param  name        Name of the class
- *  @param  null        Are null values allowed?
- *  @return Argument
- */
-Argument &Argument::object(const char *classname, bool null)
-{
-    _info->type_hint = objectType;
-    _info->class_name = classname;
-    _info->class_name_len = strlen(classname);
-    _info->allow_null = null;
-    return *this;
-}
-
-/**
- *  Is this a by-ref argument?
- *  @param  bool        Mark as by-ref variable
- *  @return Argument
- */
-Argument &Argument::byref(bool value)
-{
-    _info->pass_by_reference = value;
-    return *this;
+    // copy all data
+    *info = *_info;
 }
 
 /**

@@ -174,22 +174,23 @@ public:
      *  @param  function    The function to add
      *  @return Function    The added function
      */
-    Function &add(Function *function);
+    Function *add(Function *function);
     
     /**
      *  Add a native function directly to the extension
      *  @param  name        Name of the function
      *  @param  function    The function to add
+     * 	@param	arguments	Optional argument specification
      *  @return Function    The added function
      */
-    Function &add(const char *name, native_callback_0 function);
-    Function &add(const char *name, native_callback_1 function);
-    Function &add(const char *name, native_callback_2 function);
-    Function &add(const char *name, native_callback_3 function);
-    Function &add(const char *name, native_callback_4 function);
-    Function &add(const char *name, native_callback_5 function);
-    Function &add(const char *name, native_callback_6 function);
-    Function &add(const char *name, native_callback_7 function);
+    Function *add(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_4 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_5 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_6 function, const std::initializer_list<Argument> &arguments = {});
+    Function *add(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments = {});
     
     /**
      *  Retrieve the module entry
@@ -208,12 +209,6 @@ private:
      *  @var    map
      */
     std::set<std::unique_ptr<Function>> _functions;
-
-    /**
-     *  Hidden pointer to self
-     *  @var    HiddenPointer
-     */
-    HiddenPointer<Extension> _ptr;
 
     /**
      *  The information that is passed to the Zend engine

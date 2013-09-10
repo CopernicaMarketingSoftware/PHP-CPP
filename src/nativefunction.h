@@ -24,14 +24,14 @@ public:
      * 	@param	name			Function name
      *  @param  function		The native C function
      */
-    NativeFunction(const char *name, native_callback_0 function) : Function(name), _type(0) { _function.f0 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_1 function) : Function(name), _type(1) { _function.f1 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_2 function) : Function(name), _type(2) { _function.f2 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_3 function) : Function(name), _type(3) { _function.f3 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_4 function) : Function(name), _type(4) { _function.f4 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_5 function) : Function(name), _type(5) { _function.f5 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_6 function) : Function(name), _type(6) { _function.f6 = function; _ptr.setPointer(this); }
-    NativeFunction(const char *name, native_callback_7 function) : Function(name), _type(7) { _function.f7 = function; _ptr.setPointer(this); }
+    NativeFunction(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(0) { _function.f0 = function; }
+    NativeFunction(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(1) { _function.f1 = function; }
+    NativeFunction(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(2) { _function.f2 = function; }
+    NativeFunction(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(3) { _function.f3 = function; }
+    NativeFunction(const char *name, native_callback_4 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(4) { _function.f4 = function; }
+    NativeFunction(const char *name, native_callback_5 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(5) { _function.f5 = function; }
+    NativeFunction(const char *name, native_callback_6 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(6) { _function.f6 = function; }
+    NativeFunction(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(7) { _function.f7 = function; }
 
     /**
      *  Destructor
