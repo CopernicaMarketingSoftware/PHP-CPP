@@ -36,7 +36,7 @@
  */
 #include "../include/hiddenpointer.h"
 #include "../include/type.h"
-#include "../include/request.h"
+#include "../include/environment.h"
 #include "../include/argument.h"
 #include "../include/byval.h"
 #include "../include/byref.h"

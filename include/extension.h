@@ -35,12 +35,12 @@ namespace Php {
  */
 typedef void    (*native_callback_0)();
 typedef void    (*native_callback_1)(Parameters &);
-typedef void    (*native_callback_2)(Request &);
-typedef void    (*native_callback_3)(Request &, Parameters &);
+typedef void    (*native_callback_2)(Environment &);
+typedef void    (*native_callback_3)(Environment &, Parameters &);
 typedef Value   (*native_callback_4)();
 typedef Value   (*native_callback_5)(Parameters &);
-typedef Value   (*native_callback_6)(Request &);
-typedef Value   (*native_callback_7)(Request &, Parameters &);
+typedef Value   (*native_callback_6)(Environment &);
+typedef Value   (*native_callback_7)(Environment &, Parameters &);
 
 /**
  *  Class definition
@@ -99,17 +99,29 @@ public:
     }
     
     /**
-     *  Create a new request
+     *  Create a new environment
      * 
-     *  You can override this method if you've created your own request class,
+     *  You can override this method if you've created your own environment class,
      *  and you'd like to use an instance of that class instead. The returned
      *  object must have been created on the heap.
      * 
-     *  @return Request*
+     *  @return Environment*
      */
-    virtual Request *request()
+    virtual Environment *createEnvironment()
     {
-        return new Request(this);
+        return new Environment(this);
+    }
+    
+    /**
+     *  Destruct an environment
+     *  
+     *  This is the counterpart of the createEnvironment method.
+     * 
+     *  @param  Environment
+     */
+    virtual void deleteEnvironment(Environment *environment)
+    {
+        delete environment;
     }
     
     /**
@@ -121,17 +133,8 @@ public:
      * 
      *  @return boolean
      */
-    bool startRequest()
+    bool startRequest(Environment &environment)
     {
-//        // failure if we already have a request
-//        if (_request) return false;
-//        
-//        // create the request
-//        _request = request();
-//    
-//        // and initialize it
-//        return _request->initialize();
-
         return true;
     }
     
@@ -143,20 +146,8 @@ public:
      *
      *  @return boolean
      */
-    bool endRequest()
+    bool endRequest(Environment &environment)
     {
-//        // request must exist
-//        if (!_request) return false;
-//    
-//        // finalize the request
-//        bool result = _request->finalize();
-//        
-//        // destruct the request object
-//        delete _request;
-//        
-//        // done
-//        return result;
-
         return true;
     }
     

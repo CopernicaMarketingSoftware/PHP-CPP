@@ -40,21 +40,21 @@ public:
 
     /**
      *  Method that gets called every time the function is executed
-     *  @param  request     Request environment
+     *  @param  environment Environment
      *  @param  params      The parameters that were passed
      *  @return Variable    Return value
      */
-    virtual Value invoke(Request &request, Parameters &params) override
+    virtual Value invoke(Environment &environment, Parameters &params) override
     {
         switch (_type) {
         case 0:     _function.f0(); return Value();
         case 1:     _function.f1(params); return Value();
-        case 2:     _function.f2(request); return Value();
-        case 3:     _function.f3(request, params); return Value();
+        case 2:     _function.f2(environment); return Value();
+        case 3:     _function.f3(environment, params); return Value();
         case 4:     return _function.f4();
         case 5:     return _function.f5(params);
-        case 6:     return _function.f6(request);
-        case 7:     return _function.f7(request, params);
+        case 6:     return _function.f6(environment);
+        case 7:     return _function.f7(environment, params);
         default:    return Value();
         }
     }

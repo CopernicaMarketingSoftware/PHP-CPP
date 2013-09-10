@@ -40,7 +40,7 @@ static Extension *extension = nullptr;
  *  one and only global variable
  */
 ZEND_BEGIN_MODULE_GLOBALS(phpcpp)
-    Request *request;
+    Environment *environment;
 ZEND_END_MODULE_GLOBALS(phpcpp)
 
 /**
@@ -49,9 +49,9 @@ ZEND_END_MODULE_GLOBALS(phpcpp)
  *  structure above.
  */
 #ifdef ZTS
-#define REQUEST_G(v) TSRMG(phpcpp_globals_id, zend_phpcpp_globals *, v)
+#define PHPCPP_G(v) TSRMG(phpcpp_globals_id, zend_phpcpp_globals *, v)
 #else
-#define REQUEST_G(v) (phpcpp_globals.v)
+#define PHPCPP_G(v) (phpcpp_globals.v)
 #endif
 
 /**
@@ -69,7 +69,7 @@ static ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
  *  method (crazy)
  *  @param  globals
  */
-static void php_phpcpp_init_globals(zend_phpcpp_globals *globals) {}
+static void init_globals(zend_phpcpp_globals *globals) {}
 
 
 
@@ -81,11 +81,8 @@ static void php_phpcpp_init_globals(zend_phpcpp_globals *globals) {}
  */
 static int extension_startup(INIT_FUNC_ARGS)
 {
-    
-    
-    
     // initialize and allocate the "global" variables
-//  ZEND_INIT_MODULE_GLOBALS(hello, php_phpcpp_init_globals, NULL); 
+    ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
     
     // initialize the extension
     return BOOL2SUCCESS(extension->initialize());
@@ -111,8 +108,11 @@ static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
  */
 static int request_startup(INIT_FUNC_ARGS)
 {
-    // create the request
-    return BOOL2SUCCESS(extension->startRequest());
+    // create the environment
+    PHPCPP_G(environment) = extension->createEnvironment();
+    
+    // start the request
+    return BOOL2SUCCESS(extension->startRequest(*(PHPCPP_G(environment))));
 }
 
 /**
@@ -124,9 +124,14 @@ static int request_startup(INIT_FUNC_ARGS)
 static int request_shutdown(INIT_FUNC_ARGS)
 {
     // end the request
-    return BOOL2SUCCESS(extension->endRequest());
+    bool success = extension->endRequest(*(PHPCPP_G(environment)));
+    
+    // deallocate the environment
+    extension->deleteEnvironment(PHPCPP_G(environment));
+    
+    // done
+    return BOOL2SUCCESS(success);
 }
-
 
 /**
  *  Constructor

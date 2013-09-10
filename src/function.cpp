@@ -38,10 +38,10 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     Parameters params(ZEND_NUM_ARGS());
 
     // @todo get the appropriate request (or environment)
-    Request request(NULL);
+    Environment environment(NULL);
 
 	// get the result
-	result = function->invoke(request, params);
+	result = function->invoke(environment, params);
 }
 
 /**

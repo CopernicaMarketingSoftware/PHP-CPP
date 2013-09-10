@@ -1,14 +1,14 @@
 /**
- *  Request.h
+ *  Environment.h
  *
  *  During the lifetime of the extension, multiple requests can be handled
- *  by it. For every request that is handled, a request object is created.
+ *  by it. For every request that is handled, an environment object is created.
  *
- *  The base class for the request is implemented in this file. If you'd like
- *  to add state variables to the request you can override this class and
+ *  The base class for the environment is defined in this file. If you'd like
+ *  to add state variables to the environment you can override this class and
  *  add the extra features you'd like. If you override this method, you should
- *  also override Extension::request() to return an instance of a different 
- *  class.
+ *  also override Extension::createEnvironment() to return an instance of a 
+ *  different class.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -27,19 +27,25 @@ class Extension;
 /**
  *  Class definition
  */
-class Request
+class Environment
 {
 public:
     /**
      *  Constructor
      *  @param  extension
      */
-    Request(Extension *extension) : _extension(extension) {}
+    Environment(Extension *extension) : _extension(extension) {}
+    
+    /**
+     *  Disable copy and move operations
+     */
+    Environment(const Environment &environment) = delete;
+    Environment(Environment &&environment) = delete;
     
     /**
      *  Destructor
      */
-    virtual ~Request() {}
+    virtual ~Environment() {}
     
     /**
      *  Initialize the request
@@ -67,19 +73,37 @@ public:
     {
         return true;
     }
+    
+    /**
+     *  Get access to the user supplied data
+     *  @return void*
+     */
+    virtual void *data()
+    {
+        return _data;
+    }
+    
+    /**
+     *  Change the user supplied data
+     *  @param  data
+     */
+    virtual void setData(void *data)
+    {
+        _data = data;
+    }
 
 protected:
     /**
-     *  The extension that this request belongs to
+     *  The extension that this environment belongs to
      *  @var Extension*
      */
     Extension *_extension;
     
     /**
-     *  Optional extra data
-     *  @var Type
+     *  Pointer to user supplied data
+     *  @var void*
      */
-    Type _data;
+    void *_data = NULL;
 };
 
 /**

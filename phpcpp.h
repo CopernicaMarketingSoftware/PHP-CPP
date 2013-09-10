@@ -23,7 +23,7 @@
  */
 #include <phpcpp/hiddenpointer.h>
 #include <phpcpp/type.h>
-#include <phpcpp/request.h>
+#include <phpcpp/environment.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>
