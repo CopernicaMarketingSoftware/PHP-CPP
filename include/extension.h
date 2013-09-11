@@ -29,6 +29,11 @@ struct _zend_module_entry;
 namespace Php {
 
 /**
+ *  Optional callback types for starting and stopping the request
+ */
+typedef bool    (*request_callback)(Environment &);
+
+/**
  *  A couple of predefined native callback functions that can be registered.
  *  These are functions that optional accept a Request and/or Parameters object,
  *  and that either return void or a Value object. 
@@ -52,9 +57,10 @@ public:
      *  Constructor that defines a number of functions right away
      *  @param  name        Extension name
      *  @param  version     Extension version string
-     *  @param  functions   The functions that are defined
+     *  @param  callback    Function that is called when request starts
+     *  @param  callback    Function that is called when request ends
      */
-    Extension(const char *name = NULL, const char *version = NULL);
+    Extension(const char *name = NULL, const char *version = NULL, request_callback start = NULL, request_callback stop = NULL);
     
     /**
      *  No copy'ing and no moving
@@ -109,6 +115,7 @@ public:
      */
     virtual Environment *createEnvironment()
     {
+        // allocate the environment
         return new Environment(this);
     }
     
@@ -121,6 +128,7 @@ public:
      */
     virtual void deleteEnvironment(Environment *environment)
     {
+        // destruct the environment
         delete environment;
     }
     
@@ -133,9 +141,13 @@ public:
      * 
      *  @return boolean
      */
-    bool startRequest(Environment &environment)
+    virtual bool startRequest(Environment &environment)
     {
-        return true;
+        // ok if no callback was set
+        if (!_start) return true;
+        
+        // call the callback function
+        return _start(environment);
     }
     
     /**
@@ -146,9 +158,13 @@ public:
      *
      *  @return boolean
      */
-    bool endRequest(Environment &environment)
+    virtual bool endRequest(Environment &environment)
     {
-        return true;
+        // ok if no callback is set
+        if (!_stop) return true;
+        
+        // call callback
+        return _stop(environment);
     }
     
     /**
@@ -211,6 +227,18 @@ private:
      *  @var zend_module_entry
      */
     _zend_module_entry *_entry;
+    
+    /**
+     *  Callback that is called before each request
+     *  @var request_callback
+     */
+    request_callback _start;
+    
+    /**
+     *  Callback that is called after each request
+     *  @var request_callback
+     */
+    request_callback _stop;
     
 };
 

@@ -37,11 +37,8 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     // construct parameters
     Parameters params(ZEND_NUM_ARGS());
 
-    // @todo get the appropriate request (or environment)
-    Environment environment(NULL);
-
 	// get the result
-	result = function->invoke(environment, params);
+	result = function->invoke(*PHPCPP_G(environment), params);
 }
 
 /**

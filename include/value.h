@@ -124,6 +124,13 @@ public:
     virtual Value &operator=(const Value &value);
     
     /**
+     *  Move assignment
+     *  @param  value
+     *  @return Value
+     */
+    virtual Value &operator=(Value &&value);
+    
+    /**
      *  Assignment operator
      *  @param  value
      *  @return Value

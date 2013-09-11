@@ -45,8 +45,10 @@
 #include "../include/parameters.h"
 #include "../include/function.h"
 #include "../include/extension.h"
+#include "../include/globals.h"
 
 /**
  *  Interface files for internal use only
  */
 #include "nativefunction.h"
+

@@ -26,42 +26,13 @@ namespace Php {
 static Extension *extension = nullptr;
 
 /**
- *  The way how PHP C API deals with "global" variables is stupid.
- * 
- *  This is supposed to turn into a structure that is going to be 
- *  instantiated for each parallel running request, and for which the 
- *  PHP engine allocates a certain amount of memory, and a magic
- *  pointer that is passed and should be forwarded to every thinkable 
- *  PHP function.
- * 
- *  We don't like this architecture. We have our own request object
- *  that makes much more sense, and that we use. However, we need
- *  to assign this object somewhere, so that's what we do in this
- *  one and only global variable
- */
-ZEND_BEGIN_MODULE_GLOBALS(phpcpp)
-    Environment *environment;
-ZEND_END_MODULE_GLOBALS(phpcpp)
-
-/**
- *  And now we're going to define a macro. This also is a ridiculous
- *  architecture from PHP to get access to a variable from the 
- *  structure above.
- */
-#ifdef ZTS
-#define PHPCPP_G(v) TSRMG(phpcpp_globals_id, zend_phpcpp_globals *, v)
-#else
-#define PHPCPP_G(v) (phpcpp_globals.v)
-#endif
-
-/**
  *  We're almost there, we now need to declare an instance of the
  *  structure defined above (if building for a single thread) or some
  *  sort of impossible to understand magic pointer-to-a-pointer (for
  *  multi-threading builds). We make this a static variable because
  *  this already is bad enough.
  */
-static ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
+ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
 
 /**
  *  Function that must be defined to initialize the "globals"
@@ -70,8 +41,6 @@ static ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
  *  @param  globals
  */
 static void init_globals(zend_phpcpp_globals *globals) {}
-
-
 
 /**
  *  Function that is called when the extension initializes
@@ -109,10 +78,16 @@ static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 static int request_startup(INIT_FUNC_ARGS)
 {
     // create the environment
-    PHPCPP_G(environment) = extension->createEnvironment();
+    Environment *environment = extension->createEnvironment();
+    
+    // store in global structure
+    PHPCPP_G(environment) = environment;
+    
+    // initialize the environment
+    environment->initialize();
     
     // start the request
-    return BOOL2SUCCESS(extension->startRequest(*(PHPCPP_G(environment))));
+    return BOOL2SUCCESS(environment->initialize() && extension->startRequest(*environment));
 }
 
 /**
@@ -123,11 +98,17 @@ static int request_startup(INIT_FUNC_ARGS)
  */
 static int request_shutdown(INIT_FUNC_ARGS)
 {
+    // retrieve the environment
+    Environment *environment = PHPCPP_G(environment);
+    
     // end the request
-    bool success = extension->endRequest(*(PHPCPP_G(environment)));
+    bool success = extension->endRequest(*environment) && environment->finalize();
     
     // deallocate the environment
-    extension->deleteEnvironment(PHPCPP_G(environment));
+    extension->deleteEnvironment(environment);
+    
+    // reset global variable
+    PHPCPP_G(environment) = NULL;
     
     // done
     return BOOL2SUCCESS(success);
@@ -137,8 +118,10 @@ static int request_shutdown(INIT_FUNC_ARGS)
  *  Constructor
  *  @param  name        Name of the extension
  *  @param  version     Version number
+ *  @param  start       Request start callback
+ *  @param  stop        Request stop callback
  */
-Extension::Extension(const char *name, const char *version)
+Extension::Extension(const char *name, const char *version, request_callback start, request_callback stop) : _start(start), _stop(stop)
 {
 	// store extension variable
 	extension = this;

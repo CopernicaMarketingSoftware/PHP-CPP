@@ -244,6 +244,77 @@ Value &Value::operator=(const Value &value)
 }
 
 /**
+ *  Move operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(Value &&value)
+{
+    // skip self assignment
+    if (this == &value) return *this;
+
+	// is the object a reference?
+	if (Z_ISREF_P(_val))
+	{
+        // @todo difference if the other object is a reference or not?
+        
+        
+		// the current object is a reference, this means that we should
+		// keep the zval object, and copy the other value into it, get
+		// the current refcount
+		int refcount = Z_REFCOUNT_P(_val);
+		
+		// clean up the current zval (but keep the zval structure)
+		zval_dtor(_val);
+		
+		// make the copy
+		*_val = *value._val;
+		
+		// restore reference and refcount setting
+		Z_SET_ISREF_TO_P(_val, true);
+		Z_SET_REFCOUNT_P(_val, refcount);
+        
+        // how many references did the old variable have?
+        if (Z_ISREF_P(value._val) > 1)
+        {
+			// the other object already had multiple references, this
+			// implies that many other PHP variables are also referring 
+			// to it, and we still need to store its contents, with one 
+			// reference less
+			Z_DELREF_P(value._val);
+			
+			// and we need to run the copy constructor on the current
+			// value, because we're making a deep copy
+			zval_copy_ctor(_val);
+		}
+		else
+		{
+			// the last and only reference to the other object was
+			// removed, we no longer need it
+			FREE_ZVAL(value._val);
+			
+			// the other object is no longer valid
+			value._val = nullptr;
+		}
+	}
+	else
+	{
+		// destruct the zval (this function will decrement the reference counter,
+		// and only destruct if there are no other references left)
+		zval_ptr_dtor(&_val);
+
+		// just copy the zval completely
+		_val = value._val;
+
+		// the other object is no longer valid
+		value._val = nullptr;
+	}
+	
+    // done
+    return *this;
+}
+
+/**
  *  Assignment operator
  *  @param  value
  *  @return Value
