@@ -121,14 +121,14 @@ public:
      *  @param  value
      *  @return Value
      */
-    virtual Value &operator=(const Value &value);
+    Value &operator=(const Value &value);
     
     /**
      *  Move assignment
      *  @param  value
      *  @return Value
      */
-    virtual Value &operator=(Value &&value);
+    Value &operator=(Value &&value);
     
     /**
      *  Assignment operator
@@ -425,7 +425,7 @@ public:
      *  @param  value       Value to set
      *  @return Value       The value that was set
      */
-    const Value &set(int index, const Value &value);
+    virtual const Value &set(int index, const Value &value);
     
     /**
      *  Set a certain property
@@ -435,7 +435,7 @@ public:
      *  @param  value       Value to set
      *  @return Value       The value that was set
      */
-    const Value &set(const char *key, int size, const Value &value);
+    virtual const Value &set(const char *key, int size, const Value &value);
 
     /**
      *  Set a certain property

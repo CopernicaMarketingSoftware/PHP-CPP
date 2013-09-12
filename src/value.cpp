@@ -134,19 +134,28 @@ Value::Value(double value)
  *  @param  zval        Value to wrap
  *  @param  ref         Force this to be a reference
  */
-Value::Value(struct _zval_struct *zval, bool ref)
+Value::Value(struct _zval_struct *val, bool ref)
 {
     // just copy the zval into this object
-    _val = zval;
+    _val = val;
+    
+    // if the variable is not already a reference, and it has more than one
+    // variable pointing to it, we should seperate it so that any changes
+    // we're going to make will not change the other variable
+    if (ref && Z_REFCOUNT_P(_val) > 1)
+    {
+		// separate the zval
+		SEPARATE_ZVAL_IF_NOT_REF(&_val);
+	}
     
     // we see ourselves as reference too
     Z_ADDREF_P(_val);
     
     // we're ready if we do not have to force it as a reference
-    if (!ref || Z_ISREF_P(zval)) return;
+    if (!ref || Z_ISREF_P(_val)) return;
     
     // make this a reference
-    Z_SET_ISREF_P(zval);
+    Z_SET_ISREF_P(_val);
 }
 
 /**
@@ -238,9 +247,9 @@ Value &Value::operator=(const Value &value)
 		// and we have one more reference
 		Z_ADDREF_P(_val);
 	}
-
-    // done
-    return *this;
+	
+	// update the object
+	return *this;
 }
 
 /**
@@ -309,9 +318,9 @@ Value &Value::operator=(Value &&value)
 		// the other object is no longer valid
 		value._val = nullptr;
 	}
-	
-    // done
-    return *this;
+
+	// update the object
+	return *this;
 }
 
 /**
@@ -329,9 +338,9 @@ Value &Value::operator=(int value)
     
     // set new value
     ZVAL_LONG(_val, value);
-    
-    // done
-    return *this;
+
+	// update the object
+	return *this;
 }
 
 /**
@@ -349,9 +358,9 @@ Value &Value::operator=(long value)
     
     // set new value
     ZVAL_LONG(_val, value);
-    
-    // done
-    return *this;
+
+	// update the object
+	return *this;
 }
 
 /**
@@ -369,9 +378,9 @@ Value &Value::operator=(bool value)
     
     // set new value
     ZVAL_BOOL(_val, value);
-    
-    // done
-    return *this;
+
+	// update the object
+	return *this;
 }
 
 /**
@@ -390,8 +399,8 @@ Value &Value::operator=(char value)
     // set new value
     ZVAL_STRINGL(_val, &value, 1, 1);
     
-    // done
-    return *this;
+	// update the object
+	return *this;
 }
 
 /**
@@ -410,8 +419,8 @@ Value &Value::operator=(const std::string &value)
     // set new value
     ZVAL_STRINGL(_val, value.c_str(), value.size(), 1);
     
-    // done
-    return *this;
+	// update the object
+	return *this;
 }
 
 /**
@@ -430,8 +439,8 @@ Value &Value::operator=(const char *value)
     // set new value
     ZVAL_STRING(_val, value, 1);
     
-    // done
-    return *this;
+	// update the object
+	return *this;
 }
 
 /**
@@ -450,8 +459,8 @@ Value &Value::operator=(double value)
     // set new value
     ZVAL_DOUBLE(_val, value);
     
-    // done
-    return *this;
+	// update the object
+	return *this;
 }
 
 /**

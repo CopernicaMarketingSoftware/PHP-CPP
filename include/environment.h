@@ -23,6 +23,7 @@ namespace Php {
  *  Forward definitions
  */
 class Extension;
+class Global;
 
 /**
  *  Class definition
@@ -91,6 +92,22 @@ public:
     {
         _data = data;
     }
+    
+    /**
+     *  Get access to a global variable
+     *  @param  name
+     *  @return Global
+     */
+    Global operator[](const char *name);
+    
+    /**
+     *  Get access to a global variable
+     *  @param  name
+     *  @return Global
+     */
+    Global operator[](const std::string &name);
+    
+    
 
 protected:
     /**

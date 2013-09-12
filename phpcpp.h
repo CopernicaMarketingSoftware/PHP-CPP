@@ -28,6 +28,7 @@
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>
 #include <phpcpp/value.h>
+#include <phpcpp/global.h>
 #include <phpcpp/member.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>

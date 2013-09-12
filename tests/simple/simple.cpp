@@ -15,10 +15,18 @@
  */
 using namespace std;
 
-static Php::Value my_plus(Php::Parameters &params)
+static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
 {
     string p1 = params[0];
     string p2 = params[1];
+    
+    cout << "global g1: " << env["g1"].stringValue() << endl;
+    cout << "global g2: " << env["g2"].stringValue() << endl;
+    
+    Php::Global g(env["g3"]);
+    
+    g = "zo kan het ook";
+    
     return p1 + p2;
 }
 
