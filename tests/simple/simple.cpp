@@ -27,6 +27,10 @@ static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
     
     g = "zo kan het ook";
     
+    string output = env.call("strtoupper","test in lowercase");
+    
+    cout << "output: " << output << endl;
+    
     return p1 + p2;
 }
 

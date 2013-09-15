@@ -34,13 +34,13 @@
 /**
  *  Include other files from this library
  */
-#include "../include/hiddenpointer.h"
 #include "../include/type.h"
+#include "../include/value.h"
+#include "../include/hiddenpointer.h"
 #include "../include/environment.h"
 #include "../include/argument.h"
 #include "../include/byval.h"
 #include "../include/byref.h"
-#include "../include/value.h"
 #include "../include/global.h"
 #include "../include/member.h"
 #include "../include/parameters.h"

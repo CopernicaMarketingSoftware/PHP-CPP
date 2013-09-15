@@ -492,6 +492,11 @@ protected:
      *  @var struct zval
      */
     struct _zval_struct *_val;
+    
+    /**
+     *  The environment can access the zval directly
+     */
+    friend class Environment;
 };
 
 /**

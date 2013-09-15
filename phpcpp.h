@@ -21,13 +21,13 @@
 /**
  *  Include all headers files that are related to this library
  */
-#include <phpcpp/hiddenpointer.h>
 #include <phpcpp/type.h>
+#include <phpcpp/value.h>
+#include <phpcpp/hiddenpointer.h>
 #include <phpcpp/environment.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>
-#include <phpcpp/value.h>
 #include <phpcpp/global.h>
 #include <phpcpp/member.h>
 #include <phpcpp/parameters.h>
