@@ -247,6 +247,24 @@ zend_module_entry *Extension::module()
 }
 
 /**
+ *  Initialize the extension
+ *  @return bool
+ */
+bool Extension::initialize()
+{
+    // loop through the classes
+    for (auto iter = _classes.begin(); iter != _classes.end(); iter++)
+    {
+        // initialize the class
+        (*iter)->initialize();
+    }
+    
+    // done
+    return true;
+}
+
+
+/**
  *  End of namespace
  */
 }

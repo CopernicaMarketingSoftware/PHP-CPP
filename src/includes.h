@@ -45,6 +45,9 @@
 #include "../include/member.h"
 #include "../include/parameters.h"
 #include "../include/function.h"
+#include "../include/base.h"
+#include "../include/class.h"
+#include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/globals.h"
 

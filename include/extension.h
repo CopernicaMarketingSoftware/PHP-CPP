@@ -80,15 +80,15 @@ public:
      *  and after the compatibility has been checked, but before the requests 
      *  are handled. You can override this method to add your own initialization.
      * 
+     *  The default behavior of this function is to enable all classes that are
+     *  defined in this extension, so that they are also available in PHP.
+     * 
      *  The method should return true on success, and false on failure (in which
      *  case the extension will not be used)
      * 
      *  @return bool
      */
-    virtual bool initialize()
-    {
-        return true;
-    }
+    virtual bool initialize();
     
     /**
      *  Finalize the extension
@@ -200,6 +200,21 @@ public:
     Function *add(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments = {});
     
     /**
+     *  Add a native class to the extension
+     *  @param  name        Name of the class
+     *  @param  type        The class implementation
+     */
+    template<typename T>
+    void add(const char *name, const Class<T> &type)
+    {
+        // construct info
+        ClassInfo<T> *info = new ClassInfo<T>(name, type);
+        
+        // add class
+        _classes.insert(std::unique_ptr<_ClassInfo>(info));
+    }
+    
+    /**
      *  Retrieve the module entry
      * 
      *  This is the memory address that should be exported by the get_module()
@@ -213,9 +228,15 @@ public:
 private:
     /**
      *  Set of function objects defined in the library
-     *  @var    map
+     *  @var    set
      */
     std::set<std::unique_ptr<Function>> _functions;
+
+    /**
+     *  Set of classes defined in the library
+     *  @var    set
+     */
+    std::set<std::unique_ptr<_ClassInfo>> _classes;
 
     /**
      *  The information that is passed to the Zend engine

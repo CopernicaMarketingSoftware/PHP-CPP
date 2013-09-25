@@ -15,6 +15,12 @@
  */
 using namespace std;
 
+/**
+ *  Our own "my_plus" function that will be available in PHP
+ *  @param  environment
+ *  @param  params
+ *  @return Value
+ */
 static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
 {
     string p1 = params[0];
@@ -34,19 +40,13 @@ static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
     return p1 + p2;
 }
 
-class MyCustomFunction : public Php::Function
+/**
+ *  Custom class that will be available in PHP
+ */
+class MyCustomClass : public Php::Base
 {
 public:
-	MyCustomFunction(const char *name) : Function(name) {}
-    
-	
-    
 };
-
-
-
-
-
 
 // symbols are exported according to the "C" language
 extern "C"
@@ -65,11 +65,8 @@ extern "C"
 			Php::ByRef("d", Php::stringType)
 		});
 		
-//      extension.add("my_concat", my_concat);
-        extension.add(new MyCustomFunction("my_custom"));
-
         // define classes
-//      extension.add("my_class", MyCustomClass());
+        extension.add("my_class", Php::Class<MyCustomClass>());
         
         // return the module entry
         return extension.module();
