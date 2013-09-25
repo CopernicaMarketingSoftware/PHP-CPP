@@ -31,3 +31,11 @@ echo("g1: $g1\n");
 echo("g2: $g2\n");
 echo("g3: $g3\n");
 
+
+if (class_exists("my_class")) echo("Warempel, de class bestaat\n");
+
+$x = new my_class();
+
+$x->my_method();
+
+

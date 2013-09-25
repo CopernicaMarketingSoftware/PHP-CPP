@@ -55,4 +55,5 @@
  *  Interface files for internal use only
  */
 #include "nativefunction.h"
+#include "internalfunction.h"
 

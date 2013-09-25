@@ -12,6 +12,11 @@
  */
 
 /**
+ *  Forward declarations
+ */
+struct _zend_class_entry;
+
+/**
  *  Namespace
  */
 namespace Php {
@@ -26,9 +31,34 @@ class _ClassInfo
 {
 public:
     /**
+     *  Constructor
+     *  @param  name
+     */
+    _ClassInfo(const char *name) : _name(name), _entry(NULL) {}
+    
+    /**
+     *  Destructor
+     */
+    virtual ~_ClassInfo() {}
+
+    /**
      *  Initialize the class
      */
-    virtual void initialize() = 0;
+    void initialize();
+
+private:
+    /**
+     *  Class name
+     *  @var    string
+     */
+    std::string _name;
+
+    /** 
+     *  The class entry
+     *  @var    zend_class_entry
+     */
+    struct _zend_class_entry *_entry;
+
 };
 
 /**
@@ -43,7 +73,7 @@ public:
      *  @param  name        Name of the class
      *  @param  type        The class type
      */
-    ClassInfo(const char *name, const Class<T> &type) : _name(name), _type(type)
+    ClassInfo(const char *name, const Class<T> &type) : _ClassInfo(name), _type(type)
     {
     }
 
@@ -52,18 +82,8 @@ public:
      */
     virtual ~ClassInfo() {}
 
-    /**
-     *  Initialize the class
-     */
-    virtual void initialize();
 
 private:
-    /**
-     *  Class name
-     *  @var    string
-     */
-    std::string _name;
-    
     /**
      *  The class object
      *  @var    Class

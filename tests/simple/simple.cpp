@@ -45,7 +45,32 @@ static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
  */
 class MyCustomClass : public Php::Base
 {
+private:
+    int _x;
+    
 public:
+    MyCustomClass()
+    {
+    }
+    
+    virtual void __construct()
+    {
+        
+    }
+
+    virtual void __destruct()
+    {
+        
+        
+    }
+    
+    void myMethod(Php::Parameters &params)
+    {
+        
+        
+    }
+
+
 };
 
 // symbols are exported according to the "C" language

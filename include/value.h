@@ -500,6 +500,14 @@ protected:
 };
 
 /**
+ *  Custom output stream operator
+ *  @param  stream
+ *  @param  value
+ *  @return ostream
+ */
+std::ostream &operator<<(std::ostream &stream, const Value &value);
+
+/**
  *  End of namespace
  */
 }
