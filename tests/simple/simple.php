@@ -12,10 +12,10 @@ $myvar = "hoi";
 
 class MyClass {
 
-	public function __toString()
-	{
-		return "aksjdfhsdfkj";
-	}
+    public function __toString()
+    {
+        return "aksjdfhsdfkj";
+    }
 }
 
 $g1 = 123;
@@ -35,7 +35,10 @@ echo("g3: $g3\n");
 if (class_exists("my_class")) echo("Warempel, de class bestaat\n");
 
 $x = new my_class();
+unset($x);
 
-$x->my_method();
+echo("done\n");
+
+//$x->my_method();
 
 

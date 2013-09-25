@@ -37,34 +37,34 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     // construct parameters
     Parameters params(ZEND_NUM_ARGS());
 
-	// get the result
-	result = function->invoke(*PHPCPP_G(environment), params);
+    // get the result
+    result = function->invoke(*PHPCPP_G(environment), params);
 }
 
 /**
  *  Constructor
- * 	@param	name	Name of the function
+ *  @param  name    Name of the function
  *  @param  min     Min number of arguments
  *  @param  max     Max number of arguments
  */
 Function::Function(const char *name, const std::initializer_list<Argument> &arguments) : _ptr(this, name)
 {
-	// construct vector for arguments
-	_argc = arguments.size();
-	_argv = new zend_arg_info[_argc+1];
-	
-	// counter
-	int i=1;
-	
-	// loop through the arguments
-	for (auto it = arguments.begin(); it != arguments.end(); it++)
-	{
-		// fill the arg info
-		it->fill(&_argv[i++]);
-	}
-	
-	// @todo find out number of required arguments
-	_required = _argc;
+    // construct vector for arguments
+    _argc = arguments.size();
+    _argv = new zend_arg_info[_argc+1];
+    
+    // counter
+    int i=1;
+    
+    // loop through the arguments
+    for (auto it = arguments.begin(); it != arguments.end(); it++)
+    {
+        // fill the arg info
+        it->fill(&_argv[i++]);
+    }
+    
+    // @todo find out number of required arguments
+    _required = _argc;
 }
 
 /**
@@ -72,7 +72,7 @@ Function::Function(const char *name, const std::initializer_list<Argument> &argu
  */
 Function::~Function()
 {
-	delete[] _argv;
+    delete[] _argv;
 }
 
 /**

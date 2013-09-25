@@ -173,7 +173,7 @@ public:
      *  It is only possible to create functions during the initialization of
      *  the library, before the Extension::module() method is called.
      * 
-     * 	Note that the function must have been allocated on the HEAP (using
+     *  Note that the function must have been allocated on the HEAP (using
      *  "new") and that the object will be destructed (using "delete")
      *  by the extension object (you thus do not have to destruct it
      *  yourself!) 
@@ -187,7 +187,7 @@ public:
      *  Add a native function directly to the extension
      *  @param  name        Name of the function
      *  @param  function    The function to add
-     * 	@param	arguments	Optional argument specification
+     *  @param  arguments   Optional argument specification
      *  @return Function    The added function
      */
     Function *add(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments = {});

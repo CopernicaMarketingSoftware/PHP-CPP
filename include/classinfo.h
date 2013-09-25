@@ -22,6 +22,11 @@ struct _zend_class_entry;
 namespace Php {
 
 /**
+ *  Forward declarations
+ */
+class InternalFunction;
+
+/**
  *  Virtual base class of the classInfo
  * 
  *  We need this virtual base class to store pointers to class objects,
@@ -34,31 +39,49 @@ public:
      *  Constructor
      *  @param  name
      */
-    _ClassInfo(const char *name) : _name(name), _entry(NULL) {}
+    _ClassInfo(const char *name);
     
     /**
      *  Destructor
      */
-    virtual ~_ClassInfo() {}
+    virtual ~_ClassInfo();
 
     /**
      *  Initialize the class
      */
     void initialize();
+    
+    /**
+     *  Construct the C++ object
+     *  @return Base
+     */
+    virtual Base *construct() = 0;
 
 private:
-    /**
-     *  Class name
-     *  @var    string
-     */
-    std::string _name;
-
     /** 
      *  The class entry
      *  @var    zend_class_entry
      */
     struct _zend_class_entry *_entry;
 
+    /**
+     *  The name
+     *  @var    string
+     */
+    std::string _name;
+    
+    /**
+     *  Constructor function
+     *  @var    InternalFunction
+     */
+    InternalFunction *_constructor;
+    
+    /**
+     *  Destructor function
+     *  @var    InternalFunction
+     */
+    InternalFunction *_destructor;
+    
 };
 
 /**
@@ -82,6 +105,14 @@ public:
      */
     virtual ~ClassInfo() {}
 
+    /**
+     *  Construct the object
+     *  @return Base
+     */
+    virtual Base *construct()
+    {
+        return _type.construct();
+    }
 
 private:
     /**

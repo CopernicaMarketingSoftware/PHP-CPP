@@ -28,7 +28,7 @@ class Function
 public:
     /**
      *  Constructor
-     * 	@param	name	Name of the function
+     *  @param  name    Name of the function
      *  @param  min     Min number of arguments
      *  @param  max     Max number of arguments
      */
@@ -55,42 +55,42 @@ public:
     
     /**
      *  Comparison
-     *  @param	function	The other function
-     * 	@return	bool
+     *  @param  function    The other function
+     *  @return bool
      */
     bool operator<(const Function &function) const
     {
-		return strcmp(name(), function.name()) < 0;
-	}
+        return strcmp(name(), function.name()) < 0;
+    }
 
     /**
      *  Comparison
-     *  @param	function	The other function
-     * 	@return	bool
+     *  @param  function    The other function
+     *  @return bool
      */
     bool operator>(const Function &function) const
     {
-		return strcmp(name(), function.name()) > 0;
-	}
+        return strcmp(name(), function.name()) > 0;
+    }
 
     /**
      *  Comparison
-     *  @param	function	The other function
-     * 	@return	bool
+     *  @param  function    The other function
+     *  @return bool
      */
     bool operator==(const Function &function) const
     {
-		return strcmp(name(), function.name()) == 0;
-	}
+        return strcmp(name(), function.name()) == 0;
+    }
 
-	/**
-	 *  Function name
-	 *  @return	const char *
-	 */
-	const char *name() const
-	{
-		return _ptr.text();
-	}
+    /**
+     *  Function name
+     *  @return const char *
+     */
+    const char *name() const
+    {
+        return _ptr.text();
+    }
 
     /**
      *  Method that gets called every time the function is executed
@@ -111,17 +111,17 @@ protected:
      */
     Type _type = nullType;
 
-	/**
-	 *  Required number of arguments
-	 *  @var	integer
-	 */
-	int _required;
-	
-	/**
-	 *  Total number of arguments
-	 *  @var	integer
-	 */
-	int _argc;
+    /**
+     *  Required number of arguments
+     *  @var    integer
+     */
+    int _required;
+    
+    /**
+     *  Total number of arguments
+     *  @var    integer
+     */
+    int _argc;
 
     /**
      *  The arguments
@@ -130,8 +130,8 @@ protected:
     struct _zend_arg_info *_argv;
 
     /**
-     *  The name is stored in a hidden pointer, so that we have access to the function
-     *  @var	HiddenPointer
+     *  The object address is stored in a hidden pointer, so that we have access to the function object
+     *  @var    HiddenPointer
      */
     HiddenPointer<Function> _ptr;
 

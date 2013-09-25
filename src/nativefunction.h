@@ -21,8 +21,8 @@ class NativeFunction : public Function
 public:
     /**
      *  Constructor
-     * 	@param	name			Function name
-     *  @param  function		The native C function
+     *  @param  name            Function name
+     *  @param  function        The native C function
      */
     NativeFunction(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(0) { _function.f0 = function; }
     NativeFunction(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments = {}) : Function(name, arguments), _type(1) { _function.f1 = function; }

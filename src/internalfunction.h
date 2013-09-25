@@ -47,19 +47,10 @@ public:
     virtual ~InternalFunction() {}
     
     /**
-     *  Cast to zend_internal_function pointer
-     *  @return zend_internal_function
-     */
-    operator zend_internal_function *()
-    {
-        return &_func;
-    }
-    
-    /**
      *  Cast to zend_function pointer
      *  @return zend_function
      */
-    operator zend_function *()
+    zend_function *function()
     {
         return (zend_function *)&_func;
     }

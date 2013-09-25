@@ -51,26 +51,30 @@ private:
 public:
     MyCustomClass()
     {
+        _x = 3;
+        cout << "MyCustomClass::MyCustomClass" << endl;
     }
+    
+    virtual ~MyCustomClass()
+    {
+        cout << "MyCustomClass::~MyCustomClass" << endl;
+    }
+        
     
     virtual void __construct()
     {
-        
+        cout << "MyCustomClass::__construct" << endl;
     }
 
     virtual void __destruct()
     {
-        
-        
+        cout << "MyCustomClass::__destruct" << endl;
     }
     
     void myMethod(Php::Parameters &params)
     {
-        
-        
+
     }
-
-
 };
 
 // symbols are exported according to the "C" language
@@ -84,12 +88,12 @@ extern "C"
 
         // define the functionsnm 
         extension.add("my_plus", my_plus, {
-			Php::ByVal("a", Php::stringType),
-			Php::ByVal("b", Php::arrayType),
-			Php::ByVal("c", "MyClass"),
-			Php::ByRef("d", Php::stringType)
-		});
-		
+            Php::ByVal("a", Php::stringType),
+            Php::ByVal("b", Php::arrayType),
+            Php::ByVal("c", "MyClass"),
+            Php::ByRef("d", Php::stringType)
+        });
+        
         // define classes
         extension.add("my_class", Php::Class<MyCustomClass>());
         

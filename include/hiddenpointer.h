@@ -113,19 +113,19 @@ public:
     
     /**
      *  Change the pointer
-     *  @param	Type*
+     *  @param  Type*
      */
     void setPointer(Type *pointer)
     {
-		// store pointer
-		_pointer = pointer;
+        // store pointer
+        _pointer = pointer;
     
-		// overwrite in data
-		_data.replace(0, sizeof(Type *), (const char *)&_pointer, sizeof(Type *));
-		
+        // overwrite in data
+        _data.replace(0, sizeof(Type *), (const char *)&_pointer, sizeof(Type *));
+        
         // for safety reasons, we recalculate text pointer
         _text = _data.c_str() + sizeof(Type *);
-	}
+    }
     
     /**
      *  Retrieve the text
@@ -138,14 +138,14 @@ public:
     
     /**
      *  Change the text
-     *  @param	text
-     * 	@param	size
+     *  @param  text
+     *  @param  size
      */
     void setText(const char *text, int size=-1)
     {
-		// check if size was set
-		if (size < 0) size = strlen(text);
-		
+        // check if size was set
+        if (size < 0) size = strlen(text);
+        
         // reserve enough room for the text and the pointer
         _data.reserve(size + sizeof(Type *));
         
@@ -157,7 +157,7 @@ public:
         
         // store new text
         _text = _data.c_str() + sizeof(Type *);
-	}
+    }
     
     /**
      *  Cast to the pointer
@@ -183,8 +183,8 @@ public:
      */
     int length() const
     {
-		return _data.size() - sizeof(Type *);
-	}
+        return _data.size() - sizeof(Type *);
+    }
 
 private:
     /**

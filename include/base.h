@@ -17,6 +17,11 @@ class Base
 {
 public:
     /**
+     *  Virtual destructor
+     */
+    virtual ~Base() {}
+
+    /**
      *  The pseudo constructor that is called from PHP after the object is constructed
      *  @param  environment
      *  @param  parameters
@@ -46,6 +51,20 @@ public:
      */
     virtual void __construct() {}
 
+    /**
+     *  The pseudo destructor that is called from PHP right before the object is destructed
+     *  @param  environment
+     */
+    virtual void __destruct(Environment &environment)
+    {
+        // call the other implementation
+        __destruct();
+    }
+    
+    /**
+     *  The pseudo destructor that is called from PHP right before the object is destructed
+     */
+    virtual void __destruct() {}
 
 };
 

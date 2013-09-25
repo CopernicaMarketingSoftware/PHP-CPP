@@ -21,7 +21,7 @@ namespace Php {
 
 /**
  *  Pointer to the one and only extension object
- *	@var	Extension
+ *  @var    Extension
  */
 static Extension *extension = nullptr;
 
@@ -123,9 +123,9 @@ static int request_shutdown(INIT_FUNC_ARGS)
  */
 Extension::Extension(const char *name, const char *version, request_callback start, request_callback stop) : _start(start), _stop(stop)
 {
-	// store extension variable
-	extension = this;
-	
+    // store extension variable
+    extension = this;
+    
     // allocate memory (we allocate this on the heap so that the size of the
     // entry does not have to be defined in the .h file. We pay a performance
     // price for this, but we pay this price becuase the design goal of the
