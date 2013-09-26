@@ -778,33 +778,33 @@ const Value &Value::set(const char *key, int size, const Value &value)
  *  Array access operator
  *  This can be used for accessing arrays
  *  @param  index
- *  @return Member
+ *  @return HashMember
  */
-Member<int> Value::operator[](int index) 
+HashMember<int> Value::operator[](int index) 
 {
-    return Member<int>(this, index);
+    return HashMember<int>(this, index);
 }
 
 /**
  *  Array access operato
  *  This can be used for accessing associative arrays
  *  @param  key
- *  @return Member
+ *  @return HashMember
  */
-Member<std::string> Value::operator[](const std::string &key) 
+HashMember<std::string> Value::operator[](const std::string &key) 
 {
-    return Member<std::string>(this, key);
+    return HashMember<std::string>(this, key);
 }
 
 /**
  *  Array access operator
  *  This can be used for accessing associative arrays
  *  @param  key
- *  @return Member
+ *  @return HashMember
  */
-Member<std::string> Value::operator[](const char *key) 
+HashMember<std::string> Value::operator[](const char *key) 
 {
-    return Member<std::string>(this, key);
+    return HashMember<std::string>(this, key);
 }
 
 /**

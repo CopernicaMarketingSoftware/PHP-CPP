@@ -31,7 +31,7 @@ namespace Php {
 /**
  *  Forward definitions
  */
-template <class Type> class Member;
+template <class Type> class HashMember;
 
 /**
  *  Class definition
@@ -467,7 +467,7 @@ public:
      *  @param  index
      *  @return Member
      */
-    Member<int> operator[](int index);
+    HashMember<int> operator[](int index);
     
     /**
      *  Array access operator
@@ -475,15 +475,15 @@ public:
      *  @param  key
      *  @return Member
      */
-    Member<std::string> operator[](const std::string &key);
+    HashMember<std::string> operator[](const std::string &key);
 
     /**
      *  Array access operator
      *  This can be used for accessing associative arrays
      *  @param  key
-     *  @return Member
+     *  @return HashMember
      */
-    Member<std::string> operator[](const char *key);
+    HashMember<std::string> operator[](const char *key);
 
 
 protected:

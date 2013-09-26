@@ -29,7 +29,7 @@
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>
 #include <phpcpp/global.h>
-#include <phpcpp/member.h>
+#include <phpcpp/hashmember.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/base.h>

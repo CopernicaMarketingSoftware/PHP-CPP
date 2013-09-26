@@ -1,5 +1,5 @@
 /**
- *  Member.h
+ *  HashMember.h
  *
  *  When you're accessing members in an array or an object, you're
  *  doing this via an internal member object. This is an object that
@@ -27,20 +27,20 @@ class Value;
  *  Member class
  */
 template <typename Type>
-class Member
+class HashMember
 {
 public:
     /**
      *  Destructor
      */
-    virtual ~Member() {}
+    virtual ~HashMember() {}
 
     /**
      *  Assign a value object to the array
      *  @param  value
      *  @return Member
      */
-    Member &operator=(const Value &value)
+    HashMember &operator=(const Value &value)
     {
         // set property in parent array
         _base.set(_index, value);
@@ -119,9 +119,9 @@ public:
      *  Array access operator
      *  This can be used for accessing arrays
      *  @param  index
-     *  @return Member
+     *  @return HashMember
      */
-    Member operator[](int index)
+    HashMember operator[](int index)
     {
         return _base.get(_index)[index].add(this);
     }
@@ -130,9 +130,9 @@ public:
      *  Array access operator
      *  This can be used for accessing associative arrays
      *  @param  key
-     *  @return Member
+     *  @return HashMember
      */
-    Member operator[](const std::string &key)
+    HashMember operator[](const std::string &key)
     {
         return _base.get(_index)[key].add(this);
     }
@@ -141,9 +141,9 @@ public:
      *  Array access operator
      *  This can be used for accessing associative arrays
      *  @param  key
-     *  @return Member
+     *  @return HashMember
      */
-    Member operator[](const char *key)
+    HashMember operator[](const char *key)
     {
         return _base.get(_index)[key].add(this);
     }
@@ -154,20 +154,20 @@ private:
      *  @param  base    Base value
      *  @param  index   Index in the array
      */
-    Member(const Value *base, Type index) : _base(*base), _index(index) {}
+    HashMember(const Value *base, Type index) : _base(*base), _index(index) {}
     
     /**
      *  Protected copy constructor
      *  @param  value   Other element
      */
-    Member(const Member<Type> &member) : _base(member._base), _index(member._index), _parent(member._parent) {}
+    HashMember(const HashMember<Type> &member) : _base(member._base), _index(member._index), _parent(member._parent) {}
     
     /**
      *  Add parent
      *  @param  parent
-     *  @return Member
+     *  @return HashMember
      */
-    Member &add(Member *parent)
+    HashMember &add(HashMember *parent)
     {
         _parent = parent;
         return *this;
@@ -187,9 +187,9 @@ private:
     
     /**
      *  Parent member (in case of nested members)
-     *  @var Member
+     *  @var HashMember
      */
-    Member *_parent = nullptr;
+    HashMember *_parent = nullptr;
     
     /**
      *  Only value objects may construct members
