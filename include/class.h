@@ -13,7 +13,12 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
- 
+
+/**
+ *  Forward declarations
+ */
+struct _zend_class_entry;
+
 /**
  *  Set up namespace
  */
@@ -32,15 +37,21 @@ public:
     Class() {}
     
     /**
+     *  Constructor with initializer list to define the properties
+     *  @param  members
+     */
+    Class(const std::initializer_list<Member> &members) : _members(members) {}
+    
+    /**
      *  Move constructor
      *  @param  that
      */
-    Class(Class &&that) {}
+    Class(Class &&that) : _members(std::move(that._members)) {}
 
     /**
      *  Copy constructor
      */
-    Class(const Class &that) {}
+    Class(const Class &that) : _members(that._members) {}
     
     /**
      *  Destructor
@@ -57,7 +68,26 @@ public:
         return new T();
     }
 
+    /**
+     *  Initialize the class
+     *  This will declare all members
+     *  @param entry
+     */
+    void initialize(struct _zend_class_entry *entry)
+    {
+        // loop through the members
+        for (auto iter = _members.begin(); iter != _members.end(); iter++)
+        {
+            iter->declare(entry);
+        }
+    }
+
 protected:
+    /**
+     *  The initial arguments
+     *  @var vector
+     */
+    std::vector<Member> _members;
 
 };
 

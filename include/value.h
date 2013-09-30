@@ -497,6 +497,7 @@ protected:
      *  The environment can access the zval directly
      */
     friend class Environment;
+    friend class Member;
 };
 
 /**

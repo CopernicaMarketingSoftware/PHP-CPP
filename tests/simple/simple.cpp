@@ -59,8 +59,7 @@ public:
     {
         cout << "MyCustomClass::~MyCustomClass" << endl;
     }
-        
-    
+
     virtual void __construct()
     {
         cout << "MyCustomClass::__construct" << endl;
@@ -86,7 +85,7 @@ extern "C"
         // create extension
         static Php::Extension extension("simple","1.0");
 
-        // define the functionsnm 
+        // define the functions
         extension.add("my_plus", my_plus, {
             Php::ByVal("a", Php::stringType),
             Php::ByVal("b", Php::arrayType),
@@ -95,7 +94,10 @@ extern "C"
         });
         
         // define classes
-        extension.add("my_class", Php::Class<MyCustomClass>());
+        extension.add("my_class", Php::Class<MyCustomClass>({
+            Php::Public("a", 123),
+            Php::Protected("b", "abc")
+        }));
         
         // return the module entry
         return extension.module();

@@ -56,6 +56,12 @@ public:
      *  @return Base
      */
     virtual Base *construct() = 0;
+    
+    /**
+     *  Initialize the class
+     *  @param  entry
+     */
+    virtual void initialize(struct _zend_class_entry *entry) = 0;
 
 private:
     /** 
@@ -112,6 +118,16 @@ public:
     virtual Base *construct()
     {
         return _type.construct();
+    }
+    
+    /**
+     *  Initialize the class
+     *  @param entry
+     */
+    virtual void initialize(struct _zend_class_entry *entry)
+    {
+        // pass to the entry
+        _type.initialize(entry);
     }
 
 private:

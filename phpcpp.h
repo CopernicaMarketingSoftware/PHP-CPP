@@ -33,6 +33,9 @@
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/base.h>
+#include <phpcpp/member.h>
+#include <phpcpp/public.h>
+#include <phpcpp/protected.h>
 #include <phpcpp/class.h>
 #include <phpcpp/classinfo.h>
 #include <phpcpp/extension.h>

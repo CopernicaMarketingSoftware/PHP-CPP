@@ -177,6 +177,9 @@ void _ClassInfo::initialize(TSRMLS_D)
 
     // store pointer to the class in the unused doc_comment member
     _entry->info.user.doc_comment = (const char *)this;
+    
+    // initialize the entry
+    initialize(_entry);
 }
 
 /**
