@@ -23,7 +23,15 @@ public:
      *  @param  name        Name of the property
      *  @param  value       Default value of the property
      */
-    Protected(const char *name, const Value &value) : Member(name, false, value) {}
+    Protected(const char *name) : Member(name, false) {}
+    Protected(const char *name, std::nullptr_t value) : Member(name, false, value) {}
+    Protected(const char *name, int value) : Member(name, false, value) {}
+    Protected(const char *name, long value) : Member(name, false, value) {}
+    Protected(const char *name, bool value) : Member(name, false, value) {}
+    Protected(const char *name, char value) : Member(name, false, value) {}
+    Protected(const char *name, const std::string &value) : Member(name, false, value) {}
+    Protected(const char *name, const char *value, int size=-1) : Member(name, false, value, size) {}
+    Protected(const char *name, double value) : Member(name, false, value) {}
     
     /**
      *  Destructor

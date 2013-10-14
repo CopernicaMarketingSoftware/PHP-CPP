@@ -34,8 +34,11 @@ static void deallocate_object(void *object TSRMLS_DC)
     if (obj->cpp) delete obj->cpp;
     
     // get rid of the object properties
-    zend_hash_destroy(obj->php.properties);
-    FREE_HASHTABLE(obj->php.properties);
+	// @todo if we enable the following two lines, segmentation
+	//		faults and memory corruption occurs. however, the online
+	//		documentation does it like this
+    //zend_hash_destroy(obj->php.properties);
+    //FREE_HASHTABLE(obj->php.properties);
 
     // deallocate the entire object
     efree(obj);

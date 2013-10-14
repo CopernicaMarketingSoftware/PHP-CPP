@@ -23,7 +23,15 @@ public:
      *  @param  name        Name of the property
      *  @param  value       Default value of the property
      */
-    Public(const char *name, const Value &value) : Member(name, true, value) {}
+    Public(const char *name) : Member(name, true) {}
+    Public(const char *name, std::nullptr_t value) : Member(name, true, value) {}
+    Public(const char *name, int value) : Member(name, true, value) {}
+    Public(const char *name, long value) : Member(name, true, value) {}
+    Public(const char *name, bool value) : Member(name, true, value) {}
+    Public(const char *name, char value) : Member(name, true, value) {}
+    Public(const char *name, const std::string &value) : Member(name, true, value) {}
+    Public(const char *name, const char *value, int size=-1) : Member(name, true, value, size) {}
+    Public(const char *name, double value) : Member(name, true, value) {}
     
     /**
      *  Destructor

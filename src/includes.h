@@ -59,4 +59,9 @@
  */
 #include "nativefunction.h"
 #include "internalfunction.h"
-
+#include "memberinfo.h"
+#include "nullmember.h"
+#include "longmember.h"
+#include "boolmember.h"
+#include "stringmember.h"
+#include "doublemember.h"
