@@ -63,7 +63,13 @@ public:
      */
     virtual void initialize(struct _zend_class_entry *entry) = 0;
 
-private:
+    /**
+     *  Retrieve the methods
+     *  @return zend_function_entry[]
+     */
+    virtual struct _zend_function_entry *methods() = 0;
+
+protected:
     /** 
      *  The class entry
      *  @var    zend_class_entry
@@ -128,6 +134,16 @@ public:
     {
         // pass to the entry
         _type.initialize(entry);
+    }
+
+    /**
+     *  Retrieve the methods
+     *  @return zend_function_entry[]
+     */
+    virtual struct _zend_function_entry *methods()
+    {
+        // ask class object
+        return _type.methods(_name.c_str());
     }
 
 private:

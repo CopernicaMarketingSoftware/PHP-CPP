@@ -69,6 +69,18 @@ public:
 };
 
 /**
+ *  Definition of a method
+ */
+typedef void    (Base::*method_callback_0)();
+typedef void    (Base::*method_callback_1)(Parameters &);
+typedef void    (Base::*method_callback_2)(Environment &);
+typedef void    (Base::*method_callback_3)(Environment &, Parameters &);
+typedef Value   (Base::*method_callback_4)();
+typedef Value   (Base::*method_callback_5)(Parameters &);
+typedef Value   (Base::*method_callback_6)(Environment &);
+typedef Value   (Base::*method_callback_7)(Environment &, Parameters &);
+
+/**
  *  End of namespace
  */
 }

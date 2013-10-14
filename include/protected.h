@@ -32,6 +32,20 @@ public:
     Protected(const char *name, const std::string &value) : Member(name, false, value) {}
     Protected(const char *name, const char *value, int size=-1) : Member(name, false, value, size) {}
     Protected(const char *name, double value) : Member(name, false, value) {}
+
+    /**
+     *  Constructor
+     *  @param  name        Name of the property
+     *  @param  method      Method to add
+     */
+    Protected(const char *name, method_callback_0 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_1 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_2 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_3 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_4 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_5 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_6 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
+    Protected(const char *name, method_callback_7 method, const std::initializer_list<Argument> &arguments = {}) : Member(name, false, method, arguments) {}
     
     /**
      *  Destructor

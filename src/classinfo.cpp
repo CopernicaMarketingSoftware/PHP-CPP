@@ -162,13 +162,13 @@ _ClassInfo::~_ClassInfo()
  *  Initialize the class
  *  @param  mixed       Optional threading ID 
  */
-void _ClassInfo::initialize(TSRMLS_D)
+void _ClassInfo::initialize(TSRMLS_DC)
 {
     // the class entry
     zend_class_entry entry;
 
     // initialize the class entry
-    INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), NULL);
+    INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), methods());
 
     // we need a special constructor
     entry.create_object = create_object;

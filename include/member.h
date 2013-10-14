@@ -99,6 +99,21 @@ public:
      *  @param  value       The value to add
      */
     Member(const char *name, bool pub, double value);
+    
+    /**
+     *  Constructor
+     *  @param  name        Name of the method
+     *  @param  pub         Is this a public method (otherwise it is protected)
+     *  @param  method      The method to add
+     */
+    Member(const char *name, bool pub, method_callback_0 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_1 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_2 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_3 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_4 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_5 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_6 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, method_callback_7 method, const std::initializer_list<Argument> &arguments = {});
 
     /**
      *  Copy constructor
@@ -119,9 +134,30 @@ public:
     
     /**
      *  Internal method to declare the property
-     *  @var zend_class_entry
+     *  @param  zend_class_entry
+     *  @internal
      */
     void declare(struct _zend_class_entry *entry);
+    
+    /**
+     *  Internal method to fill a function entry
+     *  @param  zend_function_entry
+     *  @param  classname
+     *  @internal
+     */
+    void fill(struct _zend_function_entry *entry, const char *classname);
+    
+    /**
+     *  Is this a property member
+     *  @return bool
+     */
+    bool isProperty();
+    
+    /**
+     *  Is this a method member
+     *  @return bool
+     */
+    bool isMethod();
     
 
 private:

@@ -44,6 +44,12 @@ public:
     virtual ~StringMember() {}
 
     /**
+     *  Is this a property member
+     *  @return bool
+     */
+    virtual bool isProperty() { return true; }
+
+    /**
      *  Virtual method to declare the property
      *  @param  entry       Class entry
      *  @param  name        Name of the member

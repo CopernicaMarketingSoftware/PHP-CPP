@@ -81,13 +81,23 @@ public:
             iter->declare(entry);
         }
     }
+    
+    /**
+     *  Retrieve the functions
+     *  @param  classname
+     *  @return zend_function_entry*
+     */
+    struct _zend_function_entry *methods(const char *classname)
+    {
+        return _members.methods(classname);
+    }
 
 protected:
     /**
      *  The initial arguments
-     *  @var vector
+     *  @var Members
      */
-    std::vector<Member> _members;
+    Members _members;
 
 };
 

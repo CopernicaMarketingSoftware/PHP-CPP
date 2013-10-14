@@ -82,8 +82,9 @@ Function::~Function()
  *  function or method introces himself
  * 
  *  @param  entry       Entry to be filled
+ *  @param  classname   Optional class name
  */
-void Function::fill(zend_function_entry *entry) const
+void Function::fill(zend_function_entry *entry, const char *classname) const
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _ptr;
@@ -95,21 +96,22 @@ void Function::fill(zend_function_entry *entry) const
     entry->flags = 0;
     
     // we should fill the first argument as well
-    fill((zend_internal_function_info *)entry->arg_info);
+    fill((zend_internal_function_info *)entry->arg_info, classname);
 }
 
 /**
  *  Fill a function entry
  *  @param  info        Info to be filled
+ *  @param  classname   Optional classname
  */
-void Function::fill(zend_internal_function_info *info) const
+void Function::fill(zend_internal_function_info *info, const char *classname) const
 {
     // fill in all the members, note that return reference is false by default,
-    // because we do want to return references, inside the name we hide a pointer
-    // to the current object
+    // because we do not support returning references in PHP-CPP, although Zend
+    // engine allows it. Inside the name we hide a pointer to the current object
     info->_name = _ptr;
     info->_name_len = _ptr.length();
-    info->_class_name = NULL;
+    info->_class_name = classname;
     
     // number of required arguments, and the expected return type
     info->required_num_args = _required;

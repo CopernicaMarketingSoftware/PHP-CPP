@@ -36,6 +36,7 @@
 #include <phpcpp/member.h>
 #include <phpcpp/public.h>
 #include <phpcpp/protected.h>
+#include <phpcpp/members.h>
 #include <phpcpp/class.h>
 #include <phpcpp/classinfo.h>
 #include <phpcpp/extension.h>

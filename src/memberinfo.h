@@ -49,13 +49,33 @@ public:
     int refcount(int change) { return _refcount += change; }
     
     /**
+     *  Is this a property member
+     *  @return bool
+     */
+    virtual bool isProperty() { return false; }
+    
+    /**
+     *  Is this a method member
+     *  @return bool
+     */
+    virtual bool isMethod() { return false; }
+
+    /**
      *  Virtual method to declare the property
      *  @param  entry       Class entry
      *  @param  name        Name of the member
      *  @param  size        Size of the name
      *  @param  flags       Additional flags
      */
-    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags)=0;
+    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags) {};
+    
+    /**
+     *  Fill a function entry object
+     *  @param  entry       Function entry
+     *  @param  classname   Name of the class
+     */
+    virtual void fill(struct _zend_function_entry *entry, const char *classname) {};
+    
 };
 
 /**

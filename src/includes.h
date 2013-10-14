@@ -49,6 +49,7 @@
 #include "../include/member.h"
 #include "../include/public.h"
 #include "../include/protected.h"
+#include "../include/members.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"
 #include "../include/extension.h"
@@ -65,3 +66,4 @@
 #include "boolmember.h"
 #include "stringmember.h"
 #include "doublemember.h"
+#include "methodmember.h"

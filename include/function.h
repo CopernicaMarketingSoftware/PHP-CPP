@@ -135,18 +135,20 @@ protected:
      */
     HiddenPointer<Function> _ptr;
 
-private:
+protected:
     /**
      *  Fill a function entry
      *  @param  entry       Entry to be filled
+     *  @param  classname   Optional class name
      */
-    void fill(struct _zend_function_entry *entry) const;
+    void fill(struct _zend_function_entry *entry, const char *classname=NULL) const;
 
     /**
      *  Fill function info
      *  @param  info        Info object to be filled
+     *  @param  classname   Optional class name
      */
-    void fill(struct _zend_internal_function_info *info) const;
+    void fill(struct _zend_internal_function_info *info, const char *classname=NULL) const;
     
     /**
      *  Extension has access to the private members

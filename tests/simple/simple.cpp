@@ -72,7 +72,6 @@ public:
     
     void myMethod(Php::Parameters &params)
     {
-
     }
 };
 
@@ -95,8 +94,9 @@ extern "C"
         
         // define classes
         extension.add("my_class", Php::Class<MyCustomClass>({
-            Php::Public("a", 123),
-            Php::Protected("b", "abc")
+//            Php::Public("a", 123),
+//            Php::Protected("b", "abc"),
+            Php::Public("myMethod", static_cast<Php::method_callback_1>(&MyCustomClass::myMethod))
         }));
         
         // return the module entry
