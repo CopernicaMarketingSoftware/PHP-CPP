@@ -13,6 +13,11 @@
 namespace Php {
 
 /**
+ *  Forward declarations
+ */
+class Base;
+
+/**
  *  Class definition
  */
 class Parameters : public std::vector<Value>
@@ -20,15 +25,29 @@ class Parameters : public std::vector<Value>
 public:
     /**
      *  Constructor
-     *  @param  argc    Number of arguments
+     *  @param  this_ptr    Optional this_ptr
+     *  @param  argc        Number of arguments
      *  @param  tsrm_ls
      */
-    Parameters(int argc);// TSRMLS_DC);
+    Parameters(struct _zval_struct *this_ptr, int argc);// TSRMLS_DC);
 
     /**
      *  Destructor
      */
     virtual ~Parameters() {}
+    
+    /**
+     *  The the object that is called
+     *  @return Base
+     */
+    Base *object();
+    
+private:
+    /**
+     *  The this pointer
+     *  @var zval
+     */
+    struct _zval_struct *_this;
 };
 
 /**

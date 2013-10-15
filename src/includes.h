@@ -46,6 +46,7 @@
 #include "../include/parameters.h"
 #include "../include/function.h"
 #include "../include/base.h"
+#include "../include/method.h"
 #include "../include/member.h"
 #include "../include/public.h"
 #include "../include/protected.h"
@@ -58,6 +59,7 @@
 /**
  *  Interface files for internal use only
  */
+#include "mixedobject.h"
 #include "nativefunction.h"
 #include "internalfunction.h"
 #include "memberinfo.h"

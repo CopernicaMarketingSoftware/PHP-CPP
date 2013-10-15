@@ -3,7 +3,8 @@
  *
  *  Implementation for the class info
  *
- *  @documentation private
+ *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
+ *  @copyright 2013 Copernica BV
  */
 #include "includes.h"
 
@@ -11,15 +12,6 @@
  *  Set up namespace
  */
 namespace Php {
-
-/**
- *  Structure that combines a C++ object with a zend object
- */
-struct MixedObject
-{
-    zend_object php;
-    Base *cpp;
-};
 
 /**
  *  Function that is called to clean up space that is occupied by the object
@@ -66,8 +58,12 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     // allocate memory for the object
     MixedObject *object = (MixedObject *)emalloc(sizeof(MixedObject));
     
+    // find base object
+    zend_class_entry *base = type;
+    while (base->parent) base = base->parent;
+    
     // retrieve the classinfo object
-    _ClassInfo *info = (_ClassInfo *)type->info.user.doc_comment;
+    _ClassInfo *info = (_ClassInfo *)base->info.user.doc_comment;
     
     // construct the cpp object
     object->cpp = info->construct();
@@ -99,53 +95,11 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
 }
 
 /**
- *  Function that is called by the Zend engine every time the constructor gets called
- *  @param  ht      
- *  @param  return_value
- *  @param  return_value_ptr
- *  @param  this_ptr
- *  @param  return_value_used
- *  @param  tsrm_ls
- */
-static void invoke_constructor(INTERNAL_FUNCTION_PARAMETERS)
-{
-    // get the mixed object
-    MixedObject *obj = (MixedObject *)zend_object_store_get_object(this_ptr TSRMLS_CC);
-
-    // construct parameters
-    Parameters params(ZEND_NUM_ARGS());
-
-    // call the constructor
-    obj->cpp->__construct(*PHPCPP_G(environment), params);
-}
-
-/**
- *  Function that is called by the Zend engine every time the destructor gets called
- *  @param  ht      
- *  @param  return_value
- *  @param  return_value_ptr
- *  @param  this_ptr
- *  @param  return_value_used
- *  @param  tsrm_ls
- */
-static void invoke_destructor(INTERNAL_FUNCTION_PARAMETERS)
-{
-    // get the mixed object
-    MixedObject *obj = (MixedObject *)zend_object_store_get_object(this_ptr TSRMLS_CC);
-
-    // call the destructor
-    obj->cpp->__destruct(*PHPCPP_G(environment));
-}
-
-/**
  *  Constructor
  *  @param  name
  */
 _ClassInfo::_ClassInfo(const char *name) : _name(name), _entry(NULL) 
 {
-    // allocate internal functions
-    _constructor = new InternalFunction(invoke_constructor, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR);
-    _destructor = new InternalFunction(invoke_destructor, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR);
 }
 
 /**
@@ -153,9 +107,6 @@ _ClassInfo::_ClassInfo(const char *name) : _name(name), _entry(NULL)
  */
 _ClassInfo::~_ClassInfo() 
 {
-    // deallocate internal function
-    delete _constructor;
-    delete _destructor;
 }
 
 /**
@@ -172,8 +123,6 @@ void _ClassInfo::initialize(TSRMLS_DC)
 
     // we need a special constructor
     entry.create_object = create_object;
-    entry.constructor = _constructor->function();
-    entry.destructor = _destructor->function();
     
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);

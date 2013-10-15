@@ -33,6 +33,7 @@
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/base.h>
+#include <phpcpp/method.h>
 #include <phpcpp/member.h>
 #include <phpcpp/public.h>
 #include <phpcpp/protected.h>

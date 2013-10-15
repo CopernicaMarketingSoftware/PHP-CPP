@@ -13,10 +13,11 @@ namespace Php {
 
 /**
  *  Parameters
- *  @param  argc    Number of arguments
+ *  @param  this_ptr    Pointer to the object
+ *  @param  argc        Number of arguments
  *  @param  tsrm_ls
  */
-Parameters::Parameters(int argc TSRMLS_DC)
+Parameters::Parameters(zval *this_ptr, int argc TSRMLS_DC) : _this(this_ptr)
 {
     // reserve plenty of space
     reserve(argc);
@@ -30,6 +31,19 @@ Parameters::Parameters(int argc TSRMLS_DC)
         // append value
         push_back(Value(*arg));
     }
+}
+
+/**
+ *  The the object that is called
+ *  @return Base
+ */
+Base *Parameters::object()
+{
+    // get the mixed object
+    MixedObject *obj = (MixedObject *)zend_object_store_get_object(_this TSRMLS_CC);
+    
+    // return the CPP object
+    return obj->cpp;
 }
 
 /**

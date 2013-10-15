@@ -35,7 +35,7 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     Value result(return_value, true);
 
     // construct parameters
-    Parameters params(ZEND_NUM_ARGS());
+    Parameters params(this_ptr, ZEND_NUM_ARGS());
 
     // get the result
     result = function->invoke(*PHPCPP_G(environment), params);
@@ -83,8 +83,9 @@ Function::~Function()
  * 
  *  @param  entry       Entry to be filled
  *  @param  classname   Optional class name
+ *  @param  pub         Is this a public property?
  */
-void Function::fill(zend_function_entry *entry, const char *classname) const
+void Function::fill(zend_function_entry *entry, const char *classname, bool pub) const
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _ptr;
@@ -93,7 +94,7 @@ void Function::fill(zend_function_entry *entry, const char *classname) const
     entry->num_args = _argc;
 
     // there are no flags like deprecated, private or protected
-    entry->flags = 0;
+    entry->flags = classname ? (pub ? ZEND_ACC_PUBLIC : ZEND_ACC_PROTECTED) : 0;
     
     // we should fill the first argument as well
     fill((zend_internal_function_info *)entry->arg_info, classname);

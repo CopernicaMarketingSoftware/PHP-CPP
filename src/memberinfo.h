@@ -73,8 +73,9 @@ public:
      *  Fill a function entry object
      *  @param  entry       Function entry
      *  @param  classname   Name of the class
+     *  @param  pub         Is this a public method?
      */
-    virtual void fill(struct _zend_function_entry *entry, const char *classname) {};
+    virtual void fill(struct _zend_function_entry *entry, const char *classname, bool pub) {};
     
 };
 

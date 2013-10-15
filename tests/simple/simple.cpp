@@ -23,8 +23,9 @@ using namespace std;
  */
 static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
 {
-    string p1 = params[0];
-    string p2 = params[1];
+    int p1 = params[0];
+    int p2 = params[1];
+    return p1 + p2;
     
     cout << "global g1: " << env["g1"].stringValue() << endl;
     cout << "global g2: " << env["g2"].stringValue() << endl;
@@ -53,6 +54,8 @@ public:
     {
         _x = 3;
         cout << "MyCustomClass::MyCustomClass" << endl;
+        cout << this << endl;
+        cout << _x << endl;
     }
     
     virtual ~MyCustomClass()
@@ -72,6 +75,10 @@ public:
     
     void myMethod(Php::Parameters &params)
     {
+        cout << "myMethod GETS CALLED!!!!" << endl;
+        cout << this << endl;
+        cout << _x << endl;
+        
     }
 };
 
@@ -86,17 +93,20 @@ extern "C"
 
         // define the functions
         extension.add("my_plus", my_plus, {
-            Php::ByVal("a", Php::stringType),
-            Php::ByVal("b", Php::arrayType),
-            Php::ByVal("c", "MyClass"),
-            Php::ByRef("d", Php::stringType)
+            Php::ByVal("a", Php::longType),
+            Php::ByVal("b", Php::longType)
+//            Php::ByVal("c", "MyClass"),
+//            Php::ByRef("d", Php::stringType)
         });
+        
+        Php::Method<MyCustomClass> x(&MyCustomClass::myMethod);
         
         // define classes
         extension.add("my_class", Php::Class<MyCustomClass>({
-//            Php::Public("a", 123),
-//            Php::Protected("b", "abc"),
-            Php::Public("myMethod", static_cast<Php::method_callback_1>(&MyCustomClass::myMethod))
+            Php::Public("a", 123),
+            Php::Protected("b", "abc"),
+            Php::Protected("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod)),
+            Php::Public("__construct", Php::Method<MyCustomClass>(&MyCustomClass::__construct))
         }));
         
         // return the module entry

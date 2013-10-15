@@ -106,14 +106,7 @@ public:
      *  @param  pub         Is this a public method (otherwise it is protected)
      *  @param  method      The method to add
      */
-    Member(const char *name, bool pub, method_callback_0 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_1 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_2 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_3 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_4 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_5 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_6 method, const std::initializer_list<Argument> &arguments = {});
-    Member(const char *name, bool pub, method_callback_7 method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, bool pub, const _Method &method, const std::initializer_list<Argument> &arguments = {});
 
     /**
      *  Copy constructor

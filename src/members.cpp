@@ -34,8 +34,6 @@ int Members::methods()
     // loop through the functions
     for (auto it = begin(); it != end(); it++)
     {
-        std::cout << "iter" << std::endl;
-        
         // check if this is a method
         if (it->isMethod()) result++;
     }
@@ -55,8 +53,6 @@ struct _zend_function_entry *Members::methods(const char *classname)
     
     // the number of methods
     int count = methods();
-    
-    std::cout << "allocate " << count << " methods" << std::endl;
     
     // allocate memory for the functions
     _methods = new zend_function_entry[count + 1];

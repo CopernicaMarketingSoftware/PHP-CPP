@@ -34,8 +34,23 @@
 
 if (class_exists("my_class")) echo("Warempel, de class bestaat\n");
 
-$x = new my_class();
-$x->myMethod();
+class my_extended_class extends my_class
+{
+    public function myMethod($val)
+    {
+        echo($this->a."\n");
+        echo($this->b."\n");
+        echo("hoi\n");
+        
+        parent::myMethod($val);
+    }
+    
+}
+
+$x = new my_extended_class();
+$x->myMethod(123);
+
+my_plus(1,2,3,4);
 
 //echo("my_class::a = ".$x->a."\n");
 //echo("my_class::b = ".$x->b."\n");

@@ -140,8 +140,9 @@ protected:
      *  Fill a function entry
      *  @param  entry       Entry to be filled
      *  @param  classname   Optional class name
+     *  @param  pub         Is this a public property?
      */
-    void fill(struct _zend_function_entry *entry, const char *classname=NULL) const;
+    void fill(struct _zend_function_entry *entry, const char *classname=NULL, bool pub=true) const;
 
     /**
      *  Fill function info
