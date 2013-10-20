@@ -43,7 +43,7 @@ Value::Value()
 
 /**
  *  Constructor for null ptr
- */
+*/
 Value::Value(std::nullptr_t value)
 {
     // create a null zval
@@ -55,7 +55,18 @@ Value::Value(std::nullptr_t value)
  *  Constructor based on integer value
  *  @param  value
  */
-Value::Value(int value)
+Value::Value(int16_t value)
+{
+    // create an integer zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_LONG(_val, value);
+}
+
+/**
+ *  Constructor based on integer value
+ *  @param  value
+ */
+Value::Value(int32_t value)
 {
     // create an integer zval
     MAKE_STD_ZVAL(_val);
@@ -66,7 +77,7 @@ Value::Value(int value)
  *  Constructor based on long value
  *  @param  value
  */
-Value::Value(long value)
+Value::Value(int64_t value)
 {
     // create an integer zval
     MAKE_STD_ZVAL(_val);
@@ -164,14 +175,29 @@ Value::Value(struct _zval_struct *val, bool ref)
  */
 Value::Value(const Value &that)
 {
-    // just copy the zval
-    _val = that._val;
-
-   // and we have one more reference
+    // how many references does the other object has?
+    if (Z_REFCOUNT_P(that._val) > 1 && !Z_ISREF_P(that._val))
+    {
+        // there are already multiple variables linked to this value, and it
+        // is not a reference. this implies that we can not turn this variable
+        // into a reference, otherwise strange things could happen, we're going
+        // to create a new zval
+        ALLOC_ZVAL(_val);
+        INIT_PZVAL_COPY(_val, that._val);
+        zval_copy_ctor(_val);
+    }
+    else
+    {
+        // simply use the same zval
+        _val = that._val;
+    }
+        
+    // the other object only has one variable using it, or it is already
+    // a variable by reference, we can safely add one more reference to it
+    // and make it a variable by reference if it was not already a ref
     Z_ADDREF_P(_val);
 
-    // two value objects are both sharing the same zval, we turn the zval into a reference
-    // @todo this is not necessarily correct
+    // make reference
     Z_SET_ISREF_P(_val);
 }
 
@@ -204,6 +230,76 @@ Value::~Value()
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
     zval_ptr_dtor(&_val);
+}
+
+/**
+ *  Move operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(Value &&value)
+{
+    // skip self assignment
+    if (this == &value) return *this;
+
+    // is the object a reference?
+    if (Z_ISREF_P(_val))
+    {
+        // @todo difference if the other object is a reference or not?
+        
+        // the current object is a reference, this means that we should
+        // keep the zval object, and copy the other value into it, get
+        // the current refcount
+        int refcount = Z_REFCOUNT_P(_val);
+        
+        // clean up the current zval (but keep the zval structure)
+        zval_dtor(_val);
+        
+        // make the copy
+        *_val = *value._val;
+        
+        // restore reference and refcount setting
+        Z_SET_ISREF_TO_P(_val, true);
+        Z_SET_REFCOUNT_P(_val, refcount);
+        
+        // how many references did the old variable have?
+        if (Z_REFCOUNT_P(value._val) > 1)
+        {
+            // the other object already had multiple references, this
+            // implies that many other PHP variables are also referring 
+            // to it, and we still need to store its contents, with one 
+            // reference less
+            Z_DELREF_P(value._val);
+            
+            // and we need to run the copy constructor on the current
+            // value, because we're making a deep copy
+            zval_copy_ctor(_val);
+        }
+        else
+        {
+            // the last and only reference to the other object was
+            // removed, we no longer need it
+            FREE_ZVAL(value._val);
+            
+            // the other object is no longer valid
+            value._val = nullptr;
+        }
+    }
+    else
+    {
+        // destruct the zval (this function will decrement the reference counter,
+        // and only destruct if there are no other references left)
+        zval_ptr_dtor(&_val);
+
+        // just copy the zval completely
+        _val = value._val;
+
+        // the other object is no longer valid
+        value._val = nullptr;
+    }
+
+    // update the object
+    return *this;
 }
 
 /**
@@ -253,82 +349,11 @@ Value &Value::operator=(const Value &value)
 }
 
 /**
- *  Move operator
- *  @param  value
- *  @return Value
- */
-Value &Value::operator=(Value &&value)
-{
-    // skip self assignment
-    if (this == &value) return *this;
-
-    // is the object a reference?
-    if (Z_ISREF_P(_val))
-    {
-        // @todo difference if the other object is a reference or not?
-        
-        
-        // the current object is a reference, this means that we should
-        // keep the zval object, and copy the other value into it, get
-        // the current refcount
-        int refcount = Z_REFCOUNT_P(_val);
-        
-        // clean up the current zval (but keep the zval structure)
-        zval_dtor(_val);
-        
-        // make the copy
-        *_val = *value._val;
-        
-        // restore reference and refcount setting
-        Z_SET_ISREF_TO_P(_val, true);
-        Z_SET_REFCOUNT_P(_val, refcount);
-        
-        // how many references did the old variable have?
-        if (Z_ISREF_P(value._val) > 1)
-        {
-            // the other object already had multiple references, this
-            // implies that many other PHP variables are also referring 
-            // to it, and we still need to store its contents, with one 
-            // reference less
-            Z_DELREF_P(value._val);
-            
-            // and we need to run the copy constructor on the current
-            // value, because we're making a deep copy
-            zval_copy_ctor(_val);
-        }
-        else
-        {
-            // the last and only reference to the other object was
-            // removed, we no longer need it
-            FREE_ZVAL(value._val);
-            
-            // the other object is no longer valid
-            value._val = nullptr;
-        }
-    }
-    else
-    {
-        // destruct the zval (this function will decrement the reference counter,
-        // and only destruct if there are no other references left)
-        zval_ptr_dtor(&_val);
-
-        // just copy the zval completely
-        _val = value._val;
-
-        // the other object is no longer valid
-        value._val = nullptr;
-    }
-
-    // update the object
-    return *this;
-}
-
-/**
  *  Assignment operator
  *  @param  value
  *  @return Value
  */
-Value &Value::operator=(int value)
+Value &Value::operator=(int16_t value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -348,7 +373,27 @@ Value &Value::operator=(int value)
  *  @param  value
  *  @return Value
  */
-Value &Value::operator=(long value)
+Value &Value::operator=(int32_t value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+    
+    // set new value
+    ZVAL_LONG(_val, value);
+
+    // update the object
+    return *this;
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(int64_t value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -464,6 +509,127 @@ Value &Value::operator=(double value)
 }
 
 /**
+ *  Add a value to the object
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator+=(const Value &value)        { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(int16_t value)             { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(int32_t value)             { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(int64_t value)             { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(bool value)                { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(char value)                { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(const std::string &value)  { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(const char *value)         { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(double value)              { return Arithmetic<std::plus>(this).assign(value); }
+
+/**
+ *  Subtract a value from the object
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator-=(const Value &value)        { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(int16_t value)             { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(int32_t value)             { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(int64_t value)             { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(bool value)                { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(char value)                { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(const std::string &value)  { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(const char *value)         { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(double value)              { return Arithmetic<std::minus>(this).assign(value); }
+
+/**
+ *  Multiply the object with a certain value
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator*=(const Value &value)        { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(int16_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(int32_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(int64_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(bool value)                { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(char value)                { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(const std::string &value)  { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(const char *value)         { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(double value)              { return Arithmetic<std::multiplies>(this).assign(value); }
+
+/**
+ *  Divide the object with a certain value
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator/=(const Value &value)        { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(int16_t value)             { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(int32_t value)             { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(int64_t value)             { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(bool value)                { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(char value)                { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(const std::string &value)  { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(const char *value)         { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(double value)              { return Arithmetic<std::divides>(this).assign(value); }
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value Value::operator+(const Value &value)          { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(int16_t value)               { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(int32_t value)               { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(int64_t value)               { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(bool value)                  { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(char value)                  { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(const std::string &value)    { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(const char *value)           { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(double value)                { return Arithmetic<std::plus>(this).apply(value); }
+
+/**
+ *  Subtraction operator
+ *  @param  value
+ *  @return Value
+ */
+Value Value::operator-(const Value &value)          { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(int16_t value)               { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(int32_t value)               { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(int64_t value)               { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(bool value)                  { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(char value)                  { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(const std::string &value)    { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(const char *value)           { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(double value)                { return Arithmetic<std::minus>(this).apply(value); }
+
+/**
+ *  Multiplication operator
+ *  @param  value
+ *  @return Value
+ */
+Value Value::operator*(const Value &value)          { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(int16_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(int32_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(int64_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(bool value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(char value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(const std::string &value)    { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(const char *value)           { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(double value)                { return Arithmetic<std::multiplies>(this).apply(value); }
+
+/**
+ *  Division operator
+ *  @param  value
+ *  @return Value
+ */
+Value Value::operator/(const Value &value)          { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(int16_t value)               { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(int32_t value)               { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(int64_t value)               { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(bool value)                  { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(char value)                  { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(const std::string &value)    { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(const char *value)           { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(double value)                { return Arithmetic<std::divides>(this).apply(value); }
+
+
+/**
  *  The type of object
  *  @return Type
  */
@@ -488,8 +654,8 @@ Value &Value::setType(Type type)
     // run the conversion
     switch (type) {
     case nullType:              convert_to_null(_val); break;
-    case longType:              convert_to_long(_val); break;
-    case decimalType:           convert_to_double(_val); break;
+    case numericType:           convert_to_long(_val); break;
+    case floatType:             convert_to_double(_val); break;
     case boolType:              convert_to_boolean(_val); break;
     case arrayType:             convert_to_array(_val); break;
     case objectType:            convert_to_object(_val); break;
@@ -540,13 +706,15 @@ Value Value::clone(Type type) const
  *  Retrieve the value as integer
  *  @return long
  */
-long Value::longValue() const
+long Value::numericValue() const
 {
     // already a long?
-    if (isLong()) return Z_LVAL_P(_val);
+    if (isNumeric()) return Z_LVAL_P(_val);
+    
+    std::cout << "clone to numeric" << std::endl;
     
     // make a clone
-    return clone(longType).longValue();
+    return clone(numericType).numericValue();
 }
 
 /**
@@ -592,13 +760,13 @@ const char *Value::rawValue() const
  *  Retrieve the value as decimal
  *  @return double
  */
-double Value::decimalValue() const
+double Value::floatValue() const
 {
     // already a double
-    if (isDecimal()) return Z_DVAL_P(_val);
+    if (isFloat()) return Z_DVAL_P(_val);
 
     // make a clone
-    return clone(decimalType).decimalValue();
+    return clone(floatType).floatValue();
 }
 
 /**
@@ -617,7 +785,7 @@ int Value::size() const
     Value copy(*this);
     
     // convert the copy to a string
-    copy.setType(decimalType);
+    copy.setType(stringType);
     
     // return the string size
     return copy.size();
@@ -807,18 +975,10 @@ HashMember<std::string> Value::operator[](const char *key)
     return HashMember<std::string>(this, key);
 }
 
-/**
- *  Array access operator
- *  This can be used for adding a record to the array
- *  Be aware: if the 'this' object is not already an array, it will be converted into one!
- *  @param  key
- *  @return Value
- */
-//Value Value::operator[]()
-//{
-//    
-//    
-//}
+int Value::refcount()
+{
+    return Z_REFCOUNT_P(_val);
+}
 
 /**
  *  End of namespace

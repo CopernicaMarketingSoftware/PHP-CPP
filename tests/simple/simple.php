@@ -31,26 +31,57 @@
 //echo("g2: $g2\n");
 //echo("g3: $g3\n");
 
-
-if (class_exists("my_class")) echo("Warempel, de class bestaat\n");
-
-class my_extended_class extends my_class
+function slowsort($input)
 {
-    public function myMethod($val)
+    $size = count($input);
+    for ($i=0; $i<$size; $i++)
     {
-        echo($this->a."\n");
-        echo($this->b."\n");
-        echo("hoi\n");
-        
-        parent::myMethod($val);
+        $left = $input[$i];
+        for ($j=$i+1; $j<$size; $j++)
+        {
+            $right = $input[$j];
+            
+            if ($left < $right) continue;
+            
+            // swap values
+            $input[$i] = $right;
+            $input[$j] = $left;
+            $left = $right;
+        }
     }
-    
+    return $input;
 }
 
-$x = new my_extended_class();
-$x->myMethod(123);
+//if (class_exists("my_class")) echo("Warempel, de class bestaat\n");
+//
+//class my_extended_class extends my_class
+//{
+//    public function myMethod($val)
+//    {
+//        echo($this->a."\n");
+//        echo($this->b."\n");
+//        echo("hoi\n");
+//        
+//        parent::myMethod($val);
+//    }
+//    
+//}
+//
+//$x = new my_extended_class();
+//$x->myMethod(123);
 
-my_plus(1,2,3,4);
+//echo(my_plus(1,2,3,4)."\n");
+
+$array = array();
+for ($i=0; $i<10000; $i++) $array[] = rand();
+
+//$array = array(1,2,3);
+
+//print_r($array);
+bubblesort($array);
+
+print_r($array);
+
 
 //echo("my_class::a = ".$x->a."\n");
 //echo("my_class::b = ".$x->b."\n");

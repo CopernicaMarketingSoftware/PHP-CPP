@@ -71,12 +71,30 @@ public:
     }
 
     /**
-     *  Cast to a long
-     *  @return long
+     *  Cast to a integer
+     *  @return int16_t
      */
-    operator long () const
+    operator int16_t () const
     {
-        return _base.get(_index).longValue();
+        return _base.get(_index).numericValue();
+    }
+
+    /**
+     *  Cast to a integer
+     *  @return int32_t
+     */
+    operator int32_t () const
+    {
+        return _base.get(_index).numericValue();
+    }
+
+    /**
+     *  Cast to a integer
+     *  @return int64_t
+     */
+    operator int64_t () const
+    {
+        return _base.get(_index).numericValue();
     }
     
     /**

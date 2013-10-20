@@ -19,8 +19,8 @@ namespace Php {
  */
 typedef enum _Type {
     nullType            =   0,
-    longType            =   1,
-    decimalType         =   2,
+    numericType         =   1,
+    floatType           =   2,
     boolType            =   3,
     arrayType           =   4,
     objectType          =   5,

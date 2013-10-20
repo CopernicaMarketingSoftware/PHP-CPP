@@ -45,51 +45,17 @@ public:
     Value();
 
     /**
-     *  Constructor for null ptr
+     *  Constructor for various types
+     *  @param  value
      */
     Value(std::nullptr_t value);
-
-    /**
-     *  Constructor based on integer value
-     *  @param  value
-     */
-    Value(int value);
-    
-    /**
-     *  Constructor based on integer value
-     *  @param  value
-     */
-    Value(long value);
-    
-    /**
-     *  Constructor based on boolean value
-     *  @param  value
-     */
+    Value(int16_t value);
+    Value(int32_t value);
+    Value(int64_t value);
     Value(bool value);
-    
-    /**
-     *  Constructor based on single character
-     *  @param  value
-     */
     Value(char value);
-    
-    /**
-     *  Constructor based on string value
-     *  @param  value
-     */
     Value(const std::string &value);
-    
-    /**
-     *  Constructor based on byte buffer
-     *  @param  value
-     *  @param  size
-     */
     Value(const char *value, int size = -1);
-    
-    /**
-     *  Constructor based on decimal value
-     *  @param  value
-     */
     Value(double value);
     
     /**
@@ -117,13 +83,6 @@ public:
     virtual ~Value();
 
     /**
-     *  Assignment operator
-     *  @param  value
-     *  @return Value
-     */
-    Value &operator=(const Value &value);
-    
-    /**
      *  Move assignment
      *  @param  value
      *  @return Value
@@ -131,53 +90,139 @@ public:
     Value &operator=(Value &&value);
     
     /**
-     *  Assignment operator
+     *  Assignment operator for various types
      *  @param  value
      *  @return Value
      */
-    Value &operator=(long value);
-
-    /**
-     *  Assignment operator
-     *  @param  value
-     *  @return Value
-     */
-    Value &operator=(int value);
-
-    /**
-     *  Assignment operator
-     *  @param  value
-     *  @return Value
-     */
+    Value &operator=(const Value &value);
+    Value &operator=(int16_t value);
+    Value &operator=(int32_t value);
+    Value &operator=(int64_t value);
     Value &operator=(bool value);
-
-    /**
-     *  Assignment operator
-     *  @param  value
-     *  @return Value
-     */
     Value &operator=(char value);
+    Value &operator=(const std::string &value);
+    Value &operator=(const char *value);
+    Value &operator=(double value);
+    
+    /**
+     *  Add a value to the object
+     *  @param  value
+     *  @return Value
+     */
+    Value &operator+=(const Value &value);
+    Value &operator+=(int16_t value);
+    Value &operator+=(int32_t value);
+    Value &operator+=(int64_t value);
+    Value &operator+=(bool value);
+    Value &operator+=(char value);
+    Value &operator+=(const std::string &value);
+    Value &operator+=(const char *value);
+    Value &operator+=(double value);
 
     /**
-     *  Assignment operator
+     *  Subtract a value from the object
      *  @param  value
      *  @return Value
      */
-    Value &operator=(const std::string &value);
+    Value &operator-=(const Value &value);
+    Value &operator-=(int16_t value);
+    Value &operator-=(int32_t value);
+    Value &operator-=(int64_t value);
+    Value &operator-=(bool value);
+    Value &operator-=(char value);
+    Value &operator-=(const std::string &value);
+    Value &operator-=(const char *value);
+    Value &operator-=(double value);
+    
+    /**
+     *  Multiply the object with a certain value
+     *  @param  value
+     *  @return Value
+     */
+    Value &operator*=(const Value &value);
+    Value &operator*=(int16_t value);
+    Value &operator*=(int32_t value);
+    Value &operator*=(int64_t value);
+    Value &operator*=(bool value);
+    Value &operator*=(char value);
+    Value &operator*=(const std::string &value);
+    Value &operator*=(const char *value);
+    Value &operator*=(double value);
+
+    /**
+     *  Divide the object with a certain value
+     *  @param  value
+     *  @return Value
+     */
+    Value &operator/=(const Value &value);
+    Value &operator/=(int16_t value);
+    Value &operator/=(int32_t value);
+    Value &operator/=(int64_t value);
+    Value &operator/=(bool value);
+    Value &operator/=(char value);
+    Value &operator/=(const std::string &value);
+    Value &operator/=(const char *value);
+    Value &operator/=(double value);
     
     /**
      *  Assignment operator
      *  @param  value
      *  @return Value
      */
-    Value &operator=(const char *value);
-    
+    Value operator+(const Value &value);
+    Value operator+(int16_t value);
+    Value operator+(int32_t value);
+    Value operator+(int64_t value);
+    Value operator+(bool value);
+    Value operator+(char value);
+    Value operator+(const std::string &value);
+    Value operator+(const char *value);
+    Value operator+(double value);
+
     /**
-     *  Assignment operator
+     *  Subtraction operator
      *  @param  value
      *  @return Value
      */
-    Value &operator=(double value);
+    Value operator-(const Value &value);
+    Value operator-(int16_t value);
+    Value operator-(int32_t value);
+    Value operator-(int64_t value);
+    Value operator-(bool value);
+    Value operator-(char value);
+    Value operator-(const std::string &value);
+    Value operator-(const char *value);
+    Value operator-(double value);
+
+    /**
+     *  Multiplication operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator*(const Value &value);
+    Value operator*(int16_t value);
+    Value operator*(int32_t value);
+    Value operator*(int64_t value);
+    Value operator*(bool value);
+    Value operator*(char value);
+    Value operator*(const std::string &value);
+    Value operator*(const char *value);
+    Value operator*(double value);
+
+    /**
+     *  Division operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator/(const Value &value);
+    Value operator/(int16_t value);
+    Value operator/(int32_t value);
+    Value operator/(int64_t value);
+    Value operator/(bool value);
+    Value operator/(char value);
+    Value operator/(const std::string &value);
+    Value operator/(const char *value);
+    Value operator/(double value);
     
     /**
      *  The type of object
@@ -205,73 +250,22 @@ public:
     Value clone(Type type) const;
 
     /**
-     *  Is this a NULL value?
+     *  Check if the value is of a certain type
      *  @return bool
      */
-    bool isNull() const
-    {
-        return type() == nullType;
-    }
-
-    /**
-     *  Is this an integer value?
-     *  @return bool
-     */
-    bool isLong() const
-    {
-        return type() == longType;
-    }
+    bool isNull()       const { return type() == nullType; }
+    bool isNumeric()    const { return type() == numericType; }
+    bool isBool()       const { return type() == boolType; }
+    bool isString()     const { return type() == stringType; }
+    bool isFloat()      const { return type() == floatType; }
+    bool isObject()     const { return type() == objectType; }
+    bool isArray()      const { return type() == arrayType; }
     
     /**
-     *  Is this a boolean value?
-     *  @return bool
+     *  Retrieve the value as number
+     *  @return long
      */
-    bool isBool() const
-    {
-        return type() == boolType;
-    }
-    
-    /**
-     *  Is this a string value?
-     *  @return bool
-     */
-    bool isString() const
-    {
-        return type() == stringType;
-    }
-    
-    /**
-     *  Is this a decimal value?
-     *  @return bool
-     */
-    bool isDecimal() const
-    {
-        return type() == decimalType;
-    }
-    
-    /**
-     *  Is this an object value?
-     *  @return bool
-     */
-    bool isObject() const
-    {
-        return type() == objectType;
-    }
-    
-    /**
-     *  Is this an array value?
-     *  @return bool
-     */
-    bool isArray() const
-    {
-        return type() == arrayType;
-    }
-    
-    /**
-     *  Retrieve the value as integer
-     *  @return int
-     */
-    long longValue() const;
+    long numericValue() const;
     
     /**
      *  Retrieve the value as boolean
@@ -297,7 +291,7 @@ public:
      *  Retrieve the value as decimal
      *  @return double
      */
-    double decimalValue() const;
+    double floatValue() const;
     
     /**
      *  The number of members in case of an array or object
@@ -349,12 +343,30 @@ public:
     bool contains(const char *key, int size) const;
     
     /**
-     *  Cast to a long
-     *  @return long
+     *  Cast to a number
+     *  @return int32_t
      */
-    operator long () const
+    operator int16_t () const
     {
-        return longValue();
+        return numericValue();
+    }
+
+    /**
+     *  Cast to a number
+     *  @return int32_t
+     */
+    operator int32_t () const
+    {
+        return numericValue();
+    }
+
+    /**
+     *  Cast to a number
+     *  @return uint64_t
+     */
+    operator int64_t () const
+    {
+        return numericValue();
     }
     
     /**
@@ -390,7 +402,7 @@ public:
      */
     operator double () const
     {
-        return decimalValue();
+        return floatValue();
     }
     
     /**
@@ -484,7 +496,6 @@ public:
      *  @return HashMember
      */
     HashMember<std::string> operator[](const char *key);
-
 
 protected:
     /**

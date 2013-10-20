@@ -69,3 +69,5 @@
 #include "stringmember.h"
 #include "doublemember.h"
 #include "methodmember.h"
+#include "arithmetic.h"
+
