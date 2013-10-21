@@ -975,11 +975,6 @@ HashMember<std::string> Value::operator[](const char *key)
     return HashMember<std::string>(this, key);
 }
 
-int Value::refcount()
-{
-    return Z_REFCOUNT_P(_val);
-}
-
 /**
  *  End of namespace
  */
