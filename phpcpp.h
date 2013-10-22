@@ -32,6 +32,7 @@
 #include <phpcpp/hashmember.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
+#include <phpcpp/properties.h>
 #include <phpcpp/base.h>
 #include <phpcpp/method.h>
 #include <phpcpp/member.h>

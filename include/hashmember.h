@@ -213,8 +213,19 @@ private:
      *  Only value objects may construct members
      */
     friend class Value;
+    friend class Properties;
     
 };
+
+/**
+ *  Custom output stream operator
+ *  @param  stream
+ *  @param  value
+ *  @return ostream
+ */
+std::ostream &operator<<(std::ostream &stream, const HashMember<int> &value);
+std::ostream &operator<<(std::ostream &stream, const HashMember<std::string> &value);
+
     
 /**
  *  End of namespace

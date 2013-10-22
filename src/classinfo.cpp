@@ -65,9 +65,6 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     // retrieve the classinfo object
     _ClassInfo *info = (_ClassInfo *)base->info.user.doc_comment;
     
-    // construct the cpp object
-    object->cpp = info->construct();
-    
     // store the class
     object->php.ce = type;
 
@@ -89,6 +86,12 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     
     // put the object in the storage, and assign a method for deallocating and cloning
     result.handle = zend_objects_store_put(object, NULL, deallocate_object, clone_object TSRMLS_CC); 
+
+    // finally, construct the cpp object
+    object->cpp = info->construct();
+
+    std::cout << "Allocate object" << std::endl;
+    std::cout << object->cpp << " " << object << std::endl;
 
     // done
     return result;

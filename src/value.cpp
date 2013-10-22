@@ -1006,6 +1006,17 @@ HashMember<std::string> Value::operator[](const char *key)
 }
 
 /**
+ *  Custom output stream operator
+ *  @param  stream
+ *  @param  value
+ *  @return ostream
+ */
+std::ostream &operator<<(std::ostream &stream, const Value &value)
+{
+    return stream << value.stringValue();
+}
+
+/**
  *  End of namespace
  */
 }

@@ -143,7 +143,8 @@ public:
         cout << "myMethod GETS CALLED!!!!" << endl;
         cout << this << endl;
         cout << _x << endl;
-        
+//        cout << "A: " << _properties["a"] << endl;
+//        cout << "Z: " << _properties["z"] << endl;
     }
 };
 
@@ -153,8 +154,6 @@ extern "C"
     // export the "get_module" function that will be called by the Zend engine
     PHPCPP_EXPORT void *get_module() 
     { 
-        cout << "call get_module()" << endl;
-        
         // create extension
         static Php::Extension extension("simple","1.0");
 

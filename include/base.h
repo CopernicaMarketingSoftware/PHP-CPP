@@ -17,6 +17,11 @@ class Base
 {
 public:
     /**
+     *  Constructor
+     */
+    Base() {}
+
+    /**
      *  Virtual destructor
      */
     virtual ~Base() {}
@@ -66,6 +71,28 @@ public:
      */
     virtual void __destruct() {}
 
+    /**
+     *  Get access to a property by name
+     *  @param  string
+     *  @return Property
+     */
+//    Property operator[](const char *name);
+    
+    /**
+     *  Alternative way to access a property
+     *  @param  string
+     *  @return Property
+     */
+//    Property operator[](const std::string &name);
+
+protected:
+    /**
+     *  All properties of the object
+     *  @var    Properties
+     */
+//    Properties _properties;
+
+private:
 };
 
 /**

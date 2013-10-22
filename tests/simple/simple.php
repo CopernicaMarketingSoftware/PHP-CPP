@@ -70,6 +70,10 @@ function slowsort($input)
 //$x = new my_extended_class();
 //$x->myMethod(123);
 
+$x = new my_class();
+$x->myMethod();
+
+
 //echo(my_plus(1,2,3,4)."\n");
 
 $array = array();
@@ -78,9 +82,9 @@ for ($i=0; $i<10000; $i++) $array[] = rand();
 //$array = array(1,2,3);
 
 //print_r($array);
-bubblesort($array);
+//bubblesort($array);
 
-print_r($array);
+//print_r($array);
 
 
 //echo("my_class::a = ".$x->a."\n");
