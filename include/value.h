@@ -163,6 +163,21 @@ public:
     Value &operator/=(const std::string &value);
     Value &operator/=(const char *value);
     Value &operator/=(double value);
+
+    /**
+     *  Divide the object with a certain value, and get the rest
+     *  @param  value
+     *  @return Value
+     */
+    Value &operator%=(const Value &value);
+    Value &operator%=(int16_t value);
+    Value &operator%=(int32_t value);
+    Value &operator%=(int64_t value);
+    Value &operator%=(bool value);
+    Value &operator%=(char value);
+    Value &operator%=(const std::string &value);
+    Value &operator%=(const char *value);
+    Value &operator%=(double value);
     
     /**
      *  Assignment operator
@@ -223,6 +238,21 @@ public:
     Value operator/(const std::string &value);
     Value operator/(const char *value);
     Value operator/(double value);
+
+    /**
+     *  Modulus operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator%(const Value &value);
+    Value operator%(int16_t value);
+    Value operator%(int32_t value);
+    Value operator%(int64_t value);
+    Value operator%(bool value);
+    Value operator%(char value);
+    Value operator%(const std::string &value);
+    Value operator%(const char *value);
+    Value operator%(double value);
     
     /**
      *  The type of object

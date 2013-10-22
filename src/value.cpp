@@ -569,6 +569,22 @@ Value &Value::operator/=(const char *value)         { return Arithmetic<std::div
 Value &Value::operator/=(double value)              { return Arithmetic<std::divides>(this).assign(value); }
 
 /**
+ *  Divide the object with a certain value and get the rest
+ *  Note that this does not use the Arithmetic object, because no conversion between floats is necessary
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator%=(const Value &value)        { return operator=(numericValue() % value.numericValue()); }
+Value &Value::operator%=(int16_t value)             { return operator=(numericValue() % value); }
+Value &Value::operator%=(int32_t value)             { return operator=(numericValue() % value); }
+Value &Value::operator%=(int64_t value)             { return operator=(numericValue() % value); }
+Value &Value::operator%=(bool value)                { return operator=(numericValue() % value); }
+Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
+Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
+Value &Value::operator%=(const char *value)         { return operator=(numericValue() % atoi(value)); }
+Value &Value::operator%=(double value)              { return operator=(numericValue() % (int)value); }
+
+/**
  *  Assignment operator
  *  @param  value
  *  @return Value
@@ -628,6 +644,20 @@ Value Value::operator/(const std::string &value)    { return Arithmetic<std::div
 Value Value::operator/(const char *value)           { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(double value)                { return Arithmetic<std::divides>(this).apply(value); }
 
+/**
+ *  Modulus operator
+ *  @param  value
+ *  @return Value
+ */
+Value Value::operator%(const Value &value)          { return Value(numericValue() % value.numericValue()); }
+Value Value::operator%(int16_t value)               { return Value(numericValue() % value); }
+Value Value::operator%(int32_t value)               { return Value(numericValue() % value); }
+Value Value::operator%(int64_t value)               { return Value(numericValue() % value); }
+Value Value::operator%(bool value)                  { return Value(numericValue() % value); }
+Value Value::operator%(char value)                  { return Value(numericValue() % value); }
+Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }
+Value Value::operator%(const char *value)           { return Value(numericValue() % atoi(value)); }
+Value Value::operator%(double value)                { return Value(numericValue() % (int)value); }
 
 /**
  *  The type of object
