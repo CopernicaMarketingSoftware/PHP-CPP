@@ -1,0 +1,181 @@
+<h1>Loading native extensions</h1>
+<p>
+    Native PHP extensions are compiled into *.so files, and can be enabled by adding 
+    a line to the core php.ini configuration file - or one of the additional 
+    configuration files that are loaded by PHP. If you do not know where you can 
+    find the PHP configuration file(s) on your system, you can run the following 
+    command from the command line:
+</p>
+<p>
+    <code><pre>
+        php --ini
+    </pre></code>
+</p>
+<p>
+    Extensions are enabled by adding "extension=name.so" lines to the
+    configuration file - where 'name' should of course be replaced by the name of 
+    your extension. A default PHP installation already comes with many default 
+    extensions, so in the configuration file(s) on your system you will certainly 
+    find a number of these "extension=name.so" lines.
+</p>
+<p>
+    The extension lines either take an absolute path ("extension=/path/to/extension.so")
+    or a relative path ("extension=extension.so"). If you'd like to use relative
+    paths, you must make sure that you've copied your extension *.so file to the
+    default extension directory, so that PHP can find it. To find out this default
+    extension directory, use the following command line instruction:
+</p>
+<p>
+    <code><pre>
+        php -i|grep extension_dir
+    </pre></code>
+</p>
+<p>
+    When PHP starts, it loads its configuration file(s) and for each "extension=name.so"
+    line in it, it will open the appropriate library, and call the "get_module()"
+    function from it. Each extension library must therefore define and implement 
+    this "get_module()" C function. The function is called by PHP right after
+    the library is loaded (and thus way before pageviews are handled), and it 
+    should return a memory address that points to a structure that holds information 
+    about all functions, classes, variables and constants that are made available 
+    by the extension. 
+</p>
+<p>
+    The structure that the get_module() returns is defined in the header files of 
+    the Zend engine, but it is a pretty complicated structure without good documentation. 
+    Luckily, the PHP-CPP library makes life easier for you, and offers an Extension 
+    class that can be used instead.
+</p>
+<p>
+    <code><pre>
+        #include &lt;phpcpp.h&gt;
+        
+        extern "C" {
+            PHPCPP_EXPORT void *get_module() {
+                static Php::Extension myExtension("my_extension", "1.0");
+                return myExtension.module();
+            }
+        }
+    </pre></code>
+</p>
+<p>
+    In the example above you see a very straightforward implementation of the
+    get_module() function. A number of elements require special attention. For a 
+    start, the only header file that you see is the phpcpp.h header
+    file. If you're using the PHP-CPP library to build your own extensions,
+    you do not have to include the complicated, unstructured, and mostly undocumented
+    header files of the Zend engine - all you need is the single header file of
+    the PHP-CPP library. If you insist, you are of course free to also include the header
+    files of the core PHP engine - but you do not have to.
+</p>
+<p>
+    The PHP-CPP library is a C++ library, and you can use all features
+    of this language. However, PHP expects your library, and especially your 
+    get_module() function, to be implemented in C and not in C++. That's why we've 
+    wrapped the get_module() function in an 'extern "C"' block. This will instruct 
+    the C++ compiler that the get_module() is a regular C function, and
+    no C++ name mangling should be applied to it.
+</p>
+<p>
+    The PHP-CPP library defines a "PHPCPP_EXPORT" macro that should be placed
+    in front of the get_module() function. This macro makes sure that the get_module()
+    function is publicly exported, and thus callable by PHP. The macro has a different
+    implementation based on the compiler and operating system.
+</p>
+<p>
+    Inside the get_module() function the Extension object is instantiated, and the
+    Extension::module() method is called. It is crucial that you make a <i>static</i>
+    instance of this Extension class, because the object should exist for the entire
+    lifetime of the PHP process, and not only for the duration of the get_module()
+    call. The constructor takes two arguments: the name of your extension and 
+    its version number. The Extension::module() method returns the memory address
+    that PHP needs to initialize the library.
+</p>
+<p>
+    Note that the example above does not yet make any native functions or 
+    native classes available in PHP - it only creates the extension.
+</p>
+<h1>Exporting native functions</h1>
+<p>
+    An extension is of course only useful if you define functions and/or 
+    classes that can be accessed from PHP scripts. For functions you can do this 
+    by adding your native function implementations to the Extension object:
+</p>
+<p>
+    <code><pre>
+        #include &lt;phpcpp.h&gt;
+        
+        extern void example1();
+        extern void example2(Php::Parameters &params);
+        extern Php::Value example3();
+        extern Php::Value example4(Php::Parameters &params);
+        
+        extern "C" {
+            PHPCPP_EXPORT void *get_module() {
+                static Php::Extension myExtension("my_extension", "1.0");
+                myExtension.add("native1", example1);
+                myExtension.add("native2", example2);
+                myExtension.add("native3", example3);
+                myExtension.add("native4", example4);
+                return myExtension.module();
+            }
+        }
+    </pre></code>
+</p>
+<p>
+    What do we see here? We've added four function declarations ("example1", 
+    "example2", "example3" and "example4") to the source code of our extension. 
+    The reason why we've only declared the functions, and not fully implemented 
+    them is to keep the example code relatively small. We assume that the 
+    four example functions are implemented in a different file. In a real world 
+    example you could just as well remove the "extern" keyword and implement the 
+    four functions in the same source file as the get_module() call.
+</p>
+<p>
+    The four functions all have a different signature: Some return a value, while
+    others do not return anything. And some take parameters, while others do not.
+    Despite the different signature of the functions, they can all be made
+    available in PHP by adding them to the extension object, by simply calling
+    the myExtension.add() method. This method takes two parameters: the name by
+    which the function should be accessible in PHP, and the actual native
+    function.
+</p>
+<p>
+    In the example above we've used different names for the native functions
+    ("example1" up to "example4") as for the PHP functions ("native1" to
+    "native4"). This is legal - you do not have to use the same names for your
+    native functions as for your PHP functions. The following PHP script can be 
+    used to call the four native functions:
+</p>
+<p>
+    <code><pre>
+        &lt;?php
+        native1();
+        native2("a","b");
+        $x = native3();
+        $y = native4(1,2);
+        ?&gt;
+    </pre></code>
+</p>
+<p>
+    The signature of the four example functions are exactly the signatures that
+    are supported by the PHP-CPP libraries. Every native function that returns
+    void or a Php::Value object, and that either accepts a Php::Parameters object
+    or no parameters at all, can be added to the extension object and can thus
+    be exported to PHP.
+</p>
+<h1>Working with variables</h1>
+<p>
+    Variables in PHP are non-typed. A variable can thus hold any possible type:
+    an integer, string, a floating point number, and even an object or an array.
+    C++ on the other hand is a typed language. In C++ an integer variable always 
+    has a numeric value, and a string variable always hold a string value.
+</p>
+<p>
+    When you mix native code and PHP code, you will need to convert the non-typed 
+    PHP variables into native variables, and the other way round: convert native 
+    variables back into non-typed PHP variables. The PHP-CPP library offers the 
+    "Value" class that makes this a very simple task.
+</p>
+<p>
+    
