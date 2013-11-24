@@ -43,7 +43,7 @@ static void deallocate_object(void *object TSRMLS_DC)
  */
 static void clone_object(void *object, void **clone TSRMLS_DC)
 {
-    std::cout << "clone_object" << std::endl;
+    std::cout << "PHP-CPP: Cloning of object has not been implemented." << std::endl;
     
     // @todo implementation
 }
@@ -90,8 +90,8 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     // finally, construct the cpp object
     object->cpp = info->construct();
 
-    std::cout << "Allocate object" << std::endl;
-    std::cout << object->cpp << " " << object << std::endl;
+    //std::cout << "Allocate object" << std::endl;
+    //std::cout << object->cpp << " " << object << std::endl;
 
     // done
     return result;
