@@ -25,6 +25,7 @@
  *  PHP includes
  */
 #include <php.h>
+#include "zend_exceptions.h"
 
 /**
  *  Macro to convert results to success status
@@ -56,6 +57,7 @@
 #include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/globals.h"
+#include "../include/error.h"
 
 /**
  *  Interface files for internal use only
