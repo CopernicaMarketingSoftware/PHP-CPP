@@ -1,14 +1,13 @@
 /**
- *	functionvoid.cpp
+ *	functionnoparameters.cpp
  * 	@Author Jasper van Eck
  * 
- * 	An example file to show the working of a void function call.
+ * 	An example file to show the working of a function call without parameters.
  */
 
 /**
  * 	Libraries used.
  */
-#include <iostream>
 #include <phpcpp.h>
 
 /**
@@ -17,11 +16,12 @@
 using namespace std;
 
 /**
- * 	my_function_void()
+ * 	my_no_parameters_function()
+ * 	@return Php::Value
  */
-void my_function_void()
+Php::Value my_no_parameters_function()
 {
-	cout << "In my_function_void()" << endl;
+	return "42";
 }
 
 
@@ -32,10 +32,10 @@ extern "C"
 	PHPCPP_EXPORT void *get_module()
 	{
 		// create extension
-        static Php::Extension extension("my_function_void","1.0");
+        static Php::Extension extension("my_function_return_value","1.0");
         
         // add function to extension
-        extension.add("my_void_function", my_function_void);
+        extension.add("my_no_parameters_function", my_no_parameters_function);
 		
 		// return the extension module
 		return extension.module();

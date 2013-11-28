@@ -9,7 +9,7 @@ PHP_CONFIG_DIR	= /etc/php5/cli/conf.d
 
 LD              = g++
 LD_FLAGS        = -Wall -shared -O2 
-RESULT          = functionvoid.so
+RESULT          = functionwithparameters.so
 
 PHPINIFILE		= 30-phpcpp.ini
 
