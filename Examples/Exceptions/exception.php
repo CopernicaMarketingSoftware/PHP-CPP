@@ -15,11 +15,12 @@
 
 try
 {
-	echo "Function which throws an exception; my_throw_exception_function()\n"
+	echo "Function which throws an exception; my_throw_exception_function()\n";
 	echo my_throw_exception_function() . "\n";
 }
 catch (Exception $exception)
 {
-	
+	echo $exception->getMessage();
 	
 }
+	echo my_throw_exception_function() . "\n";

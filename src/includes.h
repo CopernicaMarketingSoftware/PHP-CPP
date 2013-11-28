@@ -17,6 +17,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <exception>
 
 // for debugging
 #include <iostream>
@@ -25,7 +26,7 @@
  *  PHP includes
  */
 #include <php.h>
-
+#include "zend_exceptions.h"
 /**
  *  Macro to convert results to success status
  */
@@ -55,6 +56,7 @@
 #include "../include/class.h"
 #include "../include/classinfo.h"
 #include "../include/extension.h"
+#include "../include/exception.h"
 #include "../include/globals.h"
 
 /**

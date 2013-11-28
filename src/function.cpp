@@ -38,20 +38,15 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     Parameters params(this_ptr, ZEND_NUM_ARGS());
 
 	// the function could throw an exception
-	//try
-	//{
+	try
+	{
 		// get the result
 		result = function->invoke(*PHPCPP_G(environment), params);
-	//}
-	//catch (const Php::Exception &exception)
-	//{
-	//	cout << "got exception";
-		
-		// @todo throw the exception....
-		
-		
-		
-	//}
+	}
+	catch (const Php::Exception &exception)
+	{
+		zend_throw_exception(zend_exception_get_default(), exception.getMessage(), 0 TSRMLS_CC);
+	}
 }
 
 /**
