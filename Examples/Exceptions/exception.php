@@ -20,7 +20,6 @@ try
 }
 catch (Exception $exception)
 {
-	echo $exception->getMessage();
+	echo $exception->getMessage(). "\n";
 	
 }
-	echo my_throw_exception_function() . "\n";
