@@ -73,13 +73,26 @@ Php::Value bubblesort(Php::Parameters &params)
     return r;
 }
 
+
+void my_function()
+{
+	
+}
+
+Php::Value my_integer_return()
+{
+	throw Php::Exception("er is iets mis");
+	
+	return "abcd";
+}
+
 /**
  *  Our own "my_plus" function that will be available in PHP
  *  @param  environment
  *  @param  params
  *  @return Value
  */
-static Php::Value my_plus(Php::Environment &env, Php::Parameters &params)
+static Php::Value my_plus(Php::Parameters &params)
 {
     Php::Value r(0);
     
@@ -159,10 +172,10 @@ extern "C"
 
         // define the functions
         extension.add("my_plus", my_plus, {
-//            Php::ByVal("a", Php::numericType),
-//            Php::ByVal("b", Php::numericType)
-//            Php::ByVal("c", "MyClass"),
-//            Php::ByRef("d", Php::stringType)
+            Php::ByVal("a", Php::numericType),
+            Php::ByVal("b", Php::numericType)
+            Php::ByVal("c", "MyClass"),
+            Php::ByRef("d", Php::stringType)
         });
         
         extension.add("bubblesort", bubblesort);
