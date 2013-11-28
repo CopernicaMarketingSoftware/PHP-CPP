@@ -1,7 +1,7 @@
 <?php
 /*
  *	functionreturnvalue.php
- * 	@Author Jasper van Eck
+ * 	@author Jasper van Eck<jasper.vaneck@copernica.com>
  * 
  * 	An example file to show the working of a function call with a return value.
  */
