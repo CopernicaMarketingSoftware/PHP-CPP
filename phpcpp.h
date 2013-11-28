@@ -43,6 +43,7 @@
 #include <phpcpp/classinfo.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/error.h>
+#include <phpcpp/objectinfo.h>
 
 /**
  *  Macro to export a function

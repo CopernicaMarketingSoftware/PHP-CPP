@@ -322,7 +322,7 @@ public:
      *  @return double
      */
     double floatValue() const;
-    
+
     /**
      *  The number of members in case of an array or object
      *  @return int
@@ -539,6 +539,7 @@ protected:
      */
     friend class Environment;
     friend class Member;
+    friend class ObjectInfo;
 };
 
 /**

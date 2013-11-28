@@ -17,6 +17,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <stdexcept>
 
 // for debugging
 #include <iostream>
@@ -25,7 +26,9 @@
  *  PHP includes
  */
 #include <php.h>
-#include "zend_exceptions.h"
+#include <zend_exceptions.h>
+#include <zend_object_handlers.h>
+
 
 /**
  *  Macro to convert results to success status
@@ -58,6 +61,7 @@
 #include "../include/extension.h"
 #include "../include/globals.h"
 #include "../include/error.h"
+#include "../include/objectinfo.h"
 
 /**
  *  Interface files for internal use only
