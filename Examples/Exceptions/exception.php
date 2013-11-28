@@ -12,6 +12,14 @@
 /*
  *	Run a function which throws an exception.
  */
- 
-echo "Function which throws an exception; my_throw_exception_function()\n"
-echo my_throw_exception_function() . "\n";
+
+try
+{
+	echo "Function which throws an exception; my_throw_exception_function()\n"
+	echo my_throw_exception_function() . "\n";
+}
+catch (Exception $exception)
+{
+	
+	
+}

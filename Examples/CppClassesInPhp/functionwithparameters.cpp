@@ -50,8 +50,18 @@ Php::Value my_with_defined_parameters_function(Php::Parameters &params)
 }
 
 /**
- * 	This functions receives a reference to a variable. When the variable is altered,
- * 	so is the value in the php script.
+ * 	my_with_defined_array_parameters_function()
+ * 	@param	Php::Parameters		the given parameters
+ */
+void my_with_defined_array_parameters_function(Php::Parameters &params)
+{
+	for (int i = 0; i < params[0].size(); i++)
+	{
+		cout << "Parameter " << i << ": " << params[0][i] << endl;
+	}
+}
+
+/**
  * 	my_with_defined_parameters_reference_function()
  * 	@param	Php::Parameters		the given parameters
  */
@@ -61,28 +71,12 @@ void my_with_defined_parameters_reference_function(Php::Parameters &params)
 }
 
 /**
- * 	my_with_defined_parameters_reference_function()
- * 	@param	Php::Parameters		the given parameters
- */
-void my_with_defined_array_parameters_function(Php::Parameters &params)
-{
-	for (int i = 0; i < params[0].size(); i++)
-	{
-		cout << "The array: " << params[0][i] << endl;
-	}
-}
-
-/**
  * 	my_with_defined_object_parameters_function()
- *  The use of objects is not yet implemented.
  * 	@param Php::Parameters		the given parameters
  */
 void my_with_defined_object_parameters_function(Php::Parameters &params)
 {
-	for (unsigned int i = 0; i < params.size(); i++)
-	{
-		cout << params[i] << endl;
-	}
+	cout << params[0] << endl;
 }
 
 // Symbols are exported according to the "C" language
