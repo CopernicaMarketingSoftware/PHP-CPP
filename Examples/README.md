@@ -25,7 +25,8 @@ Extension
 	
 	
 FunctionVoid
-~~~~~~~~~~~~
+------------
+
 
 	This second example shows how to add a function to the extension 
 	and call that function from the PHP code. Adding a function to 
@@ -38,9 +39,11 @@ FunctionVoid
 	
 	Functions and/or classes defined in this example.
 		- void my_function_void() Named as my_void_function()
-	
+
+
 FunctionReturnValue
-~~~~~~~~~~~~~~~~~~~
+-------------------
+
 
 	The third example shows how to return a value from C++ to PHP. 
 	Virtually any type of value can be returned to PHP from C++.
@@ -53,11 +56,18 @@ FunctionReturnValue
 	Functions and/or classes defined in this example.
 		- Php::Value my_return_value_function()
 		
+
 FunctionNoParameters
-~~~~~~~~~~~~~~~~~~~~
+--------------------
+
 
 	The fourth example is a combination of the second and third example.
 	This example illustrates how to call a function without parameters.
 	The function is added to your extension, and can then be called from
 	your PHP script.
+	
+	The function returns a Php::Value to show that the call succeeded.
+	
+	Functions and/or classes defined in this example.
+		- Php::Value my_no_parameters_function()
 	
