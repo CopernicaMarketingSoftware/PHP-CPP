@@ -12,8 +12,8 @@ according to your own specific directories.
 The following examples are available:
 
 
-Extension
----------
+### [Extension](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/Extension)
+
 
 	The first example does nothing - it only shows how to create your
 	own extension. This means your extension will be listed in the 
@@ -24,8 +24,7 @@ Extension
 	extension.
 	
 	
-FunctionVoid
-------------
+### [FunctionVoid](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionVoid)
 
 
 	This second example shows how to add a function to the extension 
@@ -41,8 +40,7 @@ FunctionVoid
 		- void my_function_void() Named as my_void_function()
 
 
-FunctionReturnValue
--------------------
+### [FunctionReturnValue](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionReturnValue)
 
 
 	The third example shows how to return a value from C++ to PHP. 
@@ -57,8 +55,7 @@ FunctionReturnValue
 		- Php::Value my_return_value_function()
 		
 
-FunctionNoParameters
---------------------
+### [FunctionNoParameters](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionNoParameters)
 
 
 	The fourth example is a combination of the second and third example.
@@ -72,8 +69,7 @@ FunctionNoParameters
 		- Php::Value my_no_parameters_function()
 	
 	
-FunctionWithParameters
-----------------------
+### [FunctionWithParameters](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionWithParameters)
 
 
 	The fifth example is an example to show how several different types
@@ -118,8 +114,7 @@ FunctionWithParameters
 		5. void my_with_defined_object_parameters_function(Php::Parameters &params)
 
 
-Exceptions
-----------
+### [Exceptions](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/Exceptions)
 
 
 	The sixth example is composed of two parts, the throw exception and 
