@@ -24,12 +24,18 @@ private:
 	 */
 	std::string _message;
 	
+	/**
+	 * 	The PHP exception code
+	 * 	@var	int
+	 */
+	int _code;
+	
 public:
 	/**
 	 * 	Constructor
 	 * 	@param	&string
 	 */
-	Exception(const std::string &message) : std::exception(), _message(message)
+	Exception(const std::string &message, int code = 0) : std::exception(), _message(message), _code(code)
 	{
 	}
 	

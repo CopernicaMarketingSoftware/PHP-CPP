@@ -121,5 +121,26 @@ FunctionWithParameters
 Exceptions
 ----------
 
+
 	The sixth example is composed of two parts, the throw exception and 
-	the catch exception examples. 
+	the catch exception examples. The requirements of the catch example,
+	passing a callback as a parameter, have not yet been implemented. 
+	
+	The throw example is there to show that an exception thrown in
+	a C++ function can be caught and handled in your PHP script. The 
+	exception thrown is a Php::Exception.
+	
+	The catch example shows that when a PHP function is passed as a 
+	callback, and is capable of throwing a (PHP) exception, that it
+	can be caught as Php::Exception and then handled in the C++ code. 
+	However, the passing of a function as a callback has not yet been 
+	implemented. It would need to be implemented for this specific 
+	example to work.
+	
+	Functions and/or classes defined in this Example.
+		- void my_catch_exception_function(Php::Parameters &params)
+		- void my_throw_exception_function()
+
+
+	
+

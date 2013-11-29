@@ -2,10 +2,9 @@
  *	exception.cpp
  * 	@author Jasper van Eck<jasper.vaneck@copernica.com>
  * 
- * 	An example file to show the working of a function which throws an exception.
+ * 	An example file to show the working of a C++ function that 
+ * 	throws an exception, which can be caught by PHP.
  * 	
- * 	Exceptions haven't been implemented yet. 
- * 	Therefore this example is not yet a working one.
  */
 
 /**
@@ -20,13 +19,11 @@ using namespace std;
 
 /**
  * 	my_throw_exception_function()
- * 	Throws an exception.
- * 	@return Php::Value
+ * 	Throws an exception which should be caught by PHP.
  */
-Php::Value my_throw_exception_function()
+void my_throw_exception_function()
 {
 	throw Php::Exception("I threw an exception in my_throw_exception_function()");
-	return "42";
 }
 
 
@@ -37,7 +34,7 @@ extern "C"
 	PHPCPP_EXPORT void *get_module()
 	{
 		// create extension
-        static Php::Extension extension("my_function_throw_exception","1.0");
+        static Php::Extension extension("my_exception_throw","1.0");
         
         // add function to extension
         extension.add("my_throw_exception_function", my_throw_exception_function);
