@@ -38,8 +38,8 @@ The method call to export the above C++ function:
 
 ```c
 extension.add("my_plus", my_plus, {
-Php::ByVal("a", Php::numericType),
-Php::ByVal("b", Php::numericType)
+	Php::ByVal("a", Php::numericType),
+	Php::ByVal("b", Php::numericType)
 });
 ```
 
