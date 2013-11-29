@@ -13,7 +13,7 @@ The following examples are available:
 
 
 Extension
-~~~~~~~~~
+---------
 
 	The first example does nothing - it only shows how to create your
 	own extension. This means your extension will be listed in the 
@@ -71,3 +71,38 @@ FunctionNoParameters
 	Functions and/or classes defined in this example.
 		- Php::Value my_no_parameters_function()
 	
+	
+FunctionWithParameters
+----------------------
+
+
+	The fifth example is an example to show how several different kinds
+	of parameters can used for functions. When defining the parameters for 
+	your function
+	
+	The first option being the undefined parameters. With undefined 
+	parameters, we can pass any and as many parameters as we want to 
+	the function. 
+	
+	The second option is defining each parameter when adding the function
+	to your extension. In this case we have added two Php::numericType
+	parameters to the function. In 'type.h' you can find all avaiable
+	types, however not every type has been implemented yet.
+	
+	The third option is passing a reference of a variable. Meaning when
+	it is altered in the C++ code, its value will also change in the PHP
+	code.
+	
+	Functions and/or classes defined in this example.
+		- void my_with_undefined_parameters_function(Php::Parameters &params)
+		- Php::Value my_with_defined_parameters_function(Php::Parameters &params)
+		- void my_with_defined_parameters_reference_function(Php::Parameters &params)
+		- void my_with_defined_array_parameters_function(Php::Parameters &params)
+		- void my_with_defined_object_parameters_function(Php::Parameters &params)
+
+
+Exceptions
+----------
+
+	The sixth example is composed of two parts, the throw exception and 
+	the catch exception examples. 
