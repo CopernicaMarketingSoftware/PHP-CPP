@@ -76,9 +76,15 @@ FunctionWithParameters
 ----------------------
 
 
-	The fifth example is an example to show how several different kinds
-	of parameters can used for functions. When defining the parameters for 
-	your function
+	The fifth example is an example to show how several different types
+	of parameters can used for functions. There are two ways to pass a 
+	parameter, by value(Php::ByVal) and by reference(Php::ByRef). Each 
+	take two parameters of their own. The first being the parameter name,
+	and the second the parameter type.
+	
+	Furthermore, parameters are always stored in the Php::Parameters 
+	object. This object is basicly an array which hold all the parameters,
+	in order.
 	
 	The first option being the undefined parameters. With undefined 
 	parameters, we can pass any and as many parameters as we want to 
@@ -91,14 +97,25 @@ FunctionWithParameters
 	
 	The third option is passing a reference of a variable. Meaning when
 	it is altered in the C++ code, its value will also change in the PHP
-	code.
+	code. This can achieved by using Php:ByRef, rather than Php::ByVal.
+	
+	The fourth option is passing an array as parameter. The array 
+	parameter will be accessible from the N-1 index of the 
+	Php::Parameters object, where is the argument number of the array
+	when passing it to the function.
+	
+	The fifth and final option is passing an object. An object can be 
+	passed in the same way as any other data type, except for that 
+	you must specify what the class is of the object. This can be done
+	by passing a string with the class name as the second parameter to 
+	Php::ByVal or Php::ByRef.
 	
 	Functions and/or classes defined in this example.
-		- void my_with_undefined_parameters_function(Php::Parameters &params)
-		- Php::Value my_with_defined_parameters_function(Php::Parameters &params)
-		- void my_with_defined_parameters_reference_function(Php::Parameters &params)
-		- void my_with_defined_array_parameters_function(Php::Parameters &params)
-		- void my_with_defined_object_parameters_function(Php::Parameters &params)
+		1. void my_with_undefined_parameters_function(Php::Parameters &params)
+		2. Php::Value my_with_defined_parameters_function(Php::Parameters &params)
+		3. void my_with_defined_parameters_reference_function(Php::Parameters &params)
+		4. void my_with_defined_array_parameters_function(Php::Parameters &params)
+		5. void my_with_defined_object_parameters_function(Php::Parameters &params)
 
 
 Exceptions
