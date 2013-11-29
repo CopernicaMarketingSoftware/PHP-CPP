@@ -14,7 +14,6 @@ The following examples are available:
 
 ### [Extension](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/Extension)
 
-
 	The first example does nothing - it only shows how to create your
 	own extension. This means your extension will be listed in the 
 	output of "phpinfo()", and it is included in the array returned 
@@ -25,7 +24,6 @@ The following examples are available:
 	
 	
 ### [FunctionVoid](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionVoid)
-
 
 	This second example shows how to add a function to the extension 
 	and call that function from the PHP code. Adding a function to 
@@ -42,7 +40,6 @@ The following examples are available:
 
 ### [FunctionReturnValue](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionReturnValue)
 
-
 	The third example shows how to return a value from C++ to PHP. 
 	Virtually any type of value can be returned to PHP from C++.
 	The returned value must be returned as Php::Value, rather than
@@ -57,7 +54,6 @@ The following examples are available:
 
 ### [FunctionNoParameters](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionNoParameters)
 
-
 	The fourth example is a combination of the second and third example.
 	This example illustrates how to call a function without parameters.
 	The function is added to your extension, and can then be called from
@@ -70,7 +66,6 @@ The following examples are available:
 	
 	
 ### [FunctionWithParameters](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/FunctionWithParameters)
-
 
 	The fifth example is an example to show how several different types
 	of parameters can used for functions. There are two ways to pass a 
@@ -115,7 +110,6 @@ The following examples are available:
 
 
 ### [Exceptions](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/Exceptions)
-
 
 	The sixth example is composed of two parts, the throw exception and 
 	the catch exception examples. The requirements of the catch example,
