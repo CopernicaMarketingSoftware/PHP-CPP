@@ -34,6 +34,15 @@ Php::Value my_plus(Php::Parameters &params)
 }
 ```
 
+The method call to export the above C++ function:
+
+```c
+extension.add("my_plus", my_plus, {
+Php::ByVal("a", Php::numericType),
+Php::ByVal("b", Php::numericType)
+});
+```
+
 The PHP-CPP library ensures that the variables
 from PHP (which internally are complicated C structures), are automatically converted into 
 integers, passed to your function, and that the return value of your "my_plus" function is 
