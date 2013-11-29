@@ -43,9 +43,9 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
 		// get the result
 		result = function->invoke(*PHPCPP_G(environment), params);
 	}
-	catch (const Php::Exception &exception)
+	catch (Php::Exception &exception)
 	{
-		zend_throw_exception(zend_exception_get_default(), exception.getMessage(), 0 TSRMLS_CC);
+		zend_throw_exception(zend_exception_get_default(), (char*)exception.message().c_str(), 0 TSRMLS_CC);
 	}
 }
 

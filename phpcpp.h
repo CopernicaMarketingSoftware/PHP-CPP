@@ -17,6 +17,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <exception>
 
 /**
  *  Include all headers files that are related to this library

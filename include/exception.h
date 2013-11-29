@@ -5,6 +5,7 @@
  * 	@author Jasper van Eck <jasper.vaneck@copernica.com>
  * 	@copyright 2013 Copernica BV
  */
+#include <exception>
 
 /**
  *  Set up namespace
@@ -14,41 +15,44 @@ namespace Php {
 /** 
  *  Class definition
  */
-class Exception
+class Exception : public std::exception
 {
 private:
 	/**
 	 * 	The exception message
-	 * 	@var char*
+	 * 	@var	char*
 	 */
-	char* _message;
+	std::string _message;
 	
 public:
 	/**
 	 * 	Constructor
-	 * 	@param	string		The exception message.
+	 * 	@param	&string
 	 */
-	Exception(char* message) throw()
+	Exception(const std::string &message) : std::exception(), _message(message)
 	{
-		_message = message;
 	}
-
+	
 	/**
-	 * 	Destructor
+	 *  Destructor
 	 */
-	~Exception() throw()
+	virtual ~Exception()
 	{
 	}
 	
 	/**
 	 * 	Returns the message of the exception.
-	 * 	@return std::string
+	 * 	@return &string
 	 */
-	char* getMessage() const throw()
+	std::string &message() throw()
 	{
 		return _message;
 	}
-
 };
 
+/**
+ *  End of namespace
+ */
 }
+
+ 
