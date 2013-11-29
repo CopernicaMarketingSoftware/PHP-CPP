@@ -12,9 +12,9 @@ C++, and the PHP-CPP library uses all the power offered by C++11 to convert the 
 values from your functions to/and from PHP:
 
 ```c
-std::string hello_word()
+Php::Value hello_word()
 {
-    return std::string("hello world!");
+    return "hello world!";
 }
 ```
 
@@ -22,15 +22,15 @@ The function above is a native C++ function. With PHP-CPP you can export this fu
 to PHP with only one single C++ method call:
 
 ```c
-extension.function("hello_world", hello_world);
+extension.add("hello_world", hello_world);
 ```
 
 Working with parameters and return values is just as easy:
 
 ```c
-int my_plus(int a, int b)
+Php::Value my_plus(Php::Parameters &params)
 {
-    return a+b;
+    return params[0] + params[1];
 }
 ```
 
