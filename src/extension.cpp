@@ -6,6 +6,11 @@
  */
 #include "includes.h"
 
+extern "C"
+{
+	zend_class_entry *default_exception_ce;
+}
+
 /**
  *  Set up namespace
  */
@@ -52,7 +57,7 @@ static int extension_startup(INIT_FUNC_ARGS)
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
-    
+
     // initialize the extension
     return BOOL2SUCCESS(extension->initialize());
 }
@@ -164,7 +169,6 @@ Extension::Extension(const char *name, const char *version, request_callback sta
 #else
     _entry->globals_ptr = NULL;
 #endif
-
 }
 
 /**
@@ -252,17 +256,54 @@ zend_module_entry *Extension::module()
  */
 bool Extension::initialize()
 {
+    // This is a bit of hack. Our Exception class MUST be the first to be registered, because
+    // other classes depend on it. However, we can not insert it before the module (extension)
+    // is being initialized because we don't have access to certain information from the Zend Engine
+    // before the module is initialized. We can also not force it to be at posistion 0 in the set
+    // of classes because we're using a std::set, which does not guarentee the order of insertion
+    // is the same during iteration, there for, we force it to register our Exception class
+    // here before ANYTHING else, it however does need to be in the set of classes, but, before
+    // any other classes are initialized, but it needs to be excluded from the iteration...
+    // sorry for the hack :p
+    GetExceptionBase()->initialize();
+
     // loop through the classes
     for (auto iter = _classes.begin(); iter != _classes.end(); iter++)
     {
         // initialize the class
         (*iter)->initialize();
     }
-    
+
     // done
     return true;
 }
 
+_ClassInfo * Extension::FindClassByName(const std::string &class_name)
+{
+	for (auto iter = _classes.begin(); iter != _classes.end(); iter++)
+	{
+		// initialize the class
+		if(std::string((*iter)->_name) == class_name)
+			return (*iter).get();
+	}
+
+	return NULL;
+}
+
+_ClassInfo * Extension::GetExceptionBase()
+{
+	static _ClassInfo * excp_class = NULL;
+
+	if(excp_class == NULL)
+	{
+		excp_class = new ClassInfo<Exception>(Php::Constants::ExceptionClassName.c_str(), Php::Class<Exception>(
+		{
+			Php::Public("__construct", Php::Method<Exception>(&Exception::__construct))
+		}));
+	}
+
+	return excp_class;
+}
 
 /**
  *  End of namespace

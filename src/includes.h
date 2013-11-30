@@ -7,6 +7,9 @@
  *  @copyright 2013 Copernica BV
  */
 
+#ifndef PHP_CPP_INCLUDES_H_
+#define PHP_CPP_INCLUDES_H_
+
 /**
  *  Include standard C and C++ libraries
  */
@@ -17,6 +20,7 @@
 #include <map>
 #include <memory>
 #include <set>
+#include <exception>
 #include <stdexcept>
 
 // for debugging
@@ -38,6 +42,7 @@
 /**
  *  Include other files from this library
  */
+#include "../include/constants.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/hiddenpointer.h"
@@ -62,6 +67,8 @@
 #include "../include/globals.h"
 #include "../include/error.h"
 #include "../include/objectinfo.h"
+#include "../include/exception.h"
+#include "../include/test_exception.h"
 
 /**
  *  Interface files for internal use only
@@ -77,4 +84,6 @@
 #include "doublemember.h"
 #include "methodmember.h"
 #include "arithmetic.h"
+
+#endif // _PHP_CPP_INCLUDES_H_
 

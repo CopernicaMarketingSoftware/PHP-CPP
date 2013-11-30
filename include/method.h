@@ -37,24 +37,7 @@ public:
      *  @param  parameters
      *  @return Value
      */
-    Value invoke(Environment &environment, Parameters &parameters)
-    {
-        // the object to call a method on
-        Base *base = parameters.object();
-        
-        // find out which method to call, and call it
-        switch (_type) {
-        case 0:     (base->*_callback.m0)(); return Value();
-        case 1:     (base->*_callback.m1)(parameters); return Value();
-        case 2:     (base->*_callback.m2)(environment); return Value();
-        case 3:     (base->*_callback.m3)(environment, parameters); return Value();
-        case 4:     return (base->*_callback.m4)();
-        case 5:     return (base->*_callback.m5)(parameters);
-        case 6:     return (base->*_callback.m6)(environment);
-        case 7:     return (base->*_callback.m7)(environment, parameters);
-        default:    return Value();
-        }
-    }
+    Value invoke(Environment &environment, Parameters &parameters);
 
 protected:
     /**

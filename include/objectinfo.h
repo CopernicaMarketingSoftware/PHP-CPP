@@ -77,7 +77,7 @@ public:
 	 *  	 converted into the specified type, NULL will be returned.
 	 * @note Do not specify a pointer type in the type specifier, specify a type, a pointer
 	 * 		 of the specified type will be returned.
-	 * @note Free the damn pointer when you're done.
+	 * @note Free the damn pointEclipseer when you're done.
 	 * @tparam The type to convert (dynamic cast) to retrieved object to.
 	 * @returns A pointer to the underlying object.
 	 */

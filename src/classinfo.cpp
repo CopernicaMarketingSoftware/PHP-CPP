@@ -101,7 +101,15 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
  *  Constructor
  *  @param  name
  */
-_ClassInfo::_ClassInfo(const char *name) : _name(name), _entry(NULL) 
+_ClassInfo::_ClassInfo(const char *name) : _name(name), _entry(NULL), _base_type(NULL)
+{
+}
+
+/**
+ *  Constructor
+ *  @param  name
+ */
+_ClassInfo::_ClassInfo(const char *name, _ClassInfo * base_class) : _name(name), _entry(NULL), _base_type(base_class)
 {
 }
 
@@ -118,6 +126,8 @@ _ClassInfo::~_ClassInfo()
  */
 void _ClassInfo::initialize(TSRMLS_DC)
 {
+	//@todo clean up this method by separating registration of classes with a base class and exception classes
+
     // the class entry
     zend_class_entry entry;
 
@@ -127,8 +137,39 @@ void _ClassInfo::initialize(TSRMLS_DC)
     // we need a special constructor
     entry.create_object = create_object;
     
-    // register the class
-    _entry = zend_register_internal_class(&entry TSRMLS_CC);
+    // do we need to set a base class?
+    if(_name == Php::Constants::ExceptionClassName)
+	{
+		// We are dealing with the exception base class being registered, set the
+		// base class to the zend exception default
+		_entry = zend_register_internal_class_ex(&entry, zend_exception_get_default(), (char*)Php::Constants::PhpExceptionBaseClass.c_str() TSRMLS_CC);
+	}
+    else if(_base_type == NULL || _base_type->_entry == NULL)
+    {
+    	// we do not have a base class, just register the class
+    	_entry = zend_register_internal_class(&entry TSRMLS_CC);
+    }
+    else if(_base_type->_entry != NULL)
+    {
+    	// copy the name of the base class into a new string literal
+    	std::string class_name = std::string(_base_type->_entry->name);
+    	char *class_name_writeable = new char[class_name.size() + 1];
+    	std::copy(class_name.begin(), class_name.end(), class_name_writeable);
+    	class_name_writeable[class_name.size()] = '\0';
+
+    	// if the base class is 'PhpCppException', make the default Zend exception
+    	// class the base class, this is because all exceptions in PHP must inherit
+    	// from the default PHP Exception class, and our Exception class (named PhpCppException)
+    	// represents the PHP Exception class..
+    	if(class_name == Php::Constants::ExceptionClassName.c_str())
+    	{
+    		_entry = zend_register_internal_class_ex(&entry, zend_exception_get_default(), (char*)Php::Constants::PhpExceptionBaseClass.c_str() TSRMLS_CC);
+    	}
+    	else
+    	{
+    		_entry = zend_register_internal_class_ex(&entry, _base_type->_entry, class_name_writeable TSRMLS_CC);
+    	}
+    }
 
     // store pointer to the class in the unused doc_comment member
     _entry->info.user.doc_comment = (const char *)this;

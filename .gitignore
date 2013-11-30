@@ -2,3 +2,4 @@
 *.project
 *~
 *.o
+.settings*

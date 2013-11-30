@@ -18,10 +18,14 @@
  *  @copyright 2013 Copernica BV
  */
 
+#include <iostream>
+
 /**
  *  Structures referenced in this class
  */
 struct _zend_module_entry;
+struct _zend_class_entry;
+typedef struct _zend_class_entry zend_class_entry;
 
 /**
  *  Set up namespace
@@ -198,22 +202,41 @@ public:
     Function *add(const char *name, native_callback_5 function, const std::initializer_list<Argument> &arguments = {});
     Function *add(const char *name, native_callback_6 function, const std::initializer_list<Argument> &arguments = {});
     Function *add(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments = {});
-    
+
     /**
      *  Add a native class to the extension
      *  @param  name        Name of the class
+     *  @param  base_class	A pointer to a _ClassInfo instance that must serve as the base class.
      *  @param  type        The class implementation
      */
     template<typename T>
-    void add(const char *name, const Class<T> &type)
+    ClassInfo<T> * add(const char *name, _ClassInfo *base_class, const Class<T> &type)
     {
         // construct info
-        ClassInfo<T> *info = new ClassInfo<T>(name, type);
-        
+    	ClassInfo<T> *info = NULL;
+    	if(base_class != NULL)
+    		info = new ClassInfo<T>(name, base_class, type);
+    	else
+    		info = new ClassInfo<T>(name, type);
+
         // add class
         _classes.insert(std::unique_ptr<_ClassInfo>(info));
+
+        // return the class we just created
+        return info;
     }
-    
+
+    /**
+	 *  Add a native class to the extension
+	 *  @param  name        Name of the class
+	 *  @param  type        The class implementation
+	 */
+	template<typename T>
+	void add(const char *name, const Class<T> &type)
+	{
+		add(name, NULL, type);
+	}
+
     /**
      *  Retrieve the module entry
      * 
@@ -224,7 +247,22 @@ public:
      */
     _zend_module_entry *module();
     
+    /**
+     * Attempts to find the zend class entry for a class with the specified name.
+     * @param class_name The name of the class to find.
+     * @returns A pointer to the _zend_class_entry structure for the specified class.
+     * 		    If no class with the specified name could be found, NULL will be returned.
+     */
+    _ClassInfo * FindClassByName(const std::string &class_name);
     
+    /**
+     * Gets a pointer to the _ClassInfo instance that represents the base class for exception
+     * classes.
+     * @return A pointer to the _ClassInfo instance that represents the base class for exceptions,
+     * 		   NULL is returned when something went wrong.
+     */
+    _ClassInfo * GetExceptionBase();
+
 private:
     /**
      *  Set of function objects defined in the library

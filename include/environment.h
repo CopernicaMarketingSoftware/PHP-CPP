@@ -147,6 +147,9 @@ protected:
      *  @var void*
      */
     void *_data = NULL;
+
+    // Friend the _Method class so it has access to the _extension member
+    friend class _Method;
 };
 
 /**

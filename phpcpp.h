@@ -21,6 +21,7 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/constants.h>
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/hiddenpointer.h>
@@ -44,6 +45,8 @@
 #include <phpcpp/extension.h>
 #include <phpcpp/error.h>
 #include <phpcpp/objectinfo.h>
+#include <phpcpp/exception.h>
+#include <phpcpp/test_exception.h>
 
 /**
  *  Macro to export a function

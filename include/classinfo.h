@@ -42,6 +42,13 @@ public:
     _ClassInfo(const char *name);
     
     /**
+	 *  Constructor
+	 *  @param  name
+	 *  @param base_class
+	 */
+	_ClassInfo(const char *name, _ClassInfo *  base_class);
+
+    /**
      *  Destructor
      */
     virtual ~_ClassInfo();
@@ -77,6 +84,11 @@ protected:
     struct _zend_class_entry *_entry;
 
     /**
+     * The class that must serve as the base type.
+     */
+    _ClassInfo *  _base_type;
+
+    /**
      *  The name
      *  @var    string
      */
@@ -94,6 +106,8 @@ protected:
      */
     InternalFunction *_destructor;
     
+    friend class Extension;
+    friend class _Method;
 };
 
 /**
@@ -111,6 +125,17 @@ public:
     ClassInfo(const char *name, const Class<T> &type) : _ClassInfo(name), _type(type)
     {
     }
+
+    /**
+	 *  Constructor
+	 *  @param  name        Name of the class
+	 *  @param  base_class 	A pointer to a _ClassInfo instance, which must serve as this entry's base class.
+	 *  @param  type        The class type
+	 */
+	ClassInfo(const char *name, _ClassInfo * base_class, const Class<T> &type) : _ClassInfo(name, base_class), _type(type)
+	{
+	}
+
 
     /**
      *  Destructor
@@ -152,7 +177,6 @@ private:
      *  @var    Class
      */
     Class<T> _type;
-
 };
     
 /**
