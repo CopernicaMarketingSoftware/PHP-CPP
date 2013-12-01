@@ -66,7 +66,6 @@
 #include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/globals.h"
-#include "../include/error.h"
 #include "../include/objectinfo.h"
 #include "../include/exception.h"
 

@@ -43,7 +43,6 @@
 #include <phpcpp/class.h>
 #include <phpcpp/classinfo.h>
 #include <phpcpp/extension.h>
-#include <phpcpp/error.h>
 #include <phpcpp/objectinfo.h>
 #include <phpcpp/exception.h>
 
