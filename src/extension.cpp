@@ -259,12 +259,7 @@ bool Extension::initialize()
     // This is a bit of hack. Our Exception class MUST be the first to be registered, because
     // other classes depend on it. However, we can not insert it before the module (extension)
     // is being initialized because we don't have access to certain information from the Zend Engine
-    // before the module is initialized. We can also not force it to be at posistion 0 in the set
-    // of classes because we're using a std::set, which does not guarentee the order of insertion
-    // is the same during iteration, there for, we force it to register our Exception class
-    // here before ANYTHING else, it however does need to be in the set of classes, but, before
-    // any other classes are initialized, but it needs to be excluded from the iteration...
-    // sorry for the hack :p
+    // before the module is initialized.
     GetExceptionBase()->initialize();
 
     // loop through the classes

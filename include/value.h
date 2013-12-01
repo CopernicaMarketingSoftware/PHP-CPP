@@ -290,6 +290,7 @@ public:
     bool isFloat()      const { return type() == floatType; }
     bool isObject()     const { return type() == objectType; }
     bool isArray()      const { return type() == arrayType; }
+    bool isCallable() 	const { return type() == callableType; }
     
     /**
      *  Retrieve the value as number
@@ -527,13 +528,15 @@ public:
      */
     HashMember<std::string> operator[](const char *key);
 
+    Value call(std::initializer_list<Value> params);
+
 protected:
     /**
      *  The wrapped zval
      *  @var struct zval
      */
     struct _zval_struct *_val;
-    
+
     /**
      *  The environment can access the zval directly
      */

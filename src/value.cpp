@@ -158,10 +158,10 @@ Value::Value(struct _zval_struct *val, bool ref)
         // separate the zval
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
     }
-    
+
     // we see ourselves as reference too
     Z_ADDREF_P(_val);
-    
+
     // we're ready if we do not have to force it as a reference
     if (!ref || Z_ISREF_P(_val)) return;
     
@@ -343,7 +343,7 @@ Value &Value::operator=(const Value &value)
         // and we have one more reference
         Z_ADDREF_P(_val);
     }
-    
+
     // update the object
     return *this;
 }
@@ -665,6 +665,14 @@ Value Value::operator%(double value)                { return Value(numericValue(
  */
 Type Value::type() const
 {
+	// When the type is a call able type, Z_TYPE_P does not return
+	// a valid type, we use zend_is_callable to check if it's a call able
+	char *func_name;
+	if(zend_is_callable(_val, 0, &func_name))
+	{
+		return callableType;
+	}
+
     return (Type)Z_TYPE_P(_val);
 }
 
@@ -1014,6 +1022,41 @@ HashMember<std::string> Value::operator[](const char *key)
 std::ostream &operator<<(std::ostream &stream, const Value &value)
 {
     return stream << value.stringValue();
+}
+
+
+Value Value::call(std::initializer_list<Value> params)
+{
+	if(!isCallable())
+		throw Php::Exception("This is not a callable type!");
+
+	// count the number of params we received and declare
+	// a temporay counter variable for when we're going
+	// to loop the passed params
+	int param_count = static_cast<int>(params.size());
+	int temp_counter = 0;
+
+	// declare a new array of zval pointers, in size equal
+	// to the amount of parameters that we're passed
+	zval * raw_params[param_count];
+
+	// iterate over the passed params and add them to our
+	// array of zval's
+	for(auto itr = params.begin(); itr != params.end(); itr++)
+	{
+		raw_params[temp_counter] = (*itr)._val;
+		temp_counter++;
+	}
+
+	// declare a zval for the return value
+	zval retval;
+
+	// call the function in php space, and return the return value
+	if(call_user_function(CG(function_table), NULL, _val, &retval, (unsigned int) param_count, raw_params TSRMLS_CC) == SUCCESS)
+		return Value(&retval).clone(); // clone because the pointer we make is going out of scope when we return
+
+	// something went wrong, return null
+	return Value();
 }
 
 /**

@@ -18,8 +18,6 @@
  *  @copyright 2013 Copernica BV
  */
 
-#include <iostream>
-
 /**
  *  Structures referenced in this class
  */

@@ -22,6 +22,7 @@
 #include <set>
 #include <exception>
 #include <stdexcept>
+#include <initializer_list>
 
 // for debugging
 #include <iostream>
