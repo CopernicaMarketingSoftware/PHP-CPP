@@ -69,7 +69,6 @@
 #include "../include/error.h"
 #include "../include/objectinfo.h"
 #include "../include/exception.h"
-#include "../include/test_exception.h"
 
 /**
  *  Interface files for internal use only

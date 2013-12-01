@@ -46,7 +46,6 @@
 #include <phpcpp/error.h>
 #include <phpcpp/objectinfo.h>
 #include <phpcpp/exception.h>
-#include <phpcpp/test_exception.h>
 
 /**
  *  Macro to export a function
