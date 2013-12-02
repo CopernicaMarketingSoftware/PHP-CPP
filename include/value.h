@@ -38,6 +38,15 @@ template <class Type> class HashMember;
  */
 class Value
 {
+private:
+	/**
+	 *  Call function with a number of parameters
+	 *  @param  argc        Number of parameters
+	 *  @param  argv        The parameters
+	 *  @return Value
+	 */
+	Value exec(int argc, zval ***params);
+
 public:
     /**
      *  Empty constructor (value = NULL)
@@ -290,6 +299,7 @@ public:
     bool isFloat()      const { return type() == floatType; }
     bool isObject()     const { return type() == objectType; }
     bool isArray()      const { return type() == arrayType; }
+    bool isCallable() 	const { return type() == callableType; }
     
     /**
      *  Retrieve the value as number
@@ -526,6 +536,26 @@ public:
      *  @return HashMember
      */
     HashMember<std::string> operator[](const char *key);
+
+    /**
+     *  Call the function in PHP
+     *  We have ten variants of this function, depending on the number of parameters
+     * 	This call operator is only useful when the variable represents a callable
+     *  @param  name        Name of the function
+     *  @return Value
+     */
+    Value operator()();
+    Value operator()(Value p0);
+    Value operator()(Value p0, Value p1);
+    Value operator()(Value p0, Value p1, Value p2);
+    Value operator()(Value p0, Value p1, Value p2, Value p3);
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4);
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+
 
 protected:
     /**

@@ -660,6 +660,130 @@ Value Value::operator%(const char *value)           { return Value(numericValue(
 Value Value::operator%(double value)                { return Value(numericValue() % (int)value); }
 
 /**
+ *  Call the function in PHP
+ *  We have ten variants of this function, depending on the number of parameters
+ * 	This call operator is only useful when the variable represents a callable
+ *  @param  p0-p10			Parameters of the function to be called.
+ *  @return Value
+ */
+Value Value::operator()()
+{
+	// call with zero parameters
+    return exec(0, NULL);
+}
+
+Value Value::operator()(Value p0)
+{
+    // array of parameters
+    zval **params[1] = { &p0._val };
+
+    // call the function
+    return exec(1, params);
+}
+
+Value Value::operator()(Value p0, Value p1)
+{
+    // array of parameters
+    zval **params[2] = { &p0._val, &p1._val };
+
+    // call the function
+    return exec(2, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2)
+{
+    // array of parameters
+    zval **params[3] = { &p0._val, &p1._val, &p2._val };
+
+    // call the function
+    return exec(3, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
+{
+    // array of parameters
+    zval **params[4] = { &p0._val, &p1._val, &p2._val, &p3._val };
+
+    // call the function
+    return exec(4, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
+{
+    // array of parameters
+    zval **params[5] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val };
+
+    // call the function
+    return exec(5, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
+{
+	// array of parameters
+    zval **params[6] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val };
+
+    // call the function
+    return exec(6, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
+{
+    // array of parameters
+    zval **params[7] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val };
+
+    // call the function
+    return exec(7, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
+{
+    // array of parameters
+    zval **params[8] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val };
+
+    // call the function
+    return exec(8, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
+{
+	// array of parameters
+    zval **params[9] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val };
+
+    // call the function
+    return exec(9, params);
+}
+
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
+{
+    // array of parameters
+    zval **params[10] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val};
+
+    // call the function
+    return exec(10, params);
+}
+
+/**
+ *  Call function with a number of parameters
+ *  @param  argc        Number of parameters
+ *  @param  argv        The parameters
+ *  @return Value
+ */
+Value Value::exec(int argc, zval ***params)
+{
+    // the return zval
+    zval *retval = nullptr;
+    
+    // call the function
+    if (call_user_function_ex(CG(function_table), NULL, _val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
+    
+    // was a value returned?
+    if (retval) return Value(retval);
+    
+    // no value was returned, return NULL
+    return nullptr;
+}
+
+/**
  *  The type of object
  *  @return Type
  */
