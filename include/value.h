@@ -38,15 +38,6 @@ template <class Type> class HashMember;
  */
 class Value
 {
-private:
-	/**
-	 *  Call function with a number of parameters
-	 *  @param  argc        Number of parameters
-	 *  @param  argv        The parameters
-	 *  @return Value
-	 */
-	Value exec(int argc, zval ***params);
-
 public:
     /**
      *  Empty constructor (value = NULL)
@@ -556,6 +547,14 @@ public:
     Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
     Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
 
+private:
+	/**
+	 *  Call function with a number of parameters
+	 *  @param  argc        Number of parameters
+	 *  @param  argv        The parameters
+	 *  @return Value
+	 */
+	Value exec(int argc, struct _zval_struct ***params);
 
 protected:
     /**
