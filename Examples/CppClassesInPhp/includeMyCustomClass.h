@@ -1,7 +1,7 @@
 /**
  *	The includes.h
  */
-
+ 
 /**
  * 	Default Cpp libraries
  */
@@ -22,4 +22,4 @@ using namespace std;
 /**
  * 	The test class.
  */
-#include "mycustomclass.h"
+//#include "mycustomclass.h"

@@ -74,17 +74,6 @@ Php::Value bubblesort(Php::Parameters &params)
 }
 
 
-void my_function()
-{
-	
-}
-
-Php::Value my_integer_return()
-{
-	throw Php::Exception("er is iets mis");
-	
-	return "abcd";
-}
 
 /**
  *  Our own "my_plus" function that will be available in PHP
@@ -173,7 +162,7 @@ extern "C"
         // define the functions
         extension.add("my_plus", my_plus, {
             Php::ByVal("a", Php::numericType),
-            Php::ByVal("b", Php::numericType)
+            Php::ByVal("b", Php::numericType),
             Php::ByVal("c", "MyClass"),
             Php::ByRef("d", Php::stringType)
         });
@@ -184,9 +173,7 @@ extern "C"
         
         // define classes
         extension.add("my_class", Php::Class<MyCustomClass>({
-            Php::Public("a", 123),
-            Php::Protected("b", "abc"),
-            Php::Protected("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod)),
+            Php::Public("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod)),
             Php::Public("__construct", Php::Method<MyCustomClass>(&MyCustomClass::__construct))
         }));
         
