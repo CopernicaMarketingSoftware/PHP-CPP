@@ -672,6 +672,11 @@ Value Value::operator()()
     return exec(0, NULL);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0)
 {
     // array of parameters
@@ -681,6 +686,12 @@ Value Value::operator()(Value p0)
     return exec(1, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1)
 {
     // array of parameters
@@ -690,6 +701,13 @@ Value Value::operator()(Value p0, Value p1)
     return exec(2, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2)
 {
     // array of parameters
@@ -699,6 +717,14 @@ Value Value::operator()(Value p0, Value p1, Value p2)
     return exec(3, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
 {
     // array of parameters
@@ -708,6 +734,15 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
     return exec(4, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ * 	@param	p4			The fifth parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
 {
     // array of parameters
@@ -717,6 +752,16 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
     return exec(5, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ * 	@param 	p4			The fifth parameter
+ * 	@param	p5			The sixth parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
 {
 	// array of parameters
@@ -726,6 +771,17 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
     return exec(6, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ * 	@param 	p4			The fifth parameter
+ * 	@param	p5			The sixth parameter
+ * 	@param	p6			The seventh parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
 {
     // array of parameters
@@ -735,6 +791,18 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
     return exec(7, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ * 	@param 	p4			The fifth parameter
+ * 	@param	p5			The sixth parameter
+ * 	@param	p6			The seventh parameter
+ * 	@param	p7			The eighth parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
 {
     // array of parameters
@@ -744,6 +812,19 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
     return exec(8, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ * 	@param 	p4			The fifth parameter
+ * 	@param	p5			The sixth parameter
+ * 	@param	p6			The seventh parameter
+ * 	@param	p7			The eighth parameter
+ * 	@param	p8			The ninth parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
 {
 	// array of parameters
@@ -753,6 +834,20 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
     return exec(9, params);
 }
 
+/**
+ *  Call the function - if the variable holds a callable thing
+ *  @param	p0			The first parameter
+ * 	@param	p1			The second parameter
+ * 	@param	p2			The third parameter
+ * 	@param 	p3			The fourth parameter
+ * 	@param 	p4			The fifth parameter
+ * 	@param	p5			The sixth parameter
+ * 	@param	p6			The seventh parameter
+ * 	@param	p7			The eighth parameter
+ * 	@param	p8			The ninth parameter
+ * 	@param	p9			The tenth parameter
+ *  @return	Value
+ */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
 {
     // array of parameters
@@ -789,14 +884,6 @@ Value Value::exec(int argc, zval ***params)
  */
 Type Value::type() const
 {
-    // When the type should be a callable Z_TYPE_P returns objectType
-    // To circumvent this, we check whether _val is callable
-    char *func_name;
-	if(zend_is_callable(_val, 0, &func_name))
-	{
-		return callableType;
-	}
-
 	// return regular type
     return (Type)Z_TYPE_P(_val);
 }
@@ -828,6 +915,16 @@ Value &Value::setType(Type type)
     // done
     return *this;
 }
+
+/**
+ * 	Check if the variable holds something that is callable
+ *  @return	bool
+ */ 
+bool Value::isCallable() const
+{
+	// we can not rely on the type, because strings can be callable as well
+	return zend_is_callable(_val, 0, NULL);
+}	
 
 /**
  *  Make a clone of the type

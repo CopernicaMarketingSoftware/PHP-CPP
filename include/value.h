@@ -290,7 +290,7 @@ public:
     bool isFloat()      const { return type() == floatType; }
     bool isObject()     const { return type() == objectType; }
     bool isArray()      const { return type() == arrayType; }
-    bool isCallable() 	const { return type() == callableType; }
+    bool isCallable() 	const;
     
     /**
      *  Retrieve the value as number

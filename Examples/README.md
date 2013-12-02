@@ -126,10 +126,23 @@ The following examples are available:
 	implemented. It would need to be implemented for this specific 
 	example to work.
 	
-	Functions and/or classes defined in this Example.
+	Functions and/or classes defined in this example.
 		- void my_catch_exception_function(Php::Parameters &params)
 		- void my_throw_exception_function()
 
 
+### [PHP function calls](https://github.com/EmielBruijntjes/PHP-CPP/tree/master/Examples/CallPhpFunctions)
+
+	The seventh example shows how to pass a callable PHP function as
+	a parameter. As can be seen in the example, there are several ways 
+	of passing a PHP function to the C++ function. When a function is 
+	passed, it is possible to use the () operator on the parameter, with 
+	the correct amount of parameters for the callable PHP function.
 	
+	When using the wrong amount, or when trying to use the () operator
+	on a non-callable type, you will get PHP errors rather than 
+	segmentation faults or other kinds of C++ errors.
+	
+	Functions and/or classes defined in this example.
+		- Php::Value call_php_function(Php::Parameters &params)
 
