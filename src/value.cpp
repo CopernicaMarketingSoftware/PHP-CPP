@@ -789,6 +789,15 @@ Value Value::exec(int argc, zval ***params)
  */
 Type Value::type() const
 {
+    // When the type should be a callable Z_TYPE_P returns objectType
+    // To circumvent this, we check whether _val is callable
+    char *func_name;
+	if(zend_is_callable(_val, 0, &func_name))
+	{
+		return callableType;
+	}
+
+	// return regular type
     return (Type)Z_TYPE_P(_val);
 }
 

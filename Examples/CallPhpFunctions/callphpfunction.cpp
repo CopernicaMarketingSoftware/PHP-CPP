@@ -24,8 +24,10 @@ using namespace std;
  */
 Php::Value call_php_function(Php::Parameters &params)
 {
-	//if (!params[0].isCallable()) throw Php::Exception("Not a callable type.");
-	
+	// check whether the parameter is callable
+	if (!params[0].isCallable()) throw Php::Exception("Not a callable type.");
+		
+	// perform the callback
 	return params[0](1,2,3);
 }
 
@@ -41,7 +43,8 @@ extern "C"
         
         // add function to extension
         extension.add("call_php_function", call_php_function, {
-			Php::ByVal("addFunc", Php::callableType)
+			Php::ByVal("addFunc", Php::callableType),
+			Php::ByVal("x", Php::numericType)
 			});
 		
 		// return the extension module

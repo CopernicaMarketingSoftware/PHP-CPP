@@ -6,11 +6,13 @@
  * 	An example file to show the working of a php function call in C++.
  */
 
-/*
- *	Run the function with the given name. As you can see, the given name 
- * 	can be different from the actual function name.
+/**
+ * 	Call a C++ function with a callable PHP function as its parameter.
+ * 	The PHP function is then executed from the C++ code.
+ * 	The PHP function is this case, adds three numbers.
  */
 $result = call_php_function(function($a, $b, $c){
-							return $a + $b + $c;
+								return $a + $b + $c;
 							});
-echo $result;
+// print the result
+echo $result . "\n";
