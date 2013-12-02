@@ -667,11 +667,17 @@ Type Value::type() const
 {
 	// When the type is a call able type, Z_TYPE_P does not return
 	// a valid type, we use zend_is_callable to check if it's a call able
-	char *func_name;
-	if(zend_is_callable(_val, 0, &func_name))
+	zend_try
 	{
-		return callableType;
+		if(zend_is_callable(_val, IS_CALLABLE_CHECK_SILENT, NULL TSRMLS_CC))
+		{
+			return callableType;
+		}
 	}
+	zend_catch
+	{
+	}
+	zend_end_try();
 
     return (Type)Z_TYPE_P(_val);
 }
