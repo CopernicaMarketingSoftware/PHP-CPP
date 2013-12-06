@@ -564,9 +564,9 @@ protected:
     struct _zval_struct *_val;
     
     /**
-     *  The environment can access the zval directly
+     *  The Globals and Member classes can access the zval directly
      */
-    friend class Environment;
+    friend class Globals;
     friend class Member;
 };
 

@@ -180,9 +180,9 @@ private:
     bool _exists;
     
     /**
-     *  The environment can access the private method from this class
+     *  The globals can access the private method from this class
      */
-    friend class Environment;
+    friend class Globals;
 };
 
 /**

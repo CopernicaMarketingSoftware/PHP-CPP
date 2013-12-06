@@ -29,9 +29,15 @@ struct _zend_module_entry;
 namespace Php {
 
 /**
- *  Optional callback types for starting and stopping the request
+ *  Forward declaration
  */
-typedef bool    (*request_callback)(Environment &);
+class Extension;
+
+/**
+ *  Optional callback types for starting and stopping the request
+ * 	@param	extension
+ */
+typedef bool    (*request_callback)(Extension *extension);
 
 /**
  *  A couple of predefined native callback functions that can be registered.
@@ -40,12 +46,8 @@ typedef bool    (*request_callback)(Environment &);
  */
 typedef void    (*native_callback_0)();
 typedef void    (*native_callback_1)(Parameters &);
-typedef void    (*native_callback_2)(Environment &);
-typedef void    (*native_callback_3)(Environment &, Parameters &);
-typedef Value   (*native_callback_4)();
-typedef Value   (*native_callback_5)(Parameters &);
-typedef Value   (*native_callback_6)(Environment &);
-typedef Value   (*native_callback_7)(Environment &, Parameters &);
+typedef Value   (*native_callback_2)();
+typedef Value   (*native_callback_3)(Parameters &);
 
 /**
  *  Class definition
@@ -105,34 +107,6 @@ public:
     }
     
     /**
-     *  Create a new environment
-     * 
-     *  You can override this method if you've created your own environment class,
-     *  and you'd like to use an instance of that class instead. The returned
-     *  object must have been created on the heap.
-     * 
-     *  @return Environment*
-     */
-    virtual Environment *createEnvironment()
-    {
-        // allocate the environment
-        return new Environment(this);
-    }
-    
-    /**
-     *  Destruct an environment
-     *  
-     *  This is the counterpart of the createEnvironment method.
-     * 
-     *  @param  Environment
-     */
-    virtual void deleteEnvironment(Environment *environment)
-    {
-        // destruct the environment
-        delete environment;
-    }
-    
-    /**
      *  Start a request
      * 
      *  This method is called when the zend engine is about to start a new
@@ -141,13 +115,13 @@ public:
      * 
      *  @return boolean
      */
-    virtual bool startRequest(Environment &environment)
+    virtual bool startRequest()
     {
         // ok if no callback was set
         if (!_start) return true;
         
         // call the callback function
-        return _start(environment);
+        return _start(this);
     }
     
     /**
@@ -158,13 +132,13 @@ public:
      *
      *  @return boolean
      */
-    virtual bool endRequest(Environment &environment)
+    virtual bool endRequest()
     {
         // ok if no callback is set
         if (!_stop) return true;
         
         // call callback
-        return _stop(environment);
+        return _stop(this);
     }
     
     /**
@@ -194,10 +168,6 @@ public:
     Function *add(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments = {});
     Function *add(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments = {});
     Function *add(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_4 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_5 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_6 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments = {});
     
     /**
      *  Add a native class to the extension

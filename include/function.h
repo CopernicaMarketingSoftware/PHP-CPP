@@ -94,11 +94,10 @@ public:
 
     /**
      *  Method that gets called every time the function is executed
-     *  @param  environment Environment object
      *  @param  params      The parameters that were passed
      *  @return Variable    Return value
      */
-    virtual Value invoke(Environment &environment, Parameters &params)
+    virtual Value invoke(Parameters &params)
     {
         return nullptr;
     }

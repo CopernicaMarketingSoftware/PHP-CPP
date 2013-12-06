@@ -1,7 +1,7 @@
 /**
- *  Environment.cpp
+ *  Globals.cpp
  *
- *  Implementation of the environment class
+ *  Implementation of the globals class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -14,11 +14,27 @@
 namespace Php {
 
 /**
+ *	Get access to the globals single instance
+ *	@return	Globals
+ */
+Globals &Globals::instance()
+{
+	static Globals globals;
+	return globals;
+}
+
+/**
+ *  The one and only instance
+ *	@var	Globals
+ */
+Globals &globals = Globals::instance();
+
+/**
  *  Get access to a global variable
  *  @param  name
  *  @return Global
  */
-Global Environment::operator[](const char *name)
+Global Globals::operator[](const char *name)
 {
     // pointer to a zval
     zval **varvalue;
@@ -43,7 +59,7 @@ Global Environment::operator[](const char *name)
  *  @param  name
  *  @return Global
  */
-Global Environment::operator[](const std::string &name)
+Global Globals::operator[](const std::string &name)
 {
     // pointer to a zval
     zval **varvalue;
@@ -70,7 +86,7 @@ Global Environment::operator[](const std::string &name)
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Environment::exec(const Value &name, int argc, zval ***params)
+Value Globals::exec(const Value &name, int argc, zval ***params)
 {
     // the return zval
     zval *retval = nullptr;
@@ -90,7 +106,7 @@ Value Environment::exec(const Value &name, int argc, zval ***params)
  *  @param  name        Name of the function
  *  @return Value
  */
-Value Environment::call(const Value &name)
+Value Globals::call(const Value &name)
 {
     // call with zero parameters
     return exec(name, 0, NULL);
@@ -102,7 +118,7 @@ Value Environment::call(const Value &name)
  *  @param  p0          The first parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0)
+Value Globals::call(const Value &name, Value p0)
 {
     // array of parameters
     zval **params[1] = { &p0._val };
@@ -118,7 +134,7 @@ Value Environment::call(const Value &name, Value p0)
  *  @param  p1          The second parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1)
+Value Globals::call(const Value &name, Value p0, Value p1)
 {
     // array of parameters
     zval **params[2] = { &p0._val, &p1._val };
@@ -135,7 +151,7 @@ Value Environment::call(const Value &name, Value p0, Value p1)
  *  @param  p2          The third parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2)
 {
     // array of parameters
     zval **params[3] = { &p0._val, &p1._val, &p2._val };
@@ -153,7 +169,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2)
  *  @param  p3          The fourth parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3)
 {
     // array of parameters
     zval **params[4] = { &p0._val, &p1._val, &p2._val, &p3._val };
@@ -172,7 +188,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p
  *  @param  p4          The fifth parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4)
 {
     // array of parameters
     zval **params[5] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val };
@@ -192,7 +208,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p
  *  @param  p5          The sixth parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
 {
     // array of parameters
     zval **params[6] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val };
@@ -213,7 +229,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p
  *  @param  p6          The seventh parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
 {
     // array of parameters
     zval **params[7] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val };
@@ -235,7 +251,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p
  *  @param  p7          The eight parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
 {
     // array of parameters
     zval **params[8] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val };
@@ -258,7 +274,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p
  *  @param  p8          The nineth parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
 {
     // array of parameters
     zval **params[9] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val };
@@ -282,7 +298,7 @@ Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p
  *  @param  p9          The tenth parameter
  *  @return Value
  */
-Value Environment::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
+Value Globals::call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
 {
     // array of parameters
     zval **params[10] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val };

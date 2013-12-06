@@ -1,55 +1,104 @@
 /**
  *  Globals.h
  *
- *  Variables and structured required by the Zend engine to work
- *  with global variables
+ * 	Wrapper object that gives access to all global variables. You
+ *  can use it more or less the same as the $_GLOBALS object in
+ * 	PHP.
+ * 
+ * 	The global PHP variables are acessible via the Php::globals["varname"]
+ *  variables.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
-
+ 
 /**
- *  Namespace
+ *  Set up namespace
  */
 namespace Php {
 
 /**
- *  The way how PHP C API deals with "global" variables is stupid.
- * 
- *  This is supposed to turn into a structure that is going to be 
- *  instantiated for each parallel running request, and for which the 
- *  PHP engine allocates a certain amount of memory, and a magic
- *  pointer that is passed and should be forwarded to every thinkable 
- *  PHP function.
- * 
- *  We don't like this architecture. We have our own environment object
- *  that makes much more sense, and that we use. However, we need
- *  to assign this object somewhere, so that's what we do in this
- *  one and only global variable
+ *  Forward definitions
  */
-ZEND_BEGIN_MODULE_GLOBALS(phpcpp)
-    Php::Environment *environment;
-ZEND_END_MODULE_GLOBALS(phpcpp)
+class Global;
 
 /**
- *  And now we're going to define a macro. This also is a ridiculous
- *  architecture from PHP to get access to a variable from the 
- *  structure above.
+ *  Class definition
  */
-#ifdef ZTS
-#define PHPCPP_G(v) TSRMG(phpcpp_globals_id, phpcpp_globals *, v)
-#else
-#define PHPCPP_G(v) (phpcpp_globals.v)
-#endif
+class Globals
+{
+public:
+    /**
+     *  Disable copy and move operations
+     */
+    Globals(const Globals &globals) = delete;
+    Globals(Globals &&globals) = delete;
+    
+    /**
+     *  Destructor
+     */
+    virtual ~Globals() {}
+    
+    /**
+     *  Get access to a global variable
+     *  @param  name
+     *  @return Global
+     */
+    Global operator[](const char *name);
+    
+    /**
+     *  Get access to a global variable
+     *  @param  name
+     *  @return Global
+     */
+    Global operator[](const std::string &name);
+    
+    /**
+     *  Call a function in PHP
+     *  We have ten variants of this function, depending on the number of parameters
+     *  @param  name        Name of the function
+     *  @return Value
+     */
+    Value call(const Value &name);
+    Value call(const Value &name, Value p0);
+    Value call(const Value &name, Value p0, Value p1);
+    Value call(const Value &name, Value p0, Value p1, Value p2);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
+    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+
+private:
+    /**
+     *  Call function with a number of parameters
+     *  @param  name        Function name
+     *  @param  argc        Number of parameters
+     *  @param  argv        The parameters
+     *  @return Value
+     */
+    Value exec(const Value &name, int argc, struct _zval_struct ***params);
+
+    /**
+     *  Constructor
+     */
+    Globals() {}
+    
+public:
+	/**
+	 *  Get the one and only instance
+	 *  @return	Globals
+	 */
+	static Globals &instance();
+};
 
 /**
- *  We're almost there, we now need to declare an instance of the
- *  structure defined above (if building for a single thread) or some
- *  sort of impossible to understand magic pointer-to-a-pointer (for
- *  multi-threading builds). We make this a static variable because
- *  this already is bad enough.
+ *  We always have one instance
+ *	@var	Globals
  */
-extern ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
+extern Globals &globals;
 
 /**
  *  End of namespace

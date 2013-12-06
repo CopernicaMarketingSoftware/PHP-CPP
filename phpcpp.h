@@ -25,7 +25,7 @@
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/hiddenpointer.h>
-#include <phpcpp/environment.h>
+#include <phpcpp/globals.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>

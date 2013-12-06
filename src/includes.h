@@ -38,7 +38,7 @@
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/hiddenpointer.h"
-#include "../include/environment.h"
+#include "../include/globals.h"
 #include "../include/argument.h"
 #include "../include/byval.h"
 #include "../include/byref.h"
@@ -57,7 +57,7 @@
 #include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/exception.h"
-#include "../include/globals.h"
+#include "../include/init.h"
 
 /**
  *  Interface files for internal use only

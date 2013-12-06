@@ -77,17 +77,8 @@ static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
  */
 static int request_startup(INIT_FUNC_ARGS)
 {
-    // create the environment
-    Environment *environment = extension->createEnvironment();
-    
-    // store in global structure
-    PHPCPP_G(environment) = environment;
-    
-    // initialize the environment
-    environment->initialize();
-    
     // start the request
-    return BOOL2SUCCESS(environment->initialize() && extension->startRequest(*environment));
+    return extension->startRequest();
 }
 
 /**
@@ -98,20 +89,8 @@ static int request_startup(INIT_FUNC_ARGS)
  */
 static int request_shutdown(INIT_FUNC_ARGS)
 {
-    // retrieve the environment
-    Environment *environment = PHPCPP_G(environment);
-    
     // end the request
-    bool success = extension->endRequest(*environment) && environment->finalize();
-    
-    // deallocate the environment
-    extension->deleteEnvironment(environment);
-    
-    // reset global variable
-    PHPCPP_G(environment) = NULL;
-    
-    // done
-    return BOOL2SUCCESS(success);
+    return BOOL2SUCCESS(extension->endRequest());
 }
 
 /**
@@ -203,10 +182,6 @@ Function *Extension::add(const char *name, native_callback_0 function, const std
 Function *Extension::add(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
 Function *Extension::add(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
 Function *Extension::add(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_4 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_5 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_6 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_7 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
 
 /**
  *  Retrieve the module entry
