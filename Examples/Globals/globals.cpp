@@ -38,6 +38,9 @@ Php::Value process_globals()
     // add a member to an array
     Php::globals["c"]["member"] = 123;
     
+    // and increment it
+    Php::globals["c"]["member"] += 77;
+    
     // if a global variable holds a function, we can call it
     return Php::globals["d"](1,2,3);
 }

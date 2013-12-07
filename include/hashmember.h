@@ -166,6 +166,157 @@ public:
         return _base.get(_index)[key].add(this);
     }
 
+    /**
+     *  Add a value to the object
+     *  @param  value
+     *  @return HashMember
+     */
+    HashMember &operator+=(const Value &value)          { return operator=(this->value() + value); }
+    HashMember &operator+=(int16_t value)               { return operator=(this->value() + value); }
+    HashMember &operator+=(int32_t value)               { return operator=(this->value() + value); }
+    HashMember &operator+=(int64_t value)               { return operator=(this->value() + value); }
+    HashMember &operator+=(bool value)                  { return operator=(this->value() + value); }
+    HashMember &operator+=(char value)                  { return operator=(this->value() + value); }
+    HashMember &operator+=(const std::string &value)    { return operator=(this->value() + value); }
+    HashMember &operator+=(const char *value)           { return operator=(this->value() + value); }
+    HashMember &operator+=(double value)                { return operator=(this->value() + value); }
+
+    /**
+     *  Subtract a value from the object
+     *  @param  value
+     *  @return HashMember
+     */
+    HashMember &operator-=(const Value &value)          { return operator=(this->value() - value); }
+    HashMember &operator-=(int16_t value)               { return operator=(this->value() - value); }
+    HashMember &operator-=(int32_t value)               { return operator=(this->value() - value); }
+    HashMember &operator-=(int64_t value)               { return operator=(this->value() - value); }
+    HashMember &operator-=(bool value)                  { return operator=(this->value() - value); }
+    HashMember &operator-=(char value)                  { return operator=(this->value() - value); }
+    HashMember &operator-=(const std::string &value)    { return operator=(this->value() - value); }
+    HashMember &operator-=(const char *value)           { return operator=(this->value() - value); }
+    HashMember &operator-=(double value)                { return operator=(this->value() - value); }
+    
+    /**
+     *  Multiply the object with a certain value
+     *  @param  value
+     *  @return HashMember
+     */
+    HashMember &operator*=(const Value &value)          { return operator=(this->value() * value); }
+    HashMember &operator*=(int16_t value)               { return operator=(this->value() * value); }
+    HashMember &operator*=(int32_t value)               { return operator=(this->value() * value); }
+    HashMember &operator*=(int64_t value)               { return operator=(this->value() * value); }
+    HashMember &operator*=(bool value)                  { return operator=(this->value() * value); }
+    HashMember &operator*=(char value)                  { return operator=(this->value() * value); }
+    HashMember &operator*=(const std::string &value)    { return operator=(this->value() * value); }
+    HashMember &operator*=(const char *value)           { return operator=(this->value() * value); }
+    HashMember &operator*=(double value)                { return operator=(this->value() * value); }
+
+    /**
+     *  Divide the object with a certain value
+     *  @param  value
+     *  @return HashMember
+     */
+    HashMember &operator/=(const Value &value)          { return operator=(this->value() / value); }
+    HashMember &operator/=(int16_t value)               { return operator=(this->value() / value); }
+    HashMember &operator/=(int32_t value)               { return operator=(this->value() / value); }
+    HashMember &operator/=(int64_t value)               { return operator=(this->value() / value); }
+    HashMember &operator/=(bool value)                  { return operator=(this->value() / value); }
+    HashMember &operator/=(char value)                  { return operator=(this->value() / value); }
+    HashMember &operator/=(const std::string &value)    { return operator=(this->value() / value); }
+    HashMember &operator/=(const char *value)           { return operator=(this->value() / value); }
+    HashMember &operator/=(double value)                { return operator=(this->value() / value); }
+
+    /**
+     *  Divide the object with a certain value, and get the rest
+     *  @param  value
+     *  @return HashMember
+     */
+    HashMember &operator%=(const Value &value)          { return operator=(this->value() % value); }
+    HashMember &operator%=(int16_t value)               { return operator=(this->value() % value); }
+    HashMember &operator%=(int32_t value)               { return operator=(this->value() % value); }
+    HashMember &operator%=(int64_t value)               { return operator=(this->value() % value); }
+    HashMember &operator%=(bool value)                  { return operator=(this->value() % value); }
+    HashMember &operator%=(char value)                  { return operator=(this->value() % value); }
+    HashMember &operator%=(const std::string &value)    { return operator=(this->value() % value); }
+    HashMember &operator%=(const char *value)           { return operator=(this->value() % value); }
+    HashMember &operator%=(double value)                { return operator=(this->value() % value); }
+    
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator+(const Value &value)         { return this->value() + value; }
+    Value operator+(int16_t value)              { return this->value() + value; }
+    Value operator+(int32_t value)              { return this->value() + value; }
+    Value operator+(int64_t value)              { return this->value() + value; }
+    Value operator+(bool value)                 { return this->value() + value; }
+    Value operator+(char value)                 { return this->value() + value; }
+    Value operator+(const std::string &value)   { return this->value() + value; }
+    Value operator+(const char *value)          { return this->value() + value; }
+    Value operator+(double value)               { return this->value() + value; }
+
+    /**
+     *  Subtraction operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator-(const Value &value)         { return this->value() - value; }
+    Value operator-(int16_t value)              { return this->value() - value; }
+    Value operator-(int32_t value)              { return this->value() - value; }
+    Value operator-(int64_t value)              { return this->value() - value; }
+    Value operator-(bool value)                 { return this->value() - value; }
+    Value operator-(char value)                 { return this->value() - value; }
+    Value operator-(const std::string &value)   { return this->value() - value; }
+    Value operator-(const char *value)          { return this->value() - value; }
+    Value operator-(double value)               { return this->value() - value; }
+
+    /**
+     *  Multiplication operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator*(const Value &value)         { return this->value() * value; }
+    Value operator*(int16_t value)              { return this->value() * value; }
+    Value operator*(int32_t value)              { return this->value() * value; }
+    Value operator*(int64_t value)              { return this->value() * value; }
+    Value operator*(bool value)                 { return this->value() * value; }
+    Value operator*(char value)                 { return this->value() * value; }
+    Value operator*(const std::string &value)   { return this->value() * value; }
+    Value operator*(const char *value)          { return this->value() * value; }
+    Value operator*(double value)               { return this->value() * value; }
+
+    /**
+     *  Division operator
+     *  @param  value
+     *  @return Value
+     */
+    Value operator/(const Value &value)         { return this->value() / value; }
+    Value operator/(int16_t value)              { return this->value() / value; }
+    Value operator/(int32_t value)              { return this->value() / value; }
+    Value operator/(int64_t value)              { return this->value() / value; }
+    Value operator/(bool value)                 { return this->value() / value; }
+    Value operator/(char value)                 { return this->value() / value; }
+    Value operator/(const std::string &value)   { return this->value() / value; }
+    Value operator/(const char *value)          { return this->value() / value; }
+    Value operator/(double value)               { return this->value() / value; }
+
+    /**
+     *  Modulus operator
+     *  @param  value
+     *  @return HashMember
+     */
+    Value operator%(const Value &value)         { return this->value() % value; }
+    Value operator%(int16_t value)              { return this->value() % value; }
+    Value operator%(int32_t value)              { return this->value() % value; }
+    Value operator%(int64_t value)              { return this->value() % value; }
+    Value operator%(bool value)                 { return this->value() % value; }
+    Value operator%(char value)                 { return this->value() % value; }
+    Value operator%(const std::string &value)   { return this->value() % value; }
+    Value operator%(const char *value)          { return this->value() % value; }
+    Value operator%(double value)               { return this->value() % value; }
+
+
 private:
     /**
      *  Constructor
