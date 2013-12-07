@@ -9,9 +9,9 @@ PHP_CONFIG_DIR	= /etc/php5/cli/conf.d
 
 LD              = g++
 LD_FLAGS        = -Wall -shared -O2 
-RESULT          = callphpfunction.so
+RESULT          = globals.so
 
-PHPINIFILE		= 30-callphpfunction.ini
+PHPINIFILE		= 30-globals.ini
 
 SOURCES			= $(wildcard *.cpp)
 OBJECTS         = $(SOURCES:%.cpp=%.o)

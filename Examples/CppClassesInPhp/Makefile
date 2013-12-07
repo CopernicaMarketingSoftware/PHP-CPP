@@ -11,7 +11,7 @@ LD              = g++
 LD_FLAGS        = -Wall -shared -O2 
 RESULT          = cppclassinphp.so
 
-PHPINIFILE		= 30-phpcpp.ini
+PHPINIFILE		= 30-cppclassinphp.ini
 
 SOURCES			= $(wildcard *.cpp)
 OBJECTS         = $(SOURCES:%.cpp=%.o)

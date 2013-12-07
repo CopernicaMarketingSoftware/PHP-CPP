@@ -11,7 +11,7 @@ LD              = g++
 LD_FLAGS        = -Wall -shared -O2 
 RESULT          = functionwithparameters.so
 
-PHPINIFILE		= 30-phpcpp.ini
+PHPINIFILE		= 30-functionwithparameters.ini
 
 SOURCES			= $(wildcard *.cpp)
 OBJECTS         = $(SOURCES:%.cpp=%.o)
