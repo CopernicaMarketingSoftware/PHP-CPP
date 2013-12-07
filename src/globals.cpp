@@ -14,18 +14,18 @@
 namespace Php {
 
 /**
- *	Get access to the globals single instance
- *	@return	Globals
+ *  Get access to the globals single instance
+ *  @return Globals
  */
 Globals &Globals::instance()
 {
-	static Globals globals;
-	return globals;
+    static Globals globals;
+    return globals;
 }
 
 /**
  *  The one and only instance
- *	@var	Globals
+ *  @var    Globals
  */
 Globals &globals = Globals::instance();
 

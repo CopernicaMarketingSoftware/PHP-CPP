@@ -662,20 +662,20 @@ Value Value::operator%(double value)                { return Value(numericValue(
 /**
  *  Call the function in PHP
  *  We have ten variants of this function, depending on the number of parameters
- * 	This call operator is only useful when the variable represents a callable
- *  @param  p0-p10			Parameters of the function to be called.
+ *  This call operator is only useful when the variable represents a callable
+ *  @param  p0-p10          Parameters of the function to be called.
  *  @return Value
  */
 Value Value::operator()()
 {
-	// call with zero parameters
+    // call with zero parameters
     return exec(0, NULL);
 }
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0)
 {
@@ -688,9 +688,9 @@ Value Value::operator()(Value p0)
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1)
 {
@@ -703,10 +703,10 @@ Value Value::operator()(Value p0, Value p1)
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2)
 {
@@ -719,11 +719,11 @@ Value Value::operator()(Value p0, Value p1, Value p2)
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
 {
@@ -736,12 +736,12 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- * 	@param	p4			The fifth parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
 {
@@ -754,17 +754,17 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- * 	@param 	p4			The fifth parameter
- * 	@param	p5			The sixth parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
 {
-	// array of parameters
+    // array of parameters
     zval **params[6] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val };
 
     // call the function
@@ -773,14 +773,14 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- * 	@param 	p4			The fifth parameter
- * 	@param	p5			The sixth parameter
- * 	@param	p6			The seventh parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
 {
@@ -793,15 +793,15 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- * 	@param 	p4			The fifth parameter
- * 	@param	p5			The sixth parameter
- * 	@param	p6			The seventh parameter
- * 	@param	p7			The eighth parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @param  p7          The eighth parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
 {
@@ -814,20 +814,20 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- * 	@param 	p4			The fifth parameter
- * 	@param	p5			The sixth parameter
- * 	@param	p6			The seventh parameter
- * 	@param	p7			The eighth parameter
- * 	@param	p8			The ninth parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @param  p7          The eighth parameter
+ *  @param  p8          The ninth parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
 {
-	// array of parameters
+    // array of parameters
     zval **params[9] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val };
 
     // call the function
@@ -836,17 +836,17 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
 
 /**
  *  Call the function - if the variable holds a callable thing
- *  @param	p0			The first parameter
- * 	@param	p1			The second parameter
- * 	@param	p2			The third parameter
- * 	@param 	p3			The fourth parameter
- * 	@param 	p4			The fifth parameter
- * 	@param	p5			The sixth parameter
- * 	@param	p6			The seventh parameter
- * 	@param	p7			The eighth parameter
- * 	@param	p8			The ninth parameter
- * 	@param	p9			The tenth parameter
- *  @return	Value
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @param  p7          The eighth parameter
+ *  @param  p8          The ninth parameter
+ *  @param  p9          The tenth parameter
+ *  @return Value
  */
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
 {
@@ -884,7 +884,7 @@ Value Value::exec(int argc, zval ***params)
  */
 Type Value::type() const
 {
-	// return regular type
+    // return regular type
     return (Type)Z_TYPE_P(_val);
 }
 
@@ -917,14 +917,14 @@ Value &Value::setType(Type type)
 }
 
 /**
- * 	Check if the variable holds something that is callable
- *  @return	bool
+ *  Check if the variable holds something that is callable
+ *  @return bool
  */ 
 bool Value::isCallable() const
 {
-	// we can not rely on the type, because strings can be callable as well
-	return zend_is_callable(_val, 0, NULL);
-}	
+    // we can not rely on the type, because strings can be callable as well
+    return zend_is_callable(_val, 0, NULL);
+}   
 
 /**
  *  Make a clone of the type
@@ -1035,20 +1035,45 @@ double Value::floatValue() const
  */
 int Value::size() const
 {
-    // is it an array
-    if (isArray()) return zend_hash_num_elements(Z_ARRVAL_P(_val));
+    // is it an array?
+    if (isArray()) 
+    {
+        // get the number of elements
+        return zend_hash_num_elements(Z_ARRVAL_P(_val));
+    }
+
+    // or an object?
+    else if (isObject())
+    {
+        // the count_elements member function should be defined
+        if (!Z_OBJ_HT_P(_val)->count_elements) return 0;
+        
+        // create a variable to hold the result
+        long result;
+        
+        // call the function
+        return Z_OBJ_HT_P(_val)->count_elements(_val, &result) == SUCCESS ? result : 0;
+    }
 
     // not an array, return string size if this is a string
-    if (isString()) return Z_STRLEN_P(_val);
+    else if (isString()) 
+    {
+        // get string size
+        return Z_STRLEN_P(_val);
+    }
     
-    // make a copy
-    Value copy(*this);
-    
-    // convert the copy to a string
-    copy.setType(stringType);
-    
-    // return the string size
-    return copy.size();
+    // in all other situations, we convert the variable to a string
+    else
+    {
+        // make a copy
+        Value copy(*this);
+        
+        // convert the copy to a string
+        copy.setType(stringType);
+        
+        // return the string size
+        return copy.size();
+    }
 }
 
 /**
@@ -1060,7 +1085,7 @@ bool Value::contains(int index) const
 {
     // must be an array
     if (!isArray()) return false;
-    
+
     // unused variable
     zval **result;
     
@@ -1076,17 +1101,28 @@ bool Value::contains(int index) const
  */
 bool Value::contains(const char *key, int size) const
 {
-    // must be an array
-    if (!isArray()) return false;
-    
     // calculate size
     if (size < 0) size = strlen(key);
 
-    // unused variable
-    zval **result;
- 
-    // check if index is already in the array
-    return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
+    // deal with arrays
+    if (isArray())
+    {
+        // unused variable
+        zval **result;
+     
+        // check if index is already in the array
+        return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
+    }
+    else if (isObject())
+    {
+        // @todo implementation
+        return false;
+    }
+    else
+    {
+        // scalar variable
+        return false;
+    }
 }
 
 /**
@@ -1118,19 +1154,28 @@ Value Value::get(int index) const
 Value Value::get(const char *key, int size) const
 {
     // must be an array
-    if (!isArray()) return Value();
+    if (!isArray() && !isObject()) return Value();
 
     // calculate size
     if (size < 0) size = strlen(key);
-
-    // the result value
-    zval **result;
     
-    // check if this index is already in the array, otherwise we return NULL
-    if (zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
-    
-    // wrap the value
-    return Value(*result);
+    // are we in an object or an array?
+    if (isArray())
+    {
+        // the result value
+        zval **result;
+        
+        // check if this index is already in the array, otherwise we return NULL
+        if (zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
+        
+        // wrap the value
+        return Value(*result);
+    }
+    else
+    {
+        // @todo implementation for objects
+        return Value();
+    }
 }
 
 /**

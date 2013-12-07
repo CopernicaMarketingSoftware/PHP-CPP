@@ -37,17 +37,17 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     // construct parameters
     Parameters params(this_ptr, ZEND_NUM_ARGS());
 
-	// the function could throw an exception
-	try
-	{
-		// get the result
-		result = function->invoke(*PHPCPP_G(environment), params);
-	}
-	catch (Php::Exception &exception)
-	{
-		// an exception originally thrown by C++ should be passed on to PHP
-		zend_throw_exception(zend_exception_get_default(), (char*)exception.message().c_str(), 0 TSRMLS_CC);
-	}
+    // the function could throw an exception
+    try
+    {
+        // get the result
+        result = function->invoke(params);
+    }
+    catch (Php::Exception &exception)
+    {
+        // an exception originally thrown by C++ should be passed on to PHP
+        zend_throw_exception(zend_exception_get_default(), (char*)exception.message().c_str(), 0 TSRMLS_CC);
+    }
 }
 
 /**
