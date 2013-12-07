@@ -1,11 +1,11 @@
 /**
  *  Globals.h
  *
- * 	Wrapper object that gives access to all global variables. You
+ *  Wrapper object that gives access to all global variables. You
  *  can use it more or less the same as the $_GLOBALS object in
- * 	PHP.
+ *  PHP.
  * 
- * 	The global PHP variables are acessible via the Php::globals["varname"]
+ *  The global PHP variables are acessible via the Php::globals["varname"]
  *  variables.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -87,16 +87,16 @@ private:
     Globals() {}
     
 public:
-	/**
-	 *  Get the one and only instance
-	 *  @return	Globals
-	 */
-	static Globals &instance();
+    /**
+     *  Get the one and only instance
+     *  @return Globals
+     */
+    static Globals &instance();
 };
 
 /**
  *  We always have one instance
- *	@var	Globals
+ *  @var    Globals
  */
 extern Globals &globals;
 

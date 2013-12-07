@@ -24,6 +24,7 @@
  */
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
+#include <phpcpp/array.h>
 #include <phpcpp/hiddenpointer.h>
 #include <phpcpp/globals.h>
 #include <phpcpp/argument.h>

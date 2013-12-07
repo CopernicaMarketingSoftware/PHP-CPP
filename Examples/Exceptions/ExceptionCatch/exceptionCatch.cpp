@@ -1,14 +1,14 @@
 /**
- *	exception.cpp
- * 	@author Jasper van Eck<jasper.vaneck@copernica.com>
+ *  exception.cpp
+ *  @author Jasper van Eck<jasper.vaneck@copernica.com>
  * 
- * 	An example file to show the working of a C++ function that 
- * 	takes a callback function as parameter, and handles the 
- * 	exception thrown by the callback function.
+ *  An example file to show the working of a C++ function that 
+ *  takes a callback function as parameter, and handles the 
+ *  exception thrown by the callback function.
  */
 
 /**
- * 	Libraries used.
+ *  Libraries used.
  */
 #include <phpcpp.h>
 
@@ -18,9 +18,9 @@
 using namespace std;
 
 /**
- * 	my_catch_exception_function()
- * 	Catches the exception thrown by the PHP callback function.
- * 	@param		Php::Parameters
+ *  my_catch_exception_function()
+ *  Catches the exception thrown by the PHP callback function.
+ *  @param      Php::Parameters
  */
 void my_catch_exception_function(Php::Parameters &params)
 {
@@ -47,18 +47,18 @@ void my_catch_exception_function(Php::Parameters &params)
 // Symbols are exported according to the "C" language
 extern "C" 
 {
-	// export the "get_module" function that will be called by the Zend engine
-	PHPCPP_EXPORT void *get_module()
-	{
-		// create extension
+    // export the "get_module" function that will be called by the Zend engine
+    PHPCPP_EXPORT void *get_module()
+    {
+        // create extension
         static Php::Extension extension("my_exception_catch","1.0");
         
         // add function to extension
         extension.add("my_catch_exception_function", my_catch_exception_function, {
-			Php::ByVal("callback", Php::callableType);
-			});
-		
-		// return the extension module
-		return extension.module();
-	}
+            Php::ByVal("callback", Php::callableType);
+            });
+        
+        // return the extension module
+        return extension.module();
+    }
 }

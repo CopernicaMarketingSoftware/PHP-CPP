@@ -1,12 +1,12 @@
 <?php
 /**
- *	exception.cpp
+ *  exception.cpp
  * 
- * 	@author Jasper van Eck <jasper.vaneck@copernica.com>
+ *  @author Jasper van Eck <jasper.vaneck@copernica.com>
  * 
- * 	This example shows the working of a C++ function that throws an 
- * 	exception, and that exception is then caught by PHP code.
- * 	
+ *  This example shows the working of a C++ function that throws an 
+ *  exception, and that exception is then caught by PHP code.
+ *  
  */
 
 // call the second C++ function that accepts a callback

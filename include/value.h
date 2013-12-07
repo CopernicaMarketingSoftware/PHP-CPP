@@ -264,7 +264,7 @@ public:
      *  Change the internal type of the variable
      *  @param  Type
      */
-    Value &setType(Type type);
+    virtual Value &setType(Type type);
 
     /**
      *  Make a clone of the value with the same type
@@ -290,7 +290,7 @@ public:
     bool isFloat()      const { return type() == floatType; }
     bool isObject()     const { return type() == objectType; }
     bool isArray()      const { return type() == arrayType; }
-    bool isCallable() 	const;
+    bool isCallable()   const;
     
     /**
      *  Retrieve the value as number
@@ -531,7 +531,7 @@ public:
     /**
      *  Call the function in PHP
      *  We have ten variants of this function, depending on the number of parameters
-     * 	This call operator is only useful when the variable represents a callable
+     *  This call operator is only useful when the variable represents a callable
      *  @param  name        Name of the function
      *  @return Value
      */
@@ -548,13 +548,13 @@ public:
     Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
 
 private:
-	/**
-	 *  Call function with a number of parameters
-	 *  @param  argc        Number of parameters
-	 *  @param  argv        The parameters
-	 *  @return Value
-	 */
-	Value exec(int argc, struct _zval_struct ***params);
+    /**
+     *  Call function with a number of parameters
+     *  @param  argc        Number of parameters
+     *  @param  argv        The parameters
+     *  @return Value
+     */
+    Value exec(int argc, struct _zval_struct ***params);
 
 protected:
     /**
@@ -562,6 +562,14 @@ protected:
      *  @var struct zval
      */
     struct _zval_struct *_val;
+    
+    /**
+     *  Validate the value
+     *  This is a overridable function that is implemented in base classes to
+     *  ensure that a value of certain type stays valid
+     *  @return Value
+     */
+    virtual Value &validate() { return *this; }
     
     /**
      *  The Globals and Member classes can access the zval directly

@@ -1,8 +1,8 @@
 /**
- *	cppclassinphp.cpp
- * 	@author Jasper van Eck<jasper.vaneck@copernica.com>
+ *  cppclassinphp.cpp
+ *  @author Jasper van Eck<jasper.vaneck@copernica.com>
  * 
- * 	An example file to show the working of using a C++ class in PHP.
+ *  An example file to show the working of using a C++ class in PHP.
  */
 
 #include "includeMyCustomClass.h"
@@ -40,32 +40,32 @@ public:
     }
     
     void myMethod(Php::Parameters &params)
-	{
-		std::cout << "myMethod is called." << std::endl;
-		std::cout << "_x: " << _x << std::endl;
-		_x = params[0];
-		std::cout << "New _x" << _x << std::endl;
-	}
+    {
+        std::cout << "myMethod is called." << std::endl;
+        std::cout << "_x: " << _x << std::endl;
+        _x = params[0];
+        std::cout << "New _x" << _x << std::endl;
+    }
 };
 
 
 // Symbols are exported according to the "C" language
 extern "C" 
 {
-	// export the "get_module" function that will be called by the Zend engine
-	PHPCPP_EXPORT void *get_module()
-	{
-		// create extension
+    // export the "get_module" function that will be called by the Zend engine
+    PHPCPP_EXPORT void *get_module()
+    {
+        // create extension
         static Php::Extension extension("my_function_with_parameters","1.0");
         
         // add the custom class ot the extension
-		extension.add("MyClass", Php::Class<MyCustomClass>({
-			Php::Public("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod),{
-				Php::ByVal("newX", Php::numericType)
-				})
-			}));
-				
-		// return the extension module
-		return extension.module();
-	}
+        extension.add("MyClass", Php::Class<MyCustomClass>({
+            Php::Public("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod),{
+                Php::ByVal("newX", Php::numericType)
+                })
+            }));
+                
+        // return the extension module
+        return extension.module();
+    }
 }

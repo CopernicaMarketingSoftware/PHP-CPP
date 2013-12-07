@@ -37,6 +37,7 @@
  */
 #include "../include/type.h"
 #include "../include/value.h"
+#include "../include/array.h"
 #include "../include/hiddenpointer.h"
 #include "../include/globals.h"
 #include "../include/argument.h"

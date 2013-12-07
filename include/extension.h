@@ -35,7 +35,7 @@ class Extension;
 
 /**
  *  Optional callback types for starting and stopping the request
- * 	@param	extension
+ *  @param  extension
  */
 typedef bool    (*request_callback)(Extension *extension);
 

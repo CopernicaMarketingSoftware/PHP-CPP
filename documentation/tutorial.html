@@ -1,10 +1,28 @@
-<h1>Loading native extensions</h1>
+<div style="width: 1024px; font-family: verdana; font-size: 10pt; line-height: 16pt;">
+
+
+<h1>A PHP-CPP tutorial</h1>
 <p>
-    Native PHP extensions are compiled into *.so files, and can be enabled by adding 
-    a line to the core php.ini configuration file - or one of the additional 
-    configuration files that are loaded by PHP. If you do not know where you can 
-    find the PHP configuration file(s) on your system, you can run the following 
-    command from the command line:
+    Building PHP extensions with the PHP-CPP library is not at all difficult - 
+    in this tutorial we will give you step by step instructions to build
+    your own extensions. However, before we start the actual programming, we will
+    first explain how PHP interacts with its extensions - how extension libraries
+    are loaded and how PHP knows which functions, constants and classes are
+    defined by the extensions.
+</p>
+<h2>How does PHP load its extensions?</h2>
+<p>
+    You probably already know that native PHP extensions are compiled into *.so 
+    files on unix-like systems, and *.dll files on Windows environments, and that
+    the global php.ini file holds a list of all extensions available on your system.
+    This means that if you're building your own extension, you will also need to
+    create such a *.so or *.dll file and you will need to update the PHP 
+    configuration so that your own extension is loaded by PHP.
+</p>
+<h3>Where to find your PHP configuration files?</h3>
+<p>
+    If for one reason or another you can not find the PHP configuration file(s) 
+    on your system, you can run the following command from the command line:
 </p>
 <p>
     <code><pre>
@@ -12,6 +30,7 @@
     </pre></code>
 </p>
 <p>
+    This will output a list of all configuration files that are loaded by PHP.
     Extensions are enabled by adding "extension=name.so" lines to the
     configuration file - where 'name' should of course be replaced by the name of 
     your extension. A default PHP installation already comes with many default 
@@ -30,13 +49,16 @@
         php -i|grep extension_dir
     </pre></code>
 </p>
+<h2>The get_module() startup function</h2>
 <p>
-    When PHP starts, it loads its configuration file(s) and for each "extension=name.so"
-    line in it, it will open the appropriate library, and call the "get_module()"
-    function from it. Each extension library must therefore define and implement 
-    this "get_module()" C function. The function is called by PHP right after
-    the library is loaded (and thus way before pageviews are handled), and it 
-    should return a memory address that points to a structure that holds information 
+    Before we explain how you can create your own extension however, we first explain
+    what PHP does to load an extension. When PHP starts, it loads the configuration 
+    file(s) that we just described and for each "extension=name.so" line in these
+    files, it opens the appropriate library, and calls the "get_module()"
+    function from it. Each extension library (your extension too) must therefore 
+    define and implement this "get_module()" C function. The function is called by 
+    PHP right after the library is loaded (and thus way before pageviews are handled), 
+    and it should return a memory address that points to a structure that holds information 
     about all functions, classes, variables and constants that are made available 
     by the extension. 
 </p>
@@ -60,7 +82,9 @@
 </p>
 <p>
     In the example above you see a very straightforward implementation of the
-    get_module() function. A number of elements require special attention. For a 
+    get_module() function. Every PHP extension that uses the PHP-CPP library
+    implements this function in a more or less similar way as the extension 
+    starting point. A number of elements require special attention. For a 
     start, the only header file that you see is the phpcpp.h header
     file. If you're using the PHP-CPP library to build your own extensions,
     you do not have to include the complicated, unstructured, and mostly undocumented
@@ -69,8 +93,9 @@
     files of the core PHP engine - but you do not have to.
 </p>
 <p>
-    The PHP-CPP library is a C++ library, and you can use all features
-    of this language. However, PHP expects your library, and especially your 
+    The next thing that you'll notice it that we placed the get_module() function
+    inside an 'extern "C"' code block. As the name of the library already gives away, 
+    PHP-CPP is a C++ library. However, PHP expects your library, and especially your 
     get_module() function, to be implemented in C and not in C++. That's why we've 
     wrapped the get_module() function in an 'extern "C"' block. This will instruct 
     the C++ compiler that the get_module() is a regular C function, and
@@ -85,19 +110,19 @@
 <p>
     Inside the get_module() function the Extension object is instantiated, and the
     Extension::module() method is called. It is crucial that you make a <i>static</i>
-    instance of this Extension class, because the object should exist for the entire
+    instance of this Extension class, because the object must exist for the entire
     lifetime of the PHP process, and not only for the duration of the get_module()
     call. The constructor takes two arguments: the name of your extension and 
     its version number. The Extension::module() method returns the memory address
     that PHP needs to initialize the library.
 </p>
 <p>
-    Note that the example above does not yet make any native functions or 
-    native classes available in PHP - it only creates the extension.
+    Note that the example above does not yet export any native functions or 
+    native classes to PHP - it only creates the extension. 
 </p>
-<h1>Exporting native functions</h1>
+<h2>Exporting native functions</h2>
 <p>
-    An extension is of course only useful if you define functions and/or 
+    An extension can of course only be useful if you define functions and/or 
     classes that can be accessed from PHP scripts. For functions you can do this 
     by adding your native function implementations to the Extension object:
 </p>
@@ -106,9 +131,9 @@
         #include &lt;phpcpp.h&gt;
         
         extern void example1();
-        extern void example2(Php::Parameters &params);
+        extern void example2(Php::Parameters &amp;params);
         extern Php::Value example3();
-        extern Php::Value example4(Php::Parameters &params);
+        extern Php::Value example4(Php::Parameters &amp;params);
         
         extern "C" {
             PHPCPP_EXPORT void *get_module() {
@@ -158,13 +183,57 @@
     </pre></code>
 </p>
 <p>
-    The signature of the four example functions are exactly the signatures that
-    are supported by the PHP-CPP libraries. Every native function that returns
-    void or a Php::Value object, and that either accepts a Php::Parameters object
+    It is not possible to export every thinkable C/C++ function to the 
+    PHP extension. Only functions that have one of the four supported signatures
+    can be exported: functions that return
+    void or a Php::Value object, and that either accept a Php::Parameters object
     or no parameters at all, can be added to the extension object and can thus
     be exported to PHP.
 </p>
-<h1>Working with variables</h1>
+<h2>Parameter types</h2>
+<p>
+    PHP has a mechanism to enforce function parameters types, and to accept
+    parameters either by reference or by value. In the examples above, we have
+    not yet used that mechanism yes: it is up to the function implementations
+    themselves to inspect the 'Parameters' object, and check if the
+    variables are of the right type.
+</p>
+<p>
+    However, the 'Extension::add()' method takes a third optional parameter that
+    you can use to specify the number of parameters that are supported, whether
+    the parameters are passed by reference or by value, and what the type of
+    the parameters is:
+</p>
+<p>
+    <code><pre>
+        #include &lt;phpcpp.h&gt;
+        
+        extern void example(Php::Parameters &amp;params);
+        
+        extern "C" {
+            PHPCPP_EXPORT void *get_module() {
+                static Php::Extension myExtension("my_extension", "1.0");
+                myExtension.add("example", example, {
+                    Php::ByVal("a", Php::numericType),
+                    Php::ByVal("b", "ExampleClass"),
+                    Php::ByRef("c", "OtherClass")
+                });
+                return myExtension.module();
+            }
+        }
+    </pre></code>
+</p>
+<p>
+    Above you see that we pass in additional information when we register the         
+    
+
+
+    The Extension::add() method can be used to register native functions, and
+    make them available in PHP. In the examples above, you've seen that the
+    method takes two parameters: the name the function shou
+
+
+<h2>Working with variables</h2>
 <p>
     Variables in PHP are non-typed. A variable can thus hold any possible type:
     an integer, string, a floating point number, and even an object or an array.
