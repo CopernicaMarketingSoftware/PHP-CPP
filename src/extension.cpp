@@ -20,12 +20,6 @@ namespace Php {
 #endif
 
 /**
- *  Pointer to the one and only extension object
- *  @var    Extension
- */
-static Extension *extension = nullptr;
-
-/**
  *  We're almost there, we now need to declare an instance of the
  *  structure defined above (if building for a single thread) or some
  *  sort of impossible to understand magic pointer-to-a-pointer (for
@@ -43,6 +37,68 @@ ZEND_DECLARE_MODULE_GLOBALS(phpcpp)
 static void init_globals(zend_phpcpp_globals *globals) {}
 
 /**
+ *  The *startup() and *shutdown() callback functions are passed a module_number
+ *  variable. However, there does not seem to be a decent API call in Zend to
+ *  get back the original module_entry linked to this number. So we have to
+ *  look up entries in a hash table to find the right module entry. To make things
+ *  even worse, the records in this hash table are copies of the original 
+ *  zend_module_entry structure, so we can also not hide the C++ extension
+ *  object pointer in the entry that we created ourselves.
+ * 
+ *  We have an ugly solution, we keep track of a map of all C++ extension names
+ *  and their associated extension object, and a map of all module number and
+ *  the linked extension object.
+ * 
+ *  @var map
+ */
+static std::map<std::string,Extension*> name2extension;
+static std::map<int,Extension*> number2extension;
+
+/**
+ *  Handler function that is used in combination with zend_hash_apply()
+ * 
+ *  This function is called when we need to find an extension object based on
+ *  an extension number. We loop through the list of all registered modules, and 
+ *  for each module we check if we know the extension based on the name
+ * 
+ *  @param  _zend_module_entry
+ */
+static int match_module(_zend_module_entry *entry)
+{
+    // check if there is an extension with this name
+    auto iter = name2extension.find(entry->name);
+    if (iter == name2extension.end()) return ZEND_HASH_APPLY_KEEP;
+    
+    // we have the extension, store in combination with the number
+    number2extension[entry->module_number] = iter->second;
+    
+    // done
+    return ZEND_HASH_APPLY_KEEP;
+}
+
+/**
+ *  Find an extension based on the module number
+ *  @param  number
+ *  @return Extension*
+ */
+static Extension *extension(int number)
+{
+    // do we already have an extension with this number?
+    auto iter = number2extension.find(number);
+    if (iter != number2extension.end()) return iter->second;
+    
+    // no, not yet, loop through all modules
+    zend_hash_apply(&module_registry, (apply_func_t)match_module);
+    
+    // find again
+    iter = number2extension.find(number);
+    if (iter == number2extension.end()) return nullptr;
+    
+    // found!
+    return iter->second;
+}
+
+/**
  *  Function that is called when the extension initializes
  *  @param  type        Module type
  *  @param  number      Module number
@@ -54,7 +110,7 @@ static int extension_startup(INIT_FUNC_ARGS)
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
     
     // initialize the extension
-    return BOOL2SUCCESS(extension->initialize());
+    return BOOL2SUCCESS(extension(module_number)->initialize());
 }
 
 /**
@@ -66,7 +122,7 @@ static int extension_startup(INIT_FUNC_ARGS)
 static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 {
     // finalize the extension
-    return BOOL2SUCCESS(extension->finalize());
+    return BOOL2SUCCESS(extension(module_number)->finalize());
 }
 
 /**
@@ -78,7 +134,7 @@ static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
 static int request_startup(INIT_FUNC_ARGS)
 {
     // start the request
-    return extension->startRequest();
+    return extension(module_number)->startRequest();
 }
 
 /**
@@ -90,7 +146,7 @@ static int request_startup(INIT_FUNC_ARGS)
 static int request_shutdown(INIT_FUNC_ARGS)
 {
     // end the request
-    return BOOL2SUCCESS(extension->endRequest());
+    return BOOL2SUCCESS(extension(module_number)->endRequest());
 }
 
 /**
@@ -102,14 +158,14 @@ static int request_shutdown(INIT_FUNC_ARGS)
  */
 Extension::Extension(const char *name, const char *version, request_callback start, request_callback stop) : _start(start), _stop(stop)
 {
-    // store extension variable
-    extension = this;
+    // keep extension pointer based on the name
+    name2extension[name] = this;
     
     // allocate memory (we allocate this on the heap so that the size of the
     // entry does not have to be defined in the .h file. We pay a performance
     // price for this, but we pay this price becuase the design goal of the
     // PHP-C++ library is to have an interface that is as simple as possible
-    _entry = new zend_module_entry;
+    _entry = new _zend_module_entry;
     
     // assign all members (apart from the globals)
     _entry->size = sizeof(zend_module_entry);               // size of the data
