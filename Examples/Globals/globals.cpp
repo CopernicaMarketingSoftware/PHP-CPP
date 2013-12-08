@@ -41,6 +41,9 @@ Php::Value process_globals()
     // and increment it
     Php::globals["c"]["member"] += 77;
     
+    // change value e
+    Php::globals["e"] = Php::globals["e"][0]("hello");
+    
     // if a global variable holds a function, we can call it
     return Php::globals["d"](1,2,3);
 }

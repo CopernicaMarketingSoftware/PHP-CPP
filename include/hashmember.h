@@ -315,7 +315,32 @@ public:
     Value operator%(const std::string &value)   { return this->value() % value; }
     Value operator%(const char *value)          { return this->value() % value; }
     Value operator%(double value)               { return this->value() % value; }
-
+    
+    /**
+     *  Handle calls to the hash member
+     *  @param  param0
+     *  @param  param1
+     *  @param  param2
+     *  @param  param3
+     *  @param  param4
+     *  @param  param5
+     *  @param  param6
+     *  @param  param7
+     *  @param  param8
+     *  @param  param9
+     *  @return Value
+     */
+    Value operator()() { return value()(); }
+    Value operator()(Value param0) { return value()(param0); }
+    Value operator()(Value param0, Value param1) { return value()(param0, param1); }
+    Value operator()(Value param0, Value param1, Value param2) { return value()(param0, param1, param2); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3) { return value()(param0, param1, param2, param3); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4) { return value()(param0, param1, param2, param3, param4); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5) { return value()(param0, param1, param2, param3, param4, param5); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5, Value param6) { return value()(param0, param1, param2, param3, param4, param5, param6); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5, Value param6, Value param7) { return value()(param0, param1, param2, param3, param4, param5, param6, param7); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5, Value param6, Value param7, Value param8) { return value()(param0, param1, param2, param3, param4, param5, param6, param7, param8); }
+    Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5, Value param6, Value param7, Value param8, Value param9) { return value()(param0, param1, param2, param3, param4, param5, param6, param7, param8, param9); }
 
 private:
     /**
