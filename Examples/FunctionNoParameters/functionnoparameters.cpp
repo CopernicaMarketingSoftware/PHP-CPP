@@ -32,7 +32,7 @@ extern "C"
     PHPCPP_EXPORT void *get_module()
     {
         // create extension
-        static Php::Extension extension("my_function_return_value","1.0");
+        static Php::Extension extension("my_function_no_parameters","1.0");
         
         // add function to extension
         extension.add("my_no_parameters_function", my_no_parameters_function);

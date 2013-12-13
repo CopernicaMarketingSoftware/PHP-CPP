@@ -56,7 +56,7 @@ extern "C"
     PHPCPP_EXPORT void *get_module()
     {
         // create extension
-        static Php::Extension extension("my_function_with_parameters","1.0");
+        static Php::Extension extension("Cpp_classes_in_php","1.0");
         
         // add the custom class ot the extension
         extension.add("MyClass", Php::Class<MyCustomClass>({
