@@ -51,7 +51,11 @@ public:
      */
     virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags)
     {
+#if PHP_VERSION_ID >= 50400      
         zend_declare_property_bool(entry, name, size, _value, flags);
+#else
+        zend_declare_property_bool(entry, (char *) name, size, _value, flags);
+#endif
     }
 };
 

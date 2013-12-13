@@ -58,7 +58,11 @@ public:
      */
     virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags)
     {
-        zend_declare_property_stringl(entry, name, size, _value.c_str(), _value.size(), flags);
+#if PHP_VERSION_ID >= 50400            
+      zend_declare_property_stringl(entry, name, size, _value.c_str(), _value.size(), flags);
+#else
+      zend_declare_property_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size(), flags);
+#endif
     }
 };
 

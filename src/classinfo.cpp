@@ -61,7 +61,11 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     while (base->parent) base = base->parent;
     
     // retrieve the classinfo object
+#if PHP_VERSION_ID >= 50400
     _ClassInfo *info = (_ClassInfo *)base->info.user.doc_comment;
+#else
+    _ClassInfo *info = (_ClassInfo *)base->doc_comment;
+#endif    
     
     // store the class
     object->php.ce = type;
@@ -74,7 +78,12 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     zend_hash_init(object->php.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
     
     // initialize the properties
+#if PHP_VERSION_ID < 50399
+    zend_hash_copy(object->php.properties, &(type->default_properties),
+                   (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval*));
+#else
     object_properties_init(&(object->php), type);
+#endif    
 
     // the thing we're going to return
     zend_object_value result;
@@ -126,7 +135,11 @@ void _ClassInfo::initialize(TSRMLS_DC)
     _entry = zend_register_internal_class(&entry TSRMLS_CC);
 
     // store pointer to the class in the unused doc_comment member
+#if PHP_VERSION_ID >= 50400    
     _entry->info.user.doc_comment = (const char *)this;
+#else
+    _entry->doc_comment = (char *)this;    
+#endif        
     
     // initialize the entry
     initialize(_entry);
