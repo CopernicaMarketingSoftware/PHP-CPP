@@ -58,6 +58,7 @@
 #include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/exception.h"
+#include "../include/origexception.h"
 #include "../include/init.h"
 
 /**

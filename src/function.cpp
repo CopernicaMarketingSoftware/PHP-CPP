@@ -43,6 +43,13 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
         // get the result
         result = function->invoke(params);
     }
+    catch (Php::OrigException &exception)
+    {
+        // we caught an exception that was original thrown by PHP code, and not 
+        // processed by C++ code, this means that we're going to restore this 
+        // exception so that it can be further handled by PHP
+        exception.restore();
+    }
     catch (Php::Exception &exception)
     {
         // an exception originally thrown by C++ should be passed on to PHP

@@ -868,14 +868,17 @@ Value Value::exec(int argc, zval ***params)
     // the return zval
     zval *retval = nullptr;
     
+    // the current exception
+    zval *oldException = EG(exception);
+    
     // call the function
     if (call_user_function_ex(CG(function_table), NULL, _val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
     
-    // was a value returned?
-    if (retval) return Value(retval);
+    // was an exception thrown?
+    if (oldException != EG(exception)) throw OrigException(EG(exception));
     
-    // no value was returned, return NULL
-    return nullptr;
+    // no (additional) exception was thrown
+    return retval ? Value(retval) : nullptr;
 }
 
 /**

@@ -11,6 +11,7 @@
  *  Libraries used.
  */
 #include <phpcpp.h>
+#include <iostream>
 
 /**
  *  Namespace to use
@@ -39,7 +40,8 @@ void my_catch_exception_function(Php::Parameters &params)
     }
     catch (Php::Exception &exception)
     {
-        // @todo handle the exception that was thrown from PHP space
+        // handle the exception that was thrown from PHP space
+        std::cout << "exception caught in CPP code" << std::endl;
     }
 }
 
@@ -54,9 +56,7 @@ extern "C"
         static Php::Extension extension("my_exception_catch","1.0");
         
         // add function to extension
-        extension.add("my_catch_exception_function", my_catch_exception_function, {
-            Php::ByVal("callback", Php::callableType);
-            });
+        extension.add("my_catch_exception_function", my_catch_exception_function);
         
         // return the extension module
         return extension.module();

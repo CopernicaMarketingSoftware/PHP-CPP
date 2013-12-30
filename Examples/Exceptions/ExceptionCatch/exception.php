@@ -14,4 +14,4 @@ my_catch_exception_function(function($a, $b, $c) {
 
     // throw an exception from PHP - the C++ code will catch this exception
     throw new Exception("Example exception");
-});}
+});
