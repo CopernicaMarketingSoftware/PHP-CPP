@@ -113,7 +113,9 @@ void Function::fill(zend_function_entry *entry, const char *classname, bool pub)
     entry->flags = classname ? (pub ? ZEND_ACC_PUBLIC : ZEND_ACC_PROTECTED) : 0;
     
     // we should fill the first argument as well
+#if PHP_VERSION_ID >= 50400    
     fill((zend_internal_function_info *)entry->arg_info, classname);
+#endif
 }
 
 /**
@@ -121,6 +123,7 @@ void Function::fill(zend_function_entry *entry, const char *classname, bool pub)
  *  @param  info        Info to be filled
  *  @param  classname   Optional classname
  */
+#if PHP_VERSION_ID >= 50400
 void Function::fill(zend_internal_function_info *info, const char *classname) const
 {
     // fill in all the members, note that return reference is false by default,
@@ -140,6 +143,7 @@ void Function::fill(zend_internal_function_info *info, const char *classname) co
     // passing by reference is not used
     info->pass_rest_by_reference = false;
 }
+#endif
 
 /**
  *  End of namespace

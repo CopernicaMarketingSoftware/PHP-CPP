@@ -1,6 +1,6 @@
-PREFIX		=	/usr
-INCLUDE_DIR = 	${PREFIX}/include
-LIBRARY_DIR	=	${PREFIX}/lib
+PREFIX		=	/home/work/
+INCLUDE_DIR     = 	${PREFIX}/include/
+LIBRARY_DIR	=	${PREFIX}/lib/
 
 all:
 		cd src; $(MAKE)
