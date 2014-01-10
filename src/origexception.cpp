@@ -7,6 +7,13 @@
  *  @copyright 2013 Copernica BV
  */
 #include "includes.h"
+#include <php.h>
+#include "zend_exceptions.h"
+
+void cpp_throw_exception_hook(struct _zval_struct *exception)
+{
+  throw Php::OrigException(exception);
+}
 
 /**
  *  Set up namespace
@@ -57,6 +64,7 @@ OrigException::~OrigException()
     // clean up the exception
     zend_clear_exception();
 }
+                                         
 
 /**
  *  Restore the exception
@@ -73,6 +81,12 @@ void OrigException::restore()
     _restored = true;
 }
 
+void OrigException::hook()
+{
+  zend_throw_exception_hook = cpp_throw_exception_hook;
+}
+                                            
+                                            
 /**
  *  End of namespace
  */

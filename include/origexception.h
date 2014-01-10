@@ -8,6 +8,8 @@
  *  @copyright 2013 Copernica BV
  */
 
+void cpp_throw_exception_hook(struct _zval_struct *exception);
+
 /**
  *  Set up namespace
  */
@@ -54,6 +56,8 @@ public:
      *  @internal
      */
     void restore();
+
+    static void hook();
 };
 
 /**
