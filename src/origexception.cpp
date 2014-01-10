@@ -60,7 +60,7 @@ OrigException::~OrigException()
 {
     // skip if the exception was restored
     if (_restored) return;
-    
+    zend_throw_exception_hook = NULL;
     // clean up the exception
     zend_clear_exception();
 }
