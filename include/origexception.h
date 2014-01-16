@@ -47,7 +47,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~OrigException();
+    virtual ~OrigException() throw();
     
     /**
      *  Restore the exception - because the exception was not handled by C++ code
@@ -60,4 +60,3 @@ public:
  *  End of namespace
  */
 }
-

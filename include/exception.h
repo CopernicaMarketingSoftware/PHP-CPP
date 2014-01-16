@@ -42,7 +42,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Exception()
+    virtual ~Exception() throw()
     {
     }
     

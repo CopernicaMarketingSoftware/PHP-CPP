@@ -49,7 +49,7 @@ OrigException::OrigException(OrigException &&exception) :
 /**
  *  Destructor
  */
-OrigException::~OrigException()
+OrigException::~OrigException() noexcept
 {
     // skip if the exception was restored
     if (_restored) return;
