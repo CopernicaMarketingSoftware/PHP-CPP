@@ -58,7 +58,6 @@
 #include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/exception.h"
-#include "../include/origexception.h"
 #include "../include/init.h"
 
 /**
@@ -75,6 +74,7 @@
 #include "doublemember.h"
 #include "methodmember.h"
 #include "arithmetic.h"
+#include "origexception.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \
