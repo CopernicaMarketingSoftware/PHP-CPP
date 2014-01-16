@@ -19,9 +19,6 @@
 #include <set>
 #include <exception>
 
-// for debugging
-#include <iostream>
-
 /**
  *  PHP includes
  */

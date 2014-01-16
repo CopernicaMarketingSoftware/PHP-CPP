@@ -22,8 +22,6 @@ OrigException::OrigException(struct _zval_struct *zval) :
     Exception("OrigException"), 
     _restored(false)
 {
-    std::cout << "save the exception" << std::endl;
-    
     // save the exception
     zend_exception_save();
 }
@@ -64,8 +62,6 @@ OrigException::~OrigException() noexcept
  */
 void OrigException::restore()
 {
-    std::cout << "restore the exception" << std::endl;
-    
     // restore the exception
     zend_exception_restore();
     
