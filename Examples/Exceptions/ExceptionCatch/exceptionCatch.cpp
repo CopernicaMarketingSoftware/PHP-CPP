@@ -28,6 +28,7 @@ void my_catch_exception_function(Php::Parameters &params)
     // the first parameter should be a callback
     Php::Value callback = params[0];
 
+
     // this must be a callable type
     if (!callback.isCallable()) throw Php::Exception("Parameter 0 is not a function");
 
@@ -38,10 +39,13 @@ void my_catch_exception_function(Php::Parameters &params)
         // call the function
         callback("some","example","parameters");
     }
-    catch (Php::Exception &exception)
+    catch (Php::OrigException &exception)
     {
         // handle the exception that was thrown from PHP space
-        std::cout << "exception caught in CPP code" << std::endl;
+        std::cout << "exception caught in CPP code"
+                  << "\n"
+                  << exception.message()
+                  << std::endl;
     }
 }
 
@@ -57,7 +61,9 @@ extern "C"
         
         // add function to extension
         extension.add("my_catch_exception_function", my_catch_exception_function);
-        
+
+        Php::OrigException::hook();
+   
         // return the extension module
         return extension.module();
     }
