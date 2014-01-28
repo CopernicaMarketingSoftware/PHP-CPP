@@ -29,7 +29,7 @@ public:
      *  Constructor
      *  @param  value
      */
-    DoubleMember(bool value) : MemberInfo(), _value(value) {}
+    DoubleMember(double value) : MemberInfo(), _value(value) {}
 
     /**
      *  Destructor
