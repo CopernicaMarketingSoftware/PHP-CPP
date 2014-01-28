@@ -152,6 +152,19 @@ public:
      */
     bool isMethod();
     
+    /**
+     *  Is this a class constant
+     *  @return bool
+     */
+    bool isClassConst();
+    
+    /**
+     *  Is this a class constant
+     *  @param  bool _constant
+     *  @return bool
+     */
+    bool isClassConst(bool);
+    
 
 private:
     /**
@@ -165,6 +178,12 @@ private:
      *  @var bool
      */
     bool _public;
+    
+    /**
+     *  Is this a constant property
+     *  @var bool
+     */
+    bool _constant;
     
     /**
      *  The implementation for the member

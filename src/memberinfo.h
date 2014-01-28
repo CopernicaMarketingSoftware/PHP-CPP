@@ -68,6 +68,15 @@ public:
      *  @param  flags       Additional flags
      */
     virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags) {};
+
+    /**
+     *  Virtual method to declare the constant property
+     *  @param  entry       Class entry
+     *  @param  name        Name of the member
+     *  @param  size        Size of the name
+     *  @param  flags       Additional flags
+     */
+    virtual void declareConst(struct _zend_class_entry *entry, const char *name, int size) {};
     
     /**
      *  Fill a function entry object

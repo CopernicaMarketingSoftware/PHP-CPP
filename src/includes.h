@@ -19,6 +19,9 @@
 #include <set>
 #include <exception>
 
+ // for debug
+#include <iostream>
+
 /**
  *  PHP includes
  */
@@ -50,6 +53,7 @@
 #include "../include/member.h"
 #include "../include/public.h"
 #include "../include/protected.h"
+#include "../include/classconst.h"
 #include "../include/members.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"
