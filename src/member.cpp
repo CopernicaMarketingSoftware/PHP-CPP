@@ -228,6 +228,9 @@ void Member::declare(struct _zend_class_entry *entry)
     else
         std::cout << "declare(" << _name.c_str() << "):" << std::endl;
 
+    
+    std::cout << ZEND_ACC_CLONE << std::endl;
+
 
     // let the info object handle stuff
     if(_constant)
