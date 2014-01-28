@@ -229,7 +229,13 @@ void Member::declare(struct _zend_class_entry *entry)
         std::cout << "declare(" << _name.c_str() << "):" << std::endl;
 
     
-    std::cout << ZEND_ACC_CLONE << std::endl;
+    std::cout << ZEND_ACC_EXPLICIT_ABSTRACT_CLASS << std::endl;
+    //std::cout << static_cast<int>(Php::Zend::FlagClass::ABSTRACT) << std::endl;
+    //std::cout << Php::Zend::FlagToint(Php::Zend::FlagClass::ABSTRACT) << std::endl;
+    std::cout << Zend::Flag(Zend::FlagClass::ABSTRACT) << std::endl;
+    //std::cout << Zend::Flag() << std::endl;
+
+
 
 
     // let the info object handle stuff
