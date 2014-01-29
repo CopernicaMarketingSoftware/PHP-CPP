@@ -232,7 +232,21 @@ void Member::declare(struct _zend_class_entry *entry)
     std::cout << ZEND_ACC_EXPLICIT_ABSTRACT_CLASS << std::endl;
     //std::cout << static_cast<int>(Php::Zend::FlagClass::ABSTRACT) << std::endl;
     //std::cout << Php::Zend::FlagToint(Php::Zend::FlagClass::ABSTRACT) << std::endl;
-    std::cout << Zend::Flag(Zend::FlagClass::ABSTRACT) << std::endl;
+    //std::cout << Flag(AccClass::ABSTRACT) << std::endl;
+    /*
+    std::cout << Flag(AccClass::ABSTRACT) << " * " << 
+                Flag(AccProp::PROTECTED) << " * " << 
+                ( Flag(AccClass::ABSTRACT) | Flag(AccProp::PROTECTED) ) << " * " << 
+                ( 32 | 512 ) << " * " << 
+                ( Flag(AccProp::PROTECTED) |= Flag(AccClass::ABSTRACT) ) << std::endl;
+    */
+    std::cout << Flag(AccClass::ABSTRACT) << " * " << 
+                Flag(AccProp::PROTECTED) << " * " << 
+                ( Flag(AccClass::ABSTRACT) | Flag(AccProp::PROTECTED) ) << " * " << 
+                ( 32 | 512 ) << " * " << 
+                ( Flag(AccProp::PROTECTED) |= Flag(AccClass::ABSTRACT) ) << std::endl;
+                //FINAL
+    
     //std::cout << Zend::Flag() << std::endl;
 
 
