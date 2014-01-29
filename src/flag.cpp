@@ -6,6 +6,7 @@
  *  @author Valeriy_Dmitriev <ufabiz@gmail.com>
  */
 
+#include <typeinfo>
 #include "includes.h"
 
 
@@ -19,7 +20,7 @@ namespace Php {
      *  Constructor
      *  @param  flags        instance of AccClass
      */
-    Flag::Flag(const AccClass &flags) {
+    FlagClass::FlagClass(const AccClass &flags) {
         /**
          *  access types for methods
          *  (method flags)
@@ -51,7 +52,7 @@ namespace Php {
      *  Constructor
      *  @param  flags        instance of AccProp
      */
-    Flag::Flag(const AccProp &flags){
+    FlagProp::FlagProp(const AccProp &flags){
         /**
          *  access types for classes
          *  (class flags)
@@ -98,63 +99,6 @@ namespace Php {
         }
     }
 
-    /**
-     *  Copy constructor
-     *  @param  Flag      The Flag to copy
-     */
-    Flag::Flag(const Flag &flags) {
-        _val = flags._val;
-    }
-        
-    /**
-     *  Move constructor
-     *  @param  Flag      The Flag to move
-     */
-    Flag::Flag(Flag &&flags) {
-        _val = flags._val;
-        //_val = std::move(flags._val);
-    }
-
-    /**
-     *  Constructor
-     *  @param  int val
-     */
-    Flag::Flag(const int &val) {
-        _val = val;
-    }
-
-    /**
-     *  Assignment operator
-     *  @param  Flag
-     *  @return Flag
-     */
-    /*
-    Flag &Flag::operator=(const Flag &flags){
-        if (this != &flags) {
-            _val = flags._val;
-        }
-        return *this;
-    }
-    */
-
-    /**
-     *  Subtract a Flag from the object
-     *  @param  Flag
-     *  @return Flag
-     */
-    Flag &Flag::operator|=(const Flag &flags) { 
-        _val |= flags._val;
-        return *this;
-    }
-
-    /**
-     *  Assignment operator
-     *  @param  Flag
-     *  @return Flag
-     */
-    Flag Flag::operator|(const Flag &flags) {
-        return Flag (_val | flags._val);
-    }
 
 
 

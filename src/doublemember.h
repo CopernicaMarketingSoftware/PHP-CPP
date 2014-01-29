@@ -51,7 +51,8 @@ public:
      */
     virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags)
     {
-        flags = Flag(AccProp::PROTECTED);
+        //flags = Flag(AccProp::PROTECTED);
+
 #if PHP_VERSION_ID >= 50400
         zend_declare_property_double(entry, name, size, _value, flags);
         //zend_update_static_property_double(entry, name, size, _value);
