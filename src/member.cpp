@@ -232,43 +232,11 @@ void Member::declare(struct _zend_class_entry *entry)
     //std::cout << static_cast<int>(Php::Zend::FlagClass::ABSTRACT) << std::endl;
     //std::cout << Php::Zend::FlagToint(Php::Zend::FlagClass::ABSTRACT) << std::endl;
     //std::cout << Flag(AccClass::ABSTRACT) << std::endl;
-    /*
-    std::cout << Flag(AccClass::ABSTRACT) << " * " << 
-                Flag(AccProp::PROTECTED) << " * " << 
-                ( Flag(AccClass::ABSTRACT) | Flag(AccProp::PROTECTED) ) << " * " << 
-                ( 32 | 512 ) << " * " << 
-                ( Flag(AccProp::PROTECTED) |= Flag(AccClass::ABSTRACT) ) << std::endl;
-    */
 
-    /*
-    std::cout << FlagClass(AccClass::ABSTRACT) << " * " << 
-                FlagClass(AccClass::FINAL) << " * " << 
-                ( FlagClass(AccClass::ABSTRACT) | FlagClass(AccClass::FINAL) ) << " =?= " << 
-                //( 32 | 512 ) << " * " << 
-                ( FlagClass(AccClass::FINAL) |= FlagClass(AccClass::ABSTRACT) ) << std::endl;
-                //
-
-    std::cout << FlagProp(AccProp::ABSTRACT) << " * " << 
-                FlagProp(AccProp::FINAL) << " * " << 
-                ( FlagProp(AccProp::ABSTRACT) | FlagProp(AccProp::FINAL) ) << " =?= " << 
-                //( 32 | 512 ) << " * " << 
-                ( FlagProp(AccProp::FINAL) |= FlagProp(AccProp::ABSTRACT) ) << std::endl;
-                //
-    */
-    /*
-    std::cout << FlagProp(AccProp::ABSTRACT) << " * " << 
-                FlagClass(AccClass::FINAL) << " * " << 
-                ( FlagProp(AccProp::ABSTRACT) | FlagClass(AccClass::FINAL) ) << " =?= " << 
-                //( 32 | 512 ) << " * " << 
-                ( FlagClass(AccClass::FINAL) |= FlagProp(AccProp::ABSTRACT) ) << std::endl;
-    */
-
-    std::cout << "Смотрим" << std::endl;
-    std::cout << FlagProp(AccProp::ABSTRACT) << " * " << 
-                FlagProp(AccProp::FINAL) << " * " << 
-                ( FlagProp(AccProp::ABSTRACT) | FlagProp(AccProp::FINAL) ) << " =?= " << 
-                //( 32 | 512 ) << " * " << 
-                ( FlagProp(AccProp::FINAL) |= FlagProp(AccProp::ABSTRACT) ) << std::endl;
+    std::cout << Flag(Zend::AccProp::ABSTRACT) << " * " << 
+                Flag(Zend::AccProp::FINAL) << " * " << 
+                ( Flag(Zend::AccProp::ABSTRACT) | Flag(Zend::AccProp::FINAL) ) << " =?= " << 
+                ( Flag(Zend::AccProp::FINAL) |= Flag(Zend::AccProp::ABSTRACT) ) << std::endl;
 
 
     //std::cout << Zend::Flag() << std::endl;
