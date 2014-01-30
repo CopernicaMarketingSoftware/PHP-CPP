@@ -81,7 +81,6 @@ namespace Php {
         FlagClass(const FlagClass &flags) : BaseFlag(flags) {}
         FlagClass(FlagClass &&flags) : BaseFlag(flags) {}
 
-
         /**
          *  Bitwise OR assignment operator
          */
@@ -112,6 +111,7 @@ namespace Php {
     
     /**
      *  class FlagMemb
+     *  Flag access to a class member
      *  Designed for the safe transfer of a Zend flag to a Zend functions
      */
     class FlagMemb: public BaseFlag

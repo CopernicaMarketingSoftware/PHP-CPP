@@ -33,7 +33,7 @@ public:
      *  @param  name        Name of the member
      *  @param  pub         Is this a public property (otherwise it is protected)
      */
-    Member(const char *name, bool pub);
+    Member(const char *name, FlagMemb flags);
 
     /**
      *  Constructor
@@ -41,7 +41,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, std::nullptr_t value);
+    Member(const char *name, FlagMemb flags, std::nullptr_t value);
 
     /**
      *  Constructor
@@ -49,7 +49,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, int value);
+    Member(const char *name, FlagMemb flags, int value);
 
     /**
      *  Constructor
@@ -57,7 +57,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, long value);
+    Member(const char *name, FlagMemb flags, long value);
 
     /**
      *  Constructor
@@ -65,7 +65,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, bool value);
+    Member(const char *name, FlagMemb flags, bool value);
 
     /**
      *  Constructor
@@ -73,7 +73,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, char value);
+    Member(const char *name, FlagMemb flags, char value);
 
     /**
      *  Constructor
@@ -81,7 +81,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, const std::string &value);
+    Member(const char *name, FlagMemb flags, const std::string &value);
 
     /**
      *  Constructor
@@ -90,7 +90,7 @@ public:
      *  @param  value       The value to add
      *  @param  size        String length
      */
-    Member(const char *name, bool pub, const char *value, int size = -1);
+    Member(const char *name, FlagMemb flags, const char *value, int size = -1);
 
     /**
      *  Constructor
@@ -98,7 +98,7 @@ public:
      *  @param  pub         Is this a public property (otherwise it is protected)
      *  @param  value       The value to add
      */
-    Member(const char *name, bool pub, double value);
+    Member(const char *name, FlagMemb flags, double value);
     
     /**
      *  Constructor
@@ -106,7 +106,7 @@ public:
      *  @param  pub         Is this a public method (otherwise it is protected)
      *  @param  method      The method to add
      */
-    Member(const char *name, bool pub, const _Method &method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, FlagMemb flags, const _Method &method, const std::initializer_list<Argument> &arguments = {});
 
     /**
      *  Copy constructor
@@ -174,10 +174,10 @@ private:
     std::string _name;
     
     /**
-     *  Is this a public property
+     *  Flag access to a class member (bublic, protected etc)
      *  @var bool
      */
-    bool _public;
+    FlagMemb _accflag;
     
     /**
      *  Is this a constant property

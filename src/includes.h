@@ -35,6 +35,8 @@
 /**
  *  Include other files from this library
  */
+#include "../include/zend.h"
+#include "../include/flag.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/array.h"
@@ -48,8 +50,6 @@
 #include "../include/parameters.h"
 #include "../include/function.h"
 #include "../include/properties.h"
-#include "../include/zend.h"
-#include "../include/flag.h"
 #include "../include/base.h"
 #include "../include/method.h"
 #include "../include/member.h"

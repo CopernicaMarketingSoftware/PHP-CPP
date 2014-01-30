@@ -22,6 +22,8 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/zend.h>
+#include <phpcpp/flag.h>
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/array.h>
@@ -35,8 +37,6 @@
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/properties.h>
-#include <phpcpp/zend.h>
-#include <phpcpp/flag.h>
 #include <phpcpp/base.h>
 #include <phpcpp/method.h>
 #include <phpcpp/member.h>
