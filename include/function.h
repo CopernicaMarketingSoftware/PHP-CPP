@@ -141,7 +141,7 @@ protected:
      *  @param  classname   Optional class name
      *  @param  pub         Is this a public property?
      */
-    void fill(struct _zend_function_entry *entry, const char *classname=NULL, bool pub=true) const;
+    void fill(struct _zend_function_entry *entry, const char *classname=NULL, int flags=Flag(Zend::AccMemb::PUBLIC)) const;
 
     /**
      *  Fill function info

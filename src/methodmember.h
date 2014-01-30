@@ -43,10 +43,10 @@ public:
      *  @param  classname   Name of the class
      *  @param  pub         Is this a public entry
      */
-    virtual void fill(struct _zend_function_entry *entry, const char *classname, bool pub)
+    virtual void fill(struct _zend_function_entry *entry, const char *classname, int flags)
     {
         // call function object
-        Function::fill(entry, classname, pub);
+        Function::fill(entry, classname, flags);
     }
 
     /**

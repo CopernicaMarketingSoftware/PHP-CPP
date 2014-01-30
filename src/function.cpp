@@ -101,7 +101,7 @@ Function::~Function()
  *  @param  classname   Optional class name
  *  @param  pub         Is this a public property?
  */
-void Function::fill(zend_function_entry *entry, const char *classname, bool pub) const
+void Function::fill(zend_function_entry *entry, const char *classname, int flags) const
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _ptr;
@@ -110,7 +110,8 @@ void Function::fill(zend_function_entry *entry, const char *classname, bool pub)
     entry->num_args = _argc;
 
     // there are no flags like deprecated, private or protected
-    entry->flags = classname ? (pub ? ZEND_ACC_PUBLIC : ZEND_ACC_PROTECTED) : 0;
+    entry->flags = classname ? flags : 0;
+    
     
     // we should fill the first argument as well
 #if PHP_VERSION_ID >= 50400    

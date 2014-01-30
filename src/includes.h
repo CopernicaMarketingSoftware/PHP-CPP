@@ -35,6 +35,8 @@
 /**
  *  Include other files from this library
  */
+#include "../include/zend.h"
+#include "../include/flag.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/array.h"
@@ -51,8 +53,7 @@
 #include "../include/base.h"
 #include "../include/method.h"
 #include "../include/member.h"
-#include "../include/public.h"
-#include "../include/protected.h"
+#include "../include/membervisibility.h"
 #include "../include/classconst.h"
 #include "../include/members.h"
 #include "../include/class.h"
