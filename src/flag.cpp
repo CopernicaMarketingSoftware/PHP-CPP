@@ -60,6 +60,8 @@ namespace Php {
         switch(zflag){
                 case Zend::AccMemb::STATIC:
                     _val = ZEND_ACC_STATIC;                    //0x01
+                    //_val = ZEND_ACC_ALLOW_STATIC | ZEND_ACC_PUBLIC;
+                    //_val = ZEND_ACC_STATIC | ZEND_ACC_PUBLIC;
                 break;
                 case Zend::AccMemb::ABSTRACT:
                     _val = ZEND_ACC_ABSTRACT;                  //0x02

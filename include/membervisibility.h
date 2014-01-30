@@ -26,15 +26,15 @@ public:
      *  @param  name        Name of the property
      *  @param  value       Default value of the property
      */
-    MemberVisibility(const char *name) : Member(name, Flag(AccFlag)) {}
-    MemberVisibility(const char *name, std::nullptr_t value) : Member(name, Flag(AccFlag), value) {}
-    MemberVisibility(const char *name, int value) : Member(name, Flag(AccFlag), value) {}
-    MemberVisibility(const char *name, long value) : Member(name, Flag(AccFlag), value) {}
-    MemberVisibility(const char *name, bool value) : Member(name, Flag(AccFlag), value) {}
-    MemberVisibility(const char *name, char value) : Member(name, Flag(AccFlag), value) {}
-    MemberVisibility(const char *name, const std::string &value) : Member(name, Flag(AccFlag), value) {}
-    MemberVisibility(const char *name, const char *value, int size=-1) : Member(name, Flag(AccFlag), value, size) {}
-    MemberVisibility(const char *name, double value) : Member(name, Flag(AccFlag), value) {}
+    MemberVisibility(const char *name) : Member(name, FlagMemb(AccFlag)) {}
+    MemberVisibility(const char *name, std::nullptr_t value) : Member(name, FlagMemb(AccFlag), value) {}
+    MemberVisibility(const char *name, int value) : Member(name, FlagMemb(AccFlag), value) {}
+    MemberVisibility(const char *name, long value) : Member(name, FlagMemb(AccFlag), value) {}
+    MemberVisibility(const char *name, bool value) : Member(name, FlagMemb(AccFlag), value) {}
+    MemberVisibility(const char *name, char value) : Member(name, FlagMemb(AccFlag), value) {}
+    MemberVisibility(const char *name, const std::string &value) : Member(name, FlagMemb(AccFlag), value) {}
+    MemberVisibility(const char *name, const char *value, int size=-1) : Member(name, FlagMemb(AccFlag), value, size) {}
+    MemberVisibility(const char *name, double value) : Member(name, FlagMemb(AccFlag), value) {}
 
     /**
      *  Constructor
@@ -42,7 +42,7 @@ public:
      *  @param  method      Method to add
      *  @param  arguments   Optional argument information
      */
-    MemberVisibility(const char *name, const _Method &method, const std::initializer_list<Argument> &arguments = {}) : Member(name, Flag(AccFlag), method, arguments) {}
+    MemberVisibility(const char *name, const _Method &method, const std::initializer_list<Argument> &arguments = {}) : Member(name, FlagMemb(AccFlag), method, arguments) {}
     
     /**
      *  Destructor
@@ -54,6 +54,8 @@ public:
 typedef MemberVisibility<Zend::AccMemb::PUBLIC> Public;
 typedef MemberVisibility<Zend::AccMemb::PROTECTED> Protected;
 typedef MemberVisibility<Zend::AccMemb::PRIVATE> Private;
+typedef MemberVisibility<Zend::AccMemb::STATIC> Static;
+
 
 /**
  *  End of namespace

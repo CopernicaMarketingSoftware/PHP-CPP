@@ -224,23 +224,9 @@ bool Member::isClassConst(bool _const)
 void Member::declare(struct _zend_class_entry *entry)
 {
     if(_constant)
-        std::cout << "declareConst(" << _name.c_str() << "):" << std::endl;
+        std::cout << "declareConst(" << _name.c_str() << "):" << _accflag << std::endl;
     else
-        std::cout << "declare(" << _name.c_str() << "):" << std::endl;
-
-    
-    //std::cout << static_cast<int>(Php::Zend::FlagClass::ABSTRACT) << std::endl;
-    //std::cout << Php::Zend::FlagToint(Php::Zend::FlagClass::ABSTRACT) << std::endl;
-    //std::cout << Flag(AccClass::ABSTRACT) << std::endl;
-
-    std::cout << Flag(Zend::AccMemb::ABSTRACT) << " * " << 
-                Flag(Zend::AccMemb::FINAL) << " * " << 
-                ( Flag(Zend::AccMemb::ABSTRACT) | Flag(Zend::AccMemb::FINAL) ) << " =?= " << 
-                ( Flag(Zend::AccMemb::FINAL) |= Flag(Zend::AccMemb::ABSTRACT) ) << std::endl;
-
-
-
-
+        std::cout << "declare(" << _name.c_str() << "):" << _accflag << std::endl;
 
     // let the info object handle stuff
     if(_constant)
