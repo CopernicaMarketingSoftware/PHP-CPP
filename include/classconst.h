@@ -42,9 +42,9 @@ public:
      *  Destructor
      */
     virtual ~ClassConst() {}
- 
-    
+   
 };
+
 
 /**
  *  End of namespace

@@ -40,8 +40,12 @@
 #include <phpcpp/base.h>
 #include <phpcpp/method.h>
 #include <phpcpp/member.h>
+/*
 #include <phpcpp/public.h>
 #include <phpcpp/protected.h>
+#include <phpcpp/private.h>
+*/
+#include <phpcpp/membervisibility.h>
 #include <phpcpp/classconst.h>
 #include <phpcpp/members.h>
 #include <phpcpp/class.h>
