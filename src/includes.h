@@ -53,11 +53,6 @@
 #include "../include/base.h"
 #include "../include/method.h"
 #include "../include/member.h"
-/*
-#include "../include/public.h"
-#include "../include/protected.h"
-#include "../include/private.h"
-*/
 #include "../include/membervisibility.h"
 #include "../include/classconst.h"
 #include "../include/members.h"
