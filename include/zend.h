@@ -28,7 +28,7 @@ namespace Php {
          *  access types for methods and properties
          *  (method flags)
          */
-        enum class AccProp {
+        enum class AccMemb {
             //  method flags (types):
             STATIC                  ,//= ZEND_ACC_STATIC,                    //0x01
             ABSTRACT                ,//= ZEND_ACC_ABSTRACT,                  //0x02

@@ -35,7 +35,7 @@
 #include <phpcpp/parameters.h>
 #include <phpcpp/function.h>
 #include <phpcpp/properties.h>
-//#include <phpcpp/zend.h>
+#include <phpcpp/zend.h>
 #include <phpcpp/flag.h>
 #include <phpcpp/base.h>
 #include <phpcpp/method.h>

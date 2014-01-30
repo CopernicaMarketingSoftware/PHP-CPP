@@ -233,10 +233,10 @@ void Member::declare(struct _zend_class_entry *entry)
     //std::cout << Php::Zend::FlagToint(Php::Zend::FlagClass::ABSTRACT) << std::endl;
     //std::cout << Flag(AccClass::ABSTRACT) << std::endl;
 
-    std::cout << Flag(Zend::AccProp::ABSTRACT) << " * " << 
-                Flag(Zend::AccProp::FINAL) << " * " << 
-                ( Flag(Zend::AccProp::ABSTRACT) | Flag(Zend::AccProp::FINAL) ) << " =?= " << 
-                ( Flag(Zend::AccProp::FINAL) |= Flag(Zend::AccProp::ABSTRACT) ) << std::endl;
+    std::cout << Flag(Zend::AccMemb::ABSTRACT) << " * " << 
+                Flag(Zend::AccMemb::FINAL) << " * " << 
+                ( Flag(Zend::AccMemb::ABSTRACT) | Flag(Zend::AccMemb::FINAL) ) << " =?= " << 
+                ( Flag(Zend::AccMemb::FINAL) |= Flag(Zend::AccMemb::ABSTRACT) ) << std::endl;
 
 
     //std::cout << Zend::Flag() << std::endl;

@@ -111,23 +111,23 @@ namespace Php {
     };
     
     /**
-     *  class FlagProp
+     *  class FlagMemb
      *  Designed for the safe transfer of a Zend flag to a Zend functions
      */
-    class FlagProp: public BaseFlag
+    class FlagMemb: public BaseFlag
     {
     public:
         /**
          *  Constructors
          */
-        FlagProp(const Zend::AccProp &zflag);
-        FlagProp(const FlagProp &flags) : BaseFlag(flags) {}
-        FlagProp(FlagProp &&flags) : BaseFlag(flags) {}
+        FlagMemb(const Zend::AccMemb &zflag);
+        FlagMemb(const FlagMemb &flags) : BaseFlag(flags) {}
+        FlagMemb(FlagMemb &&flags) : BaseFlag(flags) {}
 
         /**
          *  Bitwise OR assignment operator
          */
-        FlagProp &operator|=(const FlagProp &flags) {
+        FlagMemb &operator|=(const FlagMemb &flags) {
             _val |= flags._val;
             return *this;
         }
@@ -135,26 +135,26 @@ namespace Php {
         /**
          *  Bitwise OR operator
          */
-        FlagProp operator|(const FlagProp &flags) {
-            return FlagProp (_val | flags._val);
+        FlagMemb operator|(const FlagMemb &flags) {
+            return FlagMemb (_val | flags._val);
         }
 
         /**
          *  Destructor
          */
-        virtual ~FlagProp() {}
+        virtual ~FlagMemb() {}
 
     private:
         /**
          *  Constructor
          *  @param  int val
          */
-        FlagProp(const int &val) : BaseFlag(val) {}
+        FlagMemb(const int &val) : BaseFlag(val) {}
     };
 
 
     FlagClass Flag(const Zend::AccClass &zflag);
-    FlagProp Flag(const Zend::AccProp &zflag);
+    FlagMemb Flag(const Zend::AccMemb &zflag);
 
 
 /**

@@ -50,48 +50,44 @@ namespace Php {
 
     /**
      *  Constructor
-     *  @param  flags        instance of Zend::AccProp
+     *  @param  flags        instance of Zend::AccMemb
      */
-    FlagProp::FlagProp(const Zend::AccProp &zflag){
+    FlagMemb::FlagMemb(const Zend::AccMemb &zflag){
         /**
          *  access types for classes
          *  (class flags)
          */
         switch(zflag){
-                case Zend::AccProp::STATIC:
+                case Zend::AccMemb::STATIC:
                     _val = ZEND_ACC_STATIC;                    //0x01
                 break;
-                case Zend::AccProp::ABSTRACT:
+                case Zend::AccMemb::ABSTRACT:
                     _val = ZEND_ACC_ABSTRACT;                  //0x02
                 break;
-                case Zend::AccProp::FINAL:
+                case Zend::AccMemb::FINAL:
                     _val = ZEND_ACC_FINAL;                     //0x04
                 break;
-                case Zend::AccProp::IMPLEMENTED_ABSTRACT:
+                case Zend::AccMemb::IMPLEMENTED_ABSTRACT:
                     _val = ZEND_ACC_IMPLEMENTED_ABSTRACT;      //0x08
                 break;
-                //method flag (bc only), any method that has this flag can be used statically and non statically.
-                //case Zend::AccProp::ALLOW_STATIC:
-                //    _val = ZEND_ACC_ALLOW_STATIC;              //0x10000                
-                //break;
 
                 // method flags (visibility)
                 // The order of those must be kept - public < protected < private
-                case Zend::AccProp::PUBLIC:
+                case Zend::AccMemb::PUBLIC:
                     _val = ZEND_ACC_PUBLIC;             //0x100
                 break;
-                case Zend::AccProp::PROTECTED:
+                case Zend::AccMemb::PROTECTED:
                     _val = ZEND_ACC_PROTECTED;                 //0x200
                 break;
-                case Zend::AccProp::PRIVATE:
+                case Zend::AccMemb::PRIVATE:
                     _val = ZEND_ACC_PRIVATE;                   //0x400
                 break;
-                case Zend::AccProp::PPP_MASK:
+                case Zend::AccMemb::PPP_MASK:
                     _val = ZEND_ACC_PPP_MASK;                  //(ZEND_ACC_PUBLIC | ZEND_ACC_PROTECTED | ZEND_ACC_PRIVATE)                
                 break;
 
                //shadow of parent's private method/property
-                case Zend::AccProp::SHADOW:
+                case Zend::AccMemb::SHADOW:
                     _val = ZEND_ACC_SHADOW;                       //0x20000
                 break;
                 default:
@@ -107,8 +103,8 @@ namespace Php {
         return FlagClass(zflag);
     }
 
-    FlagProp Flag(const Zend::AccProp &zflag) {
-        return FlagProp(zflag);
+    FlagMemb Flag(const Zend::AccMemb &zflag) {
+        return FlagMemb(zflag);
     }
 
 /**
