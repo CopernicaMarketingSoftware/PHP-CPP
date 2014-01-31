@@ -68,23 +68,24 @@ namespace Php {
     };
     
     /**
-     *  class FlagClass
+     *  class FlagConcrete
      *  Designed for the safe transfer of a Zend flag to a Zend functions
      */
-    class FlagClass: public BaseFlag
+    template <class AccT>
+    class FlagConcrete: public BaseFlag
     {
     public:
         /**
          *  Constructors
          */
-        FlagClass(const Zend::AccClass &zflag);
-        FlagClass(const FlagClass &flags) : BaseFlag(flags) {}
-        FlagClass(FlagClass &&flags) : BaseFlag(flags) {}
+        FlagConcrete(const AccT &zflag);
+        FlagConcrete(const FlagConcrete &flags) : BaseFlag(flags) {}
+        FlagConcrete(FlagConcrete &&flags) : BaseFlag(flags) {}
 
         /**
          *  Bitwise OR assignment operator
          */
-        FlagClass &operator|=(const FlagClass &flags) {
+        FlagConcrete &operator|=(const FlagConcrete &flags) {
             _val |= flags._val;
             return *this;
         }
@@ -92,66 +93,27 @@ namespace Php {
         /**
          *  Bitwise OR operator
          */
-        FlagClass operator|(const FlagClass &flags) {
-            return FlagClass (_val | flags._val);
+        FlagConcrete operator|(const FlagConcrete &flags) {
+            return FlagConcrete (_val | flags._val);
         }
 
         /**
          *  Destructor
          */
-        virtual ~FlagClass() {}
+        virtual ~FlagConcrete() {}
 
     private:
         /**
          *  Constructor
          *  @param  int val
          */
-        FlagClass(const int &val) : BaseFlag(val) {}
+        FlagConcrete(const int &val) : BaseFlag(val) {}
     };
     
-    /**
-     *  class FlagMemb
-     *  Flag access to a class member
-     *  Designed for the safe transfer of a Zend flag to a Zend functions
-     */
-    class FlagMemb: public BaseFlag
-    {
-    public:
-        /**
-         *  Constructors
-         */
-        FlagMemb(const Zend::AccMemb &zflag);
-        FlagMemb(const FlagMemb &flags) : BaseFlag(flags) {}
-        FlagMemb(FlagMemb &&flags) : BaseFlag(flags) {}
 
-        /**
-         *  Bitwise OR assignment operator
-         */
-        FlagMemb &operator|=(const FlagMemb &flags) {
-            _val |= flags._val;
-            return *this;
-        }
-
-        /**
-         *  Bitwise OR operator
-         */
-        FlagMemb operator|(const FlagMemb &flags) {
-            return FlagMemb (_val | flags._val);
-        }
-
-        /**
-         *  Destructor
-         */
-        virtual ~FlagMemb() {}
-
-    private:
-        /**
-         *  Constructor
-         *  @param  int val
-         */
-        FlagMemb(const int &val) : BaseFlag(val) {}
-    };
-
+    typedef FlagConcrete<Zend::AccClass> FlagClass;
+    typedef FlagConcrete<Zend::AccMemb> FlagMemb;
+    
 
     FlagClass Flag(const Zend::AccClass &zflag);
     FlagMemb Flag(const Zend::AccMemb &zflag);

@@ -6,7 +6,7 @@
  *  @author Valeriy_Dmitriev <ufabiz@gmail.com>
  */
 
-#include <typeinfo>
+//#include <typeinfo>
 #include "includes.h"
 
 
@@ -20,7 +20,9 @@ namespace Php {
      *  Constructor
      *  @param  flags        instance of Zend::AccClass
      */
-    FlagClass::FlagClass(const Zend::AccClass &zflag) {
+    template <>
+    //FlagClass::FlagClass(const Zend::AccClass &zflag) {
+    FlagConcrete<Zend::AccClass>::FlagConcrete(const Zend::AccClass &zflag) {
         /**
          *  access types for methods
          *  (method flags)
@@ -52,7 +54,9 @@ namespace Php {
      *  Constructor
      *  @param  flags        instance of Zend::AccMemb
      */
-    FlagMemb::FlagMemb(const Zend::AccMemb &zflag){
+    template <>
+    //FlagMemb::FlagMemb(const Zend::AccMemb &zflag){
+    FlagConcrete<Zend::AccMemb>::FlagConcrete(const Zend::AccMemb &zflag){
         /**
          *  access types for classes
          *  (class flags)
@@ -104,7 +108,6 @@ namespace Php {
     FlagClass Flag(const Zend::AccClass &zflag) {
         return FlagClass(zflag);
     }
-
     FlagMemb Flag(const Zend::AccMemb &zflag) {
         return FlagMemb(zflag);
     }
