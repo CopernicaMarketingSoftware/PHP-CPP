@@ -1,7 +1,7 @@
 /**
  *  flag.h
  *
- *  flag namespace
+ *  flag clases for the safe transfer of a Zend flag to a Zend functions
  *
  *  @author Valeriy_Dmitriev <ufabiz@gmail.com>
  */
@@ -16,23 +16,44 @@ namespace Php {
 
 
     /**
-     *  abstract class BaseFlag 
+     *  class FlagTemplate 
      *  Designed for the safe transfer of a Zend flag to a Zend functions
      */
-    class BaseFlag
+    template <class AccT>
+    class FlagTemplate
     {
     public:
         /**
-         *  Copy constructor
-         *  @param  BaseFlag      The BaseFlag to copy
+         *  Constructor
          */
-        BaseFlag(const BaseFlag &flags) : _val(flags._val) {}
+        FlagTemplate(const AccT &zflag);
+
+        /**
+         *  Copy constructor
+         *  @param  FlagTemplate      The FlagTemplate to copy
+         */
+        FlagTemplate(const FlagTemplate &flags) : _val(flags._val) {}
         
         /**
          *  Move constructor
-         *  @param  BaseFlag      The BaseFlag to move
+         *  @param  FlagTemplate      The FlagTemplate to move
          */
-        BaseFlag(BaseFlag &&flags) : _val(std::move(flags._val)){}
+        FlagTemplate(FlagTemplate &&flags) : _val(std::move(flags._val)){}
+
+        /**
+         *  Bitwise OR assignment operator
+         */
+        FlagTemplate &operator|=(const FlagTemplate &flags) {
+            _val |= flags._val;
+            return *this;
+        }
+
+        /**
+         *  Bitwise OR operator
+         */
+        FlagTemplate operator|(const FlagTemplate &flags) {
+            return FlagTemplate (_val | flags._val);
+        }
 
         /**
          *  Cast to a int
@@ -45,21 +66,21 @@ namespace Php {
         /**
          *  Destructor
          */
-        virtual ~BaseFlag () {}
+        ~FlagTemplate () {}
 
-    protected:
+    private:
 
         /**
-         *  Constructor
+         *  Private constructor
          *  @param  int val
          */
-        BaseFlag(const int &val) :_val(val) {}
+        FlagTemplate(const int &val) :_val(val) {}
 
         /**
-         *  Constructor
+         *  Private constructor
          *  @param  void
          */
-        BaseFlag() {}
+        FlagTemplate() {}
 
         /**
          *  value of flag
@@ -68,55 +89,22 @@ namespace Php {
     };
     
     /**
-     *  class FlagConcrete
-     *  Designed for the safe transfer of a Zend flag to a Zend functions
+     *  class FlagClass 
+     *  For the safe transfer of a Zend Class flags to a Zend functions
      */
-    template <class AccT>
-    class FlagConcrete: public BaseFlag
-    {
-    public:
-        /**
-         *  Constructors
-         */
-        FlagConcrete(const AccT &zflag);
-        FlagConcrete(const FlagConcrete &flags) : BaseFlag(flags) {}
-        FlagConcrete(FlagConcrete &&flags) : BaseFlag(flags) {}
-
-        /**
-         *  Bitwise OR assignment operator
-         */
-        FlagConcrete &operator|=(const FlagConcrete &flags) {
-            _val |= flags._val;
-            return *this;
-        }
-
-        /**
-         *  Bitwise OR operator
-         */
-        FlagConcrete operator|(const FlagConcrete &flags) {
-            return FlagConcrete (_val | flags._val);
-        }
-
-        /**
-         *  Destructor
-         */
-        virtual ~FlagConcrete() {}
-
-    private:
-        /**
-         *  Constructor
-         *  @param  int val
-         */
-        FlagConcrete(const int &val) : BaseFlag(val) {}
-    };
+    typedef FlagTemplate<Zend::AccClass> FlagClass;
+    /**
+     *  class FlagClass 
+     *  For the safe transfer of a Zend access types for methods and propertyes
+     */
+    typedef FlagTemplate<Zend::AccMemb> FlagMemb;
     
 
-    typedef FlagConcrete<Zend::AccClass> FlagClass;
-    typedef FlagConcrete<Zend::AccMemb> FlagMemb;
-    
-
+    /**
+     *  factory function
+     */
     FlagClass Flag(const Zend::AccClass &zflag);
-    FlagMemb Flag(const Zend::AccMemb &zflag);
+    FlagMemb  Flag(const Zend::AccMemb &zflag);
 
 
 /**

@@ -6,9 +6,7 @@
  *  @author Valeriy_Dmitriev <ufabiz@gmail.com>
  */
 
-//#include <typeinfo>
 #include "includes.h"
-
 
 /**
  *  Namespace Php
@@ -21,10 +19,9 @@ namespace Php {
      *  @param  flags        instance of Zend::AccClass
      */
     template <>
-    //FlagClass::FlagClass(const Zend::AccClass &zflag) {
-    FlagConcrete<Zend::AccClass>::FlagConcrete(const Zend::AccClass &zflag) {
+    FlagClass::FlagTemplate(const Zend::AccClass &zflag) {
         /**
-         *  access types for methods
+         *  access types for classes
          *  (method flags)
          */
         switch(zflag){
@@ -55,10 +52,9 @@ namespace Php {
      *  @param  flags        instance of Zend::AccMemb
      */
     template <>
-    //FlagMemb::FlagMemb(const Zend::AccMemb &zflag){
-    FlagConcrete<Zend::AccMemb>::FlagConcrete(const Zend::AccMemb &zflag){
+    FlagMemb::FlagTemplate(const Zend::AccMemb &zflag){
         /**
-         *  access types for classes
+         *  access types for methods and propertyes (members)
          *  (class flags)
          */
         switch(zflag){
