@@ -58,7 +58,6 @@ public:
 #endif
     }
 
-
     /**
      *  Virtual method to declare the class constant
      *  @param  entry       Class entry

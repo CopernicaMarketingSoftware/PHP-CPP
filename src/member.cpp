@@ -16,9 +16,9 @@ namespace Php {
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  */
-Member::Member(const char *name, const FlagMemb &flags) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags) : _name(name), _accflag(flags), _constant(false)
 {
     // create a null member
     _info = new NullMember();
@@ -27,10 +27,10 @@ Member::Member(const char *name, const FlagMemb &flags) : _name(name), _accflag(
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, std::nullptr_t value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, std::nullptr_t value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a null member
     _info = new NullMember();
@@ -39,10 +39,10 @@ Member::Member(const char *name, const FlagMemb &flags, std::nullptr_t value) : 
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, int value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, int value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a long member
     _info = new LongMember(value);
@@ -51,10 +51,10 @@ Member::Member(const char *name, const FlagMemb &flags, int value) : _name(name)
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, long value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, long value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a long member
     _info = new LongMember(value);
@@ -63,10 +63,10 @@ Member::Member(const char *name, const FlagMemb &flags, long value) : _name(name
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, bool value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, bool value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a bool member
     _info = new BoolMember(value);
@@ -75,10 +75,10 @@ Member::Member(const char *name, const FlagMemb &flags, bool value) : _name(name
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, char value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, char value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new string member
     _info = new StringMember(&value, 1);
@@ -87,10 +87,10 @@ Member::Member(const char *name, const FlagMemb &flags, char value) : _name(name
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, const std::string &value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, const std::string &value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new string member
     _info = new StringMember(value);
@@ -99,11 +99,11 @@ Member::Member(const char *name, const FlagMemb &flags, const std::string &value
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  *  @param  size        String length
  */
-Member::Member(const char *name, const FlagMemb &flags, const char *value, int size) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, const char *value, int size) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new string member
     if (size < 0) size = strlen(value);
@@ -113,10 +113,10 @@ Member::Member(const char *name, const FlagMemb &flags, const char *value, int s
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &flags, double value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, double value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new double member
     _info = new DoubleMember(value);
@@ -128,8 +128,12 @@ Member::Member(const char *name, const FlagMemb &flags, double value) : _name(na
  *  @param  pub         Is this a public method (otherwise it is protected)
  *  @param  method      The method to add
  */
-Member::Member(const char *name, const FlagMemb &flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags), _constant(false)
 {
+    // If the flags specifies as Zend::AccMemb::CONSTANT.
+    // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) ) ...
+    //XXX Flag(Zend::AccMemb::PUBLIC) -> Flag(Zend::AccMemb::STATIC)
+    if(!flags) _accflag = Flag(Zend::AccMemb::PUBLIC);
     // create method member
     _info = new MethodMember(name, method, arguments);
 }
@@ -223,13 +227,15 @@ bool Member::isClassConst(bool _const)
  */
 void Member::declare(struct _zend_class_entry *entry)
 {
-    if(_constant)
+    if(!_accflag)
+    //if(_constant)
         std::cout << "declareConst(" << _name.c_str() << "):" << _accflag << std::endl;
     else
         std::cout << "declare(" << _name.c_str() << "):" << _accflag << std::endl;
 
     // let the info object handle stuff
-    if(_constant)
+    if(!_accflag)
+    //if(_constant)
         _info->declareConst(entry, _name.c_str(), _name.size() TSRMLS_CC);
     else
         _info->declare(entry, _name.c_str(), _name.size(), _accflag TSRMLS_CC);

@@ -41,6 +41,26 @@ namespace Php {
         FlagTemplate(FlagTemplate &&flags) : _val(std::move(flags._val)){}
 
         /**
+         *  Assignment operator
+         */
+        FlagTemplate &operator=(const FlagTemplate &flags) {
+            if (this != &flags) {
+                _val = flags._val;
+            }
+            return *this;
+        }
+
+        /**
+         *  Move operator
+         */
+        FlagTemplate &operator=(FlagTemplate &&flags) {
+            if (this != &flags) {
+                _val = std::move(flags._val);
+            }
+            return *this;
+        }
+
+        /**
          *  Bitwise OR assignment operator
          */
         FlagTemplate &operator|=(const FlagTemplate &flags) {

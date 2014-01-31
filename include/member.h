@@ -31,82 +31,82 @@ public:
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      */
-    Member(const char *name, const FlagMemb &flags);
+    Member(const char *name, const FlagMemb &&flags);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, std::nullptr_t value);
+    Member(const char *name, const FlagMemb &&flags, std::nullptr_t value);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, int value);
+    Member(const char *name, const FlagMemb &&flags, int value);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, long value);
+    Member(const char *name, const FlagMemb &&flags, long value);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, bool value);
+    Member(const char *name, const FlagMemb &&flags, bool value);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, char value);
+    Member(const char *name, const FlagMemb &&flags, char value);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, const std::string &value);
+    Member(const char *name, const FlagMemb &&flags, const std::string &value);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      *  @param  size        String length
      */
-    Member(const char *name, const FlagMemb &flags, const char *value, int size = -1);
+    Member(const char *name, const FlagMemb &&flags, const char *value, int size = -1);
 
     /**
      *  Constructor
      *  @param  name        Name of the member
-     *  @param  pub         Is this a public property (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  value       The value to add
      */
-    Member(const char *name, const FlagMemb &flags, double value);
+    Member(const char *name, const FlagMemb &&flags, double value);
     
     /**
      *  Constructor
      *  @param  name        Name of the method
-     *  @param  pub         Is this a public method (otherwise it is protected)
+     *  @param  flags       Flag access to a class member (bublic, protected etc)
      *  @param  method      The method to add
      */
-    Member(const char *name, const FlagMemb &flags, const _Method &method, const std::initializer_list<Argument> &arguments = {});
+    Member(const char *name, const FlagMemb &&flags, const _Method &method, const std::initializer_list<Argument> &arguments = {});
 
     /**
      *  Copy constructor
