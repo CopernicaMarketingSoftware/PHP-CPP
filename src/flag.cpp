@@ -58,21 +58,6 @@ namespace Php {
          *  (class flags)
          */
         switch(zflag){
-                case Zend::AccMemb::STATIC:
-                    _val = ZEND_ACC_STATIC;                    //0x01
-                    //_val = ZEND_ACC_ALLOW_STATIC | ZEND_ACC_PUBLIC;
-                    //_val = ZEND_ACC_STATIC | ZEND_ACC_PUBLIC;
-                break;
-                case Zend::AccMemb::ABSTRACT:
-                    _val = ZEND_ACC_ABSTRACT;                  //0x02
-                break;
-                case Zend::AccMemb::FINAL:
-                    _val = ZEND_ACC_FINAL;                     //0x04
-                break;
-                case Zend::AccMemb::IMPLEMENTED_ABSTRACT:
-                    _val = ZEND_ACC_IMPLEMENTED_ABSTRACT;      //0x08
-                break;
-
                 // method flags (visibility)
                 // The order of those must be kept - public < protected < private
                 case Zend::AccMemb::PUBLIC:
@@ -85,15 +70,37 @@ namespace Php {
                     _val = ZEND_ACC_PRIVATE;                   //0x400
                 break;
                 case Zend::AccMemb::PPP_MASK:
-                    _val = ZEND_ACC_PPP_MASK;                  //(ZEND_ACC_PUBLIC | ZEND_ACC_PROTECTED | ZEND_ACC_PRIVATE)                
+                    _val = ZEND_ACC_PPP_MASK;                  //(ZEND_ACC_PUBLIC | ZEND_ACC_PROTECTED | ZEND_ACC_PRIVATE)
                 break;
+
+                case Zend::AccMemb::STATIC:
+                    _val = ZEND_ACC_STATIC;                    //0x01
+                    //_val = ZEND_ACC_ALLOW_STATIC | ZEND_ACC_PUBLIC;
+                    //_val = ZEND_ACC_STATIC | ZEND_ACC_PUBLIC;
+                break;
+
+                // Artificially entered field
+                case Zend::AccMemb::CONSTANT:
+                    _val = 0;                                  //0
+                break;
+
+                case Zend::AccMemb::ABSTRACT:
+                    _val = ZEND_ACC_ABSTRACT;                  //0x02
+                break;
+                case Zend::AccMemb::FINAL:
+                    _val = ZEND_ACC_FINAL;                     //0x04
+                break;
+                case Zend::AccMemb::IMPLEMENTED_ABSTRACT:
+                    _val = ZEND_ACC_IMPLEMENTED_ABSTRACT;      //0x08
+                break;
+
 
                //shadow of parent's private method/property
                 case Zend::AccMemb::SHADOW:
-                    _val = ZEND_ACC_SHADOW;                       //0x20000
+                    _val = ZEND_ACC_SHADOW;                    //0x20000
                 break;
                 default:
-                    _val = 0;
+                    _val = ZEND_ACC_PUBLIC;
         }
     }
 

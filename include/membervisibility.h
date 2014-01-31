@@ -55,6 +55,7 @@ typedef MemberVisibility<Zend::AccMemb::PUBLIC> Public;
 typedef MemberVisibility<Zend::AccMemb::PROTECTED> Protected;
 typedef MemberVisibility<Zend::AccMemb::PRIVATE> Private;
 typedef MemberVisibility<Zend::AccMemb::STATIC> Static;
+typedef MemberVisibility<Zend::AccMemb::CONSTANT> Const;
 
 
 /**

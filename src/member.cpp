@@ -16,9 +16,9 @@ namespace Php {
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  */
-Member::Member(const char *name, FlagMemb flags) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags) : _name(name), _accflag(flags)
 {
     // create a null member
     _info = new NullMember();
@@ -27,10 +27,10 @@ Member::Member(const char *name, FlagMemb flags) : _name(name), _accflag(flags),
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, std::nullptr_t value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, std::nullptr_t value) : _name(name), _accflag(flags)
 {
     // create a null member
     _info = new NullMember();
@@ -39,10 +39,10 @@ Member::Member(const char *name, FlagMemb flags, std::nullptr_t value) : _name(n
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, int value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, int value) : _name(name), _accflag(flags)
 {
     // create a long member
     _info = new LongMember(value);
@@ -51,10 +51,10 @@ Member::Member(const char *name, FlagMemb flags, int value) : _name(name), _accf
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, long value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, long value) : _name(name), _accflag(flags)
 {
     // create a long member
     _info = new LongMember(value);
@@ -63,10 +63,10 @@ Member::Member(const char *name, FlagMemb flags, long value) : _name(name), _acc
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, bool value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, bool value) : _name(name), _accflag(flags)
 {
     // create a bool member
     _info = new BoolMember(value);
@@ -75,10 +75,10 @@ Member::Member(const char *name, FlagMemb flags, bool value) : _name(name), _acc
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, char value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, char value) : _name(name), _accflag(flags)
 {
     // create a new string member
     _info = new StringMember(&value, 1);
@@ -87,10 +87,10 @@ Member::Member(const char *name, FlagMemb flags, char value) : _name(name), _acc
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, const std::string &value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, const std::string &value) : _name(name), _accflag(flags)
 {
     // create a new string member
     _info = new StringMember(value);
@@ -99,11 +99,11 @@ Member::Member(const char *name, FlagMemb flags, const std::string &value) : _na
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  *  @param  size        String length
  */
-Member::Member(const char *name, FlagMemb flags, const char *value, int size) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, const char *value, int size) : _name(name), _accflag(flags)
 {
     // create a new string member
     if (size < 0) size = strlen(value);
@@ -113,10 +113,10 @@ Member::Member(const char *name, FlagMemb flags, const char *value, int size) : 
 /**
  *  Constructor
  *  @param  name        Name of the member
- *  @param  pub         Is this a public property (otherwise it is protected)
+ *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, double value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, double value) : _name(name), _accflag(flags)
 {
     // create a new double member
     _info = new DoubleMember(value);
@@ -128,8 +128,12 @@ Member::Member(const char *name, FlagMemb flags, double value) : _name(name), _a
  *  @param  pub         Is this a public method (otherwise it is protected)
  *  @param  method      The method to add
  */
-Member::Member(const char *name, FlagMemb flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &&flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags)
 {
+    // If the flags specifies as Zend::AccMemb::CONSTANT.
+    // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) ) ...
+    //XXX Flag(Zend::AccMemb::PUBLIC) -> Flag(Zend::AccMemb::STATIC)
+    if(!flags) _accflag = Flag(Zend::AccMemb::PUBLIC);
     // create method member
     _info = new MethodMember(name, method, arguments);
 }
@@ -144,7 +148,6 @@ Member::Member(const Member &member) : _accflag(member._accflag)
     _info = member._info;
     _name = member._name;
     //_accflag = member._accflag;
-    _constant = member._constant;
     
     // update refcount in info object
     _info->refcount(+1);
@@ -160,7 +163,6 @@ Member::Member(Member &&member) : _accflag (std::move(member._accflag))
     _info = member._info;
     _name = std::move(member._name);
     //_accflag = std::move(member._accflag);
-    _constant = member._constant;
     
     // reset info in other object
     member._info = NULL;
@@ -195,27 +197,6 @@ bool Member::isMethod()
 {
     return _info && _info->isMethod();
 }
-    
-/**
- *  Is this a class constant
- *  @return bool
- */
-bool Member::isClassConst()
-{
-    return _constant;
-}
-
-/**
- *  Is this a class constant
- *  @param  bool _constant
- *  @return bool
- */
-bool Member::isClassConst(bool _const)
-{
-    bool oldval = _constant;
-    _constant = _const;
-    return oldval;
-}
 
 /**
  *  Internal method to declare the property
@@ -223,13 +204,13 @@ bool Member::isClassConst(bool _const)
  */
 void Member::declare(struct _zend_class_entry *entry)
 {
-    if(_constant)
+    if(!_accflag)
         std::cout << "declareConst(" << _name.c_str() << "):" << _accflag << std::endl;
     else
         std::cout << "declare(" << _name.c_str() << "):" << _accflag << std::endl;
 
     // let the info object handle stuff
-    if(_constant)
+    if(!_accflag) // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) )
         _info->declareConst(entry, _name.c_str(), _name.size() TSRMLS_CC);
     else
         _info->declare(entry, _name.c_str(), _name.size(), _accflag TSRMLS_CC);

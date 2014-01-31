@@ -51,6 +51,9 @@ namespace Php {
 
             //shadow of parent's private method/property
             SHADOW                  ,//= ZEND_ACC_SHADOW                       //0x20000
+
+            // additional field for designation flag CONSTANT. Not in the Zend engine
+            CONSTANT                ,//= 0                                     //0
         };
 
         /**
