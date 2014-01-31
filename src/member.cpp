@@ -18,7 +18,7 @@ namespace Php {
  *  @param  name        Name of the member
  *  @param  pub         Is this a public property (otherwise it is protected)
  */
-Member::Member(const char *name, FlagMemb flags) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags) : _name(name), _accflag(flags), _constant(false)
 {
     // create a null member
     _info = new NullMember();
@@ -30,7 +30,7 @@ Member::Member(const char *name, FlagMemb flags) : _name(name), _accflag(flags),
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, std::nullptr_t value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, std::nullptr_t value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a null member
     _info = new NullMember();
@@ -42,7 +42,7 @@ Member::Member(const char *name, FlagMemb flags, std::nullptr_t value) : _name(n
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, int value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, int value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a long member
     _info = new LongMember(value);
@@ -54,7 +54,7 @@ Member::Member(const char *name, FlagMemb flags, int value) : _name(name), _accf
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, long value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, long value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a long member
     _info = new LongMember(value);
@@ -66,7 +66,7 @@ Member::Member(const char *name, FlagMemb flags, long value) : _name(name), _acc
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, bool value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, bool value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a bool member
     _info = new BoolMember(value);
@@ -78,7 +78,7 @@ Member::Member(const char *name, FlagMemb flags, bool value) : _name(name), _acc
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, char value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, char value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new string member
     _info = new StringMember(&value, 1);
@@ -90,7 +90,7 @@ Member::Member(const char *name, FlagMemb flags, char value) : _name(name), _acc
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, const std::string &value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, const std::string &value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new string member
     _info = new StringMember(value);
@@ -103,7 +103,7 @@ Member::Member(const char *name, FlagMemb flags, const std::string &value) : _na
  *  @param  value       The value to add
  *  @param  size        String length
  */
-Member::Member(const char *name, FlagMemb flags, const char *value, int size) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, const char *value, int size) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new string member
     if (size < 0) size = strlen(value);
@@ -116,7 +116,7 @@ Member::Member(const char *name, FlagMemb flags, const char *value, int size) : 
  *  @param  pub         Is this a public property (otherwise it is protected)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, FlagMemb flags, double value) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, double value) : _name(name), _accflag(flags), _constant(false)
 {
     // create a new double member
     _info = new DoubleMember(value);
@@ -128,7 +128,7 @@ Member::Member(const char *name, FlagMemb flags, double value) : _name(name), _a
  *  @param  pub         Is this a public method (otherwise it is protected)
  *  @param  method      The method to add
  */
-Member::Member(const char *name, FlagMemb flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags), _constant(false)
+Member::Member(const char *name, const FlagMemb &flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags), _constant(false)
 {
     // create method member
     _info = new MethodMember(name, method, arguments);
