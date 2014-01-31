@@ -41,7 +41,6 @@
 #include <phpcpp/method.h>
 #include <phpcpp/member.h>
 #include <phpcpp/membervisibility.h>
-#include <phpcpp/classconst.h>
 #include <phpcpp/members.h>
 #include <phpcpp/class.h>
 #include <phpcpp/classinfo.h>

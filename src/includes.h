@@ -54,7 +54,6 @@
 #include "../include/method.h"
 #include "../include/member.h"
 #include "../include/membervisibility.h"
-#include "../include/classconst.h"
 #include "../include/members.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"
