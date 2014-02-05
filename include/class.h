@@ -76,8 +76,6 @@ public:
      */
     void initialize(struct _zend_class_entry *entry)
     {
-
-        std::cerr << "\x1b[31;47m Class<T>::initialize  \x1b[0m" << std::endl;
         // loop through the members
         for (auto iter = _members.begin(); iter != _members.end(); iter++)
         {

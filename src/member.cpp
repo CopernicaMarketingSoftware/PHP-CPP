@@ -204,11 +204,6 @@ bool Member::isMethod()
  */
 void Member::declare(struct _zend_class_entry *entry)
 {
-    if(!_accflag)
-        std::cerr << "declareConst(\x1b[4;35m" << _name.c_str() << "):\x1b[0m" << _accflag << std::endl;
-    else
-        std::cerr << "declare(\x1b[4;35m" << _name.c_str() << "):\x1b[0m" << _accflag << std::endl;
-
     // let the info object handle stuff
     if(!_accflag) // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) )
         _info->declareConst(entry, _name.c_str(), _name.size() TSRMLS_CC);

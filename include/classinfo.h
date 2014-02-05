@@ -137,8 +137,6 @@ public:
      */
     virtual void initialize(struct _zend_class_entry *entry) override
     {
-        std::cerr << "\x1b[31;47m ClassInfo::initialize  \x1b[0m" << std::endl;
-
         // set access types flags for class
         seFlags(entry, _type.getFlags());
         // pass to the entry

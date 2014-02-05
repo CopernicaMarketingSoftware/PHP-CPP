@@ -141,14 +141,6 @@ void _ClassInfo::initialize(TSRMLS_DC)
     _entry->doc_comment = (char *)this;    
 #endif
 
-    std::cerr << "\x1b[31;47m _ClassInfo::initialize  \x1b[0m" << std::endl;
-
-#ifdef ZTS
-    std::cerr << "\x1b[34;47m ZTS defined  \x1b[0m" << std::endl;
-#else /* non ZTS */
-    std::cerr << "\x1b[34;47m ZTS NOT defined  \x1b[0m" << std::endl;
-#endif /* ZTS */
-
     // initialize the entry
     initialize(_entry);
 }
@@ -159,29 +151,6 @@ void _ClassInfo::initialize(TSRMLS_DC)
 void _ClassInfo::seFlags(struct _zend_class_entry *entry, int flags) {
     entry->ce_flags |= flags;
 }
-
-
-/*
-template <typename T>
-void ClassInfo<T>::initialize(struct _zend_class_entry *entry) {
-        
-
-    //_entry->ce_flags |= ZEND_ACC_INTERFACE;
-    entry->ce_flags |= getFlags();
-    
-            //= ZEND_ACC_EXPLICIT_ABSTRACT_CLASS,     //0x20
-            //= ZEND_ACC_FINAL_CLASS,                 //0x40
-            //= ZEND_ACC_INTERFACE,                   //0x80
-            //= ZEND_ACC_TRAIT,                       //0x120
-
-    std::cerr << "\x1b[37;43m _entry->ce_flags =  \x1b[0m" << entry->ce_flags << std::endl;
-
-
-    
-    // pass to the entry
-    _type.initialize(entry);
-}
-*/
 
 /**
  *  End of namespace
