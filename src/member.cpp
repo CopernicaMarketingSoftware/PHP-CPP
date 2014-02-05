@@ -205,9 +205,9 @@ bool Member::isMethod()
 void Member::declare(struct _zend_class_entry *entry)
 {
     if(!_accflag)
-        std::cout << "declareConst(" << _name.c_str() << "):" << _accflag << std::endl;
+        std::cerr << "declareConst(\x1b[4;35m" << _name.c_str() << "):\x1b[0m" << _accflag << std::endl;
     else
-        std::cout << "declare(" << _name.c_str() << "):" << _accflag << std::endl;
+        std::cerr << "declare(\x1b[4;35m" << _name.c_str() << "):\x1b[0m" << _accflag << std::endl;
 
     // let the info object handle stuff
     if(!_accflag) // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) )

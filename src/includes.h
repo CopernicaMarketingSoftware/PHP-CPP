@@ -23,6 +23,11 @@
 #include <iostream>
 
 /**
+ *  @todo: if ZTS defined very many errors. need debug.
+ */
+//#define ZTS 1
+
+/**
  *  PHP includes
  */
 #include <php.h>

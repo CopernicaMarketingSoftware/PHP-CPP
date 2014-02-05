@@ -11,6 +11,7 @@
  *  Note that YourClass must extend from Php::Object
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
+ *  changed by Valeriy Dmitriev <ufabiz@gmail.com>
  *  @copyright 2013 Copernica BV
  */
 
@@ -40,18 +41,18 @@ public:
      *  Constructor with initializer list to define the properties
      *  @param  members
      */
-    Class(const std::initializer_list<Member> &members) : _members(members) {}
+    Class(const std::initializer_list<Member> &members, FlagClass flags = FlagClass(Zend::AccClass::NOSET)) : _members(members), _flags(flags) {}
     
     /**
      *  Move constructor
      *  @param  that
      */
-    Class(Class &&that) : _members(std::move(that._members)) {}
+    Class(Class &&that) : _members(std::move(that._members)), _flags(std::move(that._flags)) {}
 
     /**
      *  Copy constructor
      */
-    Class(const Class &that) : _members(that._members) {}
+    Class(const Class &that) : _members(that._members), _flags(that._flags) {}
     
     /**
      *  Destructor
@@ -75,6 +76,8 @@ public:
      */
     void initialize(struct _zend_class_entry *entry)
     {
+
+        std::cerr << "\x1b[31;47m Class<T>::initialize  \x1b[0m" << std::endl;
         // loop through the members
         for (auto iter = _members.begin(); iter != _members.end(); iter++)
         {
@@ -91,6 +94,14 @@ public:
     {
         return _members.methods(classname);
     }
+    
+    /**
+     *  Retrieve the functions
+     *  @return int flags of access types for classes
+     */
+    int getFlags() {
+        return _flags;
+    }
 
 protected:
     /**
@@ -98,6 +109,13 @@ protected:
      *  @var Members
      */
     Members _members;
+
+private:
+    /**
+     *  The access types flags for class
+     *  @var Members
+     */
+    FlagClass _flags;
 
 };
 

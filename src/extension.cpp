@@ -283,6 +283,7 @@ zend_module_entry *Extension::module()
  */
 bool Extension::initialize()
 {
+    std::cerr << "\x1b[31;47m Extension::initialize  \x1b[0m" << std::endl;
     // loop through the classes
     for (auto iter = _classes.begin(); iter != _classes.end(); iter++)
     {

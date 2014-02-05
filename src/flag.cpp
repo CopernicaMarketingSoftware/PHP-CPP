@@ -25,6 +25,10 @@ namespace Php {
          *  (method flags)
          */
         switch(zflag){
+                // if a class no have specified flags
+                case Zend::AccClass::NOSET:
+                    _val = 0;
+                break;
                 // ZEND_ACC_IMPLICIT_ABSTRACT_CLASS is used for abstract classes (since it is set by any abstract method even interfaces MAY have it set, too).
                 case Zend::AccClass::IMPLICIT_ABSTRACT:
                     _val = ZEND_ACC_IMPLICIT_ABSTRACT_CLASS;     //0x10
@@ -52,7 +56,7 @@ namespace Php {
      *  @param  flags        instance of Zend::AccMemb
      */
     template <>
-    FlagMemb::FlagTemplate(const Zend::AccMemb &zflag){
+    FlagMemb::FlagTemplate(const Zend::AccMemb &zflag) {
         /**
          *  access types for methods and propertyes (members)
          *  (class flags)
@@ -74,9 +78,10 @@ namespace Php {
                 break;
 
                 case Zend::AccMemb::STATIC:
-                    _val = ZEND_ACC_STATIC;                    //0x01
+                    //_val = ZEND_ACC_STATIC;                    //0x01
                     //_val = ZEND_ACC_ALLOW_STATIC | ZEND_ACC_PUBLIC;
-                    //_val = ZEND_ACC_STATIC | ZEND_ACC_PUBLIC;
+                    //_val = ZEND_ACC_STATIC | ZEND_ACC_PROTECTED;
+                    _val = ZEND_ACC_STATIC | ZEND_ACC_PUBLIC;
                 break;
 
                 // Artificially entered field
