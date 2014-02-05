@@ -514,6 +514,17 @@ public:
     
     /**
      *  Array access operator
+     *  This can be used for accessing arrays
+     *  @param  index
+     *  @return Value
+     */
+    Value operator[](int index) const
+    {
+        return get(index);
+    }
+    
+    /**
+     *  Array access operator
      *  This can be used for accessing associative arrays
      *  @param  key
      *  @return Member
@@ -524,9 +535,31 @@ public:
      *  Array access operator
      *  This can be used for accessing associative arrays
      *  @param  key
+     *  @return Value
+     */
+    Value operator[](const std::string &key) const
+    {
+        return get(key);
+    }
+
+    /**
+     *  Array access operator
+     *  This can be used for accessing associative arrays
+     *  @param  key
      *  @return HashMember
      */
     HashMember<std::string> operator[](const char *key);
+
+    /**
+     *  Array access operator
+     *  This can be used for accessing associative arrays
+     *  @param  key
+     *  @return Value
+     */
+    Value operator[](const char *key) const
+    {
+        return get(key);
+    }
 
     /**
      *  Call the function in PHP
