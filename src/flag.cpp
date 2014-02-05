@@ -30,9 +30,9 @@ namespace Php {
                     _val = 0;
                 break;
                 // ZEND_ACC_IMPLICIT_ABSTRACT_CLASS is used for abstract classes (since it is set by any abstract method even interfaces MAY have it set, too).
-                case Zend::AccClass::IMPLICIT_ABSTRACT:
-                    _val = ZEND_ACC_IMPLICIT_ABSTRACT_CLASS;     //0x10
-                break;
+                //case Zend::AccClass::IMPLICIT_ABSTRACT:
+                //    _val = ZEND_ACC_IMPLICIT_ABSTRACT_CLASS;     //0x10
+                //break;
                 //ZEND_ACC_EXPLICIT_ABSTRACT_CLASS denotes that a class was explicitly defined as abstract by using the keyword.
                 case Zend::AccClass::ABSTRACT:
                     _val = ZEND_ACC_EXPLICIT_ABSTRACT_CLASS;     //0x20;

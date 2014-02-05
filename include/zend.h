@@ -63,7 +63,7 @@ namespace Php {
         enum class AccClass {
             NOSET                   ,//=      ..       ,                       //0
             // ZEND_ACC_IMPLICIT_ABSTRACT_CLASS is used for abstract classes (since it is set by any abstract method even interfaces MAY have it set, too).
-            IMPLICIT_ABSTRACT       ,//= ZEND_ACC_IMPLICIT_ABSTRACT_CLASS,     //0x10
+            //IMPLICIT_ABSTRACT       ,//= ZEND_ACC_IMPLICIT_ABSTRACT_CLASS,     //0x10
             //ZEND_ACC_EXPLICIT_ABSTRACT_CLASS denotes that a class was explicitly defined as abstract by using the keyword.
             ABSTRACT                ,//= ZEND_ACC_EXPLICIT_ABSTRACT_CLASS,     //0x20
             FINAL                   ,//= ZEND_ACC_FINAL_CLASS,                 //0x40

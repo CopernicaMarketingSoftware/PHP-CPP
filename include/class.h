@@ -120,6 +120,28 @@ private:
 };
 
 /**
+ *  Class definition of the ClassFlagged
+ *  template ClassFlagged designed for easy instance of Class<T> for concrete flags
+ */
+template <typename T, Zend::AccClass Flags>
+class ClassFlagged : public Class<T>
+{
+public:
+    ClassFlagged() : Class<T>() {}
+    ClassFlagged(const std::initializer_list<Member> &members) : Class<T>(members, FlagClass(Flags)) {}
+};
+
+template <typename T>
+// C++11 analog of `typedef`. Equivalent to the following pseudocode: typedef ClassFlagged<T, Zend::AccClass::FINAL> FinalClass<T>;
+using FinalClass    = ClassFlagged<T, Zend::AccClass::FINAL>;
+template <typename T>
+using AbstractClass = ClassFlagged<T, Zend::AccClass::ABSTRACT>;
+template <typename T>
+using Interface     = ClassFlagged<T, Zend::AccClass::INTERFACE>;
+template <typename T>
+using Trait         = ClassFlagged<T, Zend::AccClass::TRAIT>;
+
+/**
  *  End of namespace
  */
 }
