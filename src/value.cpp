@@ -851,10 +851,216 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
 Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
 {
     // array of parameters
-    zval **params[10] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val};
+    zval **params[10] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val };
 
     // call the function
     return exec(10, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @return Value
+ */
+Value Value::call(const std::string &name)
+{
+    // call with zero parameters
+    return exec(name, 0, NULL);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0)
+{
+    // array of parameters
+    zval **params[] = { &p0._val };
+
+    // call with zero parameters
+    return exec(name, 1, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val };
+
+    // call with zero parameters
+    return exec(name, 2, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val };
+
+    // call with zero parameters
+    return exec(name, 3, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val };
+
+    // call with zero parameters
+    return exec(name, 4, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val };
+
+    // call with zero parameters
+    return exec(name, 5, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val };
+
+    // call with zero parameters
+    return exec(name, 6, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val };
+
+    // call with zero parameters
+    return exec(name, 7, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @param  p7          The eighth parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val };
+
+    // call with zero parameters
+    return exec(name, 8, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @param  p7          The eighth parameter
+ *  @param  p8          The ninth parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val };
+
+    // call with zero parameters
+    return exec(name, 9, params);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @param  p0          The first parameter
+ *  @param  p1          The second parameter
+ *  @param  p2          The third parameter
+ *  @param  p3          The fourth parameter
+ *  @param  p4          The fifth parameter
+ *  @param  p5          The sixth parameter
+ *  @param  p6          The seventh parameter
+ *  @param  p7          The eighth parameter
+ *  @param  p8          The ninth parameter
+ *  @param  p9          The tenth parameter
+ *  @return Value
+ */
+Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
+{
+    // array of parameters
+    zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val };
+
+    // call with zero parameters
+    return exec(name, 10, params);
 }
 
 /**
@@ -867,16 +1073,55 @@ Value Value::exec(int argc, zval ***params)
 {
     // the return zval
     zval *retval = nullptr;
-    
+
     // the current exception
     zval *oldException = EG(exception);
-    
+
     // call the function
     if (call_user_function_ex(CG(function_table), NULL, _val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
-    
+
     // was an exception thrown?
     if (oldException != EG(exception)) throw OrigException(EG(exception));
-    
+
+    // no (additional) exception was thrown
+    return retval ? Value(retval) : nullptr;
+}
+
+/**
+ *  Call method with a number of parameters
+ *  @param  name        Name of method to call
+ *  @param  argc        Number of parameters
+ *  @param  argv        The parameters
+ *  @return Value
+ */
+Value Value::exec(const std::string &name, int argc, struct _zval_struct ***params)
+{
+    // the method to call and the return value
+    zval *method;
+    zval *retval;
+
+    // construct the method, this is done similarly to how in PHP we can call
+    // a member function using call_user_func: pass in an array with the object
+    // and the method to call as the first parameter
+    MAKE_STD_ZVAL(method);
+    array_init(method);
+
+    // add the object and the method to call
+    add_index_zval(method, 0, _val);
+    add_index_stringl(method, 1, name.c_str(), name.length(), 0);
+
+    // the current exception
+    zval *oldException = EG(exception);
+
+    // call the function
+    if (call_user_function_ex(CG(function_table), NULL, method, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
+
+    // free the method
+    FREE_ZVAL(method);
+
+    // was an exception thrown?
+    if (oldException != EG(exception)) throw OrigException(EG(exception));
+
     // no (additional) exception was thrown
     return retval ? Value(retval) : nullptr;
 }
