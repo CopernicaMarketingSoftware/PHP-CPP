@@ -111,24 +111,30 @@ public:
 
     /**
      *  Set implemented interfaces
+     *  see http://php.net/manual/en/reserved.interfaces.php
      *  @return self
      */
+    // PHP: implements Iterator
     Class<T>& implementsIterator() {
         _implements.emplace_back(new InterfaceIterator());
         return *this;
     }
+    // PHP: implements Traversable
     Class<T>& implementsTraversable() {
         _implements.emplace_back(new InterfaceTraversable());
         return *this;
     }
+    // PHP: implements IteratorAggregate
     Class<T>& implementsAggregate() {
         _implements.emplace_back(new InterfaceAggregate());
         return *this;
     }
-    Class<T>& implementsArrayaccess() {
+    // PHP: implements ArrayAccess
+    Class<T>& implementsArrayAccess() {
         _implements.emplace_back(new InterfaceArrayaccess());
         return *this;
     }
+    // PHP: implements Serializable
     Class<T>& implementsSerializable() {
         _implements.emplace_back(new InterfaceSerializable());
         return *this;
