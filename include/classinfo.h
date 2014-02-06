@@ -139,6 +139,7 @@ public:
     {
         // set access types flags for class
         seFlags(entry, _type.getFlags());
+
         // pass to the entry
         _type.initialize(entry);
     }

@@ -32,6 +32,8 @@
  */
 #include <php.h>
 #include "zend_exceptions.h"
+#include "zend_interfaces.h"
+
 /**
  *  Macro to convert results to success status
  */
@@ -60,6 +62,7 @@
 #include "../include/member.h"
 #include "../include/membervisibility.h"
 #include "../include/members.h"
+#include "../include/extinterface.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"
 #include "../include/extension.h"

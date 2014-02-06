@@ -41,18 +41,18 @@ public:
      *  Constructor with initializer list to define the properties
      *  @param  members
      */
-    Class(const std::initializer_list<Member> &members, FlagClass flags = FlagClass(Zend::AccClass::NOSET)) : _members(members), _flags(flags) {}
+    Class(const std::initializer_list<Member> &members, FlagClass flags = FlagClass(Zend::AccClass::NOSET)) : _members(members), _flags(flags), _implements(0) {}
     
     /**
      *  Move constructor
      *  @param  that
      */
-    Class(Class &&that) : _members(std::move(that._members)), _flags(std::move(that._flags)) {}
+    Class(Class &&that) : _members(std::move(that._members)), _flags(std::move(that._flags)), _implements(std::move(that._implements)) {}
 
     /**
      *  Copy constructor
      */
-    Class(const Class &that) : _members(that._members), _flags(that._flags) {}
+    Class(const Class &that) : _members(that._members), _flags(that._flags), _implements(that._implements) {}
     
     /**
      *  Destructor
@@ -81,6 +81,14 @@ public:
         {
             iter->declare(entry);
         }
+
+        // loop through the interfaces
+        for (auto &iter: _implements) {
+            // add implemented interface (iter) to a php class definition (entry):
+            iter->addSelf(entry);
+            // Early removal object `ExtInterface`. That is The object is deleted after it is no longer needed, and not when the object `Class<T>` is destroyed:
+            iter.reset();
+        }
     }
     
     /**
@@ -94,12 +102,39 @@ public:
     }
     
     /**
-     *  Retrieve the functions
+     *  Retrieve the int access types flags for PHP class
      *  @return int flags of access types for classes
      */
     int getFlags() {
         return _flags;
     }
+
+    /**
+     *  Set implemented interfaces
+     *  @return self
+     */
+    Class<T>& implementsIterator() {
+        _implements.emplace_back(new InterfaceIterator());
+        return *this;
+    }
+    Class<T>& implementsTraversable() {
+        _implements.emplace_back(new InterfaceTraversable());
+        return *this;
+    }
+    Class<T>& implementsAggregate() {
+        _implements.emplace_back(new InterfaceAggregate());
+        return *this;
+    }
+    Class<T>& implementsArrayaccess() {
+        _implements.emplace_back(new InterfaceArrayaccess());
+        return *this;
+    }
+    Class<T>& implementsSerializable() {
+        _implements.emplace_back(new InterfaceSerializable());
+        return *this;
+    }
+    
+
 
 protected:
     /**
@@ -111,11 +146,17 @@ protected:
 private:
     /**
      *  The access types flags for class
-     *  @var Members
      */
     FlagClass _flags;
 
+    /**
+     *  Container of ExtInterface
+     *  used to set the implemented interfaces
+     */
+     std::vector< std::shared_ptr<ExtInterface> > _implements;
+
 };
+
 
 /**
  *  Class definition of the ClassFlagged

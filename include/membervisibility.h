@@ -59,15 +59,6 @@ typedef MemberVisibility<Zend::AccMemb::CONSTANT> Const;
 
 /**
  *  In the current architecture, implementation of static methods is not possible.
- *  fails due function zend_object_store_get_object at Parameters::object():
- *  (gdb) bt
- *  #0  0x0000000000713840 in zend_object_store_get_object ()
- *  #1  0x00007fffefaef1ad in Php::Parameters::object() () from /usr/lib/libphpcpp.so
- *  #2  0x00007fffefaee955 in Php::MethodMember::invoke(Php::Parameters&) () from /usr/lib/libphpcpp.so
- *  #3  0x00007fffefaecee7 in Php::invoke_function(int, _zval_struct*, _zval_struct**, _zval_struct*, int) () from /usr/lib/libphpcpp.so
- *  #4  0x000000000079ba1a in ?? ()
- *  #5  0x00000000007154c8 in execute_ex ()
- *  #6  0x00000000006df87a in zend_eval_stringl ()
  *  
  *  Static properties are supported.
  *  @todo: Requires some refactoring that it became possible.
