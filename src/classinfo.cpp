@@ -64,7 +64,7 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
 #if PHP_VERSION_ID >= 50400
     _ClassInfo *info = (_ClassInfo *)base->info.user.doc_comment;
 #else
-    _ClassInfo *info = (_ClassInfo *)base->doc_comment;
+    _ClassInfo *info = *((_ClassInfo **)base->doc_comment);
 #endif    
     
     // store the class
@@ -138,9 +138,27 @@ void _ClassInfo::initialize(TSRMLS_DC)
 #if PHP_VERSION_ID >= 50400    
     _entry->info.user.doc_comment = (const char *)this;
 #else
-    _entry->doc_comment = (char *)this;    
-#endif        
-    
+    /**
+     *  PHP 5.3 will free the doc_comment pointer if it
+     *  is not NULL, which will result in the classinfo
+     *  object being freed without being destructed
+     *  properly, leading to segfaults when the destruct
+     *  is called at a later stage (during module_shutdown).
+     *
+     *  To prevent this we create an extra pointer that
+     *  points to our this pointer. We do *not* free this
+     *  pointer ourselves, because PHP does this. This
+     *  way it does not free the classinfo.
+     */
+    char **wrapper = (char**)malloc(sizeof(char**));
+
+    // have the wrapper point to us
+    *wrapper = (char *)this;
+
+    // and store the wrapper inside the comment
+    _entry->doc_comment = (char *)wrapper;
+#endif
+
     // initialize the entry
     initialize(_entry);
 }
