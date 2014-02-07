@@ -179,6 +179,7 @@ public:
     {
         // construct info
         _ClassInfo *info = new ClassInfo<T>(name, type);
+        
         // add class
         _classes.insert(std::unique_ptr<_ClassInfo>(info));
     }

@@ -33,7 +33,7 @@ namespace Php {
             STATIC                  ,//= ZEND_ACC_STATIC,                    //0x01
             ABSTRACT                ,//= ZEND_ACC_ABSTRACT,                  //0x02
             FINAL                   ,//= ZEND_ACC_FINAL,                     //0x04
-            IMPLEMENTED_ABSTRACT    ,//= ZEND_ACC_IMPLEMENTED_ABSTRACT,      //0x08
+            //IMPLEMENTED_ABSTRACT    ,//= ZEND_ACC_IMPLEMENTED_ABSTRACT,      //0x08
             //method flag (bc only), any method that has this flag can be used statically and non statically.
             //ALLOW_STATIC            ,//= ZEND_ACC_ALLOW_STATIC,              //0x10000                
 
@@ -50,7 +50,7 @@ namespace Php {
             //CLONE                   ,//= ZEND_ACC_CLONE,                     //0x8000
 
             //shadow of parent's private method/property
-            SHADOW                  ,//= ZEND_ACC_SHADOW                       //0x20000
+            //SHADOW                  ,//= ZEND_ACC_SHADOW                       //0x20000
 
             // additional field for designation flag CONSTANT. Not in the Zend engine
             CONSTANT                ,//= 0                                     //0

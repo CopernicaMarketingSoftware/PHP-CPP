@@ -7,6 +7,9 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
 
+#ifndef PHPCPP_H
+#define PHPCPP_H
+
 /**
  *  Other C and C++ libraries that PhpCpp depends on
  */
@@ -57,3 +60,4 @@
 #   define PHPCPP_EXPORT
 #endif
 
+#endif /* phpcpp.h */

@@ -1,7 +1,8 @@
 /**
  *  flag.cpp
  *
- *  flag namespace
+ *  flag clases for the safe transfer of a Zend flag to a Zend functions
+ *  flags defined at Zend/zend_compile.h
  *
  *  @author Valeriy_Dmitriev <ufabiz@gmail.com>
  */
@@ -29,10 +30,6 @@ namespace Php {
                 case Zend::AccClass::NOSET:
                     _val = 0;
                 break;
-                // ZEND_ACC_IMPLICIT_ABSTRACT_CLASS is used for abstract classes (since it is set by any abstract method even interfaces MAY have it set, too).
-                //case Zend::AccClass::IMPLICIT_ABSTRACT:
-                //    _val = ZEND_ACC_IMPLICIT_ABSTRACT_CLASS;     //0x10
-                //break;
                 //ZEND_ACC_EXPLICIT_ABSTRACT_CLASS denotes that a class was explicitly defined as abstract by using the keyword.
                 case Zend::AccClass::ABSTRACT:
                     _val = ZEND_ACC_EXPLICIT_ABSTRACT_CLASS;     //0x20;
@@ -80,7 +77,6 @@ namespace Php {
                 case Zend::AccMemb::STATIC:
                     //_val = ZEND_ACC_STATIC;                    //0x01
                     //_val = ZEND_ACC_ALLOW_STATIC | ZEND_ACC_PUBLIC;
-                    //_val = ZEND_ACC_STATIC | ZEND_ACC_PROTECTED;
                     _val = ZEND_ACC_STATIC | ZEND_ACC_PUBLIC;
                 break;
 
@@ -95,15 +91,7 @@ namespace Php {
                 case Zend::AccMemb::FINAL:
                     _val = ZEND_ACC_FINAL;                     //0x04
                 break;
-                case Zend::AccMemb::IMPLEMENTED_ABSTRACT:
-                    _val = ZEND_ACC_IMPLEMENTED_ABSTRACT;      //0x08
-                break;
 
-
-               //shadow of parent's private method/property
-                case Zend::AccMemb::SHADOW:
-                    _val = ZEND_ACC_SHADOW;                    //0x20000
-                break;
                 default:
                     _val = ZEND_ACC_PUBLIC;
         }
