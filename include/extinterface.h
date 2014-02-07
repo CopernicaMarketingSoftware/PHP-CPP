@@ -65,7 +65,7 @@ struct InterfaceAggregate : public ExtInterface
 };
 
 // zend_class_entry* == zend_ce_arrayaccess
-struct InterfaceArrayaccess : public ExtInterface
+struct InterfaceArrayAccess : public ExtInterface
 {
     virtual void addSelf(_zend_class_entry*);
 };

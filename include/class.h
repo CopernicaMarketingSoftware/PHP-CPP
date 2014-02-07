@@ -131,12 +131,25 @@ public:
     }
     // PHP: implements ArrayAccess
     Class<T>& implementsArrayAccess() {
-        _implements.emplace_back(new InterfaceArrayaccess());
+        _implements.emplace_back(new InterfaceArrayAccess());
         return *this;
     }
     // PHP: implements Serializable
     Class<T>& implementsSerializable() {
         _implements.emplace_back(new InterfaceSerializable());
+        return *this;
+    }
+    /**
+     *  Allows extend the library php-cpp to external php interfaces
+     *  For example, let InterfaceCountable inherited from ExtInterface
+     *  and provides interface Countable from php SPL. InterfaceCountable implemented in a separate library.
+     *  In this case, that would declare the interface implementation InterfaceCountable we will need to apply
+     *  .implements(new InterfaceCountable())
+     *  @param  ExtInterface* intrface
+     *  @return self
+     */
+    Class<T>& implements(ExtInterface *intrf) {
+        _implements.emplace_back(intrf);
         return *this;
     }
     

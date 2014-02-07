@@ -26,7 +26,7 @@ namespace Php {
 	void InterfaceAggregate::addSelf(_zend_class_entry *ce) {
 		zend_class_implements(ce TSRMLS_DC, 1, zend_ce_aggregate);
 	}
-	void InterfaceArrayaccess::addSelf(_zend_class_entry *ce) {
+	void InterfaceArrayAccess::addSelf(_zend_class_entry *ce) {
 		zend_class_implements(ce TSRMLS_DC, 1, zend_ce_arrayaccess);
 	}
 	void InterfaceSerializable::addSelf(_zend_class_entry *ce) {
