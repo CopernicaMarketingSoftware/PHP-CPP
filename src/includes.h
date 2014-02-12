@@ -62,7 +62,6 @@
 #include "../include/member.h"
 #include "../include/membervisibility.h"
 #include "../include/members.h"
-#include "../include/extinterface.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"
 #include "../include/extension.h"

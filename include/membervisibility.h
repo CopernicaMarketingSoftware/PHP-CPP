@@ -63,7 +63,7 @@ typedef MemberVisibility<Zend::AccMemb::CONSTANT> Const;
  *  Static properties are supported.
  *  @todo: Requires some refactoring that it became possible.
  */
-typedef MemberVisibility<Zend::AccMemb::STATIC> Static;
+//typedef MemberVisibility<Zend::AccMemb::STATIC> Static;
 
 
 /**

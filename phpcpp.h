@@ -45,7 +45,6 @@
 #include <phpcpp/member.h>
 #include <phpcpp/membervisibility.h>
 #include <phpcpp/members.h>
-#include <phpcpp/extinterface.h>
 #include <phpcpp/class.h>
 #include <phpcpp/classinfo.h>
 #include <phpcpp/extension.h>

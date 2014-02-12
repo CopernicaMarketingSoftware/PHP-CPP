@@ -41,18 +41,18 @@ public:
      *  Constructor with initializer list to define the properties
      *  @param  members
      */
-    Class(const std::initializer_list<Member> &members, FlagClass flags = FlagClass(Zend::AccClass::NOSET)) : _members(members), _flags(flags), _implements(0) {}
+    Class(const std::initializer_list<Member> &members, FlagClass flags = FlagClass(Zend::AccClass::NOSET)) : _members(members), _flags(flags) {}
     
     /**
      *  Move constructor
      *  @param  that
      */
-    Class(Class &&that) : _members(std::move(that._members)), _flags(std::move(that._flags)), _implements(std::move(that._implements)) {}
+    Class(Class &&that) : _members(std::move(that._members)), _flags(std::move(that._flags)) {}
 
     /**
      *  Copy constructor
      */
-    Class(const Class &that) : _members(that._members), _flags(that._flags), _implements(that._implements) {}
+    Class(const Class &that) : _members(that._members), _flags(that._flags) {}
     
     /**
      *  Destructor
@@ -81,14 +81,6 @@ public:
         {
             iter->declare(entry);
         }
-
-        // loop through the interfaces
-        for (auto &iter: _implements) {
-            // add implemented interface (iter) to a php class definition (entry):
-            iter->addSelf(entry);
-            // Early removal object `ExtInterface`. That is The object is deleted after it is no longer needed, and not when the object `Class<T>` is destroyed:
-            iter.reset();
-        }
     }
     
     /**
@@ -109,52 +101,6 @@ public:
         return _flags;
     }
 
-    /**
-     *  Set implemented interfaces
-     *  see http://php.net/manual/en/reserved.interfaces.php
-     *  @return self
-     */
-    // PHP: implements Iterator
-    Class<T>& implementsIterator() {
-        _implements.emplace_back(new InterfaceIterator());
-        return *this;
-    }
-    // PHP: implements Traversable
-    Class<T>& implementsTraversable() {
-        _implements.emplace_back(new InterfaceTraversable());
-        return *this;
-    }
-    // PHP: implements IteratorAggregate
-    Class<T>& implementsAggregate() {
-        _implements.emplace_back(new InterfaceAggregate());
-        return *this;
-    }
-    // PHP: implements ArrayAccess
-    Class<T>& implementsArrayAccess() {
-        _implements.emplace_back(new InterfaceArrayAccess());
-        return *this;
-    }
-    // PHP: implements Serializable
-    Class<T>& implementsSerializable() {
-        _implements.emplace_back(new InterfaceSerializable());
-        return *this;
-    }
-    /**
-     *  Allows extend the library php-cpp to external php interfaces
-     *  For example, let InterfaceCountable inherited from ExtInterface
-     *  and provides interface Countable from php SPL. InterfaceCountable implemented in a separate library.
-     *  In this case, that would declare the interface implementation InterfaceCountable we will need to apply
-     *  .implements(new InterfaceCountable())
-     *  @param  ExtInterface* intrface
-     *  @return self
-     */
-    Class<T>& implements(ExtInterface *intrf) {
-        _implements.emplace_back(intrf);
-        return *this;
-    }
-    
-
-
 protected:
     /**
      *  The initial arguments
@@ -167,12 +113,6 @@ private:
      *  The access types flags for class
      */
     FlagClass _flags;
-
-    /**
-     *  Container of ExtInterface
-     *  used to set the implemented interfaces
-     */
-     std::vector< std::shared_ptr<ExtInterface> > _implements;
 
 };
 
