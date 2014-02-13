@@ -94,6 +94,7 @@ public:
      *  @param  value
      *  @return Value
      */
+    Value &operator=(std::nullptr_t value);
     Value &operator=(const Value &value);
     Value &operator=(int16_t value);
     Value &operator=(int32_t value);

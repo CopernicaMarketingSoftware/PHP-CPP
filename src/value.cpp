@@ -348,6 +348,27 @@ Value &Value::operator=(const Value &value)
     return validate();
 }
 
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(std::nullptr_t value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+
+    // change to null value
+    ZVAL_NULL(_val);
+
+    // update the object
+    return validate();
+}
+
 /**
  *  Assignment operator
  *  @param  value
