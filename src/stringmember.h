@@ -64,6 +64,22 @@ public:
       zend_declare_property_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size(), flags);
 #endif
     }
+
+    /**
+     *  Virtual method to declare the class constant
+     *  @param  entry       Class entry
+     *  @param  name        Name of the member
+     *  @param  size        Size of the name
+     *  @param  flags       Additional flags
+     */
+    virtual void declareConst(struct _zend_class_entry *entry, const char *name, int size)
+    {
+#if PHP_VERSION_ID >= 50400
+      zend_declare_class_constant_stringl(entry, name, size, _value.c_str(), _value.size());
+#else
+      zend_declare_class_constant_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size());
+#endif
+    }
 };
 
 /**

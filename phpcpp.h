@@ -25,6 +25,8 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/zend.h>
+#include <phpcpp/flag.h>
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/array.h>
@@ -41,8 +43,7 @@
 #include <phpcpp/base.h>
 #include <phpcpp/method.h>
 #include <phpcpp/member.h>
-#include <phpcpp/public.h>
-#include <phpcpp/protected.h>
+#include <phpcpp/membervisibility.h>
 #include <phpcpp/members.h>
 #include <phpcpp/class.h>
 #include <phpcpp/classinfo.h>

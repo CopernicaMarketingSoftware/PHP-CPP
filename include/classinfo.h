@@ -52,22 +52,27 @@ public:
     void initialize();
     
     /**
-     *  Construct the C++ object
-     *  @return Base
-     */
-    virtual Base *construct() = 0;
-    
-    /**
      *  Initialize the class
      *  @param  entry
      */
     virtual void initialize(struct _zend_class_entry *entry) = 0;
+    
+    /**
+     *  Construct the C++ object
+     *  @return Base
+     */
+    virtual Base *construct() = 0;
 
     /**
      *  Retrieve the methods
      *  @return zend_function_entry[]
      */
     virtual struct _zend_function_entry *methods() = 0;
+
+    /**
+     *  set access types flags for class
+     */
+    void seFlags(struct _zend_class_entry *entry, int flags);
 
 protected:
     /** 
@@ -130,8 +135,11 @@ public:
      *  Initialize the class
      *  @param entry
      */
-    virtual void initialize(struct _zend_class_entry *entry)
+    virtual void initialize(struct _zend_class_entry *entry) override
     {
+        // set access types flags for class
+        seFlags(entry, _type.getFlags());
+
         // pass to the entry
         _type.initialize(entry);
     }

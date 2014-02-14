@@ -68,14 +68,23 @@ public:
      *  @param  flags       Additional flags
      */
     virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags) {};
+
+    /**
+     *  Virtual method to declare the constant property
+     *  @param  entry       Class entry
+     *  @param  name        Name of the member
+     *  @param  size        Size of the name
+     *  @param  flags       Additional flags
+     */
+    virtual void declareConst(struct _zend_class_entry *entry, const char *name, int size) {};
     
     /**
      *  Fill a function entry object
      *  @param  entry       Function entry
      *  @param  classname   Name of the class
-     *  @param  pub         Is this a public method?
+     *  @param  flags       Is this a public method?
      */
-    virtual void fill(struct _zend_function_entry *entry, const char *classname, bool pub) {};
+    virtual void fill(struct _zend_function_entry *entry, const char *classname, int flags) {};
     
 };
 

@@ -19,11 +19,21 @@
 #include <set>
 #include <exception>
 
+ // for debug
+#include <iostream>
+
+/**
+ *  @todo: if ZTS defined very many errors. need debug.
+ */
+//#define ZTS 1
+
 /**
  *  PHP includes
  */
 #include <php.h>
 #include "zend_exceptions.h"
+#include "zend_interfaces.h"
+
 /**
  *  Macro to convert results to success status
  */
@@ -32,6 +42,8 @@
 /**
  *  Include other files from this library
  */
+#include "../include/zend.h"
+#include "../include/flag.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/array.h"
@@ -48,8 +60,7 @@
 #include "../include/base.h"
 #include "../include/method.h"
 #include "../include/member.h"
-#include "../include/public.h"
-#include "../include/protected.h"
+#include "../include/membervisibility.h"
 #include "../include/members.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"

@@ -164,6 +164,13 @@ void _ClassInfo::initialize(TSRMLS_DC)
 }
 
 /**
+ *  set access types flags for class
+ */
+void _ClassInfo::seFlags(struct _zend_class_entry *entry, int flags) {
+    entry->ce_flags |= flags;
+}
+
+/**
  *  End of namespace
  */
 }

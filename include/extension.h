@@ -178,7 +178,7 @@ public:
     void add(const char *name, const Class<T> &type)
     {
         // construct info
-        ClassInfo<T> *info = new ClassInfo<T>(name, type);
+        _ClassInfo *info = new ClassInfo<T>(name, type);
         
         // add class
         _classes.insert(std::unique_ptr<_ClassInfo>(info));
