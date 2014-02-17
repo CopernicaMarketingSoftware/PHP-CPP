@@ -40,9 +40,6 @@ namespace Php {
                 case Zend::AccClass::INTERFACE:
                     _val = ZEND_ACC_INTERFACE;                   //0x80;
                 break;
-                case Zend::AccClass::TRAIT:
-                    _val = ZEND_ACC_TRAIT;                       //0x120;
-                break;
                 default:
                     _val = 0;
         }

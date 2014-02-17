@@ -68,7 +68,6 @@ namespace Php {
             ABSTRACT                ,//= ZEND_ACC_EXPLICIT_ABSTRACT_CLASS,     //0x20
             FINAL                   ,//= ZEND_ACC_FINAL_CLASS,                 //0x40
             INTERFACE               ,//= ZEND_ACC_INTERFACE,                   //0x80
-            TRAIT                   ,//= ZEND_ACC_TRAIT,                       //0x120
 
             //class implement interface(s) flag,
             //IMPLEMENT_INTERFACES    ,//= ZEND_ACC_IMPLEMENT_INTERFACES,         //0x80000

@@ -129,15 +129,15 @@ public:
     ClassFlagged(const std::initializer_list<Member> &members) : Class<T>(members, FlagClass(Flags)) {}
 };
 
-template <typename T>
 // C++11 analog of `typedef`. Equivalent to the following pseudocode: typedef ClassFlagged<T, Zend::AccClass::FINAL> FinalClass<T>;
+template <typename T>
 using FinalClass    = ClassFlagged<T, Zend::AccClass::FINAL>;
+
 template <typename T>
 using AbstractClass = ClassFlagged<T, Zend::AccClass::ABSTRACT>;
+
 template <typename T>
 using Interface     = ClassFlagged<T, Zend::AccClass::INTERFACE>;
-template <typename T>
-using Trait         = ClassFlagged<T, Zend::AccClass::TRAIT>;
 
 /**
  *  End of namespace
