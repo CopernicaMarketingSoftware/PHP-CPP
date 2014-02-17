@@ -62,8 +62,8 @@ public:
         if (flags == constMember) zend_declare_class_constant_stringl(entry, name, size, _value.c_str(), _value.size());
         else zend_declare_property_stringl(entry, name, size, _value.c_str(), _value.size(), flags);
 #else
-        if (flags == constMember) zend_declare_property_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size(), flags);
-        else zend_declare_class_constant_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size());
+        if (flags == constMember) zend_declare_class_constant_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size());
+        else zend_declare_property_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size(), flags);
 #endif
     }
 };

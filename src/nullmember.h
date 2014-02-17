@@ -44,11 +44,11 @@ public:
     virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags) override
     {
 #if PHP_VERSION_ID >= 50400
-        if (flags == constMember) zend_declare_property_null(entry, name, size, flags);
-        else zend_declare_class_constant_null(entry, name, size);
+        if (flags == constMember) zend_declare_class_constant_null(entry, name, size);
+        else zend_declare_property_null(entry, name, size, flags);
 #else
-        if (flags == constMember) zend_declare_property_null(entry, (char *) name, size, flags);
-        else zend_declare_class_constant_null(entry, (char *) name, size);
+        if (flags == constMember) zend_declare_class_constant_null(entry, (char *) name, size);
+        else zend_declare_property_null(entry, (char *) name, size, flags);
 #endif
     }
 };
