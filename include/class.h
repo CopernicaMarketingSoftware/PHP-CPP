@@ -24,11 +24,11 @@ struct _zend_class_entry;
  *  Set up namespace
  */
 namespace Php {
- 
+
 /**
  *  Class definition of the class
  */
-template <typename T>
+template <typename T, Zend::AccClass _flags = Zend::AccClass::NOSET>
 class Class
 {
 public:
@@ -36,29 +36,29 @@ public:
      *  Constructor
      */
     Class() {}
-    
+
     /**
      *  Constructor with initializer list to define the properties
      *  @param  members
      */
-    Class(const std::initializer_list<Member> &members, FlagClass flags = FlagClass(Zend::AccClass::NOSET)) : _members(members), _flags(flags) {}
-    
+    Class(const std::initializer_list<Member> &members) : _members(members) {}
+
     /**
      *  Move constructor
      *  @param  that
      */
-    Class(Class &&that) : _members(std::move(that._members)), _flags(std::move(that._flags)) {}
+    Class(Class &&that) : _members(std::move(that._members)) {}
 
     /**
      *  Copy constructor
      */
-    Class(const Class &that) : _members(that._members), _flags(that._flags) {}
-    
+    Class(const Class &that) : _members(that._members) {}
+
     /**
      *  Destructor
      */
     virtual ~Class() {}
-    
+
     /**
      *  Construct an instance
      *  @return Base
@@ -82,7 +82,7 @@ public:
             iter->declare(entry);
         }
     }
-    
+
     /**
      *  Retrieve the functions
      *  @param  classname
@@ -92,13 +92,13 @@ public:
     {
         return _members.methods(classname);
     }
-    
+
     /**
      *  Retrieve the int access types flags for PHP class
      *  @return int flags of access types for classes
      */
     int getFlags() {
-        return _flags;
+        return FlagClass(_flags);
     }
 
 protected:
@@ -108,36 +108,18 @@ protected:
      */
     Members _members;
 
-private:
-    /**
-     *  The access types flags for class
-     */
-    FlagClass _flags;
-
 };
 
-
-/**
- *  Class definition of the ClassFlagged
- *  template ClassFlagged designed for easy instance of Class<T> for concrete flags
- */
-template <typename T, Zend::AccClass Flags>
-class ClassFlagged : public Class<T>
-{
-public:
-    ClassFlagged() : Class<T>() {}
-    ClassFlagged(const std::initializer_list<Member> &members) : Class<T>(members, FlagClass(Flags)) {}
-};
 
 // C++11 analog of `typedef`. Equivalent to the following pseudocode: typedef ClassFlagged<T, Zend::AccClass::FINAL> FinalClass<T>;
 template <typename T>
-using FinalClass    = ClassFlagged<T, Zend::AccClass::FINAL>;
+using FinalClass    = Class<T, Zend::AccClass::FINAL>;
 
 template <typename T>
-using AbstractClass = ClassFlagged<T, Zend::AccClass::ABSTRACT>;
+using AbstractClass = Class<T, Zend::AccClass::ABSTRACT>;
 
 template <typename T>
-using Interface     = ClassFlagged<T, Zend::AccClass::INTERFACE>;
+using Interface     = Class<T, Zend::AccClass::INTERFACE>;
 
 /**
  *  End of namespace
