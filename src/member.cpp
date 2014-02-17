@@ -203,10 +203,7 @@ bool Member::isMethod()
 void Member::declare(struct _zend_class_entry *entry)
 {
     // let the info object handle stuff
-    if(_flags == constMember)
-        _info->declareConst(entry, _name.c_str(), _name.size() TSRMLS_CC);
-    else
-        _info->declare(entry, _name.c_str(), _name.size(), _flags TSRMLS_CC);
+    _info->declare(entry, _name.c_str(), _name.size(), _flags TSRMLS_CC);
 }
 
 /**
