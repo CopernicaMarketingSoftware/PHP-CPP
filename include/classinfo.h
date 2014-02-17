@@ -72,7 +72,7 @@ public:
     /**
      *  set access types flags for class
      */
-    void seFlags(struct _zend_class_entry *entry, int flags);
+    void setFlags(struct _zend_class_entry *entry, int flags);
 
 protected:
     /** 
@@ -138,7 +138,7 @@ public:
     virtual void initialize(struct _zend_class_entry *entry) override
     {
         // set access types flags for class
-        seFlags(entry, _type.getFlags());
+        setFlags(entry, _type.getFlags());
 
         // pass to the entry
         _type.initialize(entry);
