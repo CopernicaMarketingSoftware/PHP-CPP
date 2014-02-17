@@ -41,9 +41,9 @@ public:
      *  Fill a function entry object
      *  @param  entry       Function entry
      *  @param  classname   Name of the class
-     *  @param  pub         Is this a public entry
+     *  @param  method      Is this a public entry
      */
-    virtual void fill(struct _zend_function_entry *entry, const char *classname, int flags)
+    virtual void fill(struct _zend_function_entry *entry, const char *classname, MemberModifier flags)
     {
         // call function object
         Function::fill(entry, classname, flags);

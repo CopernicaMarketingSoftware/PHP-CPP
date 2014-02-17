@@ -42,8 +42,6 @@
 /**
  *  Include other files from this library
  */
-#include "../include/zend.h"
-#include "../include/flag.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/array.h"
@@ -55,13 +53,18 @@
 #include "../include/global.h"
 #include "../include/hashmember.h"
 #include "../include/parameters.h"
+#include "../include/membermodifier.h"
 #include "../include/function.h"
 #include "../include/properties.h"
 #include "../include/base.h"
 #include "../include/method.h"
 #include "../include/member.h"
-#include "../include/membervisibility.h"
+#include "../include/public.h"
+#include "../include/protected.h"
+#include "../include/private.h"
+#include "../include/const.h"
 #include "../include/members.h"
+#include "../include/classmodifier.h"
 #include "../include/class.h"
 #include "../include/classinfo.h"
 #include "../include/extension.h"

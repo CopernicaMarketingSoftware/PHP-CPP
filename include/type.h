@@ -1,9 +1,9 @@
 /**
  *  Type.h
  *
- *  In this file an enumeration type is defined with all supporteded variable
+ *  In this file an enumeration type is defined with all supported variable
  *  types.
- * 
+ *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */

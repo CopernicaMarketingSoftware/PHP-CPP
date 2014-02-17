@@ -99,22 +99,19 @@ Function::~Function()
  * 
  *  @param  entry       Entry to be filled
  *  @param  classname   Optional class name
- *  @param  pub         Is this a public property?
+ *  @param  flags       Is this a public property?
  */
-void Function::fill(zend_function_entry *entry, const char *classname, int flags) const
+void Function::fill(zend_function_entry *entry, const char *classname, MemberModifier flags) const
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _ptr;
     entry->handler = invoke_function;
     entry->arg_info = _argv;
     entry->num_args = _argc;
+    entry->flags = flags;
 
-    // there are no flags like deprecated, private or protected
-    entry->flags = classname ? flags : 0;
-    
-    
     // we should fill the first argument as well
-#if PHP_VERSION_ID >= 50400    
+#if PHP_VERSION_ID >= 50400
     fill((zend_internal_function_info *)entry->arg_info, classname);
 #endif
 }
@@ -133,14 +130,14 @@ void Function::fill(zend_internal_function_info *info, const char *classname) co
     info->_name = _ptr;
     info->_name_len = _ptr.length();
     info->_class_name = classname;
-    
+
     // number of required arguments, and the expected return type
     info->required_num_args = _required;
     info->_type_hint = _type;
-    
+
     // we do not support return-by-reference
     info->return_reference = false;
-    
+ 
     // passing by reference is not used
     info->pass_rest_by_reference = false;
 }

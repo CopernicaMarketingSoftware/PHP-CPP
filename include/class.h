@@ -28,7 +28,7 @@ namespace Php {
 /**
  *  Class definition of the class
  */
-template <typename T, Zend::AccClass _flags = Zend::AccClass::NOSET>
+template <typename T, ClassModifier _flags = ClassModifier::regular>
 class Class
 {
 public:
@@ -94,11 +94,14 @@ public:
     }
 
     /**
-     *  Retrieve the int access types flags for PHP class
+     *  Retrieve the class flags specifying whether the class
+     *  is a regular class, abstract or final
+     *
      *  @return int flags of access types for classes
      */
-    int getFlags() {
-        return FlagClass(_flags);
+    int getFlags()
+    {
+        return _flags;
     }
 
 protected:
@@ -113,13 +116,13 @@ protected:
 
 // C++11 analog of `typedef`. Equivalent to the following pseudocode: typedef ClassFlagged<T, Zend::AccClass::FINAL> FinalClass<T>;
 template <typename T>
-using FinalClass    = Class<T, Zend::AccClass::FINAL>;
+using FinalClass    = Class<T, ClassModifier::final>;
 
 template <typename T>
-using AbstractClass = Class<T, Zend::AccClass::ABSTRACT>;
+using AbstractClass = Class<T, ClassModifier::abstract>;
 
 template <typename T>
-using Interface     = Class<T, Zend::AccClass::INTERFACE>;
+using Interface     = Class<T, ClassModifier::interface>;
 
 /**
  *  End of namespace

@@ -18,7 +18,7 @@ namespace Php {
  *  @param  name        Name of the member
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  */
-Member::Member(const char *name, const FlagMemb &&flags) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags) : _name(name), _flags(flags)
 {
     // create a null member
     _info = new NullMember();
@@ -30,7 +30,7 @@ Member::Member(const char *name, const FlagMemb &&flags) : _name(name), _accflag
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, std::nullptr_t value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, std::nullptr_t value) : _name(name), _flags(flags)
 {
     // create a null member
     _info = new NullMember();
@@ -42,7 +42,7 @@ Member::Member(const char *name, const FlagMemb &&flags, std::nullptr_t value) :
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, int value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, int value) : _name(name), _flags(flags)
 {
     // create a long member
     _info = new LongMember(value);
@@ -54,7 +54,7 @@ Member::Member(const char *name, const FlagMemb &&flags, int value) : _name(name
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, long value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, long value) : _name(name), _flags(flags)
 {
     // create a long member
     _info = new LongMember(value);
@@ -66,7 +66,7 @@ Member::Member(const char *name, const FlagMemb &&flags, long value) : _name(nam
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, bool value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, bool value) : _name(name), _flags(flags)
 {
     // create a bool member
     _info = new BoolMember(value);
@@ -78,7 +78,7 @@ Member::Member(const char *name, const FlagMemb &&flags, bool value) : _name(nam
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, char value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, char value) : _name(name), _flags(flags)
 {
     // create a new string member
     _info = new StringMember(&value, 1);
@@ -90,7 +90,7 @@ Member::Member(const char *name, const FlagMemb &&flags, char value) : _name(nam
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, const std::string &value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, const std::string &value) : _name(name), _flags(flags)
 {
     // create a new string member
     _info = new StringMember(value);
@@ -103,7 +103,7 @@ Member::Member(const char *name, const FlagMemb &&flags, const std::string &valu
  *  @param  value       The value to add
  *  @param  size        String length
  */
-Member::Member(const char *name, const FlagMemb &&flags, const char *value, int size) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, const char *value, int size) : _name(name), _flags(flags)
 {
     // create a new string member
     if (size < 0) size = strlen(value);
@@ -116,7 +116,7 @@ Member::Member(const char *name, const FlagMemb &&flags, const char *value, int 
  *  @param  flags       Flag access to a class member (bublic, protected etc)
  *  @param  value       The value to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, double value) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, double value) : _name(name), _flags(flags)
 {
     // create a new double member
     _info = new DoubleMember(value);
@@ -128,12 +128,12 @@ Member::Member(const char *name, const FlagMemb &&flags, double value) : _name(n
  *  @param  pub         Is this a public method (otherwise it is protected)
  *  @param  method      The method to add
  */
-Member::Member(const char *name, const FlagMemb &&flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _accflag(flags)
+Member::Member(const char *name, MemberModifier flags, const _Method &method, const std::initializer_list<Argument> &arguments) : _name(name), _flags(flags)
 {
-    // If the flags specifies as Zend::AccMemb::CONSTANT.
-    // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) ) ...
-    //XXX Flag(Zend::AccMemb::PUBLIC) -> Flag(Zend::AccMemb::STATIC)
-    if(!flags) _accflag = Flag(Zend::AccMemb::PUBLIC);
+    // methods cannot be constant, so in that case we default to
+    // a public member function instead
+    if (_flags == constMember) _flags = publicMember;
+
     // create method member
     _info = new MethodMember(name, method, arguments);
 }
@@ -142,13 +142,12 @@ Member::Member(const char *name, const FlagMemb &&flags, const _Method &method, 
  *  Copy constructor
  *  @param  member      The member to copy
  */
-Member::Member(const Member &member) : _accflag(member._accflag)
+Member::Member(const Member &member) : _flags(member._flags)
 {
     // copy info object, and name and public members
     _info = member._info;
     _name = member._name;
-    //_accflag = member._accflag;
-    
+
     // update refcount in info object
     _info->refcount(+1);
 }
@@ -157,13 +156,12 @@ Member::Member(const Member &member) : _accflag(member._accflag)
  *  Move constructor
  *  @param  member      The member to move
  */
-Member::Member(Member &&member) : _accflag (std::move(member._accflag))
+Member::Member(Member &&member) : _flags(member._flags)
 {
     // move info object, and name and public properties
     _info = member._info;
     _name = std::move(member._name);
-    //_accflag = std::move(member._accflag);
-    
+
     // reset info in other object
     member._info = NULL;
 }
@@ -175,7 +173,7 @@ Member::~Member()
 {
     // leap out if there is no other info object, or when it is also used by other objects
     if (!_info || _info->refcount(-1) > 0) return;
-    
+
     // deallocate info object
     delete _info;
 }
@@ -205,10 +203,10 @@ bool Member::isMethod()
 void Member::declare(struct _zend_class_entry *entry)
 {
     // let the info object handle stuff
-    if(!_accflag) // That is: if( flags == Flag(Zend::AccMemb::CONSTANT) )
+    if(_flags == constMember)
         _info->declareConst(entry, _name.c_str(), _name.size() TSRMLS_CC);
     else
-        _info->declare(entry, _name.c_str(), _name.size(), _accflag TSRMLS_CC);
+        _info->declare(entry, _name.c_str(), _name.size(), _flags TSRMLS_CC);
 }
 
 /**
@@ -220,7 +218,7 @@ void Member::declare(struct _zend_class_entry *entry)
 void Member::fill(struct _zend_function_entry *entry, const char *classname)
 {
     // let the info object do this
-    _info->fill(entry, classname, _accflag);
+    _info->fill(entry, classname, _flags);
 }
     
 /**

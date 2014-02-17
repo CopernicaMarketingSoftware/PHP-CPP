@@ -115,7 +115,7 @@ protected:
      *  @var    integer
      */
     int _required;
-    
+
     /**
      *  Total number of arguments
      *  @var    integer
@@ -134,14 +134,13 @@ protected:
      */
     HiddenPointer<Function> _ptr;
 
-protected:
     /**
      *  Fill a function entry
      *  @param  entry       Entry to be filled
      *  @param  classname   Optional class name
      *  @param  pub         Is this a public property?
      */
-    void fill(struct _zend_function_entry *entry, const char *classname=NULL, int flags=Flag(Zend::AccMemb::PUBLIC)) const;
+    void fill(struct _zend_function_entry *entry, const char *classname=NULL, MemberModifier flags = publicMember) const;
 
     /**
      *  Fill function info
@@ -149,7 +148,7 @@ protected:
      *  @param  classname   Optional class name
      */
     void fill(struct _zend_internal_function_info *info, const char *classname=NULL) const;
-    
+
     /**
      *  Extension has access to the private members
      */
