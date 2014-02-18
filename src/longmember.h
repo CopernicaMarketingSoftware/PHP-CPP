@@ -49,7 +49,7 @@ public:
      *  @param  size        Size of the name
      *  @param  flags       Additional flags
      */
-    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags) override
+    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, MemberModifier flags) override
     {
 #if PHP_VERSION_ID >= 50400
         if (flags == constMember) zend_declare_class_constant_long(entry, name, size, _value);

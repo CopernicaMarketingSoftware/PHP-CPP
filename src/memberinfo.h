@@ -67,7 +67,7 @@ public:
      *  @param  size        Size of the name
      *  @param  flags       Additional flags
      */
-    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, int flags) {};
+    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, MemberModifier flags) {};
 
     /**
      *  Fill a function entry object
@@ -75,7 +75,7 @@ public:
      *  @param  classname   Name of the class
      *  @param  flags       Is this a public method?
      */
-    virtual void fill(struct _zend_function_entry *entry, const char *classname, int flags) {};
+    virtual void fill(struct _zend_function_entry *entry, const char *classname, MemberModifier flags) {};
 };
 
 /**

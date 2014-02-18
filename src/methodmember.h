@@ -43,7 +43,7 @@ public:
      *  @param  classname   Name of the class
      *  @param  method      Is this a public entry
      */
-    virtual void fill(struct _zend_function_entry *entry, const char *classname, MemberModifier flags)
+    virtual void fill(struct _zend_function_entry *entry, const char *classname, MemberModifier flags) override
     {
         // call function object
         Function::fill(entry, classname, flags);
