@@ -31,6 +31,7 @@ namespace Php {
 /**
  *  Forward definitions
  */
+class Base;
 template <class Type> class HashMember;
 
 /**
@@ -598,6 +599,35 @@ public:
     Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
     Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
     Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+
+    /**
+     *  Retrieve the original implementation
+     * 
+     *  This only works for classes that were implemented using PHP-CPP,
+     *  it returns nullptr for all other classes
+     * 
+     *  @return Base*
+     */
+    Base *implementation() const;
+
+    /**
+     *  Retrieve the original implementation
+     * 
+     *  This only works for classes that were implemented using PHP-CPP,
+     *  it returns nullptr for all other classes
+     * 
+     *  @return mixed
+     */
+    template <typename T>
+    T *implementation() const
+    {
+        // retrieve the implementation
+        Base *base = implementation();
+        if (!base) return nullptr;
+        
+        // try casting it
+        return dynamic_cast<T*>(base);
+    }
 
 private:
     /**

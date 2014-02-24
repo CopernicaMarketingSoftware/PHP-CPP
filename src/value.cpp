@@ -1554,6 +1554,27 @@ HashMember<std::string> Value::operator[](const char *key)
 }
 
 /**
+ *  Retrieve the original implementation
+ * 
+ *  This only works for classes that were implemented using PHP-CPP,
+ *  it returns nullptr for all other classes
+ * 
+ *  @return Base*
+ */
+Base *Value::implementation() const
+{
+    // must be an object
+    if (!isObject()) return nullptr;
+    
+    // retrieve the mixed object that contains the base
+    MixedObject *object = (MixedObject *)zend_object_store_get_object(_val);
+    if (!object) return nullptr;
+    
+    // retrieve the associated C++ class
+    return object->cpp;
+}
+
+/**
  *  Custom output stream operator
  *  @param  stream
  *  @param  value
