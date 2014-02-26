@@ -687,7 +687,7 @@ Value Value::operator%(double value)                { return Value(numericValue(
  *  @param  p0-p10          Parameters of the function to be called.
  *  @return Value
  */
-Value Value::operator()()
+Value Value::operator()() const
 {
     // call with zero parameters
     return exec(0, NULL);
@@ -698,7 +698,7 @@ Value Value::operator()()
  *  @param  p0          The first parameter
  *  @return Value
  */
-Value Value::operator()(Value p0)
+Value Value::operator()(Value p0) const
 {
     // array of parameters
     zval **params[1] = { &p0._val };
@@ -713,7 +713,7 @@ Value Value::operator()(Value p0)
  *  @param  p1          The second parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1)
+Value Value::operator()(Value p0, Value p1) const
 {
     // array of parameters
     zval **params[2] = { &p0._val, &p1._val };
@@ -729,7 +729,7 @@ Value Value::operator()(Value p0, Value p1)
  *  @param  p2          The third parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2)
+Value Value::operator()(Value p0, Value p1, Value p2) const
 {
     // array of parameters
     zval **params[3] = { &p0._val, &p1._val, &p2._val };
@@ -746,7 +746,7 @@ Value Value::operator()(Value p0, Value p1, Value p2)
  *  @param  p3          The fourth parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3) const
 {
     // array of parameters
     zval **params[4] = { &p0._val, &p1._val, &p2._val, &p3._val };
@@ -764,7 +764,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3)
  *  @param  p4          The fifth parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4) const
 {
     // array of parameters
     zval **params[5] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val };
@@ -783,7 +783,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4)
  *  @param  p5          The sixth parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) const
 {
     // array of parameters
     zval **params[6] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val };
@@ -803,7 +803,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
  *  @param  p6          The seventh parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) const
 {
     // array of parameters
     zval **params[7] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val };
@@ -824,7 +824,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
  *  @param  p7          The eighth parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) const
 {
     // array of parameters
     zval **params[8] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val };
@@ -846,7 +846,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
  *  @param  p8          The ninth parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) const
 {
     // array of parameters
     zval **params[9] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val };
@@ -869,7 +869,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
  *  @param  p9          The tenth parameter
  *  @return Value
  */
-Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
+Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) const
 {
     // array of parameters
     zval **params[10] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val };
@@ -1090,7 +1090,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(int argc, zval ***params)
+Value Value::exec(int argc, zval ***params) const
 {
     // the return zval
     zval *retval = nullptr;

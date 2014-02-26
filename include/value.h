@@ -569,17 +569,17 @@ public:
      *  This call operator is only useful when the variable represents a callable
      *  @return Value
      */
-    Value operator()();
-    Value operator()(Value p0);
-    Value operator()(Value p0, Value p1);
-    Value operator()(Value p0, Value p1, Value p2);
-    Value operator()(Value p0, Value p1, Value p2, Value p3);
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4);
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+    Value operator()() const;
+    Value operator()(Value p0) const;
+    Value operator()(Value p0, Value p1) const;
+    Value operator()(Value p0, Value p1, Value p2) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) const;
+    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) const;
 
     /**
      *  Call a method
@@ -636,7 +636,7 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(int argc, struct _zval_struct ***params);
+    Value exec(int argc, struct _zval_struct ***params) const;
 
     /**
      *  Call method with a number of parameters
