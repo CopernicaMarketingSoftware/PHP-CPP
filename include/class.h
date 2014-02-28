@@ -84,8 +84,15 @@ public:
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
      */
-    template <typename TYPE>
-    void add(const char *name, const Type &value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, std::nullptr_t value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, uint64_t value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, uint32_t value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, uint16_t value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, char value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, const char *value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, const std::string &value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, bool value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, double value, int flags = Public) { ClassBase::add(name, value, flags); }
      
 protected:
     /**

@@ -71,9 +71,8 @@ extern "C"
         
         // add methods to it
         customClass.add("myMethod", &MyCustomClass::myMethod, Php::Final, {});
-        customClass.add("property", "bla");
-        customClass.add("property", "bla", Php::Protected);
-        customClass.add("property", "bla", Php::Const);
+        customClass.add("property1", "bla");
+        customClass.add("property2", "bla", Php::Protected);
         
         // add the class to the extension
         extension.add(customClass);

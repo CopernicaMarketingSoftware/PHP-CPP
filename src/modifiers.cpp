@@ -7,6 +7,7 @@
  *  @author Martijn Otto
  *  @copyright 2014 Copernica BV
  */
+#include "includes.h"
 
 /**
  *  Set up namespace

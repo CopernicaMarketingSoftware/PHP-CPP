@@ -10,7 +10,10 @@
 myFunction();
 
 //create a MyCustomClass object, which is an object of a C++ class
-$MyCustomClass = new MyClass();
+$object = new MyClass();
 
 // run a function of the class
-$MyCustomClass->myMethod(1);
+$object->myMethod(1);
+
+echo($object->property1."\n");
+echo($object->property2."\n");

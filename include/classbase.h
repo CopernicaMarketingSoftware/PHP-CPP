@@ -61,7 +61,7 @@ public:
      *  @param  that
      */
     ClassBase(ClassBase &&that) :
-        _flags(that._flags), _methods(std::move(that._methods)), _methods(std::move(that._methods)), _entry(that._entry) 
+        _flags(that._flags), _methods(std::move(that._methods)), _members(std::move(that._members)), _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
         // only moved during extension setup, when the entry pointer has not yet

@@ -46,6 +46,10 @@ public:
      */
     void initialize(struct _zend_function_entry *entry, const std::string &classname)
     {
+        // fix the flags, if neither public, private and protected is set, we use public,
+        // (this solves php warnings if only "final" or only "abstract" is set
+        if ((_flags & (Public|Private|Protected)) == 0) _flags |= Public;
+        
         // call base
         Callable::initialize(entry, classname.c_str(), _flags);
     }

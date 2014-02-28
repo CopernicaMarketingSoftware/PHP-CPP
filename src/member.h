@@ -30,7 +30,7 @@ public:
     /** 
      *  Destructor
      */
-    virtual ~Member();
+    virtual ~Member() {}
 
     /**
      *  Initialize the member

@@ -198,7 +198,7 @@ void ClassBase::initialize()
 #endif
 
     // set access types flags for class
-    _entry->ce_flags = flags;
+    _entry->ce_flags = _flags;
     
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);
