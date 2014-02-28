@@ -15,7 +15,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class BoolMember : public MemberInfo
+class BoolMember : public Member
 {
 private:
     /**
@@ -27,9 +27,11 @@ private:
 public:
     /**
      *  Constructor
+     *  @param  name
      *  @param  value
+     *  @param  flags
      */
-    BoolMember(bool value) : MemberInfo(), _value(value) {}
+    BoolMember(const char *name, bool value, int flags) : Member(name, flags), _value(value) {}
 
     /**
      *  Destructor
@@ -37,27 +39,22 @@ public:
     virtual ~BoolMember() {}
 
     /**
-     *  Is this a property member
-     *  @return bool
+     *  Virtual method to declare a class constant
+     *  @param  entry       Class entry
      */
-    virtual bool isProperty() { return true; }
+    virtual void constant(struct _zend_class_entry *entry) override
+    {
+        zend_declare_class_constant_bool(entry, _name.c_str(), _name.size(), _value);
+    }
 
     /**
      *  Virtual method to declare the property
      *  @param  entry       Class entry
-     *  @param  name        Name of the member
-     *  @param  size        Size of the name
-     *  @param  flags       Additional flags
      */
-    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, MemberModifier flags) override
+    virtual void declare(struct _zend_class_entry *entry) override
     {
-#if PHP_VERSION_ID >= 50400
-        if (flags == constMember) zend_declare_class_constant_bool(entry, name, size, _value);
-        else zend_declare_property_bool(entry, name, size, _value, flags);
-#else
-        if (flags == constMember) zend_declare_class_constant_bool(entry, (char *) name, size, _value);
-        else zend_declare_property_bool(entry, (char *) name, size, _value, flags);
-#endif
+        // char* cast is necessary for php 5.3
+        zend_declare_property_bool(entry, (char *)_name.c_str(), _name.size(), _value, _flags);
     }
 };
 

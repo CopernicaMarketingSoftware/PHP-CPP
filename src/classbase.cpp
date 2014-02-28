@@ -202,9 +202,8 @@ void ClassBase::initialize()
     // @todo something with the flags, but before or after the register_internal_class?
     //setFlags(entry, _type.getFlags());
 
-    // declare all properties
-    // @todo enable this
-//    _properties.initialize(_entry);
+    // declare all member variables
+    for (auto &member : _members) member->initialize(_entry);
 }
 
 /**
@@ -257,6 +256,114 @@ void ClassBase::add(const char *name, method_callback_3 callback, int flags, con
 {
     // add the method
     _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, std::nullptr_t value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<NullMember>(name, flags));
+}
+    
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, int16_t value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<LongMember>(name, value, flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, int32_t value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<LongMember>(name, value, flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, int64_t value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<LongMember>(name, value, flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, bool value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<BoolMember>(name, value, flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, char value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<StringMember>(name, &value, 1, flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, const std::string &value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<StringMember>(name, value, flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, const char *value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<StringMember>(name, value, strlen(value), flags));
+}
+
+/**
+ *  Add a property to the class
+ *  @param  name        Name of the property
+ *  @param  value       Actual property value
+ *  @param  flags       Optional flags
+ */
+void ClassBase::add(const char *name, double value, int flags)
+{
+    // add property
+    _members.insert(std::make_shared<FloatMember>(name, value, flags));
 }
     
 /**

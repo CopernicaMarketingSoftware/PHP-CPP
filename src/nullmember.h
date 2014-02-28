@@ -15,13 +15,15 @@ namespace Php {
 /**
  *  Class definition
  */
-class NullMember : public MemberInfo
+class NullMember : public Member
 {
 public:
     /**
      *  Constructor
+     *  @param  name
+     *  @param  flags
      */
-    NullMember() : MemberInfo() {}
+    NullMember(const char *name, int flags) : Member(name, flags) {}
 
     /**
      *  Destructor
@@ -29,27 +31,22 @@ public:
     virtual ~NullMember() {}
 
     /**
-     *  Is this a property member
-     *  @return bool
+     *  Internal method to declare the property as constant
+     *  @param  zend_class_entry
      */
-    virtual bool isProperty() { return true; }
+    virtual void constant(struct _zend_class_entry *entry) override
+    {
+        zend_declare_class_constant_null(entry, _name.c_str(), _name.size());
+    }
 
     /**
      *  Virtual method to declare the property
      *  @param  entry       Class entry
-     *  @param  name        Name of the member
-     *  @param  size        Size of the name
-     *  @param  flags       Additional flags
      */
-    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, MemberModifier flags) override
+    virtual void declare(struct _zend_class_entry *entry) override
     {
-#if PHP_VERSION_ID >= 50400
-        if (flags == constMember) zend_declare_class_constant_null(entry, name, size);
-        else zend_declare_property_null(entry, name, size, flags);
-#else
-        if (flags == constMember) zend_declare_class_constant_null(entry, (char *) name, size);
-        else zend_declare_property_null(entry, (char *) name, size, flags);
-#endif
+        // char* cast is necessary for php 5.3
+        zend_declare_property_null(entry, (char *)_name.c_str(), _name.size(), _flags);
     }
 };
 

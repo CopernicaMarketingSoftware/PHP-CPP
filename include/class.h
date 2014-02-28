@@ -50,25 +50,6 @@ public:
     virtual ~Class() {}
     
     /**
-     *  Add a property to the class
-     * 
-     *  Every instance of this class will have this property. The property
-     *  can be Php::Public, Php::Protected or Php::Private (altough setting
-     *  private properties is odd as the implementation of the class is in CPP,
-     *  so why use private properties while the whole implementation is already
-     *  hidden)
-     * 
-     *  @param  name        Name of the property
-     *  @param  property    Actual property value
-     *  @param  flags       Optional flags
-     */
-//    void add(const char *name, const Property &property, int flags = Php::Public)
-//    {
-//        // @todo    something with the flags
-//        _properties[name] = property;
-//    }
-    
-    /**
      *  Add a method to the class
      *  
      *  The method will be accessible as one of the class methods in your PHP
@@ -91,6 +72,22 @@ public:
     void add(const char *name, void(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), 0,     args); }
     void add(const char *name, bool(T::*method)(),                                  const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), 0,     args); }
     void add(const char *name, bool(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), 0,     args); }
+
+    /**
+     *  Add a property to the class
+     * 
+     *  Every instance of this class will have this property. The property
+     *  can be Php::Public, Php::Protected or Php::Private (altough setting
+     *  private properties is odd as the implementation of the class is in CPP,
+     *  so why use private properties while the whole implementation is already
+     *  hidden)
+     * 
+     *  @param  name        Name of the property
+     *  @param  value       Actual property value
+     *  @param  flags       Optional flags
+     */
+    template <typename TYPE>
+    void add(const char *name, const Type &value, int flags = Php::Public) { ClassBase::add(name, value, flags); }
      
 protected:
     /**

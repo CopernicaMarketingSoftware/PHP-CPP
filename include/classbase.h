@@ -31,6 +31,7 @@ typedef Value   (Base::*method_callback_3)(Parameters &);
  *  Forward declarations
  */
 class Method;
+class Member;
 
 /**
  *  Class definition
@@ -115,6 +116,30 @@ protected:
     void add(const char *name, method_callback_2, int flags=0, const Arguments &args = {});
     void add(const char *name, method_callback_3, int flags=0, const Arguments &args = {});
 
+    /**
+     *  Add a property to the class
+     * 
+     *  Every instance of this class will have this property. The property
+     *  can be Php::Public, Php::Protected or Php::Private (altough setting
+     *  private properties is odd as the implementation of the class is in CPP,
+     *  so why use private properties while the whole implementation is already
+     *  hidden)
+     * 
+     *  @param  name        Name of the property
+     *  @param  value       Actual property value
+     *  @param  flags       Optional flags
+     */
+    void add(const char *name, std::nullptr_t value, int flags = Php::Public);
+    void add(const char *name, int16_t value, int flags = Php::Public);
+    void add(const char *name, int32_t value, int flags = Php::Public);
+    void add(const char *name, int64_t value, int flags = Php::Public);
+    void add(const char *name, bool value, int flags = Php::Public);
+    void add(const char *name, char value, int flags = Php::Public);
+    void add(const char *name, const std::string &value, int flags = Php::Public);
+    void add(const char *name, const char *value, int flags = Php::Public);
+    void add(const char *name, double value, int flags = Php::Public);
+
+
 private:
     /**
      *  Retrieve an array of zend_function_entry objects that hold the 
@@ -151,16 +176,16 @@ private:
     struct _zend_function_entry *_entries = nullptr;
     
     /**
-     *  All class methods, this is a map indexed by method name
+     *  All class methods
      *  @var    set
      */
     std::set<std::shared_ptr<Method>> _methods;
     
     /**
-     *  All class properties, also a map indexed by name
-     *  @var    Properties
+     *  All class members (class properties)
+     *  @var    set
      */
-//    std::map<std::string,Property> _properties;
+    std::set<std::shared_ptr<Member>> _members;
 };
     
 /**

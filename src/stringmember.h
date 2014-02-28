@@ -15,7 +15,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class StringMember : public MemberInfo
+class StringMember : public Member
 {
 private:
     /**
@@ -27,16 +27,28 @@ private:
 public:
     /**
      *  Constructor
+     *  @param  name
      *  @param  value
+     *  @param  size
+     *  @param  flags
      */
-    StringMember(const std::string &value) : MemberInfo(), _value(value) {}
+    StringMember(const char *name, const char *value, size_t size, int flags) : Member(name, flags), _value(value, size) {}
 
     /**
      *  Constructor
+     *  @param  name
      *  @param  value
-     *  @param  size
+     *  @param  flags
      */
-    StringMember(const char *value, int size) : MemberInfo(), _value(value, size) {}
+    StringMember(const char *name, const char *value, int flags) : StringMember(name, value, strlen(value), flags) {}
+
+    /**
+     *  Constructor
+     *  @param  name
+     *  @param  value
+     *  @param  flags
+     */
+    StringMember(const char *name, const std::string &value, int flags) : Member(name, flags), _value(value) {}
 
     /**
      *  Destructor
@@ -44,27 +56,22 @@ public:
     virtual ~StringMember() {}
 
     /**
-     *  Is this a property member
-     *  @return bool
+     *  Virtual method to declare class constant
+     *  @param  entry       Class entry
      */
-    virtual bool isProperty() { return true; }
+    virtual void constant(struct _zend_class_entry *entry) override
+    {
+        zend_declare_class_constant_stringl(entry, _name.c_str(), _name.size(), _value.c_str(), _value.size());
+    }
 
     /**
      *  Virtual method to declare the property
      *  @param  entry       Class entry
-     *  @param  name        Name of the member
-     *  @param  size        Size of the name
-     *  @param  flags       Additional flags
      */
-    virtual void declare(struct _zend_class_entry *entry, const char *name, int size, MemberModifier flags) override
+    virtual void declare(struct _zend_class_entry *entry) override
     {
-#if PHP_VERSION_ID >= 50400
-        if (flags == constMember) zend_declare_class_constant_stringl(entry, name, size, _value.c_str(), _value.size());
-        else zend_declare_property_stringl(entry, name, size, _value.c_str(), _value.size(), flags);
-#else
-        if (flags == constMember) zend_declare_class_constant_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size());
-        else zend_declare_property_stringl(entry, (char*) name, size, (char *) _value.c_str(), _value.size(), flags);
-#endif
+        // cast to char* is necessary for php 5.3
+        zend_declare_property_stringl(entry, (char *)_name.c_str(), _name.size(), (char *)_value.c_str(), _value.size(), _flags);
     }
 };
 

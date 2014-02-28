@@ -1,7 +1,7 @@
 /**
- *  LongMember.h
+ *  FloatMember.h
  *
- *  Implementation for a property that is initially set to a long value
+ *  Implementation for a property that is initially set to a boolean value
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
@@ -15,14 +15,14 @@ namespace Php {
 /**
  *  Class definition
  */
-class LongMember : public Member
+class FloatMember : public Member
 {
 private:
     /**
      *  The value
-     *  @var long
+     *  @var double
      */
-    long _value;
+    double _value;
     
 public:
     /**
@@ -31,20 +31,20 @@ public:
      *  @param  value
      *  @param  flags
      */
-    LongMember(const char *name, long value, int flags) : Member(name, flags), _value(value) {}
+    FloatMember(const char *name, double value, int flags) : Member(name, flags), _value(value) {}
 
     /**
      *  Destructor
      */
-    virtual ~LongMember() {}
+    virtual ~FloatMember() {}
 
     /**
-     *  Declare class constant
+     *  Virtual method to declare class constant
      *  @param  entry       Class entry
      */
     virtual void constant(struct _zend_class_entry *entry) override
     {
-        zend_declare_class_constant_long(entry, _name.c_str(), _name.size(), _value);
+        zend_declare_class_constant_double(entry, _name.c_str(), _name.size(), _value);
     }
 
     /**
@@ -53,8 +53,8 @@ public:
      */
     virtual void declare(struct _zend_class_entry *entry) override
     {
-        // char* cast is necessary for php 5.3
-        zend_declare_property_long(entry, (char *)_name.c_str(), _name.size(), _value, _flags);
+        // converstion to char* necessary for php 5.3
+        zend_declare_property_double(entry, (char *)_name.c_str(), _name.size(), _value, _flags);
     }
 };
 
