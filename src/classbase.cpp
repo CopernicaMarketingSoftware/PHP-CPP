@@ -136,7 +136,6 @@ const struct _zend_function_entry *ClassBase::entries()
         zend_function_entry *entry = &_entries[i++];
 
         // let the function fill the entry
-        // @todo check flags for the method
         method->initialize(entry, _name);
     }
 
@@ -199,9 +198,8 @@ void ClassBase::initialize()
 #endif
 
     // set access types flags for class
-    // @todo something with the flags, but before or after the register_internal_class?
-    //setFlags(entry, _type.getFlags());
-
+    _entry->ce_flags = flags;
+    
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);
 }

@@ -50,22 +50,18 @@ public:
     /**
      *  Copy constructor
      *  @param  that
-     * 
-     *  @todo   add properties
+     *
      *  @todo   prefer move
      */
     ClassBase(const ClassBase &that) : 
-        _name(that._name), _flags(that._flags), _methods(that._methods) {}
+        _name(that._name), _flags(that._flags), _methods(that._methods), _members(that._members) {}
 
     /**
      *  Move constructor
      *  @param  that
-     * 
-     *  @todo   add properties
-     *  @todo   use move semantics
      */
     ClassBase(ClassBase &&that) :
-        _flags(that._flags), _methods(std::move(that._methods)), _entry(that._entry) 
+        _flags(that._flags), _methods(std::move(that._methods)), _methods(std::move(that._methods)), _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
         // only moved during extension setup, when the entry pointer has not yet

@@ -23,7 +23,7 @@
 #include <iostream>
 
 /**
- *  @todo: if ZTS defined very many errors. need debug.
+ *  @todo: if ZTS defined many errors appear. need debug.
  */
 //#define ZTS 1
 

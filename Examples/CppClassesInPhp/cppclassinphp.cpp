@@ -70,8 +70,10 @@ extern "C"
         Php::Class<MyCustomClass> customClass("MyClass");
         
         // add methods to it
-        // @todo support setting parameter properties
-        customClass.add("myMethod", &MyCustomClass::myMethod, {});
+        customClass.add("myMethod", &MyCustomClass::myMethod, Php::Final, {});
+        customClass.add("property", "bla");
+        customClass.add("property", "bla", Php::Protected);
+        customClass.add("property", "bla", Php::Const);
         
         // add the class to the extension
         extension.add(customClass);

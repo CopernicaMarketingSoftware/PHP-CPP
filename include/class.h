@@ -39,8 +39,6 @@ public:
      *  flags are set, a regular public class will be formed.
      * 
      *  @param  name        Name of the class
-     * 
-     *  @todo   make sure flags are used
      */
     Class(const char *name) : ClassBase(name) {}
 
@@ -64,14 +62,14 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
      */
-    void add(const char *name, void(T::*method)(),                   int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), flags, args); }
-    void add(const char *name, void(T::*method)(Parameters &params), int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), flags, args); }
-    void add(const char *name, bool(T::*method)(),                   int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), flags, args); }
-    void add(const char *name, bool(T::*method)(Parameters &params), int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), flags, args); }
-    void add(const char *name, void(T::*method)(),                                  const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), 0,     args); }
-    void add(const char *name, void(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), 0,     args); }
-    void add(const char *name, bool(T::*method)(),                                  const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), 0,     args); }
-    void add(const char *name, bool(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), 0,     args); }
+    void add(const char *name, void(T::*method)(),                   int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), flags,  args); }
+    void add(const char *name, void(T::*method)(Parameters &params), int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), flags,  args); }
+    void add(const char *name, bool(T::*method)(),                   int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), flags,  args); }
+    void add(const char *name, bool(T::*method)(Parameters &params), int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), flags,  args); }
+    void add(const char *name, void(T::*method)(),                                       const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), Public, args); }
+    void add(const char *name, void(T::*method)(Parameters &params),                     const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), Public, args); }
+    void add(const char *name, bool(T::*method)(),                                       const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), Public, args); }
+    void add(const char *name, bool(T::*method)(Parameters &params),                     const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), Public, args); }
 
     /**
      *  Add a property to the class
@@ -87,7 +85,7 @@ public:
      *  @param  flags       Optional flags
      */
     template <typename TYPE>
-    void add(const char *name, const Type &value, int flags = Php::Public) { ClassBase::add(name, value, flags); }
+    void add(const char *name, const Type &value, int flags = Public) { ClassBase::add(name, value, flags); }
      
 protected:
     /**
