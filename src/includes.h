@@ -30,6 +30,7 @@
 /**
  *  PHP includes
  */
+#pragma GCC system_header
 #include <php.h>
 #include "zend_exceptions.h"
 #include "zend_interfaces.h"
@@ -54,10 +55,8 @@
 #include "../include/hashmember.h"
 #include "../include/parameters.h"
 #include "../include/membermodifier.h"
-#include "../include/function.h"
 #include "../include/properties.h"
 #include "../include/base.h"
-#include "../include/method.h"
 #include "../include/member.h"
 #include "../include/public.h"
 #include "../include/protected.h"
@@ -65,8 +64,8 @@
 #include "../include/const.h"
 #include "../include/members.h"
 #include "../include/classmodifier.h"
+#include "../include/classbase.h"
 #include "../include/class.h"
-#include "../include/classinfo.h"
 #include "../include/extension.h"
 #include "../include/exception.h"
 #include "../include/init.h"
@@ -75,7 +74,9 @@
  *  Interface files for internal use only
  */
 #include "mixedobject.h"
-#include "nativefunction.h"
+#include "callable.h"
+#include "function.h"
+#include "method.h"
 #include "internalfunction.h"
 #include "memberinfo.h"
 #include "nullmember.h"

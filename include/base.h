@@ -70,13 +70,6 @@ protected:
 private:
 };
 
-/**
- *  Definition of a method
- */
-typedef void    (Base::*method_callback_0)();
-typedef void    (Base::*method_callback_1)(Parameters &);
-typedef Value   (Base::*method_callback_2)();
-typedef Value   (Base::*method_callback_3)(Parameters &);
 
 /**
  *  End of namespace

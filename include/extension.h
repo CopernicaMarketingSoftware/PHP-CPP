@@ -29,17 +29,6 @@ struct _zend_module_entry;
 namespace Php {
 
 /**
- *  Forward declaration
- */
-class Extension;
-
-/**
- *  Optional callback types for starting and stopping the request
- *  @param  extension
- */
-typedef bool    (*request_callback)(Extension *extension);
-
-/**
  *  A couple of predefined native callback functions that can be registered.
  *  These are functions that optional accept a Request and/or Parameters object,
  *  and that either return void or a Value object. 
@@ -48,6 +37,18 @@ typedef void    (*native_callback_0)();
 typedef void    (*native_callback_1)(Parameters &);
 typedef Value   (*native_callback_2)();
 typedef Value   (*native_callback_3)(Parameters &);
+
+/**
+ *  Forward declaration
+ */
+class Extension;
+class Function;
+
+/**
+ *  Optional callback types for starting and stopping the request
+ *  @param  extension
+ */
+typedef bool    (*request_callback)(Extension *extension);
 
 /**
  *  Class definition
@@ -142,32 +143,15 @@ public:
     }
     
     /**
-     *  Add a function to the extension
-     *  
-     *  It is only possible to create functions during the initialization of
-     *  the library, before the Extension::module() method is called.
-     * 
-     *  Note that the function must have been allocated on the HEAP (using
-     *  "new") and that the object will be destructed (using "delete")
-     *  by the extension object (you thus do not have to destruct it
-     *  yourself!) 
-     * 
-     *  @param  function    The function to add
-     *  @return Function    The added function
-     */
-    Function *add(Function *function);
-    
-    /**
      *  Add a native function directly to the extension
      *  @param  name        Name of the function
      *  @param  function    The function to add
      *  @param  arguments   Optional argument specification
-     *  @return Function    The added function
      */
-    Function *add(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments = {});
-    Function *add(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments = {});
+    void add(const char *name, native_callback_0 function, const Arguments &arguments = {});
+    void add(const char *name, native_callback_1 function, const Arguments &arguments = {});
+    void add(const char *name, native_callback_2 function, const Arguments &arguments = {});
+    void add(const char *name, native_callback_3 function, const Arguments &arguments = {});
     
     /**
      *  Add a native class to the extension
@@ -175,13 +159,13 @@ public:
      *  @param  type        The class implementation
      */
     template<typename T>
-    void add(const char *name, const Class<T> &type)
+    void add(const Class<T> &type)
     {
-        // construct info
-        _ClassInfo *info = new ClassInfo<T>(name, type);
+        // make a copy of the object
+        auto *info = new Class<T>(type);
         
-        // add class
-        _classes.insert(std::unique_ptr<_ClassInfo>(info));
+        // and copy it to the list of classes
+        _classes.insert(std::unique_ptr<ClassBase>(info));
     }
     
     /**
@@ -197,16 +181,16 @@ public:
     
 private:
     /**
-     *  Set of function objects defined in the library
+     *  Functions defined in the library
      *  @var    set
      */
     std::set<std::unique_ptr<Function>> _functions;
 
     /**
-     *  Set of classes defined in the library
+     *  Classes defined in the library, indexed by their name
      *  @var    set
      */
-    std::set<std::unique_ptr<_ClassInfo>> _classes;
+    std::set<std::unique_ptr<ClassBase>> _classes;
 
     /**
      *  The information that is passed to the Zend engine

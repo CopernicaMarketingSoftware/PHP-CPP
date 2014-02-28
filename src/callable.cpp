@@ -23,13 +23,13 @@ namespace Php {
  *  @param  tsrm_ls
  *  @return integer
  */
-void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
+static void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
 {
     // find the function name
     const char *name = get_active_function_name(TSRMLS_C);
     
     // uncover the hidden pointer inside the function name
-    Function *function = HiddenPointer<Function>(name);
+    Callable *callable = HiddenPointer<Callable>(name);
 
     // wrap the return value
     Value result(return_value, true);
@@ -41,7 +41,7 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
     try
     {
         // get the result
-        result = function->invoke(params);
+        result = callable->invoke(params);
     }
     catch (Php::OrigException &exception)
     {
@@ -58,40 +58,6 @@ void invoke_function(INTERNAL_FUNCTION_PARAMETERS)
 }
 
 /**
- *  Constructor
- *  @param  name    Name of the function
- *  @param  min     Min number of arguments
- *  @param  max     Max number of arguments
- */
-Function::Function(const char *name, const std::initializer_list<Argument> &arguments) : _ptr(this, name)
-{
-    // construct vector for arguments
-    _argc = arguments.size();
-    _argv = new zend_arg_info[_argc+1];
-    
-    // counter
-    int i=1;
-    
-    // loop through the arguments
-    for (auto it = arguments.begin(); it != arguments.end(); it++)
-    {
-        // fill the arg info
-        it->fill(&_argv[i++]);
-    }
-    
-    // @todo find out number of required arguments
-    _required = _argc;
-}
-
-/**
- *  Destructor
- */
-Function::~Function()
-{
-    delete[] _argv;
-}
-
-/**
  *  Fill a function entry
  * 
  *  This method is called when the extension is registering itself, when the 
@@ -101,18 +67,18 @@ Function::~Function()
  *  @param  classname   Optional class name
  *  @param  flags       Is this a public property?
  */
-void Function::fill(zend_function_entry *entry, const char *classname, MemberModifier flags) const
+void Callable::initialize(zend_function_entry *entry, const char *classname, int flags) const
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
-    entry->fname = _ptr;
-    entry->handler = invoke_function;
+    entry->fname = (const char *)_ptr;
+    entry->handler = invoke_callable;
     entry->arg_info = _argv;
     entry->num_args = _argc;
     entry->flags = flags;
 
     // we should fill the first argument as well
 #if PHP_VERSION_ID >= 50400
-    fill((zend_internal_function_info *)entry->arg_info, classname);
+    initialize((zend_internal_function_info *)entry->arg_info, classname);
 #endif
 }
 
@@ -122,7 +88,7 @@ void Function::fill(zend_function_entry *entry, const char *classname, MemberMod
  *  @param  classname   Optional classname
  */
 #if PHP_VERSION_ID >= 50400
-void Function::fill(zend_internal_function_info *info, const char *classname) const
+void Callable::initialize(zend_internal_function_info *info, const char *classname) const
 {
     // fill in all the members, note that return reference is false by default,
     // because we do not support returning references in PHP-CPP, although Zend
@@ -133,7 +99,7 @@ void Function::fill(zend_internal_function_info *info, const char *classname) co
 
     // number of required arguments, and the expected return type
     info->required_num_args = _required;
-    info->_type_hint = _type;
+    info->_type_hint = _return;
 
     // we do not support return-by-reference
     info->return_reference = false;

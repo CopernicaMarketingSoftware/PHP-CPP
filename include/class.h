@@ -28,101 +28,88 @@ namespace Php {
 /**
  *  Class definition of the class
  */
-template <typename T, ClassModifier _flags = ClassModifier::regular>
-class Class
+template <typename T>
+class Class : private ClassBase
 {
 public:
     /**
      *  Constructor
+     * 
+     *  The flags can be a combination of Php::Final and Php::Abstract. If no
+     *  flags are set, a regular public class will be formed.
+     * 
+     *  @param  name        Name of the class
+     *  @param  flags       Optional flags (final, abstract)
+     * 
+     *  @todo   make sure flags are used
      */
-    Class() {}
-
-    /**
-     *  Constructor with initializer list to define the properties
-     *  @param  members
-     */
-    Class(const std::initializer_list<Member> &members) : _members(members) {}
-
-    /**
-     *  Move constructor
-     *  @param  that
-     */
-    Class(Class &&that) : _members(std::move(that._members)) {}
-
-    /**
-     *  Copy constructor
-     */
-    Class(const Class &that) : _members(that._members) {}
+    Class(const char *name, int flags = 0) : ClassBase(name, flags) {}
 
     /**
      *  Destructor
      */
     virtual ~Class() {}
-
+    
     /**
-     *  Construct an instance
+     *  Add a property to the class
+     * 
+     *  Every instance of this class will have this property. The property
+     *  can be Php::Public, Php::Protected or Php::Private (altough setting
+     *  private properties is odd as the implementation of the class is in CPP,
+     *  so why use private properties while the whole implementation is already
+     *  hidden)
+     * 
+     *  @param  name        Name of the property
+     *  @param  property    Actual property value
+     *  @param  flags       Optional flags
+     */
+//    void add(const char *name, const Property &property, int flags = Php::Public)
+//    {
+//        // @todo    something with the flags
+//        _properties[name] = property;
+//    }
+    
+    /**
+     *  Add a method to the class
+     *  
+     *  The method will be accessible as one of the class methods in your PHP
+     *  code. When the method is called, it will automatically be forwarded
+     *  to the C++ implementation. The flags can be Php::Public, Php::Protected
+     *  or Php::Private (using private methods can be useful if you for example
+     *  want to make the __construct() function private). The access-modified
+     *  flag can be bitwise combined with the flag Php::Final or Php::Abstract).
+     *  
+     *  @param  name        Name of the method
+     *  @param  method      The actual method
+     *  @param  flags       Optional flags
+     *  @param  args        Argument descriptions
+     */
+    void add(const char *name, void(T::*method)(),                   int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), flags, args); }
+    void add(const char *name, void(T::*method)(Parameters &params), int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), flags, args); }
+    void add(const char *name, bool(T::*method)(),                   int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), flags, args); }
+    void add(const char *name, bool(T::*method)(Parameters &params), int flags = 0, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), flags, args); }
+    void add(const char *name, void(T::*method)(),                                  const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), 0,     args); }
+    void add(const char *name, void(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), 0,     args); }
+    void add(const char *name, bool(T::*method)(),                                  const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), 0,     args); }
+    void add(const char *name, bool(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), 0,     args); }
+     
+private:
+    /**
+     *  Construct a new instance of the object
      *  @return Base
      */
-    Base* construct()
+    virtual Base* construct() override
     {
-        // allocate the object
+        // construct an instance
         return new T();
     }
-
+    
     /**
-     *  Initialize the class
-     *  This will declare all members
-     *  @param entry
+     *  Extensions have access to the private base class
      */
-    void initialize(struct _zend_class_entry *entry)
-    {
-        // loop through the members
-        for (auto iter = _members.begin(); iter != _members.end(); iter++)
-        {
-            iter->declare(entry);
-        }
-    }
-
-    /**
-     *  Retrieve the functions
-     *  @param  classname
-     *  @return zend_function_entry*
-     */
-    struct _zend_function_entry *methods(const char *classname)
-    {
-        return _members.methods(classname);
-    }
-
-    /**
-     *  Retrieve the class flags specifying whether the class
-     *  is a regular class, abstract or final
-     *
-     *  @return int flags of access types for classes
-     */
-    int getFlags()
-    {
-        return _flags;
-    }
-
-protected:
-    /**
-     *  The initial arguments
-     *  @var Members
-     */
-    Members _members;
-
+    friend class Extension;
+    
 };
-
-
-// C++11 analog of `typedef`. Equivalent to the following pseudocode: typedef ClassFlagged<T, Zend::AccClass::FINAL> FinalClass<T>;
-template <typename T>
-using FinalClass    = Class<T, ClassModifier::final>;
-
-template <typename T>
-using AbstractClass = Class<T, ClassModifier::abstract>;
-
-template <typename T>
-using Interface     = Class<T, ClassModifier::interface>;
 
 /**
  *  End of namespace

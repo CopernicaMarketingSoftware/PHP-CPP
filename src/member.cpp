@@ -5,6 +5,9 @@
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
+ * 
+ * 
+ *  @todo   refactor this class to a property
  */
 #include "includes.h"
 
@@ -12,6 +15,8 @@
  *  Set up namespace
  */
 namespace Php {
+
+#ifdef XXXX
 
 /**
  *  Constructor
@@ -218,6 +223,8 @@ void Member::fill(struct _zend_function_entry *entry, const char *classname)
     _info->fill(entry, classname, _flags);
 }
     
+#endif 
+
 /**
  *  End of namespace
  */

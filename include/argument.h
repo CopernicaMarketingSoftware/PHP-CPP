@@ -85,6 +85,12 @@ private:
      */
     bool _required;
 };
+
+/**
+ *  A list of arguments can be supplied to methods
+ *  @type   Arguments
+ */
+using Arguments = std::initializer_list<Argument>;
     
 /**
  *  End of namespace

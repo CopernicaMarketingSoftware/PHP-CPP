@@ -1,10 +1,10 @@
 /**
- *  ClassInfo.cpp
+ *  ClassBase.cpp
  *
- *  Implementation for the class info
+ *  Implementation of the ClassBase class.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2014 Copernica BV
  */
 #include "includes.h"
 
@@ -62,9 +62,9 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     
     // retrieve the classinfo object
 #if PHP_VERSION_ID >= 50400
-    _ClassInfo *info = (_ClassInfo *)base->info.user.doc_comment;
+    ClassBase *info = (ClassBase *)base->info.user.doc_comment;
 #else
-    _ClassInfo *info = *((_ClassInfo **)base->doc_comment);
+    ClassBase *info = *((ClassBase **)base->doc_comment);
 #endif    
     
     // store the class
@@ -102,31 +102,70 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
 }
 
 /**
- *  Constructor
- *  @param  name
- */
-_ClassInfo::_ClassInfo(const char *name) : _name(name), _entry(NULL) 
-{
-}
-
-/**
  *  Destructor
  */
-_ClassInfo::~_ClassInfo() 
+ClassBase::~ClassBase()
 {
+    // destruct the entries
+    if (_entries) delete[] _entries;
 }
 
 /**
- *  Initialize the class
- *  @param  mixed       Optional threading ID 
+ *  Retrieve an array of zend_function_entry objects that hold the 
+ *  properties for each method. This method is called at extension
+ *  startup time to register all methods.
+ * 
+ *  @param  classname       The class name
+ *  @return zend_function_entry[]
  */
-void _ClassInfo::initialize(TSRMLS_DC)
+const struct _zend_function_entry *ClassBase::entries()
+{
+    // already initialized?
+    if (_entries) return _entries;
+    
+    // allocate memory for the functions
+    _entries = new zend_function_entry[_methods.size() + 1];
+    
+    // keep iterator counter
+    int i = 0;
+
+    // loop through the functions
+    for (auto &method : _methods)
+    {
+        // retrieve entry
+        zend_function_entry *entry = &_entries[i++];
+
+        // let the function fill the entry
+        // @todo check flags for the method
+        method->initialize(entry, _name);
+    }
+
+    // last entry should be set to all zeros
+    zend_function_entry *last = &_entries[i];
+
+    // all should be set to zero
+    memset(last, 0, sizeof(zend_function_entry));
+
+    // done
+    return _entries;
+}
+
+/**
+ *  Initialize the class, given its name
+ * 
+ *  The module functions are registered on module startup, but classes are
+ *  initialized afterwards. The Zend engine is a strange thing. Nevertheless,
+ *  this means that this method is called after the module is already available.
+ *  This function will inform the Zend engine about the existence of the
+ *  class.
+ */
+void ClassBase::initialize()
 {
     // the class entry
     zend_class_entry entry;
 
     // initialize the class entry
-    INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), methods());
+    INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
 
     // we need a special constructor
     entry.create_object = create_object;
@@ -159,19 +198,69 @@ void _ClassInfo::initialize(TSRMLS_DC)
     _entry->doc_comment = (char *)wrapper;
 #endif
 
-    // initialize the entry
-    initialize(_entry);
+    // set access types flags for class
+    // @todo something with the flags, but before or after the register_internal_class?
+    //setFlags(entry, _type.getFlags());
+
+    // declare all properties
+    // @todo enable this
+//    _properties.initialize(_entry);
 }
 
 /**
- *  set access types flags for class
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
  */
-void _ClassInfo::setFlags(struct _zend_class_entry *entry, int flags) {
-    entry->ce_flags |= flags;
+void ClassBase::add(const char *name, method_callback_0 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
 }
 
 /**
- *  End of namespace
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::add(const char *name, method_callback_1 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::add(const char *name, method_callback_2 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::add(const char *name, method_callback_3 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+}
+    
+/**
+ *  End namespace
  */
 }
- 
+

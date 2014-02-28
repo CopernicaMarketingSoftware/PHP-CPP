@@ -48,6 +48,11 @@ public:
     }
 };
 
+void myFunction(Php::Parameters &params)
+{
+    std::cout << "regular function" << std::endl;
+}
+
 
 // Symbols are exported according to the "C" language
 extern "C" 
@@ -58,12 +63,18 @@ extern "C"
         // create extension
         static Php::Extension extension("Cpp_classes_in_php","1.0");
         
-        // add the custom class ot the extension
-        extension.add("MyClass", Php::Class<MyCustomClass>({
-            Php::Public("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod),{
-                Php::ByVal("newX", Php::numericType)
-                })
-            }));
+        // add custom function
+        extension.add("myFunction", myFunction, { });
+        
+        // we are going to define a class
+        Php::Class<MyCustomClass> customClass("MyClass");
+        
+        // add methods to it
+        // @todo support setting parameter properties
+        customClass.add("myMethod", &MyCustomClass::myMethod, {});
+        
+        // add the class to the extension
+        extension.add(customClass);
                 
         // return the extension module
         return extension.module();

@@ -191,7 +191,7 @@ Extension::Extension(const char *name, const char *version, request_callback sta
     _entry->type = 0;                                       // temporary or persistent module, will be filled by Zend engine
     _entry->handle = NULL;                                  // dlopen() handle, will be filled by Zend engine
     _entry->module_number = 0;                              // module number will be filled in by Zend engine
-    _entry->build_id = ZEND_MODULE_BUILD_ID;                // check if extension and zend engine are compatible
+    _entry->build_id = (char *)ZEND_MODULE_BUILD_ID;        // check if extension and zend engine are compatible
 
     // things that only need to be initialized
 #ifdef ZTS
@@ -215,29 +215,52 @@ Extension::~Extension()
 }
 
 /**
- *  Add a function to the library
- *  @param  function    Function object
- *  @return Function
+ *  Add a native function directly to the extension
+ *  @param  name        Name of the function
+ *  @param  function    The function to add
+ *  @param  arguments   Optional argument specification
  */
-Function *Extension::add(Function *function)
+void Extension::add(const char *name, native_callback_0 function, const Arguments &arguments)
 {
-    // add the function to the map
-    _functions.insert(std::unique_ptr<Function>(function));
-    
-    // the result is a pair with an iterator
-    return function;
+    // add a function
+    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
 }
 
 /**
  *  Add a native function directly to the extension
  *  @param  name        Name of the function
  *  @param  function    The function to add
- *  @return Function    The added function
+ *  @param  arguments   Optional argument specification
  */
-Function *Extension::add(const char *name, native_callback_0 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_1 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_2 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
-Function *Extension::add(const char *name, native_callback_3 function, const std::initializer_list<Argument> &arguments) { return add(new NativeFunction(name, function, arguments)); }
+void Extension::add(const char *name, native_callback_1 function, const Arguments &arguments)
+{
+    // add a function
+    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
+}
+
+/**
+ *  Add a native function directly to the extension
+ *  @param  name        Name of the function
+ *  @param  function    The function to add
+ *  @param  arguments   Optional argument specification
+ */
+void Extension::add(const char *name, native_callback_2 function, const Arguments &arguments)
+{
+    // add a function
+    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
+}
+
+/**
+ *  Add a native function directly to the extension
+ *  @param  name        Name of the function
+ *  @param  function    The function to add
+ *  @param  arguments   Optional argument specification
+ */
+void Extension::add(const char *name, native_callback_3 function, const Arguments &arguments)
+{
+    // add a function
+    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
+}
 
 /**
  *  Retrieve the module entry
@@ -249,29 +272,29 @@ zend_module_entry *Extension::module()
     if (_entry->functions || _functions.size() == 0) return _entry;
 
     // allocate memory for the functions
-    zend_function_entry *functions = new zend_function_entry[_functions.size() + 1];
+    zend_function_entry *entries = new zend_function_entry[_functions.size() + 1];
 
     // keep iterator counter
     int i = 0;
 
     // loop through the functions
-    for (auto it = begin(_functions); it != _functions.end(); it++)
+    for (auto &function : _functions)
     {
         // retrieve entry
-        zend_function_entry *entry = &functions[i++];
+        zend_function_entry *entry = &entries[i++];
 
         // let the function fill the entry
-        (*it)->fill(entry);
+        function->initialize(entry);
     }
 
     // last entry should be set to all zeros
-    zend_function_entry *last = &functions[i];
+    zend_function_entry *last = &entries[i];
 
     // all should be set to zero
     memset(last, 0, sizeof(zend_function_entry));
 
     // store functions in entry object
-    _entry->functions = functions;
+    _entry->functions = entries;
 
     // return the entry
     return _entry;
@@ -284,11 +307,7 @@ zend_module_entry *Extension::module()
 bool Extension::initialize()
 {
     // loop through the classes
-    for (auto iter = _classes.begin(); iter != _classes.end(); iter++)
-    {
-        // initialize the class
-        (*iter)->initialize();
-    }
+    for (auto &iter : _classes) iter->initialize();
     
     // done
     return true;
