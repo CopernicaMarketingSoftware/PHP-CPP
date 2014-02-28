@@ -45,9 +45,11 @@
 #include <phpcpp/private.h>
 #include <phpcpp/const.h>
 #include <phpcpp/members.h>
-#include <phpcpp/classmodifier.h>
 #include <phpcpp/classbase.h>
 #include <phpcpp/class.h>
+#include <phpcpp/abstractclass.h>
+#include <phpcpp/finalclass.h>
+#include <phpcpp/interface.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/exception.h>
 

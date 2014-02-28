@@ -12,7 +12,7 @@
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  changed by Valeriy Dmitriev <ufabiz@gmail.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013, 2014 Copernica BV
  */
 
 /**
@@ -39,11 +39,10 @@ public:
      *  flags are set, a regular public class will be formed.
      * 
      *  @param  name        Name of the class
-     *  @param  flags       Optional flags (final, abstract)
      * 
      *  @todo   make sure flags are used
      */
-    Class(const char *name, int flags = 0) : ClassBase(name, flags) {}
+    Class(const char *name) : ClassBase(name) {}
 
     /**
      *  Destructor
@@ -93,6 +92,14 @@ public:
     void add(const char *name, bool(T::*method)(),                                  const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), 0,     args); }
     void add(const char *name, bool(T::*method)(Parameters &params),                const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), 0,     args); }
      
+protected:
+    /**
+     *  Protected constructor
+     *  @param  name
+     *  @param  flags
+     */
+    Class(const char *name, int flags) : ClassBase(name, flags) {}
+
 private:
     /**
      *  Construct a new instance of the object
@@ -108,7 +115,6 @@ private:
      *  Extensions have access to the private base class
      */
     friend class Extension;
-    
 };
 
 /**
