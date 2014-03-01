@@ -59,6 +59,7 @@
 #include "../include/modifiers.h"
 #include "../include/properties.h"
 #include "../include/base.h"
+#include "../include/classtype.h"
 #include "../include/classbase.h"
 #include "../include/class.h"
 #include "../include/abstractclass.h"

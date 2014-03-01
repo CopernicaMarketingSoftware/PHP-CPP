@@ -20,7 +20,7 @@ public:
      *  Constructor
      *  @param  name
      */
-    Interface(const char *name) : ClassBase(name, 0x80) {}
+    Interface(const char *name) : ClassBase(name, ClassType::Interface) {}
     
     /**
      *  Destructor

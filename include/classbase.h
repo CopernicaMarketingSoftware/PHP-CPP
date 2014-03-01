@@ -42,9 +42,9 @@ protected:
     /**
      *  Protected constructor
      *  @param  classname   Class name
-     *  @param  flags       The class flags
+     *  @param  type        The class type
      */
-    ClassBase(const char *classname, int flags = 0) : _name(classname), _flags(flags) {}
+    ClassBase(const char *classname, ClassType type = ClassType::Regular) : _name(classname), _type(type) {}
     
 public:
     /**
@@ -54,14 +54,14 @@ public:
      *  @todo   prefer move
      */
     ClassBase(const ClassBase &that) : 
-        _name(that._name), _flags(that._flags), _methods(that._methods), _members(that._members) {}
+        _name(that._name), _type(that._type), _methods(that._methods), _members(that._members) {}
 
     /**
      *  Move constructor
      *  @param  that
      */
     ClassBase(ClassBase &&that) :
-        _flags(that._flags), _methods(std::move(that._methods)), _members(std::move(that._members)), _entry(that._entry) 
+        _type(that._type), _methods(std::move(that._methods)), _members(std::move(that._members)), _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
         // only moved during extension setup, when the entry pointer has not yet
@@ -165,10 +165,10 @@ private:
     std::string _name;
 
     /**
-     *  The class flags (this can be values like Php::Abstract and Php::Final)
-     *  @var    int
+     *  The class type (this can be values like Php::Abstract and Php::Final)
+     *  @var    ClassType
      */
-    int _flags = 0;
+    ClassType _type = ClassType::Regular;
 
     /** 
      *  The class entry
@@ -193,6 +193,7 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
+    
 };
     
 /**

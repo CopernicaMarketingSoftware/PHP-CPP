@@ -38,6 +38,7 @@
 #include <phpcpp/modifiers.h>
 #include <phpcpp/properties.h>
 #include <phpcpp/base.h>
+#include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
 #include <phpcpp/class.h>
 #include <phpcpp/abstractclass.h>

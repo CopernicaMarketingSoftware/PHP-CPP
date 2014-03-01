@@ -23,7 +23,7 @@ public:
      *  Constructor
      *  @param  name        Name of the class
      */
-    AbstractClass(const char *name) : Class<T>(name, 0x20) {}
+    AbstractClass(const char *name) : Class<T>(name, ClassType::Abstract) {}
     
     /**
      *  Destructor

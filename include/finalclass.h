@@ -23,7 +23,7 @@ public:
      *  Constructor
      *  @param  name        Name of the class
      */
-    FinalClass(const char *name) : Class<T>(name, 0x40) {}
+    FinalClass(const char *name) : Class<T>(name, ClassType::Final) {}
     
     /**
      *  Destructor

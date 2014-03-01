@@ -203,7 +203,7 @@ void ClassBase::initialize(const std::string &prefix)
 #endif
 
     // set access types flags for class
-    _entry->ce_flags = _flags;
+    _entry->ce_flags = (int)_type;
     
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);
