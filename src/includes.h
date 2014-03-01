@@ -16,8 +16,10 @@
 #include <vector>
 #include <map>
 #include <memory>
-#include <set>
+#include <list>
 #include <exception>
+
+// @todo do we really nead shared_ptr?
 
  // for debug
 #include <iostream>
@@ -62,6 +64,7 @@
 #include "../include/abstractclass.h"
 #include "../include/finalclass.h"
 #include "../include/interface.h"
+#include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/exception.h"
 #include "../include/init.h"

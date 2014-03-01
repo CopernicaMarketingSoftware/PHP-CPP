@@ -94,7 +94,32 @@ public:
      *  @param  that
      *  @return HiddenPointer
      */
-    HiddenPointer<Type> operator=(const HiddenPointer &that) = delete;
+    HiddenPointer<Type> operator=(const HiddenPointer &that)
+    {
+        // skip self assignmend
+        if (this == &that) return *this;
+        
+        // deallocate current object
+        if (_allocated) delete[] _buffer;
+        
+        // copy allocated setting
+        _allocated = that._allocated;
+        
+        // is the other object allocated?
+        if (_allocated)
+        {
+            // allocate this object too, call constructor
+            HiddenPointer(that, that);
+        }
+        else
+        {
+            // just copy the data
+            _buffer = that._buffer;
+        }
+        
+        // done
+        return *this;
+    }
     
     /**
      *  Retrieve the pointer

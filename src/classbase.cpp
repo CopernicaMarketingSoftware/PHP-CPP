@@ -157,11 +157,16 @@ const struct _zend_function_entry *ClassBase::entries()
  *  this means that this method is called after the module is already available.
  *  This function will inform the Zend engine about the existence of the
  *  class.
+ * 
+ *  @param  prefix      namespace prefix
  */
-void ClassBase::initialize()
+void ClassBase::initialize(const std::string &prefix)
 {
     // the class entry
     zend_class_entry entry;
+
+    // update the name
+    if (prefix.size() > 0) _name = prefix + "\\" + _name;
 
     // initialize the class entry
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
@@ -214,7 +219,7 @@ void ClassBase::initialize()
 void ClassBase::add(const char *name, method_callback_0 callback, int flags, const Arguments &args)
 {
     // add the method
-    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
 }
 
 /**
@@ -227,7 +232,7 @@ void ClassBase::add(const char *name, method_callback_0 callback, int flags, con
 void ClassBase::add(const char *name, method_callback_1 callback, int flags, const Arguments &args)
 {
     // add the method
-    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
 }
 
 /**
@@ -240,7 +245,7 @@ void ClassBase::add(const char *name, method_callback_1 callback, int flags, con
 void ClassBase::add(const char *name, method_callback_2 callback, int flags, const Arguments &args)
 {
     // add the method
-    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
 }
 
 /**
@@ -253,7 +258,7 @@ void ClassBase::add(const char *name, method_callback_2 callback, int flags, con
 void ClassBase::add(const char *name, method_callback_3 callback, int flags, const Arguments &args)
 {
     // add the method
-    _methods.insert(std::make_shared<Method>(name, callback, flags, args));
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
 }
 
 /**
@@ -265,7 +270,7 @@ void ClassBase::add(const char *name, method_callback_3 callback, int flags, con
 void ClassBase::add(const char *name, std::nullptr_t value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<NullMember>(name, flags));
+    _members.push_back(std::make_shared<NullMember>(name, flags));
 }
     
 /**
@@ -277,7 +282,7 @@ void ClassBase::add(const char *name, std::nullptr_t value, int flags)
 void ClassBase::add(const char *name, int16_t value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<LongMember>(name, value, flags));
+    _members.push_back(std::make_shared<LongMember>(name, value, flags));
 }
 
 /**
@@ -289,7 +294,7 @@ void ClassBase::add(const char *name, int16_t value, int flags)
 void ClassBase::add(const char *name, int32_t value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<LongMember>(name, value, flags));
+    _members.push_back(std::make_shared<LongMember>(name, value, flags));
 }
 
 /**
@@ -301,7 +306,7 @@ void ClassBase::add(const char *name, int32_t value, int flags)
 void ClassBase::add(const char *name, int64_t value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<LongMember>(name, value, flags));
+    _members.push_back(std::make_shared<LongMember>(name, value, flags));
 }
 
 /**
@@ -313,7 +318,7 @@ void ClassBase::add(const char *name, int64_t value, int flags)
 void ClassBase::add(const char *name, bool value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<BoolMember>(name, value, flags));
+    _members.push_back(std::make_shared<BoolMember>(name, value, flags));
 }
 
 /**
@@ -325,7 +330,7 @@ void ClassBase::add(const char *name, bool value, int flags)
 void ClassBase::add(const char *name, char value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<StringMember>(name, &value, 1, flags));
+    _members.push_back(std::make_shared<StringMember>(name, &value, 1, flags));
 }
 
 /**
@@ -337,7 +342,7 @@ void ClassBase::add(const char *name, char value, int flags)
 void ClassBase::add(const char *name, const std::string &value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<StringMember>(name, value, flags));
+    _members.push_back(std::make_shared<StringMember>(name, value, flags));
 }
 
 /**
@@ -349,7 +354,7 @@ void ClassBase::add(const char *name, const std::string &value, int flags)
 void ClassBase::add(const char *name, const char *value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<StringMember>(name, value, strlen(value), flags));
+    _members.push_back(std::make_shared<StringMember>(name, value, strlen(value), flags));
 }
 
 /**
@@ -361,7 +366,7 @@ void ClassBase::add(const char *name, const char *value, int flags)
 void ClassBase::add(const char *name, double value, int flags)
 {
     // add property
-    _members.insert(std::make_shared<FloatMember>(name, value, flags));
+    _members.push_back(std::make_shared<FloatMember>(name, value, flags));
 }
     
 /**

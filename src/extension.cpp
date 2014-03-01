@@ -156,7 +156,8 @@ static int request_shutdown(INIT_FUNC_ARGS)
  *  @param  start       Request start callback
  *  @param  stop        Request stop callback
  */
-Extension::Extension(const char *name, const char *version, request_callback start, request_callback stop) : _start(start), _stop(stop)
+Extension::Extension(const char *name, const char *version, request_callback start, request_callback stop) : 
+    Namespace(""), _start(start), _stop(stop)
 {
     // keep extension pointer based on the name
     name2extension[name] = this;
@@ -215,54 +216,6 @@ Extension::~Extension()
 }
 
 /**
- *  Add a native function directly to the extension
- *  @param  name        Name of the function
- *  @param  function    The function to add
- *  @param  arguments   Optional argument specification
- */
-void Extension::add(const char *name, native_callback_0 function, const Arguments &arguments)
-{
-    // add a function
-    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
-}
-
-/**
- *  Add a native function directly to the extension
- *  @param  name        Name of the function
- *  @param  function    The function to add
- *  @param  arguments   Optional argument specification
- */
-void Extension::add(const char *name, native_callback_1 function, const Arguments &arguments)
-{
-    // add a function
-    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
-}
-
-/**
- *  Add a native function directly to the extension
- *  @param  name        Name of the function
- *  @param  function    The function to add
- *  @param  arguments   Optional argument specification
- */
-void Extension::add(const char *name, native_callback_2 function, const Arguments &arguments)
-{
-    // add a function
-    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
-}
-
-/**
- *  Add a native function directly to the extension
- *  @param  name        Name of the function
- *  @param  function    The function to add
- *  @param  arguments   Optional argument specification
- */
-void Extension::add(const char *name, native_callback_3 function, const Arguments &arguments)
-{
-    // add a function
-    _functions.insert(std::unique_ptr<Function>(new Function(name, function, arguments)));
-}
-
-/**
  *  Retrieve the module entry
  *  @return zend_module_entry
  */
@@ -272,23 +225,13 @@ zend_module_entry *Extension::module()
     if (_entry->functions || _functions.size() == 0) return _entry;
 
     // allocate memory for the functions
-    zend_function_entry *entries = new zend_function_entry[_functions.size() + 1];
+    zend_function_entry *entries = new zend_function_entry[functions() + 1];
 
-    // keep iterator counter
-    int i = 0;
-
-    // loop through the functions
-    for (auto &function : _functions)
-    {
-        // retrieve entry
-        zend_function_entry *entry = &entries[i++];
-
-        // let the function fill the entry
-        function->initialize(entry);
-    }
+    // initialize the entries
+    int count = initialize(_name, entries);
 
     // last entry should be set to all zeros
-    zend_function_entry *last = &entries[i];
+    zend_function_entry *last = &entries[count];
 
     // all should be set to zero
     memset(last, 0, sizeof(zend_function_entry));
@@ -299,20 +242,6 @@ zend_module_entry *Extension::module()
     // return the entry
     return _entry;
 }
-
-/**
- *  Initialize the extension
- *  @return bool
- */
-bool Extension::initialize()
-{
-    // loop through the classes
-    for (auto &iter : _classes) iter->initialize();
-    
-    // done
-    return true;
-}
-
 
 /**
  *  End of namespace

@@ -88,8 +88,10 @@ public:
      *  this means that this method is called after the module is already available.
      *  This function will inform the Zend engine about the existence of the
      *  class.
+     * 
+     *  @param  ns          Namespace name
      */
-    void initialize();
+    void initialize(const std::string &ns);
     
 protected:
     /**
@@ -173,15 +175,15 @@ private:
     
     /**
      *  All class methods
-     *  @var    set
+     *  @var    std::list
      */
-    std::set<std::shared_ptr<Method>> _methods;
+    std::list<std::shared_ptr<Method>> _methods;
     
     /**
      *  All class members (class properties)
-     *  @var    set
+     *  @var    std::list
      */
-    std::set<std::shared_ptr<Member>> _members;
+    std::list<std::shared_ptr<Member>> _members;
 };
     
 /**

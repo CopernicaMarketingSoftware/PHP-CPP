@@ -68,6 +68,7 @@ public:
     /**
      *  Fill a function entry
      *  @param  entry       Entry to be filled
+     *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      *  @param  flags       Access flags
      */
@@ -76,6 +77,7 @@ public:
     /**
      *  Fill function info
      *  @param  info        Info object to be filled
+     *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      */
     void initialize(struct _zend_internal_function_info *info, const char *classname = nullptr) const;

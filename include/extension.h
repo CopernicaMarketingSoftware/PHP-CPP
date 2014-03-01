@@ -29,20 +29,9 @@ struct _zend_module_entry;
 namespace Php {
 
 /**
- *  A couple of predefined native callback functions that can be registered.
- *  These are functions that optional accept a Request and/or Parameters object,
- *  and that either return void or a Value object. 
- */
-typedef void    (*native_callback_0)();
-typedef void    (*native_callback_1)(Parameters &);
-typedef Value   (*native_callback_2)();
-typedef Value   (*native_callback_3)(Parameters &);
-
-/**
  *  Forward declaration
  */
 class Extension;
-class Function;
 
 /**
  *  Optional callback types for starting and stopping the request
@@ -53,7 +42,7 @@ typedef bool    (*request_callback)(Extension *extension);
 /**
  *  Class definition
  */
-class Extension
+class Extension : public Namespace
 {
 public:
     /**
@@ -77,36 +66,36 @@ public:
     virtual ~Extension();
     
     /**
-     *  Initialize the extension.
-     *  
-     *  This method is called after the extension has been loaded, constructed 
-     *  and after the compatibility has been checked, but before the requests 
-     *  are handled. You can override this method to add your own initialization.
+     *  Initialize the extension after it was registered
      * 
-     *  The default behavior of this function is to enable all classes that are
-     *  defined in this extension, so that they are also available in PHP.
-     * 
-     *  The method should return true on success, and false on failure (in which
-     *  case the extension will not be used)
+     *  You can override this method to add your own initialization code. The
+     *  default implementation registers all classes and namespaces
      * 
      *  @return bool
      */
-    virtual bool initialize();
+    virtual bool initialize()
+    {
+        // initialize the namespace
+        Namespace::initialize("");
+        
+        // ok
+        return true;
+    }
     
     /**
-     *  Finalize the extension
-     *  
-     *  This method gets called after all requests were handled, and right before 
-     *  the Apache module or CLI script will exit. You can override it to add
-     *  your own cleanup code.
+     *  Finalize the extension after it was registered
+     *
+     *  You can override this method to do your own cleanup right before the
+     *  extension object is going to be destructed
      * 
      *  @return bool
      */
     virtual bool finalize()
     {
+        // ok
         return true;
     }
-    
+
     /**
      *  Start a request
      * 
@@ -143,32 +132,6 @@ public:
     }
     
     /**
-     *  Add a native function directly to the extension
-     *  @param  name        Name of the function
-     *  @param  function    The function to add
-     *  @param  arguments   Optional argument specification
-     */
-    void add(const char *name, native_callback_0 function, const Arguments &arguments = {});
-    void add(const char *name, native_callback_1 function, const Arguments &arguments = {});
-    void add(const char *name, native_callback_2 function, const Arguments &arguments = {});
-    void add(const char *name, native_callback_3 function, const Arguments &arguments = {});
-    
-    /**
-     *  Add a native class to the extension
-     *  @param  name        Name of the class
-     *  @param  type        The class implementation
-     */
-    template<typename T>
-    void add(const Class<T> &type)
-    {
-        // make a copy of the object
-        auto *info = new Class<T>(type);
-        
-        // and copy it to the list of classes
-        _classes.insert(std::unique_ptr<ClassBase>(info));
-    }
-    
-    /**
      *  Retrieve the module entry
      * 
      *  This is the memory address that should be exported by the get_module()
@@ -178,19 +141,23 @@ public:
      */
     _zend_module_entry *module();
     
+    /**
+     *  Cast to a module entry
+     *  @return _zend_module_entry*
+     */
+    operator _zend_module_entry * ()
+    {
+        return module();
+    }
     
 private:
     /**
-     *  Functions defined in the library
-     *  @var    set
+     *  Initialize all functions in this namespace
+     *  @param  ns          Namespace prefix
+     *  @param  entries     The array to be filled
+     *  @return int         Number of functions that were initialized
      */
-    std::set<std::unique_ptr<Function>> _functions;
-
-    /**
-     *  Classes defined in the library, indexed by their name
-     *  @var    set
-     */
-    std::set<std::unique_ptr<ClassBase>> _classes;
+    size_t initialize(const std::string &ns, zend_function_entry entries[]);
 
     /**
      *  The information that is passed to the Zend engine

@@ -41,6 +41,8 @@ public:
      *  @param  name        Name of the class
      */
     Class(const char *name) : ClassBase(name) {}
+    
+    // @todo add copy and move constructor
 
     /**
      *  Destructor
