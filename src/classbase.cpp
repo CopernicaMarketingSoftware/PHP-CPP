@@ -165,8 +165,12 @@ void ClassBase::initialize(const std::string &prefix)
     // the class entry
     zend_class_entry entry;
 
+    std::cout << "prefix " << prefix << std::endl;
+
     // update the name
     if (prefix.size() > 0) _name = prefix + "\\" + _name;
+
+    std::cout << "init class " << _name << std::endl;
 
     // initialize the class entry
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
@@ -272,7 +276,7 @@ void ClassBase::add(const char *name, std::nullptr_t value, int flags)
     // add property
     _members.push_back(std::make_shared<NullMember>(name, flags));
 }
-    
+
 /**
  *  Add a property to the class
  *  @param  name        Name of the property
@@ -368,7 +372,7 @@ void ClassBase::add(const char *name, double value, int flags)
     // add property
     _members.push_back(std::make_shared<FloatMember>(name, value, flags));
 }
-    
+
 /**
  *  End namespace
  */

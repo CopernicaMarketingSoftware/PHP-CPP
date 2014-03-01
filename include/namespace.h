@@ -180,7 +180,7 @@ protected:
      *  @param  entries     The array to be filled
      *  @return int         Number of functions that were initialized
      */
-    size_t initialize(const std::string &ns, zend_function_entry entries[]);
+    size_t initialize(const std::string &ns, struct _zend_function_entry entries[]);
 
     /**
      *  Initialize the namespace after it was registered
@@ -188,11 +188,14 @@ protected:
      */
     void initialize(const std::string &parent)
     {
+        // the namespace to use
+        std::string prefix = parent.size() ? parent + "\\" + _name : _name;
+        
         // loop through the classes in this namespace
-        for (auto &c : _classes) c->initialize(parent+"\\"+_name);
+        for (auto &c : _classes) c->initialize(prefix);
         
         // and loop through the other namespaces
-        for (auto &n : _namespaces) n->initialize(parent+"\\"+_name);
+        for (auto &n : _namespaces) n->initialize(prefix);
     }
 };
     

@@ -228,7 +228,7 @@ zend_module_entry *Extension::module()
     zend_function_entry *entries = new zend_function_entry[functions() + 1];
 
     // initialize the entries
-    int count = initialize(_name, entries);
+    int count = Namespace::initialize("", entries);
 
     // last entry should be set to all zeros
     zend_function_entry *last = &entries[count];

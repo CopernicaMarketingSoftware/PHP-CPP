@@ -116,9 +116,9 @@ private:
     }
     
     /**
-     *  Extensions have access to the private base class
+     *  Namespaces have access to the private base class
      */
-    friend class Extension;
+    friend class Namespace;
 };
 
 /**

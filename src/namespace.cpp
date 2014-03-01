@@ -67,7 +67,7 @@ void Namespace::add(const char *name, native_callback_3 function, const Argument
  *  @param  entries     The array to be filled
  *  @return int         Number of functions that were initialized
  */
-size_t Namespace::initialize(const std::string &parent, zend_function_entry entries[])
+size_t Namespace::initialize(const std::string &parent, struct _zend_function_entry entries[])
 {
     // keep iterator counter
     int count = 0;

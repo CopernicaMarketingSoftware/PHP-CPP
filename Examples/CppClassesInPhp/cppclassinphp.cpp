@@ -63,6 +63,9 @@ extern "C"
         // create extension
         static Php::Extension extension("Cpp_classes_in_php","1.0");
         
+        // create a namespace too
+        Php::Namespace ns("MyNamespace");
+        
         // add custom function
         extension.add("myFunction", myFunction, { });
         
@@ -76,7 +79,10 @@ extern "C"
         
         // add the class to the extension
         extension.add(customClass);
-                
+        
+        // add the namespace to the extension
+        extension.add(ns);
+        
         // return the extension module
         return extension.module();
     }

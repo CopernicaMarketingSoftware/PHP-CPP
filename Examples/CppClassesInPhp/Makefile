@@ -4,7 +4,7 @@ CPP_FLAGS       = -Wall -c -I. -g -std=c++11
 
 PREFIX			= /usr
 #Edit these lines to correspond with your own directories
-LIBRARY_DIR		= ${PREFIX}/lib/php5/20090626
+LIBRARY_DIR		= ${PREFIX}/lib/php5/20121212
 PHP_CONFIG_DIR	= /etc/php5/cli/conf.d
 
 LD              = g++

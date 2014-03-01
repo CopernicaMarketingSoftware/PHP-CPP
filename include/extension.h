@@ -152,14 +152,6 @@ public:
     
 private:
     /**
-     *  Initialize all functions in this namespace
-     *  @param  ns          Namespace prefix
-     *  @param  entries     The array to be filled
-     *  @return int         Number of functions that were initialized
-     */
-    size_t initialize(const std::string &ns, zend_function_entry entries[]);
-
-    /**
      *  The information that is passed to the Zend engine
      * 
      *  Although it would be slightly faster to not make this a pointer, this
