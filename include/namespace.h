@@ -78,7 +78,6 @@ public:
     
     /**
      *  Add a native class to the extension by moving it
-     *  @param  name        Name of the class
      *  @param  type        The class implementation
      */
     template<typename T>
@@ -93,7 +92,6 @@ public:
 
     /**
      *  Add a native class to the extension by copying it
-     *  @param  name        Name of the class
      *  @param  type        The class implementation
      */
     template<typename T>
@@ -101,6 +99,32 @@ public:
     {
         // make a copy of the object
         auto *copy = new Class<T>(std::move(type));
+        
+        // and add it to the list of classes
+        _classes.push_back(std::unique_ptr<ClassBase>(copy));
+    }
+
+    /**
+     *  Add an interface to the extension by moving it
+     *  @param  interface   The interface properties
+     */
+    void add(Interface &&interface)
+    {
+        // make a copy of the object
+        auto *copy = new Interface(std::move(interface));
+        
+        // and add it to the list of classes
+        _classes.push_back(std::unique_ptr<ClassBase>(copy));
+    }
+
+    /**
+     *  Add an interface to the extension by copying it
+     *  @param  interface   The interface properties
+     */
+    void add(const Interface &interface)
+    {
+        // make a copy of the object
+        auto *copy = new Interface(interface);
         
         // and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(copy));

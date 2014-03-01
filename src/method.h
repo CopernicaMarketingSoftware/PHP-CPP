@@ -31,6 +31,7 @@ public:
     Method(const char *name, method_callback_1 callback, int flags, const Arguments &args) : Callable(name, args), _type(1), _flags(flags) { _callback.m1 = callback; }
     Method(const char *name, method_callback_2 callback, int flags, const Arguments &args) : Callable(name, args), _type(2), _flags(flags) { _callback.m2 = callback; }
     Method(const char *name, method_callback_3 callback, int flags, const Arguments &args) : Callable(name, args), _type(3), _flags(flags) { _callback.m3 = callback; }
+    Method(const char *name,                             int flags, const Arguments &args) : Callable(name, args), _type(4), _flags(flags) { _callback.m0 = nullptr;  }
 
     /**
      *  Destructor

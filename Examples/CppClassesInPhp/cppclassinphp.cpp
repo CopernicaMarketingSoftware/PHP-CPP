@@ -41,25 +41,13 @@ public:
     
     void myMethod(Php::Parameters &params)
     {
+        // check number of parameters
+        if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
+        
         std::cout << "myMethod is called." << std::endl;
-        std::cout << "_x: " << _x << std::endl;
         _x = params[0];
-        std::cout << "New _x" << _x << std::endl;
-        
-        Php::Value v = params[0];
-        
-        std::cout << "contains: " << v.contains("bla") << std::endl;
-        std::cout << "value: " << v["bla"] << std::endl;
-        
-        v["something"] = "something else";
     }
 };
-
-void myFunction(Php::Parameters &params)
-{
-    std::cout << "regular function" << std::endl;
-}
-
 
 // Symbols are exported according to the "C" language
 extern "C" 
@@ -70,25 +58,28 @@ extern "C"
         // create extension
         static Php::Extension extension("Cpp_classes_in_php","1.0");
         
-        // create a namespace too
-        Php::Namespace ns("MyNamespace");
+        // build an interface
+        Php::Interface interface("MyInterface");
         
-        // add custom function
-        extension.add("myFunction", myFunction, { });
+        // add methods to the interface
+        interface.method("method1");
+        interface.method("method2");
+        
+        // add the interface to the extension
+        extension.add(interface);
         
         // we are going to define a class
         Php::Class<MyCustomClass> customClass("MyClass");
         
         // add methods to it
-        customClass.add("myMethod", &MyCustomClass::myMethod, Php::Final, {});
-        customClass.add("property1", "prop1");
-        customClass.add("property2", "prop2", Php::Protected);
+        customClass.method("myMethod", &MyCustomClass::myMethod, Php::Final, {});
+        customClass.method("myMethod2", &MyCustomClass::myMethod);
+        customClass.property("property1", "prop1");
+        customClass.property("property2", "prop2", Php::Protected);
+        customClass.method("myAbstract");
         
         // add the class to the extension
         extension.add(customClass);
-        
-        // add the namespace to the extension
-        extension.add(ns);
         
         // return the extension module
         return extension.module();

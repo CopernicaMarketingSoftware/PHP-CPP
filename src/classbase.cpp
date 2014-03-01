@@ -165,12 +165,8 @@ void ClassBase::initialize(const std::string &prefix)
     // the class entry
     zend_class_entry entry;
 
-    std::cout << "prefix " << prefix << std::endl;
-
     // update the name
     if (prefix.size() > 0) _name = prefix + "\\" + _name;
-
-    std::cout << "init class " << _name << std::endl;
 
     // initialize the class entry
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
@@ -220,7 +216,7 @@ void ClassBase::initialize(const std::string &prefix)
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::add(const char *name, method_callback_0 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, method_callback_0 callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -233,7 +229,7 @@ void ClassBase::add(const char *name, method_callback_0 callback, int flags, con
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::add(const char *name, method_callback_1 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, method_callback_1 callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -246,7 +242,7 @@ void ClassBase::add(const char *name, method_callback_1 callback, int flags, con
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::add(const char *name, method_callback_2 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, method_callback_2 callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -259,10 +255,22 @@ void ClassBase::add(const char *name, method_callback_2 callback, int flags, con
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::add(const char *name, method_callback_3 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, method_callback_3 callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add an abstract method to the class
+ *  @param  name        Name of the method
+ *  @param  flags       Optional flags (like public or protected)
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, Abstract | flags, args));
 }
 
 /**
@@ -271,7 +279,7 @@ void ClassBase::add(const char *name, method_callback_3 callback, int flags, con
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, std::nullptr_t value, int flags)
+void ClassBase::property(const char *name, std::nullptr_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<NullMember>(name, flags));
@@ -283,7 +291,7 @@ void ClassBase::add(const char *name, std::nullptr_t value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, int16_t value, int flags)
+void ClassBase::property(const char *name, int16_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<LongMember>(name, value, flags));
@@ -295,7 +303,7 @@ void ClassBase::add(const char *name, int16_t value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, int32_t value, int flags)
+void ClassBase::property(const char *name, int32_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<LongMember>(name, value, flags));
@@ -307,7 +315,7 @@ void ClassBase::add(const char *name, int32_t value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, int64_t value, int flags)
+void ClassBase::property(const char *name, int64_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<LongMember>(name, value, flags));
@@ -319,7 +327,7 @@ void ClassBase::add(const char *name, int64_t value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, bool value, int flags)
+void ClassBase::property(const char *name, bool value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<BoolMember>(name, value, flags));
@@ -331,7 +339,7 @@ void ClassBase::add(const char *name, bool value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, char value, int flags)
+void ClassBase::property(const char *name, char value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<StringMember>(name, &value, 1, flags));
@@ -343,7 +351,7 @@ void ClassBase::add(const char *name, char value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, const std::string &value, int flags)
+void ClassBase::property(const char *name, const std::string &value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<StringMember>(name, value, flags));
@@ -355,7 +363,7 @@ void ClassBase::add(const char *name, const std::string &value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, const char *value, int flags)
+void ClassBase::property(const char *name, const char *value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<StringMember>(name, value, strlen(value), flags));
@@ -367,7 +375,7 @@ void ClassBase::add(const char *name, const char *value, int flags)
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
  */
-void ClassBase::add(const char *name, double value, int flags)
+void ClassBase::property(const char *name, double value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<FloatMember>(name, value, flags));

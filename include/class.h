@@ -64,14 +64,28 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
      */
-    void add(const char *name, void(T::*method)(),                   int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), flags,  args); }
-    void add(const char *name, void(T::*method)(Parameters &params), int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), flags,  args); }
-    void add(const char *name, bool(T::*method)(),                   int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), flags,  args); }
-    void add(const char *name, bool(T::*method)(Parameters &params), int flags = Public, const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), flags,  args); }
-    void add(const char *name, void(T::*method)(),                                       const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_0>(method), Public, args); }
-    void add(const char *name, void(T::*method)(Parameters &params),                     const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_1>(method), Public, args); }
-    void add(const char *name, bool(T::*method)(),                                       const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_2>(method), Public, args); }
-    void add(const char *name, bool(T::*method)(Parameters &params),                     const Arguments &args = {}) { ClassBase::add(name, static_cast<method_callback_3>(method), Public, args); }
+    void method(const char *name, void(T::*method)(),                   int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); }
+    void method(const char *name, void(T::*method)(Parameters &params), int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); }
+    void method(const char *name, bool(T::*method)(),                   int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); }
+    void method(const char *name, bool(T::*method)(Parameters &params), int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); }
+    void method(const char *name, void(T::*method)(),                              const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); }
+    void method(const char *name, void(T::*method)(Parameters &params),            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); }
+    void method(const char *name, bool(T::*method)(),                              const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); }
+    void method(const char *name, bool(T::*method)(Parameters &params),            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); }
+
+    /**
+     *  Add an abstract method to the class
+     * 
+     *  This is only meaningful for classes that can be extended. Because the 
+     *  method is abstract, you will not have to pass an implementation. You
+     *  can pass in flags to mark the method as protected
+     * 
+     *  @param  name        Name of the method
+     *  @param  flags       Optional flags
+     *  @param  args        Argument descriptions
+     */
+    void method(const char *name, int flags, const Arguments &args = {}) { ClassBase::method(name, flags  | Abstract, args); }
+    void method(const char *name,            const Arguments &args = {}) { ClassBase::method(name, Public | Abstract, args); }
 
     /**
      *  Add a property to the class
@@ -86,15 +100,15 @@ public:
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
      */
-    void add(const char *name, std::nullptr_t value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, uint64_t value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, uint32_t value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, uint16_t value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, char value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, const char *value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, const std::string &value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, bool value, int flags = Public) { ClassBase::add(name, value, flags); }
-    void add(const char *name, double value, int flags = Public) { ClassBase::add(name, value, flags); }
+    void property(const char *name, std::nullptr_t value,     int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, uint64_t value,           int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, uint32_t value,           int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, uint16_t value,           int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, char value,               int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, const char *value,        int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); }
      
 protected:
     /**

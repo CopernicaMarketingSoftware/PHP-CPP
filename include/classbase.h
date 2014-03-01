@@ -109,10 +109,19 @@ protected:
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
      */
-    void add(const char *name, method_callback_0, int flags=0, const Arguments &args = {});
-    void add(const char *name, method_callback_1, int flags=0, const Arguments &args = {});
-    void add(const char *name, method_callback_2, int flags=0, const Arguments &args = {});
-    void add(const char *name, method_callback_3, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_0, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_1, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_2, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_3, int flags=0, const Arguments &args = {});
+
+    /**
+     *  Add an abstract method to the class
+     * 
+     *  @param  name        Name of the method
+     *  @param  flags       Optional flags (like public or protected)
+     *  @param  args        Description of the supported arguments
+     */
+    void method(const char *name, int flags=0, const Arguments &args = {});
 
     /**
      *  Add a property to the class
@@ -127,15 +136,15 @@ protected:
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
      */
-    void add(const char *name, std::nullptr_t value, int flags = Php::Public);
-    void add(const char *name, int16_t value, int flags = Php::Public);
-    void add(const char *name, int32_t value, int flags = Php::Public);
-    void add(const char *name, int64_t value, int flags = Php::Public);
-    void add(const char *name, bool value, int flags = Php::Public);
-    void add(const char *name, char value, int flags = Php::Public);
-    void add(const char *name, const std::string &value, int flags = Php::Public);
-    void add(const char *name, const char *value, int flags = Php::Public);
-    void add(const char *name, double value, int flags = Php::Public);
+    void property(const char *name, std::nullptr_t value, int flags = Php::Public);
+    void property(const char *name, int16_t value, int flags = Php::Public);
+    void property(const char *name, int32_t value, int flags = Php::Public);
+    void property(const char *name, int64_t value, int flags = Php::Public);
+    void property(const char *name, bool value, int flags = Php::Public);
+    void property(const char *name, char value, int flags = Php::Public);
+    void property(const char *name, const std::string &value, int flags = Php::Public);
+    void property(const char *name, const char *value, int flags = Php::Public);
+    void property(const char *name, double value, int flags = Php::Public);
 
 
 private:
