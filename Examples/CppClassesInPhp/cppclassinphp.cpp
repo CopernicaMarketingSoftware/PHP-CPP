@@ -45,6 +45,13 @@ public:
         std::cout << "_x: " << _x << std::endl;
         _x = params[0];
         std::cout << "New _x" << _x << std::endl;
+        
+        Php::Value v = params[0];
+        
+        std::cout << "contains: " << v.contains("bla") << std::endl;
+        std::cout << "value: " << v["bla"] << std::endl;
+        
+        v["something"] = "something else";
     }
 };
 
@@ -74,8 +81,8 @@ extern "C"
         
         // add methods to it
         customClass.add("myMethod", &MyCustomClass::myMethod, Php::Final, {});
-        customClass.add("property1", "bla");
-        customClass.add("property2", "bla", Php::Protected);
+        customClass.add("property1", "prop1");
+        customClass.add("property2", "prop2", Php::Protected);
         
         // add the class to the extension
         extension.add(customClass);

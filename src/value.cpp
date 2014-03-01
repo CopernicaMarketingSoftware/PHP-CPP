@@ -1382,8 +1382,14 @@ bool Value::contains(const char *key, int size) const
     }
     else if (isObject())
     {
-        // @todo implementation
-        return false;
+        // retrieve the class entry
+        auto *entry = zend_get_class_entry(_val);
+        
+        // read the property
+        zval *property = zend_read_property(entry, _val, key, size, 0);
+        
+        // check if valid
+        return property != nullptr;
     }
     else
     {
@@ -1440,8 +1446,14 @@ Value Value::get(const char *key, int size) const
     }
     else
     {
-        // @todo implementation for objects
-        return Value();
+        // retrieve the class entry
+        auto *entry = zend_get_class_entry(_val);
+        
+        // read the property
+        zval *property = zend_read_property(entry, _val, key, size, 1);
+        
+        // wrap in value
+        return Value(property);
     }
 }
 
@@ -1500,22 +1512,37 @@ const Value &Value::set(const char *key, int size, const Value &value)
         // skip if nothing is going to change
         if (value._val == *current) return value;
     }
-
-    // must be an array
-    setType(arrayType);
-
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
-
-    // add the value (this will reduce the refcount of the current value)
-    add_assoc_zval_ex(_val, key, size+1, value._val);
     
-    // the variable has one more reference (the array entry)
-    Z_ADDREF_P(value._val);
-    
+    // is this an object?
+    if (isObject())
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // retrieve the class entry
+        auto *entry = zend_get_class_entry(_val);
+
+        // update the property
+        zend_update_property(entry, _val, key, size, value._val);
+    }
+    else
+    {
+        // must be an array
+        setType(arrayType);
+
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // add the value (this will reduce the refcount of the current value)
+        add_assoc_zval_ex(_val, key, size+1, value._val);
+
+        // the variable has one more reference (the array entry)
+        Z_ADDREF_P(value._val);
+    }
+
     // object should stay valid
     validate();
-    
+        
     // done
     return value;
 }
