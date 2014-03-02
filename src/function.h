@@ -30,6 +30,18 @@ public:
     Function(const char *name, native_callback_3 function, const Arguments &arguments = {}) : Callable(name, arguments), _type(3) { _function.f3 = function; }
 
     /**
+     *  Copy constructor
+     *  @param  that
+     */
+    Function(const Function &that) : Callable(that), _function(that._function), _type(that._type) {}
+
+    /**
+     *  Move constructor
+     *  @param  that
+     */
+    Function(Function &&that) : Callable(std::move(that)), _function(that._function), _type(that._type) {}
+
+    /**
      *  Destructor
      */
     virtual ~Function() {}

@@ -42,7 +42,17 @@ public:
      */
     Class(const char *name) : ClassBase(name) {}
     
-    // @todo add copy and move constructor
+    /**
+     *  Copy constructor
+     *  @param  that
+     */
+    Class(const Class<T> &that) : ClassBase(that) {}
+    
+    /**
+     *  Move constructor
+     *  @param  that
+     */
+    Class(Class<T> &&that) : ClassBase(std::move(that)) {}
 
     /**
      *  Destructor

@@ -50,20 +50,23 @@ public:
     /**
      *  Copy constructor
      *  @param  that
-     *
-     *  @todo   prefer move
      */
     ClassBase(const ClassBase &that) : 
-        _name(that._name), _type(that._type), _methods(that._methods), 
-        _members(that._members), _entry(nullptr) {}
+        _name(that._name), 
+        _type(that._type), 
+        _methods(that._methods), 
+        _members(that._members), 
+        _entry(nullptr) {}
 
     /**
      *  Move constructor
      *  @param  that
      */
     ClassBase(ClassBase &&that) :
-        _name(std::move(that._name)), _type(that._type), 
-        _methods(std::move(that._methods)), _members(std::move(that._members)), 
+        _name(std::move(that._name)), 
+        _type(that._type), 
+        _methods(std::move(that._methods)), 
+        _members(std::move(that._members)), 
         _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are

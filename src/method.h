@@ -34,6 +34,13 @@ public:
     Method(const char *name,                             int flags, const Arguments &args) : Callable(name, args), _type(4), _flags(flags) { _callback.m0 = nullptr;  }
 
     /**
+     *  Copy and move constructors
+     *  @param  that
+     */
+    Method(const Method &that) : Callable(that), _type(that._type), _flags(that._flags), _callback(that._callback) {}
+    Method(Method &&that) : Callable(std::move(that)), _type(that._type), _flags(that._flags), _callback(that._callback) {}
+
+    /**
      *  Destructor
      *  @param  type
      *  @param  callback
@@ -86,7 +93,6 @@ private:
     /**
      *  Access flags (protected, public, abstract, final, private, etc)
      *  @var int
-     *  @todo   use this
      */
     int _flags;
     

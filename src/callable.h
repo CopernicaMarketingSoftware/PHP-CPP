@@ -49,13 +49,39 @@ public:
         // @todo find out number of required arguments
         _required = _argc;
     }
+    
+    /**
+     *  Copy constructor
+     *  @param  that
+     */
+    Callable(const Callable &that) :
+        _ptr(that._ptr),
+        _return(that._return),
+        _required(that._required),
+        _argc(that._argc),
+        _argv(nullptr) {}
+    
+    /**
+     *  Move constructor
+     *  @param  that
+     */
+    Callable(Callable &&that) :
+        _ptr(std::move(that._ptr)),
+        _return(that._return),
+        _required(that._required),
+        _argc(that._argc),
+        _argv(that._argv) 
+    {
+        // invalidate other object
+        that._argv = nullptr;
+    }
 
     /**
      *  Destructor
      */
     virtual ~Callable()
     {
-        delete[] _argv;
+        if (_argv) delete[] _argv;
     }
     
     /**
