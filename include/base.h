@@ -29,45 +29,118 @@ public:
 
     /**
      *  Convert the object to a Php::Value object (how it is used externally)
-     *  @return Value
+     *  @return Object
      */
-    Value value() const;
+    Object &value()
+    {
+        return _self;
+    }
+
+    /**
+     *  Convert the object to a Php::Value object (how it is used externally)
+     *  @return Object
+     */
+    const Object &value() const
+    {
+        return _self;
+    }
     
     /**
-     *  Get access to a property by name
+     *  Get access to a property by name using the [] operator
+     *  @param  string
+     *  @return Value
+     */
+    Value operator[](const char *name)
+    {
+        return _self[name];
+    }
+
+    /**
+     *  Alternative way to access a property using the [] operator
+     *  @param  string
+     *  @return Value
+     */
+    Value operator[](const std::string &name)
+    {
+        return _self[name];
+    }
+    
+    /**
+     *  Retrieve a property by name
+     *  @param  string
+     *  @return Value
+     */
+    Value property(const char *name)
+    {
+        return _self[name];
+    }
+    
+    /**
+     *  Retrieve a property by name
+     *  @param  string
+     *  @return Value
+     */
+    Value property(const std::string &name)
+    {
+        return _self[name];
+    }
+
+    /**
+     *  Get access to a property by name using the [] operator
      *  @param  string
      *  @return Value
      */
     Value operator[](const char *name) const
     {
-        return value()[name];
+        return _self[name];
     }
 
     /**
-     *  Alternative way to access a property
+     *  Alternative way to access a property using the [] operator
      *  @param  string
      *  @return Value
      */
     Value operator[](const std::string &name) const
     {
-        return value()[name];
+        return _self[name];
     }
     
-private:
+    /**
+     *  Retrieve a property by name
+     *  @param  string
+     *  @return Value
+     */
+    Value property(const char *name) const
+    {
+        return _self[name];
+    }
+    
+    /**
+     *  Retrieve a property by name
+     *  @param  string
+     *  @return Value
+     */
+    Value property(const std::string &name) const
+    {
+        return _self[name];
+    }
+    
+protected:
     /**
      *  The zend_object
-     *  @var    zend_object
+     *  @var    Value
      */
-    struct _zend_object *_object = nullptr;
-    
+    Object _self;
+   
+private:
     /**
      *  Private method to assign the zend object
      *  @param  zend_object
      */
-    void assign(struct _zend_object *object)
+    void assign(Value &&object)
     {
         // copy pointer
-        _object = object;
+        _self = std::move(object);
     }
     
     /**

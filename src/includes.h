@@ -45,6 +45,7 @@
 /**
  *  Include other files from this library
  */
+#include "../include/exception.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/forcedvalue.h"
@@ -66,7 +67,6 @@
 #include "../include/interface.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"
-#include "../include/exception.h"
 #include "../include/init.h"
 
 /**

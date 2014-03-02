@@ -67,6 +67,12 @@ public:
     Value(struct _zval_struct *zval, bool ref = false);
     
     /**
+     *  Wrap around an object
+     *  @param  value       The object value
+     */
+    Value(const struct _zend_object_value &value);
+    
+    /**
      *  Copy constructor
      *  @param  value
      */

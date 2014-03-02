@@ -24,6 +24,7 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/exception.h>
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/forcedvalue.h>
@@ -45,7 +46,6 @@
 #include <phpcpp/interface.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
-#include <phpcpp/exception.h>
 
 /**
  *  Macro to export a function

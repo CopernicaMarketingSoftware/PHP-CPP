@@ -48,6 +48,11 @@ public:
         _x = params[0];
         
         std::cout << "get property1 " << value()["property1"] << std::endl;
+        
+        // set it to something else
+        value().set("property1", "new value");
+
+        std::cout << "get property1 " << value()["property1"] << std::endl;
     }
 };
 

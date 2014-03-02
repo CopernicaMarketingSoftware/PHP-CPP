@@ -41,7 +41,11 @@ public:
      *  Copy constructor from a value object
      *  @param  value
      */
-    ForcedValue(const Value &value) : Value(value) { setType(TYPE); }
+    ForcedValue(const Value &value) : Value(value) 
+    {
+        // type must be valid
+        if (value.type() != TYPE) throw Php::Exception("Assiging a wrong value type to a forced typed variable");
+    }
     
     /**
      *  Wrap object around zval
@@ -61,8 +65,51 @@ public:
      */
     virtual Value &setType(Type type) override
     {
+        // throw exception if things are going wrong
+        if (type != TYPE) throw Php::Exception("Variable has a forced type");
+        
         // call base
         return Value::setType(TYPE);
+    }
+    
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return ForcedValue
+     */
+    ForcedValue<TYPE> &operator=(const Value &value)
+    {
+        // skip self assignment
+        if (this == &value) return *this;
+        
+        // type must be valid
+        if (value.type() != TYPE) throw Php::Exception("Assiging a wrong value type to a forced typed variable");
+        
+        // call base
+        Value::operator=(value);
+
+        // done
+        return *this;
+    }
+    
+    /**
+     *  Move assignment operator
+     *  @param  value
+     *  @return ForcedValue
+     */
+    ForcedValue<TYPE> &operator=(Value &&value)
+    {
+        // skip self assignment
+        if (this == &value) return *this;
+        
+        // type must be valid
+        if (value.type() != TYPE) throw Php::Exception("Assiging a wrong value type to a forced typed variable");
+        
+        // call base
+        Value::operator=(std::move(value));
+        
+        // done
+        return *this;
     }
     
 protected:

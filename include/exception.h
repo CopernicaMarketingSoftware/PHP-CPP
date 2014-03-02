@@ -3,7 +3,7 @@
  *  Implementation of Php Exceptions.
  * 
  *  @author Jasper van Eck <jasper.vaneck@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013, 2014 Copernica BV
  */
 #include <exception>
 

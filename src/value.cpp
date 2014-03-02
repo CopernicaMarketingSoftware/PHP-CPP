@@ -170,6 +170,18 @@ Value::Value(struct _zval_struct *val, bool ref)
 }
 
 /**
+ *  Wrap around an object
+ *  @param  value       The object value
+ */
+Value::Value(const struct _zend_object_value &value)
+{
+    // make a normal zval
+    MAKE_STD_ZVAL(_val);
+    Z_TYPE_P(_val) = IS_OBJECT;
+    Z_OBJVAL_P(_val) = value;
+}
+
+/**
  *  Copy constructor
  *  @param  value
  */

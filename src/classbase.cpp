@@ -49,7 +49,8 @@ static void clone_object(void *object, void **clone TSRMLS_DC)
 /**
  *  Function that is called when an instance of the class needs to be created.
  *  This function will create the C++ class, and the PHP object
- *  @param  type        Pointer to the class
+ *  @param  type                    Pointer to the class information
+ *  @return zend_object_value       The newly created object
  */
 static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
 {
@@ -100,7 +101,7 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     result.handle = zend_objects_store_put(object, NULL, deallocate_object, clone_object TSRMLS_CC); 
 
     // finally, construct the cpp object
-    object->cpp = info->construct(&object->php);
+    object->cpp = info->construct(Value(result));
 
     // done
     return result;

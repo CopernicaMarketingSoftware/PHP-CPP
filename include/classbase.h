@@ -79,16 +79,17 @@ public:
 
     /**
      *  Construct a new instance of the object
+     *  @param  value
      *  @return Base
      */
-    Base* construct(struct _zend_object *object)
+    Base* construct(Value &&value)
     {
         // construct the base
         auto *result = construct();
         if (!result) return nullptr;
         
         // assign the zend object to it
-        result->assign(object);
+        result->assign(std::move(value));
         
         // done
         return result;

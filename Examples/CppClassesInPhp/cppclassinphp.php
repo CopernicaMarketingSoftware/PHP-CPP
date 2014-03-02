@@ -11,6 +11,7 @@ $object = new MyClass();
 
 // run a function of the class
 $object->myMethod(1);
+$object->myMethod(2);
 
 echo($object->property1."\n");
 echo($object->property2."\n");
