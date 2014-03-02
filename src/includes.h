@@ -19,8 +19,6 @@
 #include <list>
 #include <exception>
 
-// @todo do we really nead shared_ptr?
-
  // for debug
 #include <iostream>
 

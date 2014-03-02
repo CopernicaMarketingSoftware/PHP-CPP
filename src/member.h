@@ -4,9 +4,7 @@
  *  Base class for properties of a class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
- * 
- *  @todo   remove this file completely
+ *  @copyright 2013, 2014 Copernica BV
  */
 
 /**
