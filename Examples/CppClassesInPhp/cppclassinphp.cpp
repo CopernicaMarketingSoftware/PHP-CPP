@@ -46,6 +46,8 @@ public:
         
         std::cout << "myMethod is called." << std::endl;
         _x = params[0];
+        
+        std::cout << "get property1 " << value()["property1"] << std::endl;
     }
 };
 
@@ -76,7 +78,6 @@ extern "C"
         customClass.method("myMethod2", &MyCustomClass::myMethod);
         customClass.property("property1", "prop1");
         customClass.property("property2", "prop2", Php::Protected);
-        customClass.method("myAbstract");
         
         // add the class to the extension
         extension.add(customClass);

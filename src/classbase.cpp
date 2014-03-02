@@ -100,7 +100,7 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     result.handle = zend_objects_store_put(object, NULL, deallocate_object, clone_object TSRMLS_CC); 
 
     // finally, construct the cpp object
-    object->cpp = info->construct();
+    object->cpp = info->construct(&object->php);
 
     // done
     return result;

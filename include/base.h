@@ -52,6 +52,28 @@ public:
     {
         return value()[name];
     }
+    
+private:
+    /**
+     *  The zend_object
+     *  @var    zend_object
+     */
+    struct _zend_object *_object = nullptr;
+    
+    /**
+     *  Private method to assign the zend object
+     *  @param  zend_object
+     */
+    void assign(struct _zend_object *object)
+    {
+        // copy pointer
+        _object = object;
+    }
+    
+    /**
+     *  ClassBase has access to private data
+     */
+    friend class ClassBase;
 };
 
 

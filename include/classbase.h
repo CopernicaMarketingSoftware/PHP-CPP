@@ -76,6 +76,23 @@ public:
      *  Destructor
      */
     virtual ~ClassBase();
+
+    /**
+     *  Construct a new instance of the object
+     *  @return Base
+     */
+    Base* construct(struct _zend_object *object)
+    {
+        // construct the base
+        auto *result = construct();
+        if (!result) return nullptr;
+        
+        // assign the zend object to it
+        result->assign(object);
+        
+        // done
+        return result;
+    }
     
     /**
      *  Construct a new instance of the object
