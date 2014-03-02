@@ -81,6 +81,16 @@ public:
     }
     
     /**
+     *  Move constructor
+     *  @param  that
+     */
+    HiddenPointer(HiddenPointer<Type> &&that) : _allocated(that._allocated), _buffer(that._buffer)
+    {
+        // the other object is no longer allocated
+        that._allocated = false;
+    }
+    
+    /**
      *  Destructor
      */
     virtual ~HiddenPointer() 
@@ -139,6 +149,16 @@ public:
     {
         // name starts a number of bytes further
         return _buffer + sizeof(Type *);
+    }
+    
+    /**
+     *  Derefence the pointer
+     *  @return Type*
+     */
+    Type *operator->() const
+    {
+        // type is stored in front of the buffer
+        return *((Type **)_buffer);
     }
     
 private:

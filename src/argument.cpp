@@ -29,7 +29,7 @@ Argument::Argument(const char *name, Type type, bool required, bool byref)
     _info->name = name;
     _info->name_len = strlen(name);
 #if PHP_VERSION_ID >= 50400    
-    _info->type_hint = type == arrayType || type == callableType ? type : 0;
+    _info->type_hint = (unsigned char)(type == Type::Array || type == Type::Callable ? type : Type::Null);
 #endif
     _info->class_name = NULL;
     _info->class_name_len = 0;
@@ -57,7 +57,7 @@ Argument::Argument(const char *name, const char *classname, bool nullable, bool 
     _info->name = name;
     _info->name_len = strlen(name);
 #if PHP_VERSION_ID >= 50400    
-    _info->type_hint = objectType;
+    _info->type_hint = (unsigned char)Type::Object;
 #endif
     _info->class_name = classname;
     _info->class_name_len = strlen(classname);

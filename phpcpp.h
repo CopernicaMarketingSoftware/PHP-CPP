@@ -26,7 +26,7 @@
  */
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
-#include <phpcpp/array.h>
+#include <phpcpp/forcedvalue.h>
 #include <phpcpp/hiddenpointer.h>
 #include <phpcpp/globals.h>
 #include <phpcpp/argument.h>
@@ -36,7 +36,6 @@
 #include <phpcpp/hashmember.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/modifiers.h>
-#include <phpcpp/properties.h>
 #include <phpcpp/base.h>
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>

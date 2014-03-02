@@ -1172,13 +1172,13 @@ Value &Value::setType(Type type)
     
     // run the conversion
     switch (type) {
-    case nullType:              convert_to_null(_val); break;
-    case numericType:           convert_to_long(_val); break;
-    case floatType:             convert_to_double(_val); break;
-    case boolType:              convert_to_boolean(_val); break;
-    case arrayType:             convert_to_array(_val); break;
-    case objectType:            convert_to_object(_val); break;
-    case stringType:            convert_to_string(_val); break;
+    case Type::Null:        convert_to_null(_val); break;
+    case Type::Numeric:     convert_to_long(_val); break;
+    case Type::Float:       convert_to_double(_val); break;
+    case Type::Bool:        convert_to_boolean(_val); break;
+    case Type::Array:       convert_to_array(_val); break;
+    case Type::Object:      convert_to_object(_val); break;
+    case Type::String:      convert_to_string(_val); break;
     }
     
     // done
@@ -1241,7 +1241,7 @@ long Value::numericValue() const
     if (isNumeric()) return Z_LVAL_P(_val);
     
     // make a clone
-    return clone(numericType).numericValue();
+    return clone(Type::Numeric).numericValue();
 }
 
 /**
@@ -1254,7 +1254,7 @@ bool Value::boolValue() const
     if (isBool()) return Z_BVAL_P(_val);
 
     // make a clone
-    return clone(boolType).boolValue();
+    return clone(Type::Bool).boolValue();
 }
 
 /**
@@ -1267,7 +1267,7 @@ std::string Value::stringValue() const
     if (isString()) return std::string(Z_STRVAL_P(_val), Z_STRLEN_P(_val));
 
     // make a clone
-    return clone(stringType).stringValue();
+    return clone(Type::String).stringValue();
 }
 
 /**
@@ -1280,7 +1280,7 @@ const char *Value::rawValue() const
     if (isString()) return Z_STRVAL_P(_val);
     
     // make a clone
-    return clone(stringType).rawValue();
+    return clone(Type::String).rawValue();
 }
 
 /**
@@ -1293,7 +1293,7 @@ double Value::floatValue() const
     if (isFloat()) return Z_DVAL_P(_val);
 
     // make a clone
-    return clone(floatType).floatValue();
+    return clone(Type::Float).floatValue();
 }
 
 /**
@@ -1336,7 +1336,7 @@ int Value::size() const
         Value copy(*this);
         
         // convert the copy to a string
-        copy.setType(stringType);
+        copy.setType(Type::String);
         
         // return the string size
         return copy.size();
@@ -1476,7 +1476,7 @@ const Value &Value::set(int index, const Value &value)
     }
 
     // must be an array
-    setType(arrayType);
+    setType(Type::Array);
 
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -1528,7 +1528,7 @@ const Value &Value::set(const char *key, int size, const Value &value)
     else
     {
         // must be an array
-        setType(arrayType);
+        setType(Type::Array);
 
         // if this is not a reference variable, we should detach it to implement copy on write
         SEPARATE_ZVAL_IF_NOT_REF(&_val);

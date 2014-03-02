@@ -99,7 +99,7 @@ void Callable::initialize(zend_internal_function_info *info, const char *classna
 
     // number of required arguments, and the expected return type
     info->required_num_args = _required;
-    info->_type_hint = _return;
+    info->_type_hint = (unsigned char)_return;
 
     // we do not support return-by-reference
     info->return_reference = false;

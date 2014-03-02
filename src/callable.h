@@ -94,7 +94,7 @@ protected:
      *  Suggestion for the return type
      *  @var    Type
      */
-    Type _return = nullType;
+    Type _return = Type::Null;
 
     /**
      *  Required number of arguments

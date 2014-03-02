@@ -15,59 +15,43 @@ namespace Php {
  */
 class Base
 {
-public:
+protected:
     /**
      *  Constructor
      */
     Base() {}
 
+public:
     /**
      *  Virtual destructor
      */
     virtual ~Base() {}
 
     /**
-     *  The pseudo constructor that is called from PHP after the object is constructed
-     *  @param  parameters
+     *  Convert the object to a Php::Value object (how it is used externally)
+     *  @return Value
      */
-    virtual void __construct(const Parameters &parameters)
-    {
-        // call all other possible implementations
-        __construct();
-    }
+    Value value() const;
     
-    /**
-     *  The pseudo constructor that is called from PHP after the object is constructed
-     */
-    virtual void __construct() {}
-
-    /**
-     *  The pseudo destructor that is called from PHP right before the object is destructed
-     */
-    virtual void __destruct() {}
-
     /**
      *  Get access to a property by name
      *  @param  string
-     *  @return Property
+     *  @return Value
      */
-//    Property operator[](const char *name);
-    
+    Value operator[](const char *name) const
+    {
+        return value()[name];
+    }
+
     /**
      *  Alternative way to access a property
      *  @param  string
-     *  @return Property
+     *  @return Value
      */
-//    Property operator[](const std::string &name);
-
-protected:
-    /**
-     *  All properties of the object
-     *  @var    Properties
-     */
-//    Properties _properties;
-
-private:
+    Value operator[](const std::string &name) const
+    {
+        return value()[name];
+    }
 };
 
 

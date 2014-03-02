@@ -47,7 +47,7 @@
  */
 #include "../include/type.h"
 #include "../include/value.h"
-#include "../include/array.h"
+#include "../include/forcedvalue.h"
 #include "../include/hiddenpointer.h"
 #include "../include/globals.h"
 #include "../include/argument.h"
@@ -57,7 +57,6 @@
 #include "../include/hashmember.h"
 #include "../include/parameters.h"
 #include "../include/modifiers.h"
-#include "../include/properties.h"
 #include "../include/base.h"
 #include "../include/classtype.h"
 #include "../include/classbase.h"

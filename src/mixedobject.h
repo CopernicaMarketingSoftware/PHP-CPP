@@ -17,7 +17,17 @@ namespace Php {
  */
 struct MixedObject
 {
+    /**
+     *  The actual object is the first member, so that casting
+     *  the MixedObject to a zend_object will also result in a valid pointer
+     *  @var    zend_object
+     */
     zend_object php;
+    
+    /**
+     *  Pointer to the C++ implementation
+     *  @var    Base
+     */
     Base *cpp;
 };
 

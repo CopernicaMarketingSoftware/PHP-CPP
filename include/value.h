@@ -285,13 +285,13 @@ public:
      *  Check if the value is of a certain type
      *  @return bool
      */
-    bool isNull()       const { return type() == nullType; }
-    bool isNumeric()    const { return type() == numericType; }
-    bool isBool()       const { return type() == boolType; }
-    bool isString()     const { return type() == stringType; }
-    bool isFloat()      const { return type() == floatType; }
-    bool isObject()     const { return type() == objectType; }
-    bool isArray()      const { return type() == arrayType; }
+    bool isNull()       const { return type() == Type::Null; }
+    bool isNumeric()    const { return type() == Type::Numeric; }
+    bool isBool()       const { return type() == Type::Bool; }
+    bool isString()     const { return type() == Type::String; }
+    bool isFloat()      const { return type() == Type::Float; }
+    bool isObject()     const { return type() == Type::Object; }
+    bool isArray()      const { return type() == Type::Array; }
     bool isCallable()   const;
     
     /**

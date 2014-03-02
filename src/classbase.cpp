@@ -62,10 +62,14 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     
     // retrieve the classinfo object
 #if PHP_VERSION_ID >= 50400
-    ClassBase *info = (ClassBase *)base->info.user.doc_comment;
+    const char *comment = base->info.user.doc_comment;
 #else
-    ClassBase *info = *((ClassBase **)base->doc_comment);
+    const char *comment = base->doc_comment;
 #endif    
+    
+    // the first byte of the comment is an empty string (null character), but
+    // the next bytes contain a pointer to the ClassInfo class
+    ClassBase *info = *((ClassBase **)(comment + 1));
     
     // store the class
     object->php.ce = type;
@@ -76,6 +80,7 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
 
     // initialize the hash table
     zend_hash_init(object->php.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
+
     
     // initialize the properties
 #if PHP_VERSION_ID < 50399
@@ -108,6 +113,11 @@ ClassBase::~ClassBase()
 {
     // destruct the entries
     if (_entries) delete[] _entries;
+
+    // php 5.3 deallocated the doc_comment by iself
+#if PHP_VERSION_ID >= 50400    
+    if (_comment) free(_comment);
+#endif
 }
 
 /**
@@ -176,30 +186,29 @@ void ClassBase::initialize(const std::string &prefix)
     
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);
-
+    
+    // allocate doc comment to contain an empty string + a hidden pointer
+    if (!_comment)
+    {
+        // allocate now
+        _comment = (char *)malloc(1 + sizeof(ClassBase *));
+        
+        // empty string on first position
+        _comment[0] = '\0';
+        
+        // this pointer has to be copied to temporary pointer, as &this causes compiler error
+        ClassBase *base = this;
+        
+        // copy the 'this' pointer to the doc-comment
+        memcpy(_comment+1, &base, sizeof(ClassBase *));
+    }
+    
     // store pointer to the class in the unused doc_comment member
 #if PHP_VERSION_ID >= 50400    
-    _entry->info.user.doc_comment = (const char *)this;
+    _entry->info.user.doc_comment = _comment;
 #else
-    /**
-     *  PHP 5.3 will free the doc_comment pointer if it
-     *  is not NULL, which will result in the classinfo
-     *  object being freed without being destructed
-     *  properly, leading to segfaults when the destruct
-     *  is called at a later stage (during module_shutdown).
-     *
-     *  To prevent this we create an extra pointer that
-     *  points to our this pointer. We do *not* free this
-     *  pointer ourselves, because PHP does this. This
-     *  way it does not free the classinfo.
-     */
-    char **wrapper = (char**)malloc(sizeof(char**));
-
-    // have the wrapper point to us
-    *wrapper = (char *)this;
-
     // and store the wrapper inside the comment
-    _entry->doc_comment = (char *)wrapper;
+    _entry->doc_comment = _comment;
 #endif
 
     // set access types flags for class
