@@ -11,7 +11,7 @@
  */
 using namespace std;
 
-class MyCustomClass : public Php::Base
+class MyCustomClass : public Php::Base // , public Php::Countable
 {
 private:
     int _x;
@@ -39,6 +39,11 @@ public:
         std::cout << "MyCustomClass::__destruct" << std::endl;
     }
     
+    virtual Php::Value count() //override
+    {
+        return 33;
+    }
+    
     void myMethod(Php::Parameters &params)
     {
         // check number of parameters
@@ -47,12 +52,12 @@ public:
         std::cout << "myMethod is called." << std::endl;
         _x = params[0];
         
-        std::cout << "get property1 " << value()["property1"] << std::endl;
-        
-        // set it to something else
-        value().set("property1", "new value");
-
-        std::cout << "get property1 " << value()["property1"] << std::endl;
+   //     std::cout << "get property1 " << value()["property1"] << std::endl;
+   //     
+   //     // set it to something else
+   //     value().set("property1", "new value");
+   //
+   //     std::cout << "get property1 " << value()["property1"] << std::endl;
     }
 };
 

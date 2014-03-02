@@ -16,11 +16,6 @@
  */
 
 /**
- *  Forward declarations
- */
-struct _zend_class_entry;
-
-/**
  *  Set up namespace
  */
 namespace Php {
@@ -40,7 +35,11 @@ public:
      * 
      *  @param  name        Name of the class
      */
-    Class(const char *name) : ClassBase(name) {}
+    Class(const char *name) : ClassBase(name)
+    {
+        // check for special classes
+        if (std::is_base_of<Countable, T>::value) ClassBase::interface(Countable::implementation());
+    }
     
     /**
      *  Copy constructor
@@ -74,14 +73,14 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
      */
-    void method(const char *name, void(T::*method)(),                   int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); }
-    void method(const char *name, void(T::*method)(Parameters &params), int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); }
-    void method(const char *name, bool(T::*method)(),                   int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); }
-    void method(const char *name, bool(T::*method)(Parameters &params), int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); }
-    void method(const char *name, void(T::*method)(),                              const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); }
-    void method(const char *name, void(T::*method)(Parameters &params),            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); }
-    void method(const char *name, bool(T::*method)(),                              const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); }
-    void method(const char *name, bool(T::*method)(Parameters &params),            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); }
+    void method(const char *name, void  (T::*method)(),                   int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); }
+    void method(const char *name, void  (T::*method)(Parameters &params), int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); }
+    void method(const char *name, Value (T::*method)(),                   int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); }
+    void method(const char *name, Value (T::*method)(Parameters &params), int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); }
+    void method(const char *name, void  (T::*method)(),                              const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); }
+    void method(const char *name, void  (T::*method)(Parameters &params),            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); }
+    void method(const char *name, Value (T::*method)(),                              const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); }
+    void method(const char *name, Value (T::*method)(Parameters &params),            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); }
 
     /**
      *  Add an abstract method to the class

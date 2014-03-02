@@ -350,6 +350,8 @@ private:
      */
     HashMember(const Value *base, Type index) : _base(*base), _index(index) {}
     
+    // @todo add move constructor
+    
     /**
      *  Protected copy constructor
      *  @param  value   Other element
@@ -389,7 +391,7 @@ private:
      *  Only value objects may construct members
      */
     friend class Value;
-    friend class Properties;
+    friend class Base;
     
 };
 

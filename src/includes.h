@@ -57,6 +57,7 @@
 #include "../include/parameters.h"
 #include "../include/modifiers.h"
 #include "../include/base.h"
+#include "../include/countable.h"
 #include "../include/classtype.h"
 #include "../include/classbase.h"
 #include "../include/class.h"

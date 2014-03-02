@@ -85,14 +85,15 @@ public:
      *  @param  value
      *  @return Base
      */
-    Base* construct(Value &&value)
+    Base* construct(const struct _zend_object_value &value)
     {
         // construct the base
         auto *result = construct();
         if (!result) return nullptr;
         
         // assign the zend object to it
-        result->assign(std::move(value));
+        // @todo fix this
+//        result->assign(value);
         
         // done
         return result;
@@ -170,6 +171,27 @@ protected:
     void property(const char *name, const char *value, int flags = Php::Public);
     void property(const char *name, double value, int flags = Php::Public);
 
+    /**
+     *  Add an implemented interface
+     *  
+     *  This can only be used to register interfaces that are already defined
+     *  by Zend, and not for user space interface or custom extension interfaces.
+     *  This is probably not so much of a problem, as this feature is mostly
+     *  useful for interfaces like 'Countable', 'ArrayAccess', 'Iterator', et
+     *  cetera. Interfaces defined in user space are in normal operations
+     *  inaccessible (user space code normally runs after the extension has been 
+     *  set up) - so we do not need a feature to set these.
+     * 
+     *  It does however make sense to support implementing extension-specific
+     *  interface. We may add this feature in the future.
+     * 
+     *  @param  interface
+     */
+    void interface(struct _zend_class_entry *interface)
+    {
+        // register the interface
+        _interfaces.push_back(interface);
+    }
 
 private:
     /**
@@ -223,6 +245,12 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
+    
+    /**
+     *  All interfaces that are implemented
+     *  @var    std::list
+     */
+    std::list<struct _zend_class_entry*> _interfaces;
     
 };
     

@@ -101,7 +101,7 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     result.handle = zend_objects_store_put(object, NULL, deallocate_object, clone_object TSRMLS_CC); 
 
     // finally, construct the cpp object
-    object->cpp = info->construct(Value(result));
+    object->cpp = info->construct(result);
 
     // done
     return result;
@@ -214,6 +214,9 @@ void ClassBase::initialize(const std::string &prefix)
 
     // set access types flags for class
     _entry->ce_flags = (int)_type;
+    
+    // mark the interfaces as being implemented
+    for (auto &interface : _interfaces) zend_do_implement_interface(_entry, interface);
     
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);

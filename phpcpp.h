@@ -38,6 +38,7 @@
 #include <phpcpp/parameters.h>
 #include <phpcpp/modifiers.h>
 #include <phpcpp/base.h>
+#include <phpcpp/countable.h>
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
 #include <phpcpp/class.h>

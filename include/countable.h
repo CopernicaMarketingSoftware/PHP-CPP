@@ -1,0 +1,45 @@
+/**
+ *  Countable.h
+ * 
+ *  "Interface" that can be "implemented" by your class. If you do, you
+ *  create your class like this:
+ * 
+ *  class MyClass : public Php::Base, public Php::Countable { ... }
+ * 
+ *  You will have to implement the count() method, which should return the
+ *  number of elements in the class
+ *
+ *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
+ *  @copyright 2014 Copernica BV
+ */
+
+/**
+ *  Set up namespace
+ */
+namespace Php {
+    
+/**
+ *  Class definition
+ */
+class Countable
+{
+public:
+    /**
+     *  Implementation of the countable interface
+     *  @return zend_class_entry*
+     *  @internal
+     */
+    static struct _zend_class_entry *implementation();
+
+    /**
+     *  Retrieve the number of items in the class
+     *  @return Value
+     */
+    virtual Value count() = 0;
+};
+    
+/**
+ *  End namespace
+ */
+}
+
