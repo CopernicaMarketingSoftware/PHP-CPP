@@ -47,6 +47,7 @@
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/forcedvalue.h"
+#include "../include/object.h"
 #include "../include/hiddenpointer.h"
 #include "../include/globals.h"
 #include "../include/argument.h"

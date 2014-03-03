@@ -28,6 +28,7 @@
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/forcedvalue.h>
+#include <phpcpp/object.h>
 #include <phpcpp/hiddenpointer.h>
 #include <phpcpp/globals.h>
 #include <phpcpp/argument.h>

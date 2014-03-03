@@ -1397,8 +1397,8 @@ bool Value::contains(const char *key, int size) const
         // retrieve the class entry
         auto *entry = zend_get_class_entry(_val);
         
-        // read the property
-        zval *property = zend_read_property(entry, _val, key, size, 0);
+        // read the property (cast necessary for php 5.3)
+        zval *property = zend_read_property(entry, _val, (char *)key, size, 0);
         
         // check if valid
         return property != nullptr;
@@ -1461,8 +1461,8 @@ Value Value::get(const char *key, int size) const
         // retrieve the class entry
         auto *entry = zend_get_class_entry(_val);
         
-        // read the property
-        zval *property = zend_read_property(entry, _val, key, size, 1);
+        // read the property (case necessary for php 5.3)
+        zval *property = zend_read_property(entry, _val, (char *)key, size, 1);
         
         // wrap in value
         return Value(property);
@@ -1534,8 +1534,8 @@ const Value &Value::set(const char *key, int size, const Value &value)
         // retrieve the class entry
         auto *entry = zend_get_class_entry(_val);
 
-        // update the property
-        zend_update_property(entry, _val, key, size, value._val);
+        // update the property (cast necessary for php 5.3)
+        zend_update_property(entry, _val, (char *)key, size, value._val);
     }
     else
     {

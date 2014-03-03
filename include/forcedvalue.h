@@ -132,7 +132,6 @@ protected:
  *  Define for arrays and objects
  */
 using Array     =   ForcedValue<Type::Array>;
-using Object    =   ForcedValue<Type::Object>;
     
 /**
  *  End of namespace

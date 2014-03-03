@@ -44,13 +44,16 @@ public:
         return 33;
     }
     
-    void myMethod(Php::Parameters &params)
+    Php::Value myMethod(Php::Parameters &params)
     {
         // check number of parameters
         if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
         
         std::cout << "myMethod is called." << std::endl;
-        _x = params[0];
+        
+        // construct a new class
+        return Php::Object(params[0]);
+        
         
    //     std::cout << "get property1 " << value()["property1"] << std::endl;
    //     

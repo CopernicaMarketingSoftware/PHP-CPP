@@ -57,7 +57,7 @@ static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
     // allocate memory for the object
     MixedObject *object = (MixedObject *)emalloc(sizeof(MixedObject));
     
-    // find base object
+    // find base object (because the class may have been extended in user space)
     zend_class_entry *base = type;
     while (base->parent) base = base->parent;
     
