@@ -161,21 +161,21 @@ extern "C"
 
         // define the functions
         extension.add("my_plus", my_plus, {
-            Php::ByVal("a", Php::numericType),
-            Php::ByVal("b", Php::numericType),
+            Php::ByVal("a", Php::Type::Numeric),
+            Php::ByVal("b", Php::Type::Numeric),
             Php::ByVal("c", "MyClass"),
-            Php::ByRef("d", Php::stringType)
+            Php::ByRef("d", Php::Type::String)
         });
         
         extension.add("bubblesort", bubblesort);
         
-        Php::Method<MyCustomClass> x(&MyCustomClass::myMethod);
-        
         // define classes
-        extension.add("my_class", Php::Class<MyCustomClass>({
-            Php::Public("myMethod", Php::Method<MyCustomClass>(&MyCustomClass::myMethod)),
-            Php::Public("__construct", Php::Method<MyCustomClass>(&MyCustomClass::__construct))
-        }));
+        Php::Class<MyCustomClass> myCustomClass("my_class");
+        myCustomClass.method("mymethod", &MyCustomClass::myMethod);
+        myCustomClass.method("__construct", &MyCustomClass::__construct);
+        
+        // add to extension
+        extension.add(myCustomClass);
         
         // return the module entry
         return extension.module();

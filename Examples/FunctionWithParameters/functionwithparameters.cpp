@@ -99,18 +99,18 @@ extern "C"
         
         // add function, with defined numeric parameters, to extension
         extension.add("my_with_defined_parameters_function", my_with_defined_parameters_function, {
-            Php::ByVal("x", Php::numericType),
-            Php::ByVal("y", Php::numericType)
+            Php::ByVal("x", Php::Type::Numeric),
+            Php::ByVal("y", Php::Type::Numeric)
             });
         
         // add function, with defined parameter by reference, to extension
         extension.add("my_with_defined_parameters_reference_function", my_with_defined_parameters_reference_function, {
-            Php::ByRef("string", Php::stringType)
+            Php::ByRef("string", Php::Type::String)
             });
         
         // add function, with defined array parameter, to extension
         extension.add("my_with_defined_array_parameters_function", my_with_defined_array_parameters_function, {
-            Php::ByVal("array", Php::arrayType)
+            Php::ByVal("array", Php::Type::Array)
             });
         
         // add function, with defined object parameter, to extension

@@ -43,8 +43,8 @@ extern "C"
         
         // add function to extension
         extension.add("call_php_function", call_php_function, {
-            Php::ByVal("addFunc", Php::callableType),
-            Php::ByVal("x", Php::numericType)
+            Php::ByVal("addFunc", Php::Type::Callable),
+            Php::ByVal("x", Php::Type::Numeric)
             });
         
         // return the extension module

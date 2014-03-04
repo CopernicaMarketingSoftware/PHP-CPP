@@ -18,6 +18,7 @@
  *  Forward declarations
  */
 struct _zend_object_value;
+struct _zend_object_handlers;
 
 /**
  *  Set up namespace
@@ -217,7 +218,7 @@ private:
      *  Retrieve pointer to our own object handlers
      *  @return zend_object_handlers
      */
-    static zend_object_handlers *objectHandlers();
+    static struct _zend_object_handlers *objectHandlers();
 
     /**
      *  Name of the class
