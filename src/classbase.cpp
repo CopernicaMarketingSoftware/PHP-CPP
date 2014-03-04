@@ -38,6 +38,34 @@ static ClassBase *cpp_class(zend_class_entry *entry)
 }
 
 /**
+ *  Retrieve pointer to our own object handlers
+ *  @return zend_object_handlers
+ */
+zend_object_handlers *ClassBase::objectHandlers()
+{
+    // keep static structure
+    static zend_object_handlers handlers;
+    
+    // is the object already initialized?
+    static bool initialized = false;
+    
+    // already initialized?
+    if (initialized) return &handlers;
+    
+    // initialize the handlers
+    memcpy(&handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+    
+    // install custom clone function
+    handlers.clone_obj = &ClassBase::cloneObject;
+    
+    // remember that object is now initialized
+    initialized = true;
+    
+    // done
+    return &handlers;
+}
+    
+/**
  *  Function that is called to create space for a cloned object
  *  @param  val                     The object to be cloned
  *  @return zend_obejct_value       The object to be created
@@ -63,11 +91,8 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     zend_object_value result;
     
     // set the handlers
-    result.handlers = zend_get_std_object_handlers();
+    result.handlers = ClassBase::objectHandlers();
     
-    // we need a special handler for cloning
-    result.handlers->clone_obj = &ClassBase::cloneObject;
-
     // store the object
     MixedObject *new_object = cpp->store(entry);
 
@@ -102,11 +127,8 @@ zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
     zend_object_value result;
     
     // set the handlers
-    result.handlers = zend_get_std_object_handlers();
+    result.handlers = ClassBase::objectHandlers();
     
-    // we need a special handler for cloning
-    result.handlers->clone_obj = ClassBase::cloneObject;
-
     // store the object
     cpp->store(entry);
 

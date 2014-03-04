@@ -214,6 +214,12 @@ private:
     static struct _zend_object_value createObject(struct _zend_class_entry *entry);
 
     /**
+     *  Retrieve pointer to our own object handlers
+     *  @return zend_object_handlers
+     */
+    static zend_object_handlers *objectHandlers();
+
+    /**
      *  Name of the class
      *  @var    string
      */
