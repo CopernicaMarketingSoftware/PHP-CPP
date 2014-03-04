@@ -21,14 +21,15 @@ class Object : public ForcedValue<Type::Object>
 public:
     /**
      *  Constructor for an empty stdClass object
-     * 
-     *  @todo   check if this indeed leads to a stdClass instance
      */
     Object() : ForcedValue<Type::Object>() {}
 
     /**
-     *  @todo   copy constructor, move constructor
+     *  Copy and move constructors are passed on to the base class
+     *  @param  that        An other object
      */
+    Object(const Value &value) : ForcedValue<Type::Object>(value) {}
+    Object(Value &&value) : ForcedValue<Type::Object>(std::move(value)) {}
 
     /**
      *  Constructor to create a new instance
@@ -48,12 +49,29 @@ public:
      *  @param  arg8        Optional argument 9
      *  @param  arg9        Optional argument 10
      */
-    Object(const char *name);
+    Object(const char *name) { instantiate(name); call("__construct"); }
+    Object(const char *name, Value p0) { instantiate(name); call("__construct", p0); }
+    Object(const char *name, Value p0, Value p1) { instantiate(name); call("__construct", p0, p1); }
+    Object(const char *name, Value p0, Value p1, Value p2) { instantiate(name); call("__construct", p0, p1, p2); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3) { instantiate(name); call("__construct", p0, p1, p2, p3); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4) { instantiate(name); call("__construct", p0, p1, p2, p3, p4); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) { instantiate(name); call("__construct", p0, p1, p2, p3, p4, p5); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) { instantiate(name); call("__construct", p0, p1, p2, p3, p4, p5, p6); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) { instantiate(name); call("__construct", p0, p1, p2, p3, p4, p5, p6, p7); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) { instantiate(name); call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) { instantiate(name); call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }
     
     /**
      *  Destructor
      */
     virtual ~Object() {}
+
+private:
+    /**
+     *  Helper method to instantiate an object
+     *  @param  name        Class name
+     */
+    void instantiate(const char *name);
     
 };
 

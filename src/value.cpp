@@ -895,7 +895,7 @@ Value Value::operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value 
  *  @param  name        name of the method to call
  *  @return Value
  */
-Value Value::call(const std::string &name)
+Value Value::call(const char *name)
 {
     // call with zero parameters
     return exec(name, 0, NULL);
@@ -907,7 +907,7 @@ Value Value::call(const std::string &name)
  *  @param  p0          The first parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0)
+Value Value::call(const char *name, Value p0)
 {
     // array of parameters
     zval **params[] = { &p0._val };
@@ -923,7 +923,7 @@ Value Value::call(const std::string &name, Value p0)
  *  @param  p1          The second parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1)
+Value Value::call(const char *name, Value p0, Value p1)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val };
@@ -940,7 +940,7 @@ Value Value::call(const std::string &name, Value p0, Value p1)
  *  @param  p2          The third parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2)
+Value Value::call(const char *name, Value p0, Value p1, Value p2)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val };
@@ -958,7 +958,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2)
  *  @param  p3          The fourth parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val };
@@ -977,7 +977,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  p4          The fifth parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val };
@@ -997,7 +997,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  p5          The sixth parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val };
@@ -1018,7 +1018,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  p6          The seventh parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val };
@@ -1040,7 +1040,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  p7          The eighth parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val };
@@ -1063,7 +1063,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  p8          The ninth parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val };
@@ -1087,7 +1087,7 @@ Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p
  *  @param  p9          The tenth parameter
  *  @return Value
  */
-Value Value::call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
+Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9)
 {
     // array of parameters
     zval **params[] = { &p0._val, &p1._val, &p2._val, &p3._val, &p4._val, &p5._val, &p6._val, &p7._val, &p8._val, &p9._val };
@@ -1127,7 +1127,7 @@ Value Value::exec(int argc, zval ***params) const
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(const std::string &name, int argc, struct _zval_struct ***params)
+Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
 {
     // the method to call and the return value
     zval *method;
@@ -1141,7 +1141,7 @@ Value Value::exec(const std::string &name, int argc, struct _zval_struct ***para
 
     // add the object and the method to call
     add_index_zval(method, 0, _val);
-    add_index_stringl(method, 1, name.c_str(), name.length(), 0);
+    add_index_stringl(method, 1, name, strlen(name), 0);
 
     // the current exception
     zval *oldException = EG(exception);

@@ -46,6 +46,16 @@ public:
         // type must be valid
         if (value.type() != TYPE) throw Php::Exception("Assiging a wrong value type to a forced typed variable");
     }
+
+    /**
+     *  Move constructor from a value object
+     *  @param  value
+     */
+    ForcedValue(Value &&value) : Value(std::move(value))
+    {
+        // type must be valid
+        if (value.type() != TYPE) throw Php::Exception("Assiging a wrong value type to a forced typed variable");
+    }
     
     /**
      *  Wrap object around zval

@@ -12,37 +12,27 @@
 namespace Php {
 
 /**
- *  Constructor
+ *  Internal method to instantiate an object
  *  @param  name
  */
-Object::Object(const char *name)
+void Object::instantiate(const char *name)
 {
-    // step 1: convert the name into a class_entry
+    // convert the name into a class_entry
     auto *entry = zend_fetch_class(name, strlen(name), 0);
-    if (!entry) throw Php::Exception("Unknown class name");
+    if (!entry) throw Php::Exception(std::string("Unknown class name ") + name);
 
     // initiate the zval (which was already allocated in the base constructor)
     object_init_ex(_val, entry);
     
-//    // is there a special function to create the object?
-//    if (entry->create_object)
-//    {
-//        // create the object
-//        zend_object_value value = entry->create_object(entry);
-//        
-//        // wrap this in the zval (which was already allocated in the base constructor)
-//        Z_TYPE_P(_val) = IS_OBJECT;
-//        Z_OBJVAL_P(_val) = value;
-//    }
-//    else
-//    {
-//    }
+    // @todo    should we call methods like allocating hashtables, copying and
+    //          initializing properties, et cetera????? In all example you always
+    //          see such complicated and next-to-impossible-to-understand
+    //          sequences of functions being called, but this object_init_ex
+    //          also seems to work...
     
-    // @todo    should we call methods like allocating hashtables, copyint and
-    //          initializing properties, et cetera?????
+    // @todo    is this a memory leak? the base class first initializes a stdClass, 
+    //          and then we overwrite it with a specific class
     
-    // call the constructor
-    call("__construct");
 }
 
 /**

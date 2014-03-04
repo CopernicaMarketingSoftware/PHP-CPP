@@ -594,17 +594,17 @@ public:
      *  @param  name        Name of the function
      *  @return Value
      */
-    Value call(const std::string &name);
-    Value call(const std::string &name, Value p0);
-    Value call(const std::string &name, Value p0, Value p1);
-    Value call(const std::string &name, Value p0, Value p1, Value p2);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
-    Value call(const std::string &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+    Value call(const char *name);
+    Value call(const char *name, Value p0);
+    Value call(const char *name, Value p0, Value p1);
+    Value call(const char *name, Value p0, Value p1, Value p2);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
+    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
 
     /**
      *  Retrieve the original implementation
@@ -651,7 +651,7 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(const std::string &name, int argc, struct _zval_struct ***params);
+    Value exec(const char *name, int argc, struct _zval_struct ***params);
 
 protected:
     /**
