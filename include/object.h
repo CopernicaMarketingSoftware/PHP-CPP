@@ -16,20 +16,37 @@ namespace Php {
 /**
  *  Class definition
  */
-class Object : public ForcedValue<Type::Object>
+class Object : public Value
 {
 public:
     /**
      *  Constructor for an empty stdClass object
      */
-    Object() : ForcedValue<Type::Object>() {}
+    Object() : Value() { setType(Type::Object); }
 
     /**
-     *  Copy and move constructors are passed on to the base class
+     *  Move constructor is passed to the parent
+     *  @param  value
+     */
+    Object(Value &&value) : Value(std::move(value)) 
+    {
+        // throw exception in case of problems
+        if (value.type() != Type::Object) throw Php::Exception("Constructing an object variable by moving a non object");
+    }
+
+    /**
+     *  Copy constructor is valid if the passed in object is also an object,
+     *  or when it is a string holding a classname
      *  @param  that        An other object
      */
-    Object(const Value &value) : ForcedValue<Type::Object>(value) {}
-    Object(Value &&value) : ForcedValue<Type::Object>(std::move(value)) {}
+    Object(const Value &value) : Value()
+    {
+        // string types are instantiated
+        if (value.isString()) instantiate(value);
+        
+        // otherwise copy the other object
+        else operator=(value);
+    }
 
     /**
      *  Constructor to create a new instance
@@ -65,6 +82,59 @@ public:
      *  Destructor
      */
     virtual ~Object() {}
+
+    /**
+     *  Change the internal type of the variable
+     *  @param  Type
+     */
+    virtual Value &setType(Type type) override
+    {
+        // throw exception if things are going wrong
+        if (type != Type::Object) throw Php::Exception("Changing type of a fixed object variable");
+        
+        // call base
+        return Value::setType(type);
+    }
+
+    /**
+     *  Assignment operator
+     *  @param  value
+     *  @return ForcedValue
+     */
+    Object &operator=(const Value &value)
+    {
+        // skip self assignment
+        if (this == &value) return *this;
+        
+        // type must be valid
+        if (value.type() != Type::Object) throw Php::Exception("Assiging a non-object to an object variable");
+        
+        // call base
+        Value::operator=(value);
+
+        // done
+        return *this;
+    }
+    
+    /**
+     *  Move assignment operator
+     *  @param  value
+     *  @return ForcedValue
+     */
+    Object &operator=(Value &&value)
+    {
+        // skip self assignment
+        if (this == &value) return *this;
+        
+        // type must be valid
+        if (value.type() != Type::Object) throw Php::Exception("Moving a non-object to an object variable");
+        
+        // call base
+        Value::operator=(std::move(value));
+
+        // done
+        return *this;
+    }
 
 private:
     /**

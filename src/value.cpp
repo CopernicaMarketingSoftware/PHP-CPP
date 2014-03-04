@@ -309,9 +309,6 @@ Value &Value::operator=(Value &&value)
         // the other object is no longer valid
         value._val = nullptr;
     }
-
-    // update the object
-    return validate();
 }
 
 /**
@@ -357,7 +354,7 @@ Value &Value::operator=(const Value &value)
     }
     
     // update the object
-    return validate();
+    return *this;
 }
 
 
@@ -378,7 +375,7 @@ Value &Value::operator=(std::nullptr_t value)
     ZVAL_NULL(_val);
 
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -398,7 +395,7 @@ Value &Value::operator=(int16_t value)
     ZVAL_LONG(_val, value);
 
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -418,7 +415,7 @@ Value &Value::operator=(int32_t value)
     ZVAL_LONG(_val, value);
 
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -438,7 +435,7 @@ Value &Value::operator=(int64_t value)
     ZVAL_LONG(_val, value);
 
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -458,7 +455,7 @@ Value &Value::operator=(bool value)
     ZVAL_BOOL(_val, value);
 
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -478,7 +475,7 @@ Value &Value::operator=(char value)
     ZVAL_STRINGL(_val, &value, 1, 1);
     
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -498,7 +495,7 @@ Value &Value::operator=(const std::string &value)
     ZVAL_STRINGL(_val, value.c_str(), value.size(), 1);
     
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -518,7 +515,7 @@ Value &Value::operator=(const char *value)
     ZVAL_STRING(_val, value, 1);
     
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -538,7 +535,7 @@ Value &Value::operator=(double value)
     ZVAL_DOUBLE(_val, value);
     
     // update the object
-    return validate();
+    return *this;
 }
 
 /**
@@ -1499,9 +1496,6 @@ const Value &Value::set(int index, const Value &value)
     // the variable has one more reference (the array entry)
     Z_ADDREF_P(value._val);
     
-    // object should stay valid
-    validate();
-    
     // done
     return value;
 }
@@ -1552,9 +1546,6 @@ const Value &Value::set(const char *key, int size, const Value &value)
         Z_ADDREF_P(value._val);
     }
 
-    // object should stay valid
-    validate();
-        
     // done
     return value;
 }

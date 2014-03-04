@@ -50,9 +50,22 @@ public:
         if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
         
         std::cout << "myMethod is called." << std::endl;
+
+        // create a new PHP DateTime object representing the current time
+        Php::Object now("DateTime", "now");
+
+        // show it
+        std::cout << "current time: " << now.call("format", "Y-m-d H:i:s") << std::endl;
         
+        std::cout << "construct " << params[0] << std::endl;
+
         // construct a new class
-        return Php::Object(params[0]);
+        Php::Object obj(params[0]);
+
+        std::cout << "return " << params[0] << std::endl;
+        
+        // return it
+        return obj;
         
         
    //     std::cout << "get property1 " << value()["property1"] << std::endl;
