@@ -105,10 +105,14 @@ static zend_object_value clone_object(zval *val TSRMLS_DC);
 static void store(MixedObject *object, zend_object_value *value)
 {
     // set the handlers
-    value->handlers = zend_get_std_object_handlers();
+    zend_object_handlers *handlers = zend_get_std_object_handlers();
     
     // we need a special handler for cloning
-    value->handlers->clone_obj = clone_object;
+    handlers->clone_obj = clone_object;
+
+    // In the struct zend_object_value zend_object_handlers declared as const,
+    // therefore, you need to enter the auxiliary variable `zend_object_handlers *handlers`
+    value->handlers = handlers;
 
     // the destructor and clone handlers are set to NULL. I dont know why, but they do not
     // seem to be necessary...
