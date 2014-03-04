@@ -20,6 +20,18 @@ class TestClass
 //create a MyCustomClass object, which is an object of a C++ class
 $object1 = new MyClass();
 
+
+$object2 = $object1->myMethod(1);
+$object2->myMethod(1);
+
+echo("unset\n");
+
+unset($object1);
+
+echo("got here\n");
+
+return;
+
 //echo("prop x: ".$object1->x."\n");
 
 $object1->x = 10;

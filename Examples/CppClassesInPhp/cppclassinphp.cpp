@@ -19,7 +19,12 @@ private:
 public:
     MyCustomClass()
     {
-        std::cout << "MyCustomClass::MyCustomClass" << std::endl;
+        std::cout << "MyCustomClass::MyCustomClass()" << std::endl;
+    }
+
+    MyCustomClass(int value) : _x(value)
+    {
+        std::cout << "MyCustomClass::MyCustomClass(" << value << ")" << std::endl;
     }
 
     MyCustomClass(const MyCustomClass &that)
@@ -52,7 +57,14 @@ public:
         // check number of parameters
         if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
         
-        std::cout << "myMethod is called." << std::endl;
+        std::cout << "myMethod is called for object " << _x << std::endl;
+
+
+        return Php::Object("MyClass", new MyCustomClass(100));
+
+
+        return false;
+
 
         // create a new PHP DateTime object representing the current time
         Php::Object now("DateTime", "now");
@@ -66,6 +78,9 @@ public:
         Php::Object obj(params[0]);
 
         std::cout << "return " << params[0] << std::endl;
+        
+        
+        
         
         // return it
         return obj;

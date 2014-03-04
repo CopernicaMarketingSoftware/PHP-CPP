@@ -49,6 +49,33 @@ public:
     }
 
     /**
+     *  Constructor to create a new instance of a builtin class
+     *  
+     *  You can use this constructor if you have created an instance of your
+     *  own class, but has not assigned it to a variable yet. This happens
+     *  for example for classes that are not constructed from PHP userspace,
+     *  but from your own functions:
+     * 
+     *  Php::Value yourFunction()
+     *  {
+     *      return Php::Object("MyClass", new MyClass());
+     *  }
+     * 
+     *  When you construct objects like this, the __construct function is not
+     *  going to be called. If you want to construct the object just as if it
+     *  was constructed from PHP user space, do this:
+     * 
+     *  Php::Value yourFunction()
+     *  {
+     *      return Php::Object("MyClass");
+     *  }
+     * 
+     *  @param  name        Name of the class to instantiate
+     *  @param  base        Implementation of the class
+     */
+    Object(const char *name, Base *base);
+
+    /**
      *  Constructor to create a new instance
      * 
      *  This constructor comes in many different forms, to support all possible

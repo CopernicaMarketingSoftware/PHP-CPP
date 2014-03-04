@@ -171,14 +171,34 @@ Value::Value(struct _zval_struct *val, bool ref)
 
 /**
  *  Wrap around an object
- *  @param  value       The object value
+ *  @param  object
  */
-Value::Value(const struct _zend_object_value &value)
+Value::Value(Base *object)
 {
-    // make a normal zval
+    // there are two options: the object was constructed from user space,
+    // and is already linked to a handle, or it was constructed from C++ 
+    // space, and no handle does yet exist
+    int handle = object->handle();
+    
+    // do we have a handle?
+    if (!handle) throw Php::Exception("Assigning an unassigned object to a variable");
+
+    // make a regular zval, and set it to an object
     MAKE_STD_ZVAL(_val);
     Z_TYPE_P(_val) = IS_OBJECT;
-    Z_OBJVAL_P(_val) = value;
+    Z_OBJ_HANDLE_P(_val) = handle;
+
+    // we have to lookup the object in the object-table
+    zend_object_store_bucket *obj_bucket = &EG(objects_store).object_buckets[handle];
+    
+    // this is copy-pasted from zend_objects.c - and it is necessary too!
+    if (!obj_bucket->bucket.obj.handlers) obj_bucket->bucket.obj.handlers = &std_object_handlers;
+    
+    // store the handlers in the zval too (cast is necessary for php 5.3)
+    Z_OBJ_HT_P(_val) = (zend_object_handlers*)obj_bucket->bucket.obj.handlers;
+    
+    // run the copy constructor
+    zval_copy_ctor(_val);
 }
 
 /**

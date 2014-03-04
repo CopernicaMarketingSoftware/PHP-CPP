@@ -15,6 +15,11 @@
  */
 
 /**
+ *  Forward declarations
+ */
+struct _zend_object_value;
+
+/**
  *  Set up namespace
  */
 namespace Php {
@@ -82,45 +87,6 @@ public:
 
     /**
      *  Construct a new instance of the object
-     *  @param  value
-     *  @return Base
-     */
-    Base* construct(const struct _zend_object_value &value)
-    {
-        // construct the base
-        auto *result = construct();
-        if (!result) return nullptr;
-        
-        // assign the zend object to it
-        // @todo fix this
-//        result->assign(value);
-        
-        // done
-        return result;
-    }
-
-    /**
-     *  Construct a clone of the object
-     *  @param  orig
-     *  @param  value
-     *  @return Base
-     */
-    Base* clone(Base *orig, const struct _zend_object_value &value)
-    {
-        // construct the base
-        auto *result = clone(orig);
-        if (!result) return nullptr;
-        
-        // assign the zend object to it
-        // @todo fix this
-//        result->assign(value);
-        
-        // done
-        return result;
-    }
-    
-    /**
-     *  Construct a new instance of the object
      *  @return Base
      */
     virtual Base* construct() = 0;
@@ -144,6 +110,7 @@ public:
      *  @param  ns          Namespace name
      */
     void initialize(const std::string &ns);
+
     
 protected:
     /**
@@ -230,6 +197,21 @@ private:
      *  @return zend_function_entry[]
      */
     const struct _zend_function_entry *entries();
+
+    /**
+     *  Static member functions to clone objects based on this class
+     *  @param  val                     The object to be cloned
+     *  @return zend_object_value       Object info
+     */
+    static struct _zend_object_value cloneObject(struct _zval_struct *val);
+
+    /**
+     *  Function that is called when an instance of the class needs to be created.
+     *  This function will create the C++ class, and the PHP object
+     *  @param  entry                   Pointer to the class information
+     *  @return zend_object_value       The newly created object
+     */
+    static struct _zend_object_value createObject(struct _zend_class_entry *entry);
 
     /**
      *  Name of the class

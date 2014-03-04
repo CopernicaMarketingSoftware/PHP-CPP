@@ -12,6 +12,36 @@
 namespace Php {
 
 /**
+ *  Constructor to create a new instance of a builtin class
+ *  
+ *  @param  name        Name of the class to instantiate
+ *  @param  base        Implementation of the class
+ */
+Object::Object(const char *name, Base *base)
+{
+    // does the object already have a handle?
+    if (base->handle())
+    {
+        // the object is already instantiated, we can assign it the this object
+        operator=(Value(base));
+    }
+    else
+    {
+        // this is a brand new object that should be allocated, the C++ instance
+        // is already there (created by the extension) but it is not yet stored
+        // in PHP, find out the classname first
+        auto *entry = zend_fetch_class(name, strlen(name), 0);
+        if (!entry) throw Php::Exception(std::string("Unknown class name ") + name);
+        
+        // store the object in the php object cache (this will give the object a handle)
+        base->store(entry);
+        
+        // now we can store it
+        operator=(Value(base));
+    }
+}
+
+/**
  *  Internal method to instantiate an object
  *  @param  name
  */
