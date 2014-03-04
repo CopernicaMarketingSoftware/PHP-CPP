@@ -139,6 +139,20 @@ private:
     }
     
     /**
+     *  Construct a clone
+     *  @param  orig
+     *  @return Base
+     */
+    virtual Base *clone(Base *orig) override
+    {
+        // cast to the original object
+        T *t = (T *)orig;
+        
+        // construct a new base by calling the copy constructor
+        return new T(*t);
+    }
+    
+    /**
      *  Namespaces have access to the private base class
      */
     friend class Namespace;

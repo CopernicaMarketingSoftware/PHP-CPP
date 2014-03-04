@@ -14,14 +14,17 @@ using namespace std;
 class MyCustomClass : public Php::Base // , public Php::Countable
 {
 private:
-    int _x;
+    int _x = 3;
     
 public:
     MyCustomClass()
     {
-        _x = 3;
         std::cout << "MyCustomClass::MyCustomClass" << std::endl;
-        std::cout << _x << std::endl;
+    }
+
+    MyCustomClass(const MyCustomClass &that)
+    {
+        std::cout << "MyCustomClass::MyCustomClass copy constructor" << std::endl;
     }
     
     virtual ~MyCustomClass()

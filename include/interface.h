@@ -50,6 +50,17 @@ private:
     }
 
     /**
+     *  Construct a clone of the object
+     *  @param  orig
+     *  @return Base
+     */
+    virtual Base* clone(Base *orig) override
+    {
+        // this does not occur for interfaces
+        return nullptr;
+    }
+
+    /**
      *  Namespaces have access to the private base class
      */
     friend class Namespace;

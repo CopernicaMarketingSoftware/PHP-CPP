@@ -37,71 +37,145 @@ static void deallocate_object(void *object TSRMLS_DC)
 }
 
 /**
- *  Function that is called to create space for a cloned object
- *  @param  object      The object to be cloned
- *  @param  clone       The address that should become the clone
+ *  Retrieve our C++ implementation object
+ *  @param  entry
+ *  @return ClassBase
  */
-static void clone_object(void *object, void **clone TSRMLS_DC)
+static ClassBase *cpp_class(zend_class_entry *entry)
 {
-    // @todo implementation
+    // we need the base class (in user space the class may have been overridden,
+    // but we are not interested in these user space classes)
+    while (entry->parent) entry = entry->parent;
+    
+#if PHP_VERSION_ID >= 50400
+    // retrieve the comment (it has a pointer hidden in it to the ClassBase object)
+    const char *comment = entry->info.user.doc_comment;
+#else
+    // retrieve the comment php5.3 style (it has a pointer hidden in it to the ClassBase object)
+    const char *comment = entry->doc_comment;
+#endif    
+    
+    // the first byte of the comment is an empty string (null character), but
+    // the next bytes contain a pointer to the ClassBase class
+    return *((ClassBase **)(comment + 1));
+}
+
+/**
+ *  Create an object based on a certain class entry
+ *  @param  entry
+ *  @return MixedObject
+ */
+static MixedObject *allocate_object(zend_class_entry *entry)
+{
+    // allocate memory for the object
+    MixedObject *result = (MixedObject *)emalloc(sizeof(MixedObject));
+    
+    // store the class entry in the newly created object
+    result->php.ce = entry;
+
+#if PHP_VERSION_ID < 50399
+    // the original create_object fills the initial object with the default properties,
+    // we're going to do exactly the same. start with setting up a hashtable for the props
+    ALLOC_HASHTABLE(result->php.properties);
+
+    // initialize the hash table
+    zend_hash_init(result->php.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
+
+    // initialize the properties
+    zend_hash_copy(result->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval*));
+#else
+    // version higher than 5.3 have an easier way to initialize
+    object_properties_init(&result->php, entry);
+#endif    
+    
+    // done
+    return result;
+}
+
+/**
+ *  Forward declaration
+ */
+static zend_object_value clone_object(zval *val TSRMLS_DC);
+
+/**
+ *  Store the mixed object in the PHP object cache
+ *  @param  object      The object to store
+ *  @param  value       The zend_object_value to initialize
+ */
+static void store(MixedObject *object, zend_object_value *value)
+{
+    // set the handlers
+    value->handlers = zend_get_std_object_handlers();
+    
+    // we need a special handler for cloning
+    value->handlers->clone_obj = clone_object;
+
+    // the destructor and clone handlers are set to NULL. I dont know why, but they do not
+    // seem to be necessary...
+    value->handle = zend_objects_store_put(object, NULL, deallocate_object, NULL TSRMLS_CC);
+}
+
+/**
+ *  Function that is called to create space for a cloned object
+ *  @param  val                     The object to be cloned
+ *  @return zend_obejct_value       The object to be created
+ */
+static zend_object_value clone_object(zval *val TSRMLS_DC)
+{
+    // @todo refactoring because there is a lot of double code here
+    
+    // retrieve the class entry linked to this object
+    auto *entry = zend_get_class_entry(val);
+
+    // allocate memory for the new object
+    MixedObject *new_object = allocate_object(entry);
+
+    // retrieve the old object, which we are going to copy
+    MixedObject *old_object = (MixedObject *)zend_object_store_get_object(val);
+    
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(entry);
+    
+    // the thing we're going to return
+    zend_object_value result;
+    
+    // store the object
+    store(new_object, &result);
+
+    // clone the members
+    zend_objects_clone_members(&new_object->php, result, &old_object->php, Z_OBJ_HANDLE_P(val));
+    
+    // finally, construct the cpp object
+    // @todo call this earlier, because it could fail
+    new_object->cpp = meta->clone(old_object->cpp, result);
+
+    // done
+    return result;
 }
 
 /**
  *  Function that is called when an instance of the class needs to be created.
  *  This function will create the C++ class, and the PHP object
- *  @param  type                    Pointer to the class information
+ *  @param  entry                   Pointer to the class information
  *  @return zend_object_value       The newly created object
  */
-static zend_object_value create_object(zend_class_entry *type TSRMLS_DC)
+static zend_object_value create_object(zend_class_entry *entry TSRMLS_DC)
 {
     // allocate memory for the object
-    MixedObject *object = (MixedObject *)emalloc(sizeof(MixedObject));
+    MixedObject *new_object = allocate_object(entry);
     
-    // find base object (because the class may have been extended in user space)
-    zend_class_entry *base = type;
-    while (base->parent) base = base->parent;
-    
-    // retrieve the classinfo object
-#if PHP_VERSION_ID >= 50400
-    const char *comment = base->info.user.doc_comment;
-#else
-    const char *comment = base->doc_comment;
-#endif    
-    
-    // the first byte of the comment is an empty string (null character), but
-    // the next bytes contain a pointer to the ClassInfo class
-    ClassBase *info = *((ClassBase **)(comment + 1));
-    
-    // store the class
-    object->php.ce = type;
-
-    // the original create_object fills the initial object with the default properties,
-    // we're going to do exactly the same. start with setting up a hashtable for the props
-    ALLOC_HASHTABLE(object->php.properties);
-
-    // initialize the hash table
-    zend_hash_init(object->php.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
-
-    
-    // initialize the properties
-#if PHP_VERSION_ID < 50399
-    zend_hash_copy(object->php.properties, &(type->default_properties),
-                   (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval*));
-#else
-    object_properties_init(&(object->php), type);
-#endif    
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(entry);
 
     // the thing we're going to return
     zend_object_value result;
-
-    // use default object handlers
-    result.handlers = zend_get_std_object_handlers();
     
-    // put the object in the storage, and assign a method for deallocating and cloning
-    result.handle = zend_objects_store_put(object, NULL, deallocate_object, clone_object TSRMLS_CC); 
+    // store the object
+    store(new_object, &result);
 
     // finally, construct the cpp object
-    object->cpp = info->construct(result);
+    // @todo call this earlier because it could fail
+    new_object->cpp = meta->construct(result);
 
     // done
     return result;
@@ -115,7 +189,7 @@ ClassBase::~ClassBase()
     // destruct the entries
     if (_entries) delete[] _entries;
 
-    // php 5.3 deallocated the doc_comment by iself
+    // php 5.3 deallocates the doc_comment by iself
 #if PHP_VERSION_ID >= 50400    
     if (_comment) free(_comment);
 #endif

@@ -18,7 +18,23 @@ class TestClass
 }
  
 //create a MyCustomClass object, which is an object of a C++ class
-$object = new MyClass();
+$object1 = new MyClass();
+
+//echo("prop x: ".$object1->x."\n");
+
+$object1->x = 10;
+$object1->y = 20;
+
+echo("prop x: ".$object1->x."\n");
+echo("prop y: ".$object1->y."\n");
+
+$object2 = clone $object1;
+
+echo("prop x: ".$object2->x."\n");
+echo("prop y: ".$object2->y."\n");
+
+
+return;
 
 // run a function of the class
 $obj = $object->myMethod("MyClass");

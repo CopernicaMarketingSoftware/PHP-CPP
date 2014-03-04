@@ -98,12 +98,39 @@ public:
         // done
         return result;
     }
+
+    /**
+     *  Construct a clone of the object
+     *  @param  orig
+     *  @param  value
+     *  @return Base
+     */
+    Base* clone(Base *orig, const struct _zend_object_value &value)
+    {
+        // construct the base
+        auto *result = clone(orig);
+        if (!result) return nullptr;
+        
+        // assign the zend object to it
+        // @todo fix this
+//        result->assign(value);
+        
+        // done
+        return result;
+    }
     
     /**
      *  Construct a new instance of the object
      *  @return Base
      */
     virtual Base* construct() = 0;
+    
+    /**
+     *  Create a clone of an object
+     *  @param  orig
+     *  @return Base
+     */
+    virtual Base *clone(Base *orig) = 0;
 
     /**
      *  Initialize the class, given its name
