@@ -59,6 +59,8 @@ public:
         
         std::cout << "myMethod is called for object " << _x << std::endl;
 
+        std::cout << "property1: " << property("property1") << std::endl;
+
 
         return Php::Object("MyClass", new MyCustomClass(100));
 
