@@ -129,6 +129,6 @@ extern "C"
         extension.add(customClass);
         
         // return the extension module
-        return extension.module();
+        return extension;
     }
 }
