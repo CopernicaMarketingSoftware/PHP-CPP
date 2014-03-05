@@ -69,7 +69,7 @@ extern "C" {
     you a simple to use API.
 </p>
 <p>
-    The next thing that you'll notice it that we placed the get_module() function
+    The next thing that you'll notice is that we placed the get_module() function
     inside an 'extern "C"' code block. As the name of the library already gives away, 
     PHP-CPP is a C++ library. However, PHP expects your library, and especially your 
     get_module() function, to be implemented in C and not in C++. That's why we've 
@@ -85,7 +85,7 @@ extern "C" {
 </p>
 <p>
     This, by the way, is also the only macro that PHP-CPP offers. PHP-CPP intends to 
-    be a very straightforward C++ library, without using magic or tricks from 
+    be a plain C++ library, without using magic or tricks from 
     pre-processors. What you see is what you get: If something looks like a 
     function, you can be sure that it actually IS a function, and when something 
     looks like a variable, you can be sure that it also IS a variable.
@@ -111,5 +111,5 @@ extern "C" {
 <p>
     Note that the example above does not yet export any native functions or 
     native classes to PHP - it only creates the extension. That is going to be 
-    the next step.
+    <a href="your-first-extension">the next step</a>.
 </p>
