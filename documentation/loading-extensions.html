@@ -62,8 +62,7 @@ php -i|grep extension_dir
     class that can be used instead.
 </p>
 <p>
-<pre class="language-c++"><code>
-#include &lt;phpcpp.h&gt;
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 
 /**
  *  tell the compiler that the get_module is a pure C function
@@ -88,8 +87,7 @@ extern "C" {
         // return the extension
         return myExtension;
     }
-}
-</code></pre>
+}</code></pre>
 </p>
 <p>
     In the example above you see a very straightforward implementation of the
