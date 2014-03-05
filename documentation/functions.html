@@ -5,14 +5,14 @@
     astonishingly simple. As long as you have a native C++ function that has 
     one of the following four signatures, you can call it almost directly from PHP:
 </p>
+
 <p>
-<pre class="language-c++"><code>
-void example1();
+<pre class="language-c++"><code>void example1();
 void example2(Php::Parameters &amp;params);
 Php::Value example3();
-Php::Value example4(Php::Parameters &amp;params);
-</code></pre>
+Php::Value example4(Php::Parameters &amp;params);</code></pre>
 </p>
+
 <p>
     These function signatures show you two important PHP-CPP classes, the
     Php::Value class and the Php::Parameters class. The Php::Value class is a
@@ -29,8 +29,7 @@ Php::Value example4(Php::Parameters &amp;params);
     name by which the function becomes callable from within your PHP scripts.
 </p>
 <p>
-<pre class="language-c++"><code>
-#include &lt;phpcpp.h&gt;
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 #include &lt;iostream&gt;
 
 void myFunction()
@@ -44,8 +43,7 @@ extern "C" {
         extension.add("myFunction", myFunction);
         return extension;
     }
-}
-</code></pre>
+}</code></pre>
 </p>
 <p>
     It is not difficult to imagine what the above code does. If you enable
@@ -59,8 +57,7 @@ extern "C" {
     want to return a value from your function?
 </p>
 <p>
-<pre class="language-c++"><code>
-#include &lt;phpcpp.h&gt;
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 #include &lt;stdlib.h&gt;
 
 Php::Value myFunction()
@@ -81,8 +78,7 @@ extern "C" {
         extension.add("myFunction", myFunction);
         return extension;
     }
-}
-</code></pre>
+}</code></pre>
 </p>
 <p>
     Is that cool or not? In PHP it is perfectly legal to make functions that
@@ -95,11 +91,9 @@ extern "C" {
     simple PHP script.
 </p>
 <p>
-<pre class="language-php"><code>
-&lt;?php
+<pre class="language-php"><code>&lt;?php
     for ($i=0; $i&lt;10; $i++) echo(myFunction()."\n");
-?&gt;
-</code></pre>
+?&gt;</code></pre>
 </p>
 <p>
     The possible output of this script could for example be:
@@ -125,8 +119,7 @@ string
     The following example function that takes a variable number of parameters, 
     and sums up the integer value of each of the parameters:
 </p>
-<pre class="language-c++"><code>
-#include &lt;phpcpp.h&gt;
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 
 Php::Value sum_everything(Php::Parameters &parameters)
 {
@@ -141,8 +134,7 @@ extern "C" {
         extension.add("sum_everything", sum_everything);
         return extension;
     }
-}
-</code></pre>
+}</code></pre>
 <p>
     The Php::Parameters class is in reality nothing less than a std::vector 
     filled with Php::Value objects - and you can thus iterate over it. In the
@@ -163,11 +155,9 @@ extern "C" {
     PHP script. Let's run a test.
 </p>
 <p>
-<pre class="language-php"><code>
-&lt;?php
+<pre class="language-php"><code>&lt;?php
     echo(sum_everything(10,"100",20)."\n");
-?&gt;
-</code></pre>
+?&gt;</code></pre>
 </p>
 <p>
     The output of the above script is, of course, 130. The "100" string variable
