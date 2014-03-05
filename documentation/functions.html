@@ -1,6 +1,6 @@
 <h1>Exporting native functions</h1>
 <p>
-    An extension can of course only be useful if you can make functions and/or 
+    A PHP extension can of course only be useful if you can make functions and/or 
     classes that can be called from PHP scripts. For functions this is 
     astonishingly simple. As long as you have a native C++ function that has 
     one of the following signatures, you can call it almost directly from PHP:
@@ -49,13 +49,13 @@ extern "C" {
 </p>
 <p>
     It is not difficult to imagine what the above code does. If you enable
-    this extension, you can create PHP scripts in which you can cell myFunction(),
+    this extension, you can create PHP scripts in which you can call myFunction(),
     which will print "example output" to stdout.
 </p>
 <p>
     As we've said before, there are four types of functions that can be used. In
     this first example we showed the most simple one: a function that does not
-    take any parameter, and that does also not return anything. What if you
+    take any parameter, and that returns nothing. What if you
     want to return a value from your function?
 </p>
 <p>
@@ -87,7 +87,7 @@ extern "C" {
 <p>
     Is that cool or not? In PHP it is perfectly legal to make functions that
     sometimes return a number, and sometimes return a string. This can not be
-    done in C++ - a function should always return the same type of variable.
+    done in C++, because a function must always return the same type of variable.
     But because the Php::Value class can be used to represent both numeric
     variables as well as strings (and arrays, and objects, but more on that 
     later) - we can now also create native C++ functions that sometimes return
@@ -101,8 +101,36 @@ extern "C" {
 ?&gt;
 </code></pre>
 </p>
+<p>
+    The only type of native function that is left is the one that accepts 
+    parameters. Let's give an example of a function that takes a variable
+    number of parameters, and sums up the integer value of each of the
+    parameters:
+</p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+Php::Value sum_everything(Php::Parameters &parameters)
+{
+    int result = 0;
+    for (auto &param : parameters) result += param;
+    return result;
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension extension("my_extension", "1.0");
+        extension.add("sum_everything", sum_everything);
+        return extension;
+    }
+}
+</code></pre>
+<p>
+    
 
 
+
+</p>
 <p>
     What do we see here? We've added four function declarations ("example1", 
     "example2", "example3" and "example4") to the source code of our extension. 
