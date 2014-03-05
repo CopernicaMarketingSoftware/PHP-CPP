@@ -1,0 +1,203 @@
+<h1>Exporting native functions</h1>
+<p>
+    An extension can of course only be useful if you define functions and/or 
+    classes that can be accessed from PHP scripts. For functions this is 
+    astonishingly simple. As long as you have a native C++ function that has 
+    one of the following signatures, it can almost directly be called from PHP:
+</p>
+<p>
+<pre class="language-c++"><code>
+void example1();
+void example2(Php::Parameters &amp;params);
+Php::Value example3();
+Php::Value example4(Php::Parameters &amp;params);
+</code></pre>
+</p>
+<p>
+    These function signatures also show you two important PHP-CPP classes, the
+    Php::Value class and the Php::Parameters class. The Php::Value class is a
+    powerful class that does the same as a regular PHP $variable: it can hold
+    almost any variable (integers, floating pointer numbers, strings, but also
+    regular and associative arrays and objects). The Php::Parameters class
+    can be best compared with an array or a vector holding all the parameters
+    that were passed to your function. We will come back to both classes in
+    much more detail later on.
+</p>
+<p>
+    To make a function callable from PHP, you must <i>add</i> the function
+    to your extension object, and assign a name to it. This will also be the
+    name by which the function becomes usable in PHP scripts.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+#include &lt;iostream&gt;
+
+void myFunction()
+{
+    std::cout << "example output" << std::endl;
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension extension("my_extension", "1.0");
+        extension.add("myFunction", myFunction);
+        return extension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    It is not difficult to imagine what the above code does. If you enable
+    this extension, you can create PHP scripts in which you can cell myFunction().
+    As we've said before, there are four types of functions that can be used. In
+    this first example we showed the most simple one: a function that does not
+    take any parameter, and that does also not return anything. What if you
+    want to return a value from your function?
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+#include &lt;stdlib.h&gt;
+
+Php::Value myFunction()
+{
+    if (rand() % 2 == 0)
+    {
+        return "string";
+    }
+    else
+    {
+        return 123;
+    }
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension extension("my_extension", "1.0");
+        extension.add("myFunction", myFunction);
+        return extension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    Is that cool or not? In PHP it is perfectly legal to make functions that
+    sometimes return a number, and sometimes return a string. This can not be
+    done in C++ - a function should always return the same type of variable.
+    But because the Php::Value class can be used to represent both numeric
+    variables as well as strings (and arrays, and objects, but more on that 
+    later) - we can now also create native C++ functions that sometimes return
+    a string and sometimes a numeric value. You can test the function with a 
+    simple PHP script.
+</p>
+<p>
+<pre class="language-php"><code>
+<?php
+    for ($i=0; $i<10; $i++) echo(myFunction()."\n");
+?>
+</code></pre>
+</p>
+
+
+<p>
+    What do we see here? We've added four function declarations ("example1", 
+    "example2", "example3" and "example4") to the source code of our extension. 
+    The reason why we've only declared the functions, and not fully implemented 
+    them is to keep the example code relatively small. We assume that the 
+    four example functions are implemented in a different file. In a real world 
+    example you could just as well remove the "extern" keyword and implement the 
+    four functions in the same source file as the get_module() call.
+</p>
+<p>
+    The four functions all have a different signature: Some return a value, while
+    others do not return anything. And some take parameters, while others do not.
+    Despite the different signature of the functions, they can all be made
+    available in PHP by adding them to the extension object, by simply calling
+    the myExtension.add() method. This method takes two parameters: the name by
+    which the function should be accessible in PHP, and the actual native
+    function.
+</p>
+<p>
+    In the example above we've used different names for the native functions
+    ("example1" up to "example4") as for the PHP functions ("native1" to
+    "native4"). This is legal - you do not have to use the same names for your
+    native functions as for your PHP functions. The following PHP script can be 
+    used to call the four native functions:
+</p>
+<p>
+    <code><pre>
+        &lt;?php
+        native1();
+        native2("a","b");
+        $x = native3();
+        $y = native4(1,2);
+        ?&gt;
+    </pre></code>
+</p>
+<p>
+    It is not possible to export every thinkable C/C++ function to the 
+    PHP extension. Only functions that have one of the four supported signatures
+    can be exported: functions that return
+    void or a Php::Value object, and that either accept a Php::Parameters object
+    or no parameters at all, can be added to the extension object and can thus
+    be exported to PHP.
+</p>
+<h2>Parameter types</h2>
+<p>
+    PHP has a mechanism to enforce function parameters types, and to accept
+    parameters either by reference or by value. In the examples above, we have
+    not yet used that mechanism yes: it is up to the function implementations
+    themselves to inspect the 'Parameters' object, and check if the
+    variables are of the right type.
+</p>
+<p>
+    However, the 'Extension::add()' method takes a third optional parameter that
+    you can use to specify the number of parameters that are supported, whether
+    the parameters are passed by reference or by value, and what the type of
+    the parameters is:
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+extern void example(Php::Parameters &amp;params);
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        myExtension.add("example", example, {
+            Php::ByVal("a", Php::Type::Numeric),
+            Php::ByVal("b", "ExampleClass"),
+            Php::ByRef("c", "OtherClass")
+        });
+        return myExtension.module();
+    }
+}
+</pre></code>
+</p>
+<p>
+    Above you see that we passed in additional information when we registered the
+    "example" function. We tell our extension that our function accepts three parameters:
+    the first parameter must be a regular number, while the other ones are object 
+    instances of type "ExampleClass" and "OtherClass". In the end, your native C++ 
+    "example" function will still be called with a Php::Parameters instance, but 
+    the moment it gets called, you can be sure that the Php::Parameters object 
+    will be filled with three members, and that two of them are objects of the 
+    appropriate type, and that the third one is also passed by reference.
+</p>
+<h2>Working with variables</h2>
+<p>
+    Variables in PHP are non-typed. A variable can thus hold any possible type:
+    an integer, string, a floating point number, and even an object or an array.
+    C++ on the other hand is a typed language. In C++ an integer variable always 
+    has a numeric value, and a string variable always hold a string value.
+</p>
+<p>
+    When you mix native code and PHP code, you will need to convert the non-typed 
+    PHP variables into native variables, and the other way round: convert native 
+    variables back into non-typed PHP variables. The PHP-CPP library offers the 
+    "Value" class that makes this a very simple task.
+</p>
+<p>
+    

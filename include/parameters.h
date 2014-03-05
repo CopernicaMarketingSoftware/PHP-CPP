@@ -37,7 +37,7 @@ public:
     virtual ~Parameters() {}
     
     /**
-     *  The the object that is called
+     *  The object that is being called
      *  @return Base
      */
     Base *object();

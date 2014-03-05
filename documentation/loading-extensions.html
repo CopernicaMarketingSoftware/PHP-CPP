@@ -13,9 +13,9 @@
     on your system, you can run the following command from the command line:
 </p>
 <p>
-    <code><pre>
-        php --ini
-    </pre></code>
+<pre>
+php --ini
+</pre>
 </p>
 <p>
     This will output a list of all configuration files that are loaded by PHP.
@@ -33,9 +33,9 @@
     extension directory, use the following command line instruction:
 </p>
 <p>
-    <code><pre>
-        php -i|grep extension_dir
-    </pre></code>
+<pre>
+php -i|grep extension_dir
+</pre>
 </p>
 <p>
     The extension dir often has the form /usr/lib/php5/20121212 - or a different
@@ -150,134 +150,3 @@ extern "C" {
     native classes to PHP - it only creates the extension. That is going to be 
     the next step.
 </p>
-
-
-
-<h2>Exporting native functions</h2>
-<p>
-    An extension can of course only be useful if you define functions and/or 
-    classes that can be accessed from PHP scripts. For functions you can do this 
-    by adding your native function implementations to the Extension object:
-</p>
-<p>
-<pre class="language-c++"><code>
-    #include &lt;phpcpp.h&gt;
-    
-    extern void example1();
-    extern void example2(Php::Parameters &amp;params);
-    extern Php::Value example3();
-    extern Php::Value example4(Php::Parameters &amp;params);
-    
-    extern "C" {
-        PHPCPP_EXPORT void *get_module() {
-            static Php::Extension myExtension("my_extension", "1.0");
-            myExtension.add("native1", example1);
-            myExtension.add("native2", example2);
-            myExtension.add("native3", example3);
-            myExtension.add("native4", example4);
-            return myExtension.module();
-        }
-    }
-</code></pre>
-</p>
-<p>
-    What do we see here? We've added four function declarations ("example1", 
-    "example2", "example3" and "example4") to the source code of our extension. 
-    The reason why we've only declared the functions, and not fully implemented 
-    them is to keep the example code relatively small. We assume that the 
-    four example functions are implemented in a different file. In a real world 
-    example you could just as well remove the "extern" keyword and implement the 
-    four functions in the same source file as the get_module() call.
-</p>
-<p>
-    The four functions all have a different signature: Some return a value, while
-    others do not return anything. And some take parameters, while others do not.
-    Despite the different signature of the functions, they can all be made
-    available in PHP by adding them to the extension object, by simply calling
-    the myExtension.add() method. This method takes two parameters: the name by
-    which the function should be accessible in PHP, and the actual native
-    function.
-</p>
-<p>
-    In the example above we've used different names for the native functions
-    ("example1" up to "example4") as for the PHP functions ("native1" to
-    "native4"). This is legal - you do not have to use the same names for your
-    native functions as for your PHP functions. The following PHP script can be 
-    used to call the four native functions:
-</p>
-<p>
-    <code><pre>
-        &lt;?php
-        native1();
-        native2("a","b");
-        $x = native3();
-        $y = native4(1,2);
-        ?&gt;
-    </pre></code>
-</p>
-<p>
-    It is not possible to export every thinkable C/C++ function to the 
-    PHP extension. Only functions that have one of the four supported signatures
-    can be exported: functions that return
-    void or a Php::Value object, and that either accept a Php::Parameters object
-    or no parameters at all, can be added to the extension object and can thus
-    be exported to PHP.
-</p>
-<h2>Parameter types</h2>
-<p>
-    PHP has a mechanism to enforce function parameters types, and to accept
-    parameters either by reference or by value. In the examples above, we have
-    not yet used that mechanism yes: it is up to the function implementations
-    themselves to inspect the 'Parameters' object, and check if the
-    variables are of the right type.
-</p>
-<p>
-    However, the 'Extension::add()' method takes a third optional parameter that
-    you can use to specify the number of parameters that are supported, whether
-    the parameters are passed by reference or by value, and what the type of
-    the parameters is:
-</p>
-<p>
-<pre class="language-c++"><code>
-#include &lt;phpcpp.h&gt;
-
-extern void example(Php::Parameters &amp;params);
-
-extern "C" {
-    PHPCPP_EXPORT void *get_module() {
-        static Php::Extension myExtension("my_extension", "1.0");
-        myExtension.add("example", example, {
-            Php::ByVal("a", Php::Type::Numeric),
-            Php::ByVal("b", "ExampleClass"),
-            Php::ByRef("c", "OtherClass")
-        });
-        return myExtension.module();
-    }
-}
-</pre></code>
-</p>
-<p>
-    Above you see that we passed in additional information when we registered the
-    "example" function. We tell our extension that our function accepts three parameters:
-    the first parameter must be a regular number, while the other ones are object 
-    instances of type "ExampleClass" and "OtherClass". In the end, your native C++ 
-    "example" function will still be called with a Php::Parameters instance, but 
-    the moment it gets called, you can be sure that the Php::Parameters object 
-    will be filled with three members, and that two of them are objects of the 
-    appropriate type, and that the third one is also passed by reference.
-</p>
-<h2>Working with variables</h2>
-<p>
-    Variables in PHP are non-typed. A variable can thus hold any possible type:
-    an integer, string, a floating point number, and even an object or an array.
-    C++ on the other hand is a typed language. In C++ an integer variable always 
-    has a numeric value, and a string variable always hold a string value.
-</p>
-<p>
-    When you mix native code and PHP code, you will need to convert the non-typed 
-    PHP variables into native variables, and the other way round: convert native 
-    variables back into non-typed PHP variables. The PHP-CPP library offers the 
-    "Value" class that makes this a very simple task.
-</p>
-<p>
-    
