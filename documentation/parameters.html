@@ -1,10 +1,10 @@
 <h1>Limiting function parameters</h1>
 <p>
-    PHP has a mechanism to enforce function parameters types, and to accept
-    parameters either by reference or by value. In the examples above, we have
-    not yet used that mechanism yes: it is up to the function implementations
-    themselves to inspect the 'Parameters' object, and check if the
-    variables are of the right type.
+    PHP has a mechanism to enforce the types of function parameters, and to accept
+    parameters either by reference or by value. In the earlier examples, we have
+    not yet used that mechanism, and we left it to the function implementations
+    to inspect the 'Php::Parameters' object, and to check if the number
+    of parameters were correct, and of the right type.
 </p>
 <p>
     However, the 'Extension::add()' method takes a third optional parameter that
@@ -16,7 +16,9 @@
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
 
-extern void example(Php::Parameters &amp;params);
+void example(Php::Parameters &amp;params)
+{
+}
 
 extern "C" {
     PHPCPP_EXPORT void *get_module() {
@@ -24,9 +26,9 @@ extern "C" {
         myExtension.add("example", example, {
             Php::ByVal("a", Php::Type::Numeric),
             Php::ByVal("b", "ExampleClass"),
-            Php::ByRef("c", "OtherClass")
+            Php::ByVal("c", "OtherClass")
         });
-        return myExtension.module();
+        return myExtension;
     }
 }
 </pre></code>
@@ -34,25 +36,238 @@ extern "C" {
 <p>
     Above you see that we passed in additional information when we registered the
     "example" function. We tell our extension that our function accepts three parameters:
-    the first parameter must be a regular number, while the other ones are object 
+    the first parameter must be numeric, while the other ones are 
     instances of type "ExampleClass" and "OtherClass". In the end, your native C++ 
     "example" function will still be called with a Php::Parameters instance, but 
     the moment it gets called, you can be sure that the Php::Parameters object 
     will be filled with three members, and that two of them are objects of the 
-    appropriate type, and that the third one is also passed by reference.
+    appropriate type.
 </p>
-<h2>Working with variables</h2>
+<h2>Can you really enforce scalar parameters?</h2>
 <p>
-    Variables in PHP are non-typed. A variable can thus hold any possible type:
-    an integer, string, a floating point number, and even an object or an array.
-    C++ on the other hand is a typed language. In C++ an integer variable always 
-    has a numeric value, and a string variable always hold a string value.
-</p>
-<p>
-    When you mix native code and PHP code, you will need to convert the non-typed 
-    PHP variables into native variables, and the other way round: convert native 
-    variables back into non-typed PHP variables. The PHP-CPP library offers the 
-    "Value" class that makes this a very simple task.
+    In PHP there is no way to enforce the type of a scalar parameter. When you
+    write a function in PHP, it is possible to enforce that the function receives
+    an object of a certain type, or an array, but not that you want to receive 
+    a string or an integer.
 </p>
 <p>
+<pre class="language-php"><code>
+&lt;?php
+// example how you can enforce that a function can only be called with an object
+function example1(MyClass $param)
+{
+    ...
+}
+
+// another example to enforce an array parameter
+function example2(array $param)
+{
+    ...
+}
+?&gt;
+</code></pre>
+</p>
+<p>
+    The same is true for native functions. Although the core Zend engine offers
+    the possibility to specify that your function only accepts parameters of type 
+    "Php::Type::Numeric" or of type "Php::Type::String", this setting is further 
+    completely ignored by the PHP engine. Maybe this is going to change in the 
+    future (let's hope so), but for now it is only meaningful to specify the
+    parameter type for objects and arrays. We have however chosen to still offer 
+    this feature in PHP-CPP to be ready for future versions of PHP - that might
+    support more strongly typed functions.
+</p>
+<p>
+    To come back to our example, the following functions calls can now be done
+    from PHP user space:
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// correct call, numeric and two objects of the right type
+example(12, new ExampleClass(), new OtherClass());
+
+// also valid, first parameter is not numeric but an array, but the 
+// Zend engine does not check this even though it was specified
+example(array(1,2,3), new ExampleClass(), new OtherClass());
+
+// invalid, wrong number of parameters
+example(12, new ExampleClass());
+
+// invalid, wrong objects
+example(12, new DateTime(), new DateTime());
+
+// invalid, "x" and "z" are no objects
+example("x", "y", "z");
+?&gt;
+</code></pre>
+</p>
+<p>
+    The PHP engine will trigger an error if your function is called with wrong
+    parameters, and will not make the call to your function.
+</p>
+<h2>The Php::ByVal class further explained</h2>
+<p>
+    The Php::ByVal class that we showed can be constructed in two ways.
+    Let's look at the first constructor from the C++ header file:
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Constructor
+ *  @param  name        Name of the parameter
+ *  @param  type        Parameter type
+ *  @param  required    Is this parameter required?
+ */
+ByVal(const char *name, Php::Type type, bool required = true);
+</code></pre>
+</p>
+<p>
+    The first parameter of the constructor should always be the  
+    parameter name. This is a little strange, because PHP does not support the
+    concept of 'named variables', like other languages do. Internally, this 
+    name is used to generate an error messages when the function is 
+    called in the wrong way.
+</p>
+<p>
+    The Php::Type parameter is more interesting. The following types are
+    supported:
+</p>
+<p>
+<pre>
+Php::Type::Null
+Php::Type::Numeric
+Php::Type::Float
+Php::Type::Bool
+Php::Type::Array
+Php::Type::Object
+Php::Type::String
+Php::Type::Resource
+Php::Type::Constant
+Php::Type::ConstantArray
+Php::Type::Callable
+</pre>
+</p>
+<p>
+    In practice, it only makes a difference if you specify Php::Type::Array or
+    Php::Type::Object as type, because all other types are not enforced by the 
+    underlying PHP engine.
+</p>
+<p>
+    The final parameter can be used to set whether the parameter is optional or
+    not.  If you set required to false, PHP will trigger an error when your
+    function is called without this parameter. This setting only
+    works for the trailing parameters, it is (of course) not 
+    possible to mark the first parameter as optional, and all subsequent 
+    parameters as required.
+<p>
+<p>
+    If you write a function that accepts an object as parameter, you can
+    use the second form of the Php::ByVal constructor:
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Constructor
+ *  @param  name        Name of the parameter
+ *  @param  classname   Name of the class
+ *  @param  nullable    Can it be null?
+ *  @param  required    Is this parameter required?
+ */
+ByVal(const char *name, const char *classname, bool nullable = false, bool required = true);
+</code></pre>
+</p>
+<p>
+    This alternative constructor also has a 'name' and 'required' parameter, but the
+    Php::Type parameter that was available before is now replaced by a 'classname'
+    and 'nullable' parameter. This constructor can be used for functions that 
+    accept an object of a specific type as parameter. For example, take a look 
+    at the following code in PHP:
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+function example1(DateTime $time) { ... }
+function example1(DateTime $time = null) { ... }
+?&gt;
+</code></pre>
+</p>
+<p>
+    This would be identical to the following code in C++:
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+void example1(Php::Parameters &amp;params) { ... }
+void example2(Php::Parameters &amp;params) { ... }
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        myExtension.add("example1", example1, { Php::ByVal("time", "DateTime", false); });
+        myExtension.add("example2", example2, { Php::ByVal("time", "DateTime", true); });
+        return myExtension;
+    }
+}
+</pre></code>
+</p>
+<h2>Parameters by reference</h2>
+<p>
+    By the name of the Php::ByVal() class you may have concluded that there
+    must also be a Php::ByRef() class - and you can not be more right than that.
+    If you create a function that takes a parameter by reference (and that can
+    thus use a parameter as a return value) you can specify that too.
+</p>
+<p>
+    The Php::ByRef class has exactly the same signature as the Php::ByVal class,
+    and can be used in exactly the same way. The difference is that ByRef
+    also checks if someone tries to call your function with a literal instead
+    of a variable - which is not possible for variables by reference. If this
+    happens, an error is triggered and the function will not be called.
+    Let's show an example. The following extension exports a function that
+    swaps the contents of two variables.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+void swap(Php::Parameters &amp;params) 
+{
+    Php::Value temp = params[0];
+    params[0] = params[1];
+    params[1] = temp;
+}
+    
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        myExtension.add("swap", swap, { 
+            Php::ByRef("a", Php::Type::Numeric),
+            Php::ByRef("b", Php::Type::Numeric) 
+        });
+        return myExtension;
+    }
+}
+</code></pre>
+<p>
+    And let's see how this function can now be called:
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// define two variables
+$a = 1;
+$b = 2;
+
+// swap the variables
+swap($a, $b);
+
+// invalid, literals cannot be passed by reference
+swap(10,20);
+?&gt;
+</code></pre>
+</p>
+
+
     

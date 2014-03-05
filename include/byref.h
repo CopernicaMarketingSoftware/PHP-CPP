@@ -33,7 +33,7 @@ public:
      *  @param  nullable    Can it be null?
      *  @param  required    Is this argument required?
      */
-    ByRef(const char *name, const char *classname, bool nullable = true, bool required = true) : Argument(name, classname, nullable, required, true) {}
+    ByRef(const char *name, const char *classname, bool nullable = false, bool required = true) : Argument(name, classname, nullable, required, true) {}
     
     /**
      *  Copy constructor
