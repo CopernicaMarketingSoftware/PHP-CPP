@@ -62,34 +62,34 @@
     class that can be used instead.
 </p>
 <p>
-    <code><pre>
-        #include &lt;phpcpp.h&gt;
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  tell the compiler that the get_module is a pure C function
+ */
+extern "C" {
+    
+    /**
+     *  Function that is called by PHP right after the PHP process
+     *  has started, and that returns an address of an internal PHP
+     *  strucure with all the details and features of your extension
+     *
+     *  @return void*   a pointer to an address that is understood by PHP
+     */
+    PHPCPP_EXPORT void *get_module() 
+    {
+        // static(!) Php::Extension object that should stay in memory
+        // for the entire duration of the process (that's why it's static)
+        static Php::Extension myExtension("my_extension", "1.0");
         
-        /**
-         *  tell the compiler that the get_module is a pure C function
-         */
-        extern "C" {
-            
-            /**
-             *  Function that is called by PHP right after the PHP process
-             *  has started, and that returns an address of an internal PHP
-             *  strucure with all the details and features of your extension
-             *
-             *  @return void*   a pointer to an address that is understood by PHP
-             */
-            PHPCPP_EXPORT void *get_module() 
-            {
-                // static(!) Php::Extension object that should stay in memory
-                // for the entire duration of the process (that's why it's static)
-                static Php::Extension myExtension("my_extension", "1.0");
-                
-                // @todo    add your own functions, classes, namespaces to the extension
-                
-                // return the extension
-                return myExtension;
-            }
-        }
-    </pre></code>
+        // @todo    add your own functions, classes, namespaces to the extension
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
 </p>
 <p>
     In the example above you see a very straightforward implementation of the
@@ -160,25 +160,25 @@
     by adding your native function implementations to the Extension object:
 </p>
 <p>
-    <code><pre>
-        #include &lt;phpcpp.h&gt;
-        
-        extern void example1();
-        extern void example2(Php::Parameters &amp;params);
-        extern Php::Value example3();
-        extern Php::Value example4(Php::Parameters &amp;params);
-        
-        extern "C" {
-            PHPCPP_EXPORT void *get_module() {
-                static Php::Extension myExtension("my_extension", "1.0");
-                myExtension.add("native1", example1);
-                myExtension.add("native2", example2);
-                myExtension.add("native3", example3);
-                myExtension.add("native4", example4);
-                return myExtension.module();
-            }
+<pre class="language-c++"><code>
+    #include &lt;phpcpp.h&gt;
+    
+    extern void example1();
+    extern void example2(Php::Parameters &amp;params);
+    extern Php::Value example3();
+    extern Php::Value example4(Php::Parameters &amp;params);
+    
+    extern "C" {
+        PHPCPP_EXPORT void *get_module() {
+            static Php::Extension myExtension("my_extension", "1.0");
+            myExtension.add("native1", example1);
+            myExtension.add("native2", example2);
+            myExtension.add("native3", example3);
+            myExtension.add("native4", example4);
+            return myExtension.module();
         }
-    </pre></code>
+    }
+</code></pre>
 </p>
 <p>
     What do we see here? We've added four function declarations ("example1", 
@@ -238,23 +238,23 @@
     the parameters is:
 </p>
 <p>
-    <code><pre>
-        #include &lt;phpcpp.h&gt;
-        
-        extern void example(Php::Parameters &amp;params);
-        
-        extern "C" {
-            PHPCPP_EXPORT void *get_module() {
-                static Php::Extension myExtension("my_extension", "1.0");
-                myExtension.add("example", example, {
-                    Php::ByVal("a", Php::Type::Numeric),
-                    Php::ByVal("b", "ExampleClass"),
-                    Php::ByRef("c", "OtherClass")
-                });
-                return myExtension.module();
-            }
-        }
-    </pre></code>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+extern void example(Php::Parameters &amp;params);
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        myExtension.add("example", example, {
+            Php::ByVal("a", Php::Type::Numeric),
+            Php::ByVal("b", "ExampleClass"),
+            Php::ByRef("c", "OtherClass")
+        });
+        return myExtension.module();
+    }
+}
+</pre></code>
 </p>
 <p>
     Above you see that we passed in additional information when we registered the
