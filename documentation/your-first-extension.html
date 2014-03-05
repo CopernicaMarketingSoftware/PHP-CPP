@@ -11,13 +11,14 @@
     is run "make" and "make install". 
 </p>
 <p>
-    And that's not all. You also have to make changes to the system wide php.ini
-    file to actually enable your extension. The best way to do that is create
+    But creating a Makefile is not the only thing that you have to do. You 
+    will also have to make changes to the system wide php.ini
+    file to actually enable the extension. The best way to do that is create
     your own small yourextension.ini file, and copy that to the PHP config file
     directory of your webserver.
 </p>
 <p>
-    To help you out with that, we have created an almost empty extension with 
+    To help you out with these steps, we have created an almost empty extension with 
     all the required utilities for starting up a new extension. It contains a 
     sample Makefile, a sample configuration file, and a first main.cpp file
     in which the get_module() call is already implemented. This gives you a
@@ -178,7 +179,7 @@ clean:
 <h2>Yourextension.ini</h2>
 <p>
     Your extension should not only have a Makefile, but also an initial
-    yourextension.ini file. This file is much simpler that the Makefile. You
+    yourextension.ini file. This file is much simpler than the Makefile. You
     should also modify this file to refer to the real name of your extension
     (instead of yourextension.so).
 </p>

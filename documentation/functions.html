@@ -3,7 +3,7 @@
     A PHP extension can of course only be useful if you can make functions and/or 
     classes that can be called from PHP scripts. For functions this is 
     astonishingly simple. As long as you have a native C++ function that has 
-    one of the following signatures, you can call it almost directly from PHP:
+    one of the following four signatures, you can call it almost directly from PHP:
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -17,7 +17,7 @@ Php::Value example4(Php::Parameters &amp;params);
     These function signatures show you two important PHP-CPP classes, the
     Php::Value class and the Php::Parameters class. The Php::Value class is a
     powerful class that does the same as a regular PHP $variable: it can hold
-    almost any variable (integers, floating pointer numbers, strings, but also
+    almost any value (integers, floating pointer numbers, strings, but also
     regular and associative arrays and objects). The Php::Parameters class
     can be best compared with an array or a vector holding all the parameters
     that were passed to your function. We will come back to both classes in
@@ -26,7 +26,7 @@ Php::Value example4(Php::Parameters &amp;params);
 <p>
     To make a function callable from PHP, you must <i>add</i> the function
     to your extension object, and assign a name to it. This is the
-    name by which the function becomes callable from within PHP scripts.
+    name by which the function becomes callable from within your PHP scripts.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -102,10 +102,28 @@ extern "C" {
 </code></pre>
 </p>
 <p>
-    The only type of native function that is left is the one that accepts 
-    parameters. Let's give an example of a function that takes a variable
-    number of parameters, and sums up the integer value of each of the
-    parameters:
+    The possible output of this script could for example be:
+</p>
+<p>
+<pre>
+123
+123
+string
+123
+123
+string
+string
+string
+string
+</pre>
+</p>
+<p>
+    We've mentioned that there are four types of native functions that can be
+    added to the extension object. We've showed you two examples of function
+    that both did not accept any parameters. Let's round up with the most 
+    complicated function: one that accepts parameters and also returns a result. 
+    The following example function that takes a variable number of parameters, 
+    and sums up the integer value of each of the parameters:
 </p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
@@ -126,15 +144,14 @@ extern "C" {
 }
 </code></pre>
 <p>
-    The above example shows how to work with parameters. The Php::Parameters class
-    is in reality nothing less than a std::vector filled with Php::Value objects -
-    and you can thus iterate over it. In this example we use the new C++11 way of
-    iterating, and the new-for-C++11 auto keyword to ask the compiler to find out
-    what type of variables are stored in the parameters vector (it are Php::Value
-    objects).
+    The Php::Parameters class is in reality nothing less than a std::vector 
+    filled with Php::Value objects - and you can thus iterate over it. In the
+    example we use the new C++11 way of doing this, and we use the new-for-C++11 
+    "auto" keyword to ask the compiler to find out what type of variables are 
+    stored in the parameters vector (it are Php::Value objects, of course).
 </p>
 <p>
-    And once again you can see how powerful this cute Php::Value class is. It can 
+    And in this example you can again see how powerful the Php::Value class is. It can 
     for example be used on the right hand side of a += operator to be added to 
     an integer value, and the final integer result variable is automatically 
     converted back into a Php::Value object when the function returns - just as if 
@@ -153,18 +170,17 @@ extern "C" {
 </code></pre>
 </p>
 <p>
-    The output of the above script is, of course, 130. Do you want an even 
-    funnier example? This outputs 130 too:
+    The output of the above script is, of course, 130. The "100" string variable
+    that is passed to the function is automatically converted into an integer,
+    which is exactly the same behavior of a PHP script.
 </p>
 <p>
-<pre class="language-php"><code>
-&lt;?php
-    class MyClass {
-        public function __toString() {
-            return 20;
-        }
-    }
-    echo(sum_everything(10,"100",new MyClass())."\n");
-?&gt;
-</code></pre>
+    All functions that accept parameters are called with a variable number of
+    parameters. It is up to you, the extension programmer, to check the number
+    of parameters, and to check whether the parameters that are passed to your
+    function are of the right type. In most situations however, you want
+    your functions to be called with a fixed number of parameters, or with
+    parameters of a certain type. To achieve that, you will have to specify
+    the parameter types when you add your function to the extension object.
+    More on that in the <a href="parameters">next section</a>.
 </p>
