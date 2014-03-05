@@ -13,9 +13,9 @@
 <h2>How does PHP load its extensions?</h2>
 <p>
     You probably already know that native PHP extensions are compiled into *.so 
-    files on unix-like systems, and *.dll files on Windows environments, and that
+    files on unix-like systems, and *.dll files in Windows environments, and that
     the global php.ini file holds a list of all extensions available on your system.
-    This means that if you're building your own extension, you will also need to
+    This means that if you're building your own extension, you are also going to
     create such a *.so or *.dll file and you will need to update the PHP 
     configuration so that your own extension is loaded by PHP.
 </p>
@@ -52,7 +52,7 @@
 <h2>The get_module() startup function</h2>
 <p>
     Before we explain how you can create your own extension however, we first explain
-    what PHP does to load an extension. When PHP starts, it loads the configuration 
+    what PHP does to load an extension. When PHP starts, it loads the *.ini configuration 
     file(s) that we just described and for each "extension=name.so" line in these
     files, it opens the appropriate library, and calls the "get_module()"
     function from it. Each extension library (your extension too) must therefore 
@@ -214,7 +214,7 @@
             PHPCPP_EXPORT void *get_module() {
                 static Php::Extension myExtension("my_extension", "1.0");
                 myExtension.add("example", example, {
-                    Php::ByVal("a", Php::numericType),
+                    Php::ByVal("a", Php::Type::Numeric),
                     Php::ByVal("b", "ExampleClass"),
                     Php::ByRef("c", "OtherClass")
                 });
@@ -224,15 +224,15 @@
     </pre></code>
 </p>
 <p>
-    Above you see that we pass in additional information when we register the         
-    
-
-
-    The Extension::add() method can be used to register native functions, and
-    make them available in PHP. In the examples above, you've seen that the
-    method takes two parameters: the name the function shou
-
-
+    Above you see that we passed in additional information when we registered the
+    "example" function. We tell our extension that our function accepts three parameters:
+    the first parameter must be a regular number, while the other ones are object 
+    instances of type "ExampleClass" and "OtherClass". In the end, your native C++ 
+    "example" function will still be called with a Php::Parameters instance, but 
+    the moment it gets called, you can be sure that the Php::Parameters object 
+    will be filled with three members, and that two of them are objects of the 
+    appropriate type, and that the third one is also passed by reference.
+</p>
 <h2>Working with variables</h2>
 <p>
     Variables in PHP are non-typed. A variable can thus hold any possible type:

@@ -1,0 +1,108 @@
+<div style="width: 1024px; font-family: verdana; font-size: 10pt; line-height: 16pt;">
+
+
+<h1>How to install PHP-CPP</h1>
+<p>
+    Before you can build your own super fast native PHP extension using the 
+    PHP-CPP library, you will first have to install the PHP-CPP library on your 
+    systems(s).
+</p>
+<p>
+    Luckily, for most of us (those who use Linux environments), this will be
+    a piece of cake. If you're on a different platform however, you are left on 
+    your own, because we (as in me, the PHP-CPP developer), only uses Linux
+    systems. There is however no reason why this library should not also work on 
+    other platforms, because it only uses straight forward C++ code. Thus, if 
+    you are on a different platform and have managed to compile the library on 
+    it, please give us feedback so that we can update these installation 
+    instructions and include other platforms as well.
+</p>
+
+
+<h2>Limitations</h2>
+<p>
+    At this moment, PHP-CPP only supports single-threaded PHP installations.
+    Web servers come in a number forms: there are the ones that handle each
+    page request in different process, and the ones that handle each page request
+    in the same process, but in a different thread. If you're using such a
+    multi-threaded PHP installation, you can not use the PHP-CPP library. Most
+    installations are single-threaded however, so this should not be a show stopper.
+</p>
+<p>
+    Are you not sure whether you have a single-threaded or multi-threaded PHP
+    environment? Just try to compile the PHP-CPP library, if you see a zillion
+    errors, you can be pretty sure that this is because of your installation
+    is multi-threaded.
+</p>
+<p>
+    The reason why we've chosen not to support multi-threaded PHP installations
+    lies in the fact that internally the Zend engine uses a very odd system
+    to ensure thread safety. Essentially, they pass an additional parameter to 
+    each and every function call that holds a pointer-to-a-pointer with thread
+    information that you can access with specific C macro's, and that you have
+    to pass on to every other function call that you make. This makes life for 
+    extension writers much harder than is necessary - and is in total conflict
+    with the core principle of the PHP-CPP library: to make life easy.
+</p>
+<p>
+    However, if there is demand for, we may add support for multi-threaded PHP
+    installations, and hopefully we can even keep the same simple C++ API as we 
+    have now.
+</p>
+
+
+
+<h2>Download</h2>
+<p>
+    Installation begins with downloading the source code. You can either
+    download the latest release from 
+    <a href="http://www.php-cpp.com">http://www.php-cpp.com</a>, or get the
+    latest bleading edge work-in-progress version from 
+    <a href="https://github.com/CopernicaMarketingSoftware/PHP-CPP">GitHub</a>.
+</p>
+<p>
+    To get the latest GitHub version, run the following command from the command
+    line:
+</p>
+<p>
+    <code><pre>
+        git clone https://github.com/CopernicaMarketingSoftware/PHP-CPP.git
+    </pre></code>
+</p>
+<p>
+    After you've downloaded the software (either from our website, or directly
+    from GitHub, change your working directory to the PHP-CPP directly, and open
+    the file named "Makefile" in your editor of choice.
+</p>
+<p>
+    The Makefile is a file that holds settings and instructions for the compiler.
+    In 96 out of 100 situations, the default settings in this Makefile will
+    already be perfect for you, but you may want to have a look at it and make
+    (small) changes to it. You can for example change the installation directory,
+    and the compiler that is going to be used.
+</p>
+<p>
+    After you've checked that all settings in the Makefile are correct, you can
+    build the software. Do this by running the following command from within
+    the PHP-CPP directory.
+</p>
+<p>
+    <code><pre>
+        make
+    </pre></code>
+</p>
+<p>
+    The PHP-CPP library has now been built, and all that is left to do is 
+    install it on your system. You can use the "make install" command for it.
+    This command should be executed as root, either by using "sudo", or by
+    logging on as root first.
+</p>
+<p>
+    <code><pre>
+        sudo make install
+    </pre></code>
+</p>
+<p>
+    Congratulations! You are now the happy owner of a system with PHP-CPP installed
+    and nothing can stop you from building your first fast native PHP extension.
+</p>

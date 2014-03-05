@@ -329,6 +329,9 @@ Value &Value::operator=(Value &&value)
         // the other object is no longer valid
         value._val = nullptr;
     }
+    
+    // done
+    return *this;
 }
 
 /**
@@ -1201,13 +1204,17 @@ Value &Value::setType(Type type)
     
     // run the conversion
     switch (type) {
-    case Type::Null:        convert_to_null(_val); break;
-    case Type::Numeric:     convert_to_long(_val); break;
-    case Type::Float:       convert_to_double(_val); break;
-    case Type::Bool:        convert_to_boolean(_val); break;
-    case Type::Array:       convert_to_array(_val); break;
-    case Type::Object:      convert_to_object(_val); break;
-    case Type::String:      convert_to_string(_val); break;
+    case Type::Null:            convert_to_null(_val); break;
+    case Type::Numeric:         convert_to_long(_val); break;
+    case Type::Float:           convert_to_double(_val); break;
+    case Type::Bool:            convert_to_boolean(_val); break;
+    case Type::Array:           convert_to_array(_val); break;
+    case Type::Object:          convert_to_object(_val); break;
+    case Type::String:          convert_to_string(_val); break;
+    case Type::Resource:        throw Php::Exception("Resource types can not be handled by the PHP-CPP library"); break;
+    case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
     }
     
     // done
