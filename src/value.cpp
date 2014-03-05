@@ -207,13 +207,11 @@ Value::Value(Base *object)
  */
 Value::Value(const Value &that)
 {
-    // how many references does the other object has?
-    if (Z_REFCOUNT_P(that._val) > 1 && !Z_ISREF_P(that._val))
+    // is the other variable a reference?
+    if (Z_ISREF_P(that._val))
     {
-        // there are already multiple variables linked to this value, and it
-        // is not a reference. this implies that we can not turn this variable
-        // into a reference, otherwise strange things could happen, we're going
-        // to create a new zval
+        // because this is supposed to be a COPY, we can not add ourselves
+        // to the variable but have to allocate a new variable
         ALLOC_ZVAL(_val);
         INIT_PZVAL_COPY(_val, that._val);
         zval_copy_ctor(_val);
@@ -223,14 +221,41 @@ Value::Value(const Value &that)
         // simply use the same zval
         _val = that._val;
     }
-        
-    // the other object only has one variable using it, or it is already
-    // a variable by reference, we can safely add one more reference to it
-    // and make it a variable by reference if it was not already a ref
+    
+    // that zval has one more reference
     Z_ADDREF_P(_val);
 
-    // make reference
-    Z_SET_ISREF_P(_val);
+
+//  Below the old implementation - I thought really hard about it and I though
+//  it was a correct and very smart implementation. However, it does not work
+//  when you swap two variables. I changed it to the implementation above, but
+//  maybe that implementation introduces other bugs??? Let's keep the old
+//  implementation for a while in this file, but commented out
+//
+//    // how many references does the other object have?
+//    if (Z_REFCOUNT_P(that._val) > 1 && !Z_ISREF_P(that._val))
+//    {
+//        // there are already multiple variables linked to this value, and it
+//        // is not a reference. this implies that we can not turn this variable
+//        // into a reference, otherwise strange things could happen, we're going
+//        // to create a new zval
+//        ALLOC_ZVAL(_val);
+//        INIT_PZVAL_COPY(_val, that._val);
+//        zval_copy_ctor(_val);
+//    }
+//    else
+//    {
+//        // simply use the same zval
+//        _val = that._val;
+//    }
+//        
+//    // the other object only has one variable using it, or it is already
+//    // a variable by reference, we can safely add one more reference to it
+//    // and make it a variable by reference if it was not already a ref
+//    Z_ADDREF_P(_val);
+//
+//    // make reference
+//    Z_SET_ISREF_P(_val);
 }
 
 /**

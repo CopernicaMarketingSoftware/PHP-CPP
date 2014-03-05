@@ -1,14 +1,14 @@
-<h1>Limiting function parameters</h1>
+<h1>Specifying function parameters</h1>
 <p>
     PHP has a mechanism to enforce the types of function parameters, and to accept
-    parameters either by reference or by value. In the earlier examples, we have
-    not yet used that mechanism, and we left it to the function implementations
-    to inspect the 'Php::Parameters' object, and to check if the number
-    of parameters were correct, and of the right type.
+    parameters either by reference or by value. In the <a href="functions">
+    earlier examples</a>, we had not yet used that mechanism, and we left it to 
+    the function implementations to inspect the 'Php::Parameters' object, and to 
+    check whether the number of parameters were correct, and of the right type.
 </p>
 <p>
     However, the 'Extension::add()' method takes a third optional parameter that
-    you can use to specify the number of parameters that are supported, whether
+    you can use to specify the number of parameters that are supported, if
     the parameters are passed by reference or by value, and what the type of
     the parameters is:
 </p>
@@ -33,7 +33,7 @@ extern "C" {
 </p>
 <p>
     Above you see that we passed in additional information when we registered the
-    "example" function. We tell our extension that our function accepts three parameters:
+    "example" function. We tell the PHP engine that our function accepts three parameters:
     the first parameter must be numeric, while the other ones are 
     instances of type "ExampleClass" and "OtherClass". In the end, your native C++ 
     "example" function will still be called with a Php::Parameters instance, but 
@@ -62,18 +62,24 @@ function example2(array $param)
 {
     ...
 }
+
+// this is not (yet?) possible in PHP
+function example3(int $param)
+{
+    ...
+}
+
 ?&gt;
 </code></pre>
 </p>
 <p>
-    The same is true for native functions. Although the core Zend engine offers
+    The same is true for native functions. Although the core PHP engine offers
     the possibility to specify that your function only accepts parameters of type 
     "Php::Type::Numeric" or of type "Php::Type::String", this setting is further 
-    completely ignored by the PHP engine. Maybe this is going to change in the 
+    completely ignored. Maybe this is going to change in the 
     future (let's hope so), but for now it is only meaningful to specify the
     parameter type for objects and arrays. We have however chosen to still offer 
-    this feature in PHP-CPP to be ready for future versions of PHP - that might
-    support more strongly typed functions.
+    this feature in PHP-CPP to be ready for future versions of PHP.
 </p>
 <p>
     To come back to our example, the following functions calls can now be done
@@ -82,7 +88,7 @@ function example2(array $param)
 <p>
 <pre class="language-php"><code>
 &lt;?php
-// correct call, numeric and two objects of the right type
+// correct call, parameters are numeric and two objects of the right type
 example(12, new ExampleClass(), new OtherClass());
 
 // also valid, first parameter is not numeric but an array, but the 
@@ -124,7 +130,7 @@ ByVal(const char *name, Php::Type type, bool required = true);
     The first parameter of the constructor should always be the  
     parameter name. This is a little strange, because PHP does not support the
     concept of 'named variables', like other languages do. Internally, this 
-    name is used to generate an error messages when the function is 
+    name is only used to generate an error messages when your function is 
     called in the wrong way.
 </p>
 <p>
@@ -152,8 +158,9 @@ Php::Type::Callable
     underlying PHP engine.
 </p>
 <p>
-    The final parameter can be used to set whether the parameter is optional or
-    not.  If you set required to false, PHP will trigger an error when your
+    The final parameter (do you remember that it was called 'required'?) can be 
+    used to set whether the parameter is optional or not.  If you set it
+    to true, PHP will trigger an error when your
     function is called without this parameter. This setting only
     works for the trailing parameters, it is (of course) not 
     possible to mark the first parameter as optional, and all subsequent 
@@ -185,8 +192,8 @@ ByVal(const char *name, const char *classname, bool nullable = false, bool requi
 <p>
 <pre class="language-php"><code>
 &lt;?php
-function example1(DateTime $time) { ... }
-function example1(DateTime $time = null) { ... }
+function example1(DateTime $time) { Php::Value time = params[0]; ... }
+function example1(DateTime $time = null) { Php::Value time = params[0]; ... }
 ?&gt;
 </code></pre>
 </p>
@@ -212,10 +219,11 @@ extern "C" {
 </p>
 <h2>Parameters by reference</h2>
 <p>
-    By the name of the Php::ByVal() class you may have concluded that there
-    must also be a Php::ByRef() class - and you can not be more right than that.
+    By the name of the Php::ByVal class you may have concluded that there
+    must also be a Php::ByRef class - and you can not be more right than that. 
+    There is indeed a Php::ByRef class.
     If you create a function that takes a parameter by reference (and that can
-    thus use a parameter as a return value) you can specify that too.
+    thus 'return' a value in a parameter) you can specify that too.
 </p>
 <p>
     The Php::ByRef class has exactly the same signature as the Php::ByVal class,
@@ -223,7 +231,7 @@ extern "C" {
     also checks if someone tries to call your function with a literal instead
     of a variable - which is not possible for variables by reference. If this
     happens, an error is triggered and the function will not be called.
-    Let's show an example. The following extension exports a function that
+    Let's show an example. The following extension creates a function that
     swaps the contents of two variables.
 </p>
 <p>
