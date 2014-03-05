@@ -1,20 +1,18 @@
 <h1>Exporting native functions</h1>
 <p>
-    A PHP extension can of course only be useful if you can make functions and/or 
+    A PHP extension can of course only be useful if it contains functions and/or 
     classes that can be called from PHP scripts. For functions this is 
     astonishingly simple. As long as you have a native C++ function that has 
     one of the following four signatures, you can call it almost directly from PHP:
 </p>
-
 <p>
 <pre class="language-c++"><code>void example1();
 void example2(Php::Parameters &amp;params);
 Php::Value example3();
 Php::Value example4(Php::Parameters &amp;params);</code></pre>
 </p>
-
 <p>
-    These function signatures show you two important PHP-CPP classes, the
+    The function signatures show you two important PHP-CPP classes, the
     Php::Value class and the Php::Parameters class. The Php::Value class is a
     powerful class that does the same as a regular PHP $variable: it can hold
     almost any value (integers, floating pointer numbers, strings, but also
@@ -46,14 +44,14 @@ extern "C" {
 }</code></pre>
 </p>
 <p>
-    It is not difficult to imagine what the above code does. If you enable
+    It is not difficult to imagine what the above code does. If you deploy
     this extension, you can create PHP scripts in which you can call myFunction(),
-    which will print "example output" to stdout.
+    that will print "example output" to stdout.
 </p>
 <p>
     As we've said before, there are four types of functions that can be used. In
     this first example we showed the most simple one: a function that does not
-    take any parameter, and that returns nothing. What if you
+    take any parameters, and that returns nothing. What if you
     want to return a value from your function?
 </p>
 <p>
@@ -113,11 +111,11 @@ string
 </p>
 <p>
     We've mentioned that there are four types of native functions that can be
-    added to the extension object. We've showed you two examples of function
+    added to the extension object. We've showed you two examples of functions
     that both did not accept any parameters. Let's round up with the most 
-    complicated function: one that accepts parameters and also returns a result. 
-    The following example function that takes a variable number of parameters, 
-    and sums up the integer value of each of the parameters:
+    complicated function: a function that accepts parameters and also returns a result. 
+    The following example function takes a variable number of parameters, 
+    and sums up the integer value of all the parameters:
 </p>
 <pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 
@@ -144,7 +142,7 @@ extern "C" {
 </p>
 <p>
     And in this example you can again see how powerful the Php::Value class is. It can 
-    for example be used on the right hand side of a += operator to be added to 
+    be used on the right hand side of a += operator to be added to 
     an integer value, and the final integer result variable is automatically 
     converted back into a Php::Value object when the function returns - just as if 
     you are working with regular PHP $variables. But remember, this is C++ code and 
@@ -165,10 +163,14 @@ extern "C" {
     which is exactly the same behavior of a PHP script.
 </p>
 <p>
-    All functions that accept parameters are called with a variable number of
-    parameters. It is up to you, the extension programmer, to check the number
-    of parameters, and to check whether the parameters that are passed to your
-    function are of the right type. In most situations however, you want
+    All parameter-accepting functions can be called with a variable number of
+    parameters. It is therefore valid to call them from PHP with zero, one, two 
+    or even tenthousand parameters. It is up to you, the extension programmer, to check 
+    this, and to check whether the parameters that are passed to your
+    function are of the right type.
+</p>
+<p>
+    In most situations however, you want
     your functions to be called with a fixed number of parameters, or with
     parameters of a certain type. To achieve that, you will have to specify
     the parameter types when you add your function to the extension object.
