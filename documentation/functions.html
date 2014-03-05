@@ -25,8 +25,8 @@ Php::Value example4(Php::Parameters &amp;params);
 </p>
 <p>
     To make a function callable from PHP, you must <i>add</i> the function
-    to your extension object, and assign a name to it. This will also be the
-    name by which the function becomes usable in PHP scripts.
+    to your extension object, and assign a name to it. This is the
+    name by which the function becomes callable from within PHP scripts.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -49,7 +49,10 @@ extern "C" {
 </p>
 <p>
     It is not difficult to imagine what the above code does. If you enable
-    this extension, you can create PHP scripts in which you can cell myFunction().
+    this extension, you can create PHP scripts in which you can cell myFunction(),
+    which will print "example output" to stdout.
+</p>
+<p>
     As we've said before, there are four types of functions that can be used. In
     this first example we showed the most simple one: a function that does not
     take any parameter, and that does also not return anything. What if you
