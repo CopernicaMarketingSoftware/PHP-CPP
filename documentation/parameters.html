@@ -3,8 +3,9 @@
     PHP has a mechanism to enforce the types of function parameters, and to accept
     parameters either by reference or by value. In the <a href="functions">
     earlier examples</a>, we had not yet used that mechanism, and we left it to 
-    the function implementations to inspect the 'Php::Parameters' object, and to 
-    check whether the number of parameters were correct, and of the right type.
+    the function implementations to inspect the 'Php::Parameters' object (which
+    is a std::vector of Php::Value objects), and to check whether the number of 
+    parameters is correct, and of the right type.
 </p>
 <p>
     However, the 'Extension::add()' method takes a third optional parameter that
@@ -32,7 +33,7 @@ extern "C" {
 }</pre></code>
 </p>
 <p>
-    Above you see that we passed in additional information when we registered the
+    Above you see that we pass in additional information when we register the
     "example" function. We tell the PHP engine that our function accepts three parameters:
     the first parameter must be numeric, while the other ones are 
     instances of type "ExampleClass" and "OtherClass". In the end, your native C++ 
@@ -43,9 +44,10 @@ extern "C" {
 </p>
 <h2>Can you really enforce scalar parameters?</h2>
 <p>
-    In PHP there is no way to enforce the type of a scalar parameter. When you
-    write a function in PHP, it is possible to enforce that the function receives
-    an object of a certain type, or an array, but not that you want to receive 
+    You may be surprised to see that we specified the first parameter to be of
+    type Numeric. After all, in PHP there is offical way to enforce the type of a 
+    scalar parameter. When you write a function in PHP, it is possible to enforce 
+    that the function receives an object or an array, but not that you want to receive 
     a string or an integer.
 </p>
 <p>
@@ -79,7 +81,8 @@ function example3(int $param)
     completely ignored. Maybe this is going to change in the 
     future (let's hope so), but for now it is only meaningful to specify the
     parameter type for objects and arrays. We have however chosen to still offer 
-    this feature in PHP-CPP to be ready for future versions of PHP.
+    this feature in PHP-CPP to be ready for future versions of PHP, but for now
+    the specification of a numeric parameter is completely pointless.
 </p>
 <p>
     To come back to our example, the following functions calls can now be done
