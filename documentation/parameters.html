@@ -13,8 +13,7 @@
     the parameters is:
 </p>
 <p>
-<pre class="language-c++"><code>
-#include &lt;phpcpp.h&gt;
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 
 extern void example(Php::Parameters &amp;params);
 
@@ -28,8 +27,7 @@ extern "C" {
         });
         return myExtension.module();
     }
-}
-</pre></code>
+}</pre></code>
 </p>
 <p>
     Above you see that we passed in additional information when we registered the
@@ -41,6 +39,7 @@ extern "C" {
     will be filled with three members, and that two of them are objects of the 
     appropriate type, and that the third one is also passed by reference.
 </p>
+
 <h2>Working with variables</h2>
 <p>
     Variables in PHP are non-typed. A variable can thus hold any possible type:
