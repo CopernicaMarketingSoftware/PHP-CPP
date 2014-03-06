@@ -27,11 +27,15 @@ public:
      *  @param  flags           Access flags
      *  @param  args            Argument description
      */
-    Method(const char *name, method_callback_0 callback, int flags, const Arguments &args) : Callable(name, args), _type(0), _flags(flags) { _callback.m0 = callback; }
-    Method(const char *name, method_callback_1 callback, int flags, const Arguments &args) : Callable(name, args), _type(1), _flags(flags) { _callback.m1 = callback; }
-    Method(const char *name, method_callback_2 callback, int flags, const Arguments &args) : Callable(name, args), _type(2), _flags(flags) { _callback.m2 = callback; }
-    Method(const char *name, method_callback_3 callback, int flags, const Arguments &args) : Callable(name, args), _type(3), _flags(flags) { _callback.m3 = callback; }
-    Method(const char *name,                             int flags, const Arguments &args) : Callable(name, args), _type(4), _flags(flags) { _callback.m0 = nullptr;  }
+    Method(const char *name, method_callback_0 callback, int flags, const Arguments &args) : Callable(name, args), _type(0),    _flags(flags) { _callback.m0 = callback; }
+    Method(const char *name, method_callback_1 callback, int flags, const Arguments &args) : Callable(name, args), _type(1),    _flags(flags) { _callback.m1 = callback; }
+    Method(const char *name, method_callback_2 callback, int flags, const Arguments &args) : Callable(name, args), _type(2),    _flags(flags) { _callback.m2 = callback; }
+    Method(const char *name, method_callback_3 callback, int flags, const Arguments &args) : Callable(name, args), _type(3),    _flags(flags) { _callback.m3 = callback; }
+    Method(const char *name, method_callback_4 callback, int flags, const Arguments &args) : Callable(name, args), _type(4),    _flags(flags) { _callback.m4 = callback; }
+    Method(const char *name, method_callback_5 callback, int flags, const Arguments &args) : Callable(name, args), _type(5),    _flags(flags) { _callback.m5 = callback; }
+    Method(const char *name, method_callback_6 callback, int flags, const Arguments &args) : Callable(name, args), _type(6),    _flags(flags) { _callback.m6 = callback; }
+    Method(const char *name, method_callback_7 callback, int flags, const Arguments &args) : Callable(name, args), _type(7),    _flags(flags) { _callback.m7 = callback; }
+    Method(const char *name,                             int flags, const Arguments &args) : Callable(name, args), _type(9999), _flags(flags) { _callback.m0 = nullptr;  }
 
     /**
      *  Copy and move constructors
@@ -78,6 +82,10 @@ public:
         case 1:     (base->*_callback.m1)(parameters); return Value();
         case 2:     return (base->*_callback.m2)();
         case 3:     return (base->*_callback.m3)(parameters);
+        case 4:     (base->*_callback.m4)(); return Value();
+        case 5:     (base->*_callback.m5)(parameters); return Value();
+        case 6:     return (base->*_callback.m6)();
+        case 7:     return (base->*_callback.m7)(parameters);
         default:    return Value();
         }
     }
@@ -105,6 +113,10 @@ private:
          method_callback_1 m1;
          method_callback_2 m2;
          method_callback_3 m3;
+         method_callback_4 m4;
+         method_callback_5 m5;
+         method_callback_6 m6;
+         method_callback_7 m7;
     } _callback;
 };
 

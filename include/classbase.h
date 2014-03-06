@@ -32,6 +32,10 @@ typedef void    (Base::*method_callback_0)();
 typedef void    (Base::*method_callback_1)(Parameters &);
 typedef Value   (Base::*method_callback_2)();
 typedef Value   (Base::*method_callback_3)(Parameters &);
+typedef void    (Base::*method_callback_4)() const;
+typedef void    (Base::*method_callback_5)(Parameters &) const;
+typedef Value   (Base::*method_callback_6)() const;
+typedef Value   (Base::*method_callback_7)(Parameters &) const;
 
 /**
  *  Forward declarations
@@ -133,6 +137,10 @@ protected:
     void method(const char *name, method_callback_1, int flags=0, const Arguments &args = {});
     void method(const char *name, method_callback_2, int flags=0, const Arguments &args = {});
     void method(const char *name, method_callback_3, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_4, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_5, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_6, int flags=0, const Arguments &args = {});
+    void method(const char *name, method_callback_7, int flags=0, const Arguments &args = {});
 
     /**
      *  Add an abstract method to the class

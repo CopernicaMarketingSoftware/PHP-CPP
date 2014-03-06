@@ -23,8 +23,8 @@ private:
     int _value = 0;
 
 public:
-    MyClass() {}
-    virtual ~MyClass() {}
+    Counter() {}
+    virtual ~Counter() {}
     
     Php::Value increment() { return ++_value; }
     Php::Value decrement() { return --_value; }
@@ -116,8 +116,8 @@ private:
     int _value = 0;
 
 public:
-    MyClass() {}
-    virtual ~MyClass() {}
+    Counter() {}
+    virtual ~Counter() {}
     
     Php::Value increment(Php::Parameters &params) 
     { 

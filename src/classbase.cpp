@@ -307,6 +307,58 @@ void ClassBase::method(const char *name, method_callback_3 callback, int flags, 
 }
 
 /**
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, method_callback_4 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, method_callback_5 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, method_callback_6 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, method_callback_7 callback, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
  *  Add an abstract method to the class
  *  @param  name        Name of the method
  *  @param  flags       Optional flags (like public or protected)
