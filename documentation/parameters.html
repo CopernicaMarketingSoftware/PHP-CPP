@@ -282,14 +282,14 @@ swap(10,20);
 <p>
     When you add your native functions to the extension object, you may supply
     an optional third parameter with a list of Php::ByVal and Php::ByRef objects
-    that describe the names and types of the parameters that can be passed to
-    your function. Internally, the PHP engine runs a check right before every 
+    with the names and types of the parameters that are accepted.
+    Internally, the PHP engine runs a check right before every 
     function call to verify that the passed in parameters are compatible with 
     the parameter specification that you gave, and will trigger an error if they 
     are not.
 </p>
 <p>
     Specifying parameters is optional. If you choose to leave this specification
-    out it is up to you <i>inside</i> the function to check if there are enough
+    out it is up to you to check <i>inside</i> the function if there are enough
     parameters, and if the types are correct.
 </p>
