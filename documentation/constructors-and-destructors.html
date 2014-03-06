@@ -216,8 +216,8 @@ extern "C" {
     The Php::Value class can be used as a regular PHP $variable, and you can therefore
     also use it for storing object instances. But how do you create brand
     new objects? For this we have the Php::Object class - which is simply an
-    overridden Php::Value class with an alternative constructors, and some additional 
-    checks to prevent that you will ever user a Php::Object class to store values
+    overridden Php::Value class with alternative constructors, and some additional 
+    checks to prevent that you will ever use a Php::Object class to store values
     other than objects.
 </p>
 <p>
@@ -319,7 +319,8 @@ extern "C" {
 </p>
 <p>
     The Php::Object does have an alternative syntax that takes a pointer 
-    to a C++ class, and that turns this pointer into a PHP variable without calling the 
+    to a C++ class (allocated on the heap, with operator new!), and that turns 
+    this pointer into a PHP variable without calling the 
     __construct() method. Notice that you must also specify the classname, 
     because C++ classes do not have any information about themselves (like their 
     name), while in a PHP such information is required to handle reflection and 
@@ -331,4 +332,58 @@ extern "C" {
     that get automatically called by PHP in certain situations. The same is true
     for other magic methods like __toString(), __get(), __set(), et cetera. You
     can implement these methods in the same was as you would do for other methods.
+    Let's add a __toString() method to our Counter class:
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+// actual class implementation
+class Counter : public Php::Base
+{
+private:
+    int _value = 0;
+
+public:
+    // c++ constructor
+    Counter() {}
+    
+    // c++ destructor
+    virtual ~Counter() {}
+    
+    // functions to increment and decrement
+    Php::Value increment() { return ++_value; }
+    Php::Value decrement() { return --_value; }
+    Php::Value value() const { return _value; }
+    
+    // convert to string
+    Php::Value toString() const { return std::to_string(_value); }
+    
+};
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        counter.method("__construct", &Counter::__construct);
+        counter.method("increment", &Counter::increment);
+        counter.method("decrement", &Counter::decrement);
+        counter.method("value", &Counter::value);
+        counter.method("__toString", &Counter::toString);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    You can also see that it is not necessary to use the same method names
+    in the C++ class as in PHP. The C++ method "toString" was used, and mapped
+    to the PHP function __toString().
 </p>
