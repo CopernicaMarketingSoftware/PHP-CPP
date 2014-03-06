@@ -37,9 +37,9 @@ extern "C" {
         
         // description of the class so that PHP knows which methods are accessible
         Php::Class&lt;Counter&gt; counter("Counter");
-        counter.method("increment", &Counter::increment)
-        counter.method("decrement", &Counter::decrement)
-        counter.method("value", &Counter::value)
+        counter.method("increment", &Counter::increment);
+        counter.method("decrement", &Counter::decrement);
+        counter.method("value", &Counter::value);
         
         // add the class to the extension
         myExtension.add(std::move(counter));
@@ -54,8 +54,8 @@ extern "C" {
     Let's talk about programming conventions first - I always use capitals for 
     the first letter of a classname, and my member variables always start with
     an underscore. Every class always has a destructor, and it is always virtual.
-    That's just a convention - <i>my</i> convention - and you of course do not 
-    have to follow that in your code.
+    That's just a convention - my convention - and you of course do not 
+    have to follow that.
 </p>
 <p>
     On topic. The example shows a very simple Counter class with three methods:
@@ -77,10 +77,10 @@ Php::Value YourClass::example4(Php::Parameters &amp;params);
 </p>
 <p>
     In the example we have used the third method form, a method that does
-    not take any parameters, and that returns a Php::Value object. The methods
-    work exactly the same as regular functions, with the difference that in
-    the methods you have (of course) access to the 'this' pointer that refers to 
-    the current object.
+    not take any parameters, and that returns a Php::Value object. Methods
+    work exactly the same as <a href="functions">regular functions</a>, with the 
+    difference that in the methods you have (of course) access to the member
+    variables of the object.
 </p>
 <p>
     To make the class accessible from PHP, you must add it to the extension
@@ -98,4 +98,81 @@ Php::Value YourClass::example4(Php::Parameters &amp;params);
     Note that in our example we have used the C++11 std::move function for this, so
     that the class object is actually <i>moved</i> into the extension object,
     which is a more efficient operation than copying.
+</p>
+<h2>Method parameters</h2>
+<p>
+    Methods are just like functions, and just how you use the
+    Php::ByVal and the Php::ByRef classes to <a href="parameters">specify the 
+    parameters of a function</a>, you can specify method parameters too.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+// actual class implementation
+class Counter : public Php::Base
+{
+private:
+    int _value = 0;
+
+public:
+    MyClass() {}
+    virtual ~MyClass() {}
+    
+    Php::Value increment(Php::Parameters &params) 
+    { 
+        return _value += params.size() > 0 ? (int)params[0] : 1; 
+    }
+    
+    Php::Value decrement(Php::Parameters &params) 
+    { 
+        return _value -= params.size() > 0 ? (int)params[0] : 1; 
+    }
+    
+    Php::Value value() const 
+    { 
+        return _value; 
+    }
+};
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        counter.method("increment", &Counter::increment, { Php::ByVal("change", Php::Type::Numeric, false) });
+        counter.method("decrement", &Counter::decrement, { Php::ByVal("change", Php::Type::Numeric, false) });
+        counter.method("value", &Counter::value);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    In the code above we have modified our first example. The increment and
+    decrement method now get an optional 'change' parameter, which is a numeric
+    value that holds the change that should be applied to the counter. Note that
+    this parameter is optional - so inside our method implementation we have to
+    check if the number of parameters is bigger than zero to prevent nasty 
+    segmentation faults.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+$counter = new Counter();
+$counter->increment(5);
+$counter->increment();
+$counter->decrement(3);
+echo($counter->value()."\n");
+?&gt;
+</code></pre>
+</p>
+<p>
+    Output of above script is (of course) 3.
 </p>
