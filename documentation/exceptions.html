@@ -1,1 +1,57 @@
 <h1>Exceptions</h1>
+<p>
+    PHP and C++ both support exceptions, and with the PHP-CPP library exception
+    handling between these two languages has become completely transparent -
+    which could very well be the coolest feature of the PHP-CPP library.
+    Exceptions that you throw in C++ are automatically passed on to the PHP
+    script, and exceptions thrown by PHP scripts can be caught by your C++
+    code as if it was a plain C++ exception.
+</p>
+<p>
+    Let's start with a simple C++ function that throws an exception.
+</p>
+<p>
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
+
+Php::Value myDiv(Php::Parameters &params)
+{
+    // division by zero is not permitted, throw an exception when this happens
+    if (params[1] == 0) throw Php::Exception("Division by zero");
+
+    // divide the two parameters
+    return params[0] / params[1];
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension extension("my_extension", "1.0");
+        extension.add("myDiv", myDiv, {
+            Php::ByVal("a", Php::Type::Numeric, true),
+            Php::ByVal("b", Php::Type::Numeric, true)
+        });
+        return extension;
+    }
+}</code></pre>
+</p>
+<p>
+    And once again you see a very simple extension. In this extension a "myDiv"
+    function is created that divides two numbers. But division by zero is of
+    course not allowed, so when an attempt is made to divide by zero, an
+    exception is thrown. The following PHP script uses this:
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+try
+{
+    echo(myDiv(10,2)."\n");
+    echo(myDiv(8,4)."\n");
+    echo(myDiv(5,0)."\n");
+}
+catch (Exception $exception)
+{
+    echo($exception);
+}
+&gt;
+</code></pre>
+</p>
