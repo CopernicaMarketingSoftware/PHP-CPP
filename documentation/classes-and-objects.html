@@ -36,7 +36,7 @@ extern "C" {
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
-        Php::Class<Counter> counter("Counter");
+        Php::Class&lt;Counter&gt; counter("Counter");
         counter.method("increment", &Counter::increment)
         counter.method("decrement", &Counter::decrement)
         counter.method("value", &Counter::value)
@@ -79,13 +79,13 @@ Php::Value YourClass::example4(Php::Parameters &amp;params);
     In the example we have used the third method form, a method that does
     not take any parameters, and that returns a Php::Value object. The methods
     work exactly the same as regular functions, with the difference that in
-    the methods you have (of course) access to the this pointer that refers to 
+    the methods you have (of course) access to the 'this' pointer that refers to 
     the current object.
 </p>
 <p>
     To make the class accessible from PHP, you must add it to the extension
-    object inside the get_module() function. The Php::Class object can be be used 
-    for that. This is a templated class. The template parameter should be your 
+    object inside the get_module() function. The Php::Class template class can be 
+    be used for that. The template parameter should be your 
     implementation class, so that the Php::Class object internally knows which 
     class to instantiate the moment the "new" operator is used inside a PHP script.
 </p>
@@ -95,7 +95,7 @@ Php::Value YourClass::example4(Php::Parameters &amp;params);
     you should specify all methods that you want to make accessible from PHP,
     and finally, when all methods have been registered, you should add the 
     class to your extension object so that it will be accessible from PHP.
-    Note that in our example we have used the C++11 std::move function, so
+    Note that in our example we have used the C++11 std::move function for this, so
     that the class object is actually <i>moved</i> into the extension object,
     which is a more efficient operation than copying.
 </p>
