@@ -1,6 +1,6 @@
 <h1>Constructors and destructors</h1>
 <p>
-    There is a small but very important difference between constructor and 
+    There is a small but very important difference between constructors and 
     destructors in C++, and the __construct() and __destruct() methods in PHP.
 </p>
 <p>
@@ -314,16 +314,16 @@ extern "C" {
     In the code above we made the __construct() function of the Counter class
     private. This makes it impossible to create instances of this class - both
     from PHP user scripts, and via calls to Php::Object("Counter") - because
-    constructing objects in this way will eventually also result in a __construct()
-    call.
+    constructing objects in these ways will eventually result in a forbidden 
+    __construct() call.
 </p>
 <p>
     The Php::Object does have an alternative syntax that takes a pointer 
-    to a C++ class (allocated on the heap, with operator new!), and that turns 
+    to a C++ class (allocated on the heap, with operator new!) and that turns 
     this pointer into a PHP variable without calling the 
     __construct() method. Notice that you must also specify the classname, 
     because C++ classes do not have any information about themselves (like their 
-    name), while in a PHP such information is required to handle reflection and 
+    name), while in PHP such information is required to handle reflection and 
     functions like get_class().
 </p>
 <h2>Other magic methods</h2>
