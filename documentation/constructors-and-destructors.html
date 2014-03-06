@@ -219,7 +219,7 @@ extern "C" {
     also use it for storing object instances. But how do you create brand
     new objects? For this we have the Php::Object class - which is simply an
     overridden Php::Value class with alternative constructors, and some additional 
-    checks to prevent that you will ever use a Php::Object class to store values
+    checks to prevent that you will ever use a Php::Object object to store values
     other than objects.
 </p>
 <p>
@@ -324,7 +324,7 @@ extern "C" {
     to a C++ class (allocated on the heap, with operator new!) and that turns 
     this pointer into a PHP variable without calling the 
     __construct() method. Notice that you must also specify the classname, 
-    because C++ classes do not have any information about themselves (like their 
+    because C++ classes do not hold any information about themselves (like their 
     name), while in PHP such information is required to handle reflection and 
     functions like get_class().
 </p>

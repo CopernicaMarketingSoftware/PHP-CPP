@@ -1,0 +1,88 @@
+<h1>Namespaces</h1>
+<p>
+    Although namespaces have a very rich implementation in PHP scripts,
+    with special keyswords like 'use' and 'namespace' and special constants 
+    like '__NAMESPACE__', they are internally very simple.
+</p>
+<p>
+    A namespace is nothing else than a class prefix. If you want your classes
+    or functions to appear in a specific namespace, you simply have to add 
+    a prefix to the class or function name. The following code creates a
+    function "myFunction" in the "myNamespace" namespace.
+</p>
+<p>
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
+
+// function that we're going to export
+void myFunction()
+{
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        
+        // create extension object
+        static Php::Extension extension("my_extension", "1.0");
+        
+        // add the myFunction function to the extension, and put it in namespace "myNamespace"
+        extension.add("myNamespace\\myFunction", myFunction);
+        
+        // return the extension
+        return extension;
+    }
+}</code></pre>
+</p>
+<p>
+    If you like, you can use the Php::Namespace utility class for this. This is an
+    object with exactly the same signature as the Php::Extension object, and
+    that you can use to register your functions.
+</p>
+<p>
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
+
+// function that we're going to export
+void myFunction()
+{
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        
+        // create extension object
+        static Php::Extension extension("my_extension", "1.0");
+        
+        // create a namespace
+        Php::Namespace myNamespace("myNamespace");
+        
+        // add the myFunction function to the namespace
+        myNamespace.add("myFunction", myFunction);
+        
+        // @todo add more functions and classes to the namespace
+        
+        // create a nested namespace
+        Php::Namespace nestedNamespace("nestedNamespace");
+        
+        // @todo add functions and classes to the nested namespace
+        
+        // add the nested namespace to the first namespace
+        myNamespace.add(std::move(nestedNamespace));
+        
+        // add the namespace to the extension
+        extension.add(std::move(myNamespace));
+        
+        // return the extension
+        return extension;
+    }
+}</code></pre>
+</p>
+<p>
+    The Php::Namespace class is just a container that automatically adds a
+    prefix to all classes and functions that you add to it. Nesting namespaces
+    is possible too, as you saw in the example.
+</p>
+<p>
+    In the example we used the std::move() function to move the nested namespace
+    the parent namespace, and to move the first namespace into the extension.
+    Moving is more efficient that adding, although a regular extension.add(myNamespace) 
+    would have been valid too.
+</p>
