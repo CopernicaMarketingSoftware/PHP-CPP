@@ -23,7 +23,7 @@ OrigException::OrigException(struct _zval_struct *zval) :
     _restored(false)
 {
     // save the exception
-    zend_exception_save();
+    //zend_exception_save();
 }
 
 /**
@@ -52,7 +52,7 @@ OrigException::~OrigException() noexcept
     // skip if the exception was restored
     if (_restored) return;
     
-    // clean up the exception
+    // clean up the exception, because it was handled in C++ code
     zend_clear_exception();
 }
 
@@ -63,7 +63,7 @@ OrigException::~OrigException() noexcept
 void OrigException::restore()
 {
     // restore the exception
-    zend_exception_restore();
+    //zend_exception_restore();
     
     // mark exception as restored
     _restored = true;

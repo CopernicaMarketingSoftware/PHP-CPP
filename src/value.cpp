@@ -1154,12 +1154,12 @@ Value Value::exec(int argc, zval ***params) const
 
     // the current exception
     zval *oldException = EG(exception);
-
+    
     // call the function
     if (call_user_function_ex(CG(function_table), NULL, _val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
 
-    // was an exception thrown?
-    if (oldException != EG(exception)) throw OrigException(EG(exception));
+    // was an exception thrown? we throw a C++ new exception to give the C++ the chance to catch it
+    if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
 
     // no (additional) exception was thrown
     return retval ? Value(retval) : nullptr;

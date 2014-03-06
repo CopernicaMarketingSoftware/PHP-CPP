@@ -126,15 +126,22 @@ extern "C" {
 &lt;?php
 
 // call "callMe" for the first time, and supply a function that returns "first call"
-echo(callMe(function() {
-    return "first call\n";
-}));
+$output = callMe(function() {
+    return "First call";
+});
+
+// show output (this will be "First call")
+echo("$output\n");
 
 // call "callMe" for the second time, but throw an exception this time
-echo(callMe(function() {
+$output = callMe(function() {
     throw new Exception("Sorry...\n");
-    return "second call\n";
-}));
+    return "Second call\n";
+});
+
+// show output (this will be "Exception caught")
+echo("$output\n");
+
 ?&gt;
 </code></pre>
 </p>
