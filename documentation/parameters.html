@@ -81,7 +81,8 @@ function example3(int $param)
     completely ignored. Maybe this is going to change in the 
     future (let's hope so), but for now it is only meaningful to specify the
     parameter type for objects and arrays. We have however chosen to still offer 
-    this feature in PHP-CPP to be ready for future versions of PHP, but for now
+    this feature in PHP-CPP, because it is also offered by the core PHP engine, 
+    so that we are ready for future versions of PHP. But for now
     the specification of the numeric parameter in our example is meaningless.
 </p>
 <p>
@@ -165,7 +166,7 @@ Php::Type::Callable
     used to set whether the parameter is optional or not.  If you set it
     to true, PHP will trigger an error when your
     function is called without this parameter. This setting only
-    works for the trailing parameters, it is (of course) not 
+    works for the trailing parameters, as it is (of course) not 
     possible to mark the first parameter as optional, and all subsequent 
     parameters as required.
 <p>
@@ -195,7 +196,7 @@ ByVal(const char *name, const char *classname, bool nullable = false, bool requi
 <p>
 <pre class="language-php"><code>
 &lt;?php
-function example1(DateTime $time) { Php::Value time = params[0]; ... }
+function example1(DateTime $time) { ... }
 function example1(DateTime $time = null) { Php::Value time = params[0]; ... }
 ?&gt;
 </code></pre>
@@ -207,8 +208,8 @@ function example1(DateTime $time = null) { Php::Value time = params[0]; ... }
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
 
-void example1(Php::Parameters &amp;params) { ... }
-void example2(Php::Parameters &amp;params) { ... }
+void example1(Php::Parameters &amp;params) { Php::Value time = params[0]; ... }
+void example2(Php::Parameters &amp;params) { Php::Value time = params[0]; ... }
 
 extern "C" {
     PHPCPP_EXPORT void *get_module() {
@@ -223,10 +224,10 @@ extern "C" {
 <h2>Parameters by reference</h2>
 <p>
     By the name of the Php::ByVal class you may have concluded that there
-    must also be a Php::ByRef class - and you can not be more right than that. 
+    must also be a Php::ByRef class - and you could not have be more right than that. 
     There is indeed a Php::ByRef class.
     If you create a function that takes a parameter by reference (and that can
-    thus 'return' a value in a parameter) you can specify that too.
+    thus 'return' a value via a parameter) you can specify that too.
 </p>
 <p>
     The Php::ByRef class has exactly the same signature as the Php::ByVal class,
@@ -276,4 +277,19 @@ swap($a, $b);
 swap(10,20);
 ?&gt;
 </code></pre>
+</p>
+<h2>Summary</h2>
+<p>
+    When you add your native functions to the extension object, you may supply
+    an optional third parameter with a list of Php::ByVal and Php::ByRef objects
+    that describe the names and types of the parameters that can be passed to
+    your function. Internally, the PHP engine runs a check right before every 
+    function call to verify that the passed in parameters are compatible with 
+    the parameter specification that you gave, and will trigger an error if they 
+    are not.
+</p>
+<p>
+    Specifying parameters is optional. If you choose to leave this specification
+    out it is up to you <i>inside</i> the function to check if there are enough
+    parameters, and if the types are correct.
 </p>
