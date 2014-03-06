@@ -37,21 +37,21 @@
 <p>
     Every single PHP module, every PHP extension, and every builtin PHP function
     is busy manipulating these zval structures. It is a big surprise that nobody
-    ever took the time to wrap such a zval into a simple C++ class that does all 
+    ever took the time to wrap such a zval in a simple C++ class that does all 
     this administration for you. C++ is such a nice language with constructors, 
     destructors, casting operators and operator overloading that can encapsulate all
     this complicated zval handling.
 </p>
 <p>
     And that is exactly what we did with PHP-CPP. We have introduced the Php::Value
-    object with a very simple interface, and that takes away all the problems of zval 
+    object with a very simple interface, that takes away all the problems of zval 
     handling. Internally, the Php::Value object is a wrapper around a zval variable, 
     but it completely hides the complexity of zval handling.
 </p>
 <p>
     So, everything that you always wanted to ask about the internals of PHP, but
     were afraid to ask: just forget about it. Sit back and relax, and take a look
-    how simple life is if you use PHP-CPP.
+    how simple life is with PHP-CPP.
 </p>
 <h2>Scalar variables</h2>
 <p>
@@ -143,11 +143,71 @@ Php::Value myFunction(const Php::Value &amp;value)
 </p>
 <h2>Arrays</h2>
 <p>
-    This section is not finished yet
+    PHP supports two array types: regular arrays (indexed by numbers) and
+    associative arrays (indexed by strings). The Php::Value object supports
+    arrays too. By using array access operators (square brackets) to assign
+    values to a Php::Value object, you automatically turn it into an array.
 </p>
+<p>
+<pre class="language-c++"><code>
+// create a regular array
+Php::Value array;
+array[0] = "apple";
+array[1] = "banana";
+array[2] = "tomato";
 
+// create an associative array
+Php::Value assoc;
+assoc["apple"] = "green";
+assoc["banana"] = "yellow";
+assoc["tomato"] = "green";
 
+// array values do not all have to be of the same type
+Php::Value assoc2;
+assoc2["x"] = "info@example.com";
+assoc2["y"] = nullptr;
+assoc2["z"] = 123;
 
+// nested arrays are possible too
+Php::Value assoc2;
+assoc2["x"] = "info@example.com";
+assoc2["y"] = nullptr;
+assoc2["z"][0] = "a";
+assoc2["z"][1] = "b";
+assoc2["z"][2] = "c";
+</code></pre>
+</p>
+<p>
+    Reading from arrays is just as simple. You can use the array access 
+    variables for this too.
+</p>
+<p>
+<pre class="language-c++"><code>
+Php::Value array;
+array["x"] = 10;
+array["y"] = 20;
+
+std::cout &lt;&lt; array["x"] &lt;&lt; std::endl;
+std::cout &lt;&lt; array["y"] &lt;&lt; std::endl;
+</code></pre>
+</p>
+<p>
+    There also is a special Php::Array class. This is an extended Php::Value
+    class that, when constructed, immediately starts as empty array (unlike
+    Php::Value objects that by default construct to NULL values).
+</p>
+<p>
+<pre class="language-c++"><code>
+// create empty array
+Php::Array array1;
+
+// Php::Value is the base class, so you can assign Php::Array objects
+Php::Value array2 = array1;
+
+// impossible, a Php::Array must always be an array
+array1 = 100;
+</code></pre>
+</p>
 <h2>Objects</h2>
 <p>
     This section is not finished yet
