@@ -1,5 +1,94 @@
 <h1>Classes and objects</h1>
 <p>
-    
+    Serious business now. C++ and PHP are both object oriented programming 
+    languages, in which you can create classes and objects, and the PHP-CPP library
+    gives you the tools to combine these two and make a native C++ class 
+    accessible from PHP.
+</p>
+<p>
+    Sadly (but also logically) not every thinkable C++ class can be directly 
+    exported to PHP. It takes a little more work (although not so much). For a
+    start, you must make sure that your class is derived from Php::Base, and 
+    secondly, when you add your class to the extension object, you must also  
+    specify all methods that you want to make accessible from PHP.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
 
+// actual class implementation
+class Counter : public Php::Base
+{
+private:
+    int _value = 0;
+
+public:
+    MyClass() {}
+    virtual ~MyClass() {}
+    
+    Php::Value increment() { return ++_value; }
+    Php::Value decrement() { return --_value; }
+    Php::Value value() const { return _value; }
+};
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class<Counter> counter("Counter");
+        counter.method("increment", &Counter::increment)
+        counter.method("decrement", &Counter::decrement)
+        counter.method("value", &Counter::value)
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The above example shows a very simple Counter class with three methods:
+    increment(), decrement() and value(). The two update methods return the value 
+    of the counter after the operation, the value() method returns the current value.
+</p>
+<p>
+    If you want to make a class method that is accessible from PHP, you must
+    ensure that is has one of the four supported signatures (which are the same
+    signatures that <a href="functions">exportable plain functions</a> should have):
+</p>
+<p>
+<pre class="language-c++"><code>
+void YourClass::example1();
+void YourClass::example2(Php::Parameters &amp;params);
+Php::Value YourClass::example3();
+Php::Value YourClass::example4(Php::Parameters &amp;params);
+</code></pre>
+</p>
+<p>
+    In the example we have used the third method form, a method that does
+    not take any parameters, and that returns a Php::Value object. The methods
+    work exactly the same as regular functions, with the difference that they
+    are methods so you have access to a this pointer that refers to the current
+    object.
+</p>
+<p>
+    To make the class accessible from PHP, you must add it to the extension
+    object. The Php::Class object can be be used for that. This is a templated
+    class. The template parameter should be your implementation class, so that
+    the Php::Class object internally knows which class to instantiate the moment
+    the "new" operator is used inside a PHP script.
+</p>
+<p>
+    The Php::Class constructor receives a string parameter, with the name of 
+    class in PHP. After you've created an instance of the Php::Class object,
+    you should specify all methods that you want to make accessible from PHP,
+    and finally, when all methods have been registered, you should add the 
+    class to your extension object so that it will be accessible from PHP.
+    Note that in our example we have used the C++11 std::move function, so
+    that the class object is actually <i>moved</i> into the extension object,
+    which is a more efficient operation than copying.
 </p>
