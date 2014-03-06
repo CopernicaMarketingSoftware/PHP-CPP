@@ -1,59 +1,24 @@
 <h1>How does PHP load its extensions?</h1>
 <p>
-    You probably already know that native PHP extensions are compiled into *.so 
+    You probably know that native PHP extensions are compiled into *.so 
     files on unix-like systems, and *.dll files in Windows environments, and that
     the global php.ini file holds a list of all extensions available on your system.
     This means that if you're building your own extension, you are also going to
     create such a *.so or *.dll file and you have to update the PHP 
     configuration file so that your own extension is loaded by PHP.
 </p>
-<h3>Where to find your PHP configuration files?</h3>
-<p>
-    If for one reason or another you can not find the PHP configuration file(s) 
-    on your system, you can run the following command from the command line:
-</p>
-<p>
-<pre>
-php --ini
-</pre>
-</p>
-<p>
-    This will output a list of all configuration files that are loaded by PHP.
-    Extensions are enabled by adding "extension=name.so" lines to the
-    configuration file - where 'name' should of course be replaced by the name of 
-    your extension. A default PHP installation already comes with many default 
-    extensions, so in the configuration file(s) on your system you will certainly 
-    find a number of these "extension=name.so" lines.
-</p>
-<p>
-    The extension lines either take an absolute path ("extension=/path/to/extension.so")
-    or a relative path ("extension=extension.so"). If you'd like to use relative
-    paths, you must make sure that you've copied your extension *.so file to the
-    default extension directory, so that PHP can find it. To find out this default
-    extension directory, use the following command line instruction:
-</p>
-<p>
-<pre>
-php -i|grep extension_dir
-</pre>
-</p>
-<p>
-    The extension dir often has the form /usr/lib/php5/20121212 - or a different
-    date string depending on the PHP version you use.
-</p>
-
 <h2>The get_module() startup function</h2>
 <p>
     Before we explain how you can create your own extension, we first explain
-    what PHP does to load an extension. When PHP starts, it loads the *.ini configuration 
-    file(s) that we just described and for each "extension=name.so" line in these
-    files, it opens the appropriate library, and calls the "get_module()"
-    function from it. Each extension library (your extension too) must therefore 
-    define and implement this "get_module()" C function. The function is called by 
-    PHP right after the library is loaded (and thus way before pageviews are handled), 
-    and it should return a memory address that points to a structure that holds information 
-    about all functions, classes, variables and constants that are made available 
-    by the extension. 
+    what PHP does to load an extension. When PHP starts, it loads the *.ini 
+    configuration file(s) from its configuration directory and for each 
+    "extension=name.so" line in these config files, it opens the appropriate 
+    library, and calls the "get_module()" function from it. Each extension library 
+    (your extension too) must therefore define and implement this "get_module()" 
+    function. The function is called by PHP right after the library is loaded 
+    (and thus way before pageviews are handled), and it should return a memory 
+    address that points to a structure that holds information about all functions, 
+    classes, variables and constants that are made available by the extension. 
 </p>
 <p>
     The structure that the get_module() returns is defined in the header files of 
@@ -104,7 +69,7 @@ extern "C" {
     you a simple to use API.
 </p>
 <p>
-    The next thing that you'll notice it that we placed the get_module() function
+    The next thing that you'll notice is that we placed the get_module() function
     inside an 'extern "C"' code block. As the name of the library already gives away, 
     PHP-CPP is a C++ library. However, PHP expects your library, and especially your 
     get_module() function, to be implemented in C and not in C++. That's why we've 
@@ -120,7 +85,7 @@ extern "C" {
 </p>
 <p>
     This, by the way, is also the only macro that PHP-CPP offers. PHP-CPP intends to 
-    be a very straightforward C++ library, without using magic or tricks from 
+    be a plain C++ library, without using magic or tricks from 
     pre-processors. What you see is what you get: If something looks like a 
     function, you can be sure that it actually IS a function, and when something 
     looks like a variable, you can be sure that it also IS a variable.
@@ -146,5 +111,5 @@ extern "C" {
 <p>
     Note that the example above does not yet export any native functions or 
     native classes to PHP - it only creates the extension. That is going to be 
-    the next step.
+    <a href="your-first-extension">the next step</a>.
 </p>

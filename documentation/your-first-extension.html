@@ -1,28 +1,16 @@
 <h1>Your first extension</h1>
 <p>
-    When you create your own PHP-CPP extensions, you also have to compile and
-    deploy them. A normal PHP script only has to be copied to a web server to be 
-    deployed, but it takes a little more effort to deploy an extension.
-</p>
-<p>
-    To help your users, customers, and/or operations department with deploying
-    your native extensions, you best create a Makefile with settings and 
-    instructions for the compiler. All that is then left for someone to do, 
-    is run "make" and "make install". 
-</p>
-<p>
-    But creating a Makefile is not the only thing that you have to do. You 
-    will also have to make changes to the system wide php.ini
-    file to actually enable the extension. The best way to do that is create
-    your own small yourextension.ini file, and copy that to the PHP config file
-    directory of your webserver.
+    When you create your own PHP-CPP extension, you also have to compile and
+    deploy it. A normal PHP script only has to be copied to a web server to be 
+    deployed, but it takes a little more effort to deploy an extension: you need
+    a Makefile, an extension specific php.ini file and of course the *.cpp files
+    in which you implement your extension.
 </p>
 <p>
     To help you out with these steps, we have created an almost empty extension with 
-    all the required utilities for starting up a new extension. It contains a 
-    sample Makefile, a sample configuration file, and a first main.cpp file
-    in which the get_module() call is already implemented. This gives you a
-    kickstart in developing an extension.
+    all these required files. It contains a sample Makefile, a sample configuration 
+    file, and a first main.cpp file in which the get_module() call is already 
+    implemented. This gives you a kickstart in developing an extension.
 </p>
 <p>
     <ul>
