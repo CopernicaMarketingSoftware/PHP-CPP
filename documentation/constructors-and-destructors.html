@@ -54,7 +54,7 @@ int main()
 </p>
 <p>
     The above program crashes (some compilers even refuse to compile this). 
-    Unlike similar code in PHP. In PHP however, when the __construct() method 
+    Unlike similar code in PHP. In PHP, when the __construct() method 
     gets called, the object is already fully initialized and it is perfectly 
     legal to make calls to abstract methods that are implemented in derived 
     classes, as you can see in the following example.
@@ -96,16 +96,16 @@ $d = new DERIVED();
     This PHP script correctly outputs 'doSomething()'. This happens because the 
     __construct() method in PHP is not a real constructor. It constructs nothing, it 
     has access to all members (that already are constructed), and (when available) 
-    also the base class and overridden methods. In fact, __construct() is a 
-    normal method that just happens to be the very first method that is called right 
-    after the object was constructed, and that is called automatically.
+    also the base class and overridden methods. In fact, __construct() is a very
+    normal method that just happens to be the first method that is called right 
+    after the object is constructed, and that is called automatically.
 </p>
 <p>
     This difference is important for you as a C++ programmer, because you should
-    never confuse your C++ constructor with the __construct() method. In the real
-    constructor, the C++ object is being constructed while the
-    PHP object does not yet exist. After the constructor is finished, the PHP
-    object is created, and the __construct() method gets called. It is therefore
+    never confuse your C++ constructor with the __construct() method. In the C++
+    constructor, the C++ object is being constructed and the
+    PHP object does not yet exist. After the constructor is finished, the PHP engine
+    will create the PHP object, and the __construct() method gets called. It is therefore
     valid to have both a C++ constructor and a __construct() method in your class.
 </p>
 <p>
@@ -169,7 +169,156 @@ extern "C" {
 &lt;?php
 $counter = new Counter(10);
 $counter-&gt;increment();
-echo($counter."\n");
+echo($counter->value()."\n");
 ?&gt;
 </code></pre>
+</p>
+<h2>Private constructors</h2>
+<p>
+    And just like any other functions, a __construct method can also be
+    marked as being private or protected. If you do this, you will make it
+    impossible to create instances of your class from the PHP code. But it is 
+    important to notice that the C++ constructor and C++ destructor still get 
+    called in such situations!
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        
+        // add a private __construct and __clone method to the class, so that
+        // objects can not be constructed or cloned from PHP scripts. Be aware
+        // that the C++ constructer does get called - it will be the call to 
+        // the first __construct() function that will fail!
+        counter.method("__construct", &Counter::__construct, Php::Private);
+        counter.method("__clone", &Counter::__construct, Php::Private);
+        
+        ...
+    }
+}
+</code></pre>
+</p>
+<p>
+    The same happens when you add a private __clone() method. It will then not
+    be possible to clone the object from PHP code, although your C++ class still 
+    needs a copy constructor, which is called when a "clone $object" instruction
+    is given in a PHP script.
+</p>
+<h2>Constructing objects</h2>
+<p>
+    The Php::Value class can be used as a regular PHP $variable, and you can therefore
+    also use it for storing object instances. But how do you create brand
+    new objects? For this we have the Php::Object class - which is simply an
+    overridden Php::Value class with an alternative constructors, and some additional 
+    checks to prevent that you will ever user a Php::Object class to store values
+    other than objects.
+</p>
+<p>
+<pre class="language-c++"><code>
+// new variable holding the string "Counter"
+Php::Value counter0("Counter");
+
+// new variable holding a newly created object of type "Counter"
+Php::Object counter1("Counter");
+
+// new variable holding a newly created object, and 
+// the __construct is being called with value 10
+Php::Object counter2("Counter", 10);
+
+// new builtin DateTime object, constructed with "now"
+Php::Object time("DateTime", "now");
+
+// valid, a Php::Object is an extended Php::Value, and 
+// can thus be assigned to a value
+Php::Value copy1 = counter1;
+
+// invalid statement, a Php::Object can only be used for storing objects
+Php::Object copy2 = counter0;
+</code></pre>
+</p>
+<p>
+    The constructor of a Php::Object takes the name of a class, and an optional
+    list of parameters that will be passed to the __construct() function. You 
+    can use names from builtin PHP classes (like DateTime), classes from your
+    extension (like Counter), and even classes from PHP user space.
+</p>
+<p>
+    The Php::Object class can also be used if you want to construct an instance
+    of your own C++ class without calling the __construct() function. This can 
+    for example be useful when the __construct() method is private, or when you
+    want to bypass a call to your own __construct() method.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+// actual class implementation
+class Counter : public Php::Base
+{
+private:
+    int _value = 0;
+
+public:
+    // c++ constructor
+    Counter(int value) : _value(value) {}
+    
+    // c++ destructor
+    virtual ~Counter() {}
+    
+    // php "constructor"
+    void __construct() {}
+
+    // functions to increment and decrement
+    Php::Value value() const { return _value; }
+};
+
+// function to create a new timer
+Php::Value createTimer()
+{
+    return Php::Object("Counter", new Counter(100));
+}
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible,
+        // the __construct method is private because PHP scripts are not allowed
+        // to create Counter instances
+        Php::Class&lt;Counter&gt; counter("Counter");
+        counter.method("__construct", &Counter::__construct, Php::Private);
+        counter.method("value", &Counter::value);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // add the factory function to create a timer to the extension
+        myExtension.add("createTimer", createTimer);
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    In the code above we made the __construct() function of the Counter class
+    private. This makes it impossible to create instances of this class - both
+    from PHP user scripts, and via calls to Php::Object("Counter") - because
+    constructing objects in this way will eventually also result in a __construct 
+    call.
+</p>
+<p>
+    The Php::Object does have an alternative syntax that takes a pointer 
+    to a C++ class, and that turn this into a PHP variable without calling the 
+    __construct() method. Notice that you must also specify the classname, 
+    because C++ classes do not have any information about themselves (like their 
+    name), while in a PHP such information is required to handle reflection and 
+    functions like get_class().
 </p>

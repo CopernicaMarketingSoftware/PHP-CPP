@@ -76,6 +76,12 @@ public:
     Object(const char *name, Base *base);
 
     /**
+     *  Wrap around an object implemented by us
+     *  @param  object      Object to be wrapped
+     */
+    Object(Base *base) : Value(base) {}
+
+    /**
      *  Constructor to create a new instance
      * 
      *  This constructor comes in many different forms, to support all possible
