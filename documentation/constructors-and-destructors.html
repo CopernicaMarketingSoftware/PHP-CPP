@@ -1,1 +1,98 @@
 <h1>Constructors and destructors</h1>
+<p>
+    There is a small but important difference between constructor and destructors 
+    in C++, and the __construct() and __destruct() methods in PHP.
+</p>
+<p>
+    A C++ constructor is called on an object that is <i>being</i> initialized,
+    but that is not in an initialized state yet. You can experience this by
+    calling a pure virtual method from a constructor. This will make your 
+    program crash, even when the pure virtual method was implemented in the
+    derived class. The reason for this is that inside the C++ constructor the 
+    object is not yet fully initialized, and the object is not yet aware of 
+    it's position in the class hierarchy. The call to the pure virtual method 
+    can thus not be passed on to the derived object.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;iostream&gt;
+
+// define a base class with a pure virtual method that is called from the
+// constructor
+class BASE 
+{
+public:
+    // constructor
+    BASE() 
+    {
+        // call the pure virtual method
+        doSomething();
+    }
+    
+    // define method that should be implemented by derived classes
+    virtual void doSomething() = 0;
+};
+
+// define a derived class
+class DERIVED : public BASE 
+{
+    // implementation of the virtual function
+    virtual void doSomething() override 
+    {
+        std::cout &lt;&lt; "doSomething()" &lt;&lt; std::endl;
+    }
+}
+
+// main procedure
+int main()
+{
+    DERIVED d;
+    return 0;
+}
+</code></pre>
+</p>
+<p>
+    The above program crashes. Unlike similar code in PHP. In PHP, when the 
+    __construct() method gets called, the object is already fully initialized 
+    and it is perfectly legal to make calls to abstract methods that are 
+    implemented in derived classes. 
+</p>
+<p>
+<pre class="language-php"><code>
+&lt?php
+
+// base class in PHP, we call an abstract method from the constructor
+class BASE 
+{
+    // constructor
+    public function __construct() 
+    {
+        // call abstract method
+        $this->doSomething();
+    }
+    
+    // abstract method to be implemented by derived classes
+    public abstract function doSomething();
+}
+
+// the derived class
+class DERIVED extends BASE 
+{
+    // implement the abstract method
+    public function doSomething() 
+    {
+        echo("doSomething()\n");
+    }
+}
+
+// create an instance of the derived class
+$d = new DERIVED();
+?&gt;    
+</code></pre>
+</p>
+<p>    
+    
+    The __construct() method is thus not part of
+    the object construction process (like the C++ constructor is), but simply is 
+    the first method to be called <i>after</i> the object was fully initialized.
+</p>

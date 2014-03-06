@@ -255,7 +255,7 @@ extern "C" {
 <h2>Abstract and final</h2>
 <p>
     In the previous section we showed how to use the Php::Final and Php::Abstract
-    modifiers to create a final or abstract method. If you want to make your entire
+    flags to create a final or abstract method. If you want to make your entire
     class abstract or final, you can do so by using Php::FinalClass or 
     Php::AbstractClass instead of Php::Class.
 </p>
@@ -281,7 +281,7 @@ extern "C" {
     It may seem strange that you have to pass in the address of a real C++ method
     when you mark a method as being abstract. Abstract methods do normally not 
     have an implementation, so what do you need this C++ implementation for?
-    Luckily, we also have a different way for registering abstract methods.
+    Luckily, there also is a different way for registering abstract methods.
 </p>
 <p>
 <pre class="language-c++"><code>
