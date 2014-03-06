@@ -53,8 +53,8 @@ extern "C" {
 <p>
     Let's talk about programming conventions first - I always use capitals for 
     the first letter of a classname, and my member variables always start with
-    an underscore. Every class always has a destructor, and it is always virtual.
-    That's just a convention - my convention - and you of course do not 
+    an underscore. Every class always has a destructor, and it always is virtual.
+    That's just a convention - my convention - and you do not 
     have to follow that.
 </p>
 <p>
@@ -91,11 +91,11 @@ Php::Value YourClass::example4(Php::Parameters &amp;params);
 </p>
 <p>
     The Php::Class constructor receives a string parameter, with the name of 
-    class in PHP. After you've created an instance of the Php::Class object,
+    the class in PHP. After you've created an instance of the Php::Class object,
     you should specify all methods that you want to make accessible from PHP,
     and finally, when all methods have been registered, you should add the 
     class to your extension object so that it will be accessible from PHP.
-    Note that in our example we have used the C++11 std::move function for this, so
+    Note that in our example we have used the C++11 std::move() function for this, so
     that the class object is actually <i>moved</i> into the extension object,
     which is a more efficient operation than copying.
 </p>
@@ -168,7 +168,7 @@ extern "C" {
     In the code above we have modified our first example. The increment and
     decrement method now get an optional 'change' parameter, which is a numeric
     value that holds the change that should be applied to the counter. Note that
-    this parameter is optional - so inside our method implementation we have to
+    this parameter is optional - so inside the method implementation we 
     check if the number of parameters is bigger than zero to prevent nasty 
     segmentation faults.
 </p>
@@ -184,5 +184,6 @@ echo($counter->value()."\n");
 </code></pre>
 </p>
 <p>
-    Output of above script is (of course) 3.
+    The code above shows a PHP script that uses the native Counter class.
+    The output of above script is (of course) 3.
 </p>
