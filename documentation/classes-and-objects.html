@@ -1,12 +1,12 @@
 <h1>Classes and objects</h1>
 <p>
     Serious business now. C++ and PHP are both object oriented programming 
-    languages, in which you can create classes and objects, and the PHP-CPP library
+    languages, in which you can create classes and objects. The PHP-CPP library
     gives you the tools to combine these two and make a native C++ class 
     accessible from PHP.
 </p>
 <p>
-    Sadly (but also logically) not every thinkable C++ class can be directly 
+    Sadly (but also logically if you think about it) not every thinkable C++ class can be directly 
     exported to PHP. It takes a little more work (although not so much). For a
     start, you must make sure that your class is derived from Php::Base, and 
     secondly, when you add your class to the extension object, you must also  
@@ -51,14 +51,21 @@ extern "C" {
 </code></pre>
 </p>
 <p>
-    The above example shows a very simple Counter class with three methods:
+    Let's talk about programming conventions first - I always use capitals for 
+    the first letter of a classname, and my member variables always start with
+    an underscore. Every class always has a destructor, and it is always virtual.
+    That's just a convention - <i>my</i> convention - and you of course do not 
+    have to follow that in your code.
+</p>
+<p>
+    On topic. The example shows a very simple Counter class with three methods:
     increment(), decrement() and value(). The two update methods return the value 
     of the counter after the operation, the value() method returns the current value.
 </p>
 <p>
     If you want to make a class method that is accessible from PHP, you must
     ensure that is has one of the four supported signatures (which are the same
-    signatures that <a href="functions">exportable plain functions</a> should have):
+    signatures that <a href="functions">exportable plain functions</a> can have):
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -71,16 +78,16 @@ Php::Value YourClass::example4(Php::Parameters &amp;params);
 <p>
     In the example we have used the third method form, a method that does
     not take any parameters, and that returns a Php::Value object. The methods
-    work exactly the same as regular functions, with the difference that they
-    are methods so you have access to a this pointer that refers to the current
-    object.
+    work exactly the same as regular functions, with the difference that in
+    the methods you have (of course) access to the this pointer that refers to 
+    the current object.
 </p>
 <p>
     To make the class accessible from PHP, you must add it to the extension
-    object. The Php::Class object can be be used for that. This is a templated
-    class. The template parameter should be your implementation class, so that
-    the Php::Class object internally knows which class to instantiate the moment
-    the "new" operator is used inside a PHP script.
+    object inside the get_module() function. The Php::Class object can be be used 
+    for that. This is a templated class. The template parameter should be your 
+    implementation class, so that the Php::Class object internally knows which 
+    class to instantiate the moment the "new" operator is used inside a PHP script.
 </p>
 <p>
     The Php::Class constructor receives a string parameter, with the name of 
