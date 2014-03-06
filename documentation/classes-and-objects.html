@@ -64,8 +64,9 @@ extern "C" {
 </p>
 <p>
     If you want to make a class method that is accessible from PHP, you must
-    ensure that is has one of the four supported signatures (which are the same
-    signatures that <a href="functions">exportable plain functions</a> can have):
+    ensure that is has one of the eight supported signatures (which are the same
+    signatures that <a href="functions">exportable plain functions</a> can have),
+    plus their const variant.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -73,14 +74,19 @@ void YourClass::example1();
 void YourClass::example2(Php::Parameters &amp;params);
 Php::Value YourClass::example3();
 Php::Value YourClass::example4(Php::Parameters &amp;params);
+void YourClass::example5() const;
+void YourClass::example6(Php::Parameters &amp;params) const;
+Php::Value YourClass::example7() const;
+Php::Value YourClass::example8(Php::Parameters &amp;params) const;
 </code></pre>
 </p>
 <p>
-    In the example we have used the third method form, a method that does
-    not take any parameters, and that returns a Php::Value object. Methods
+    In the example we have used the third and seventh method forms, methods that do
+    not accept any parameters, and that returns a Php::Value object. Methods
     work exactly the same as <a href="functions">regular functions</a>, with the 
     difference that in the methods you have (of course) access to the member
-    variables of the object.
+    variables of the object (and in C++ you get this for free, without
+    explicitly using "this->").
 </p>
 <p>
     To make the class accessible from PHP, you must add it to the extension
@@ -185,5 +191,60 @@ echo($counter->value()."\n");
 </p>
 <p>
     The code above shows a PHP script that uses the native Counter class.
-    The output of above script is (of course) 3.
+    The output of above script is (as you had of course expected) 3. The 
+    Php::ByRef class can be used too to specify parameters by reference.
+</p>
+<h2>Access modifiers</h2>
+<p>
+    In PHP (and in C++ too) you can mark methods as public, private or protected.
+    To achieve this for your native class too, you should pass in an additional 
+    flags parameter when you add the method to the Php::Class object. Image that
+    you want to make the increment and decrement methods in our previous example
+    protected, then you can simply add a flag:
+</p>
+<p>
+<pre class="language-c++"><code>
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        
+        // register the increment method, and specify its parameters
+        counter.method("increment", &Counter::increment, Php::Protected, { 
+            Php::ByVal("change", Php::Type::Numeric, false) 
+        });
+        
+        // register the decrement, and specify its parameters
+        counter.method("decrement", &Counter::decrement, Php::Protected, { 
+            Php::ByVal("change", Php::Type::Numeric, false) 
+        });
+        
+        // register the value method
+        counter.method("value", &Counter::value, Php::Public | Php::Final);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    By default, every method (and every property too, but we deal with that later) 
+    is public. You can pass in an additional Php::Protected or Php::Private flag
+    if you want to mark a method as being either protected or private. The flag
+    parameter can be bitwise-or'ed with Php::Abstract or Php::Final if you also 
+    want to mark your method as being either abstract or final. We did this with
+    the value() method, so that it becomes impossible to override this method in a
+    derived class.
+</p>
+<p>
+    Remember that the exported methods in your C++ class must always be public - even
+    when you've marked them as being private or protected in PHP. This makes sense,
+    because after all, your methods are called by the PHP-CPP library, and if you make
+    them private, the becomes invisible for the library.
 </p>
