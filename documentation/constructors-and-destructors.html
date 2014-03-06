@@ -106,7 +106,8 @@ $d = new DERIVED();
     never confuse your C++ constructor with the __construct() method. In the C++
     constructor, the C++ object is being constructed and the
     PHP object does not yet exist. After the constructor is finished, the PHP engine
-    will create the PHP object, and the __construct() method gets called. It is therefore
+    will create the PHP object, and the PHP-CPP library will link that PHP object
+    to your C++ class. And only then the __construct() method gets called. It is therefore
     valid to have both a C++ constructor and a __construct() method in your class.
 </p>
 <p>

@@ -52,7 +52,7 @@ extern "C" {
 </p>
 <p>
     Let's talk about programming conventions first - we always use capitals for 
-    the first letter of a classname, and our member variables always start with
+    the first letter of a classname, and member variables always start with
     an underscore. Every class always has a destructor, and it always is virtual.
     That's just a convention - our convention - and you do not 
     have to follow that.
@@ -64,7 +64,7 @@ extern "C" {
 </p>
 <p>
     If you want to make a class method that is accessible from PHP, you must
-    ensure that is has one of the eight supported signatures (which are the same
+    ensure that it has one of the eight supported signatures (which are the same
     signatures that <a href="functions">exportable plain functions</a> can have),
     plus their const variant.
 </p>
@@ -88,7 +88,7 @@ Php::Value YourClass::example8(Php::Parameters &amp;params) const;
 </p>
 <p>
     To make the class accessible from PHP, you must add it to the extension
-    object inside the get_module() function. The Php::Class template class can be 
+    object inside the get_module() function. The Php::Class template class should be 
     be used for that. The template parameter should be your 
     implementation class, so that the Php::Class object internally knows which 
     class to instantiate the moment the "new" operator is used inside a PHP script.
@@ -199,7 +199,7 @@ echo($counter->value()."\n");
 <p>
     In PHP (and in C++ too) you can mark methods as public, private or protected.
     To achieve this for your native class too, you should pass in an additional 
-    flags parameter when you add the method to the Php::Class object. Image that
+    flags parameter when you add the method to the Php::Class object. Imagine that
     you want to make the increment and decrement methods in the previous example
     protected, then you can simply add a flag:
 </p>
