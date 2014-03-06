@@ -175,11 +175,12 @@ echo($counter->value()."\n");
 </p>
 <h2>Private constructors</h2>
 <p>
-    And just like any other functions, a __construct method can also be
+    Just like any other method, the __construct() method can also be
     marked as being private or protected. If you do this, you will make it
-    impossible to create instances of your class from the PHP code. But it is 
-    important to notice that the C++ constructor and C++ destructor still get 
-    called in such situations!
+    impossible to create instances of your class from PHP scripts. It is 
+    important to realize that the C++ constructor and C++ destructor still get 
+    called in such situations, because it is the __construct() call that is 
+    going to fail - and not the actual object construction.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -224,18 +225,19 @@ extern "C" {
 // new variable holding the string "Counter"
 Php::Value counter0("Counter");
 
-// new variable holding a newly created object of type "Counter"
+// new variable holding a newly created object of type "Counter",
+// the __construct() gets called without parameters
 Php::Object counter1("Counter");
 
 // new variable holding a newly created object, and 
-// the __construct is being called with value 10
+// the __construct() is being called with value 10
 Php::Object counter2("Counter", 10);
 
 // new builtin DateTime object, constructed with "now"
 Php::Object time("DateTime", "now");
 
 // valid, a Php::Object is an extended Php::Value, and 
-// can thus be assigned to a value
+// can thus be assigned to a base Php::Value object
 Php::Value copy1 = counter1;
 
 // invalid statement, a Php::Object can only be used for storing objects
@@ -245,8 +247,9 @@ Php::Object copy2 = counter0;
 <p>
     The constructor of a Php::Object takes the name of a class, and an optional
     list of parameters that will be passed to the __construct() function. You 
-    can use names from builtin PHP classes (like DateTime), classes from your
-    extension (like Counter), and even classes from PHP user space.
+    can use names from builtin PHP classes and other extensions (like DateTime), 
+    classes from your extension (like Counter), and even classes from PHP user 
+    space.
 </p>
 <p>
     The Php::Object class can also be used if you want to construct an instance
@@ -311,14 +314,21 @@ extern "C" {
     In the code above we made the __construct() function of the Counter class
     private. This makes it impossible to create instances of this class - both
     from PHP user scripts, and via calls to Php::Object("Counter") - because
-    constructing objects in this way will eventually also result in a __construct 
+    constructing objects in this way will eventually also result in a __construct()
     call.
 </p>
 <p>
     The Php::Object does have an alternative syntax that takes a pointer 
-    to a C++ class, and that turn this into a PHP variable without calling the 
+    to a C++ class, and that turns this pointer into a PHP variable without calling the 
     __construct() method. Notice that you must also specify the classname, 
     because C++ classes do not have any information about themselves (like their 
     name), while in a PHP such information is required to handle reflection and 
     functions like get_class().
+</p>
+<h2>Other magic methods</h2>
+<p>
+    The __construct() and __destruct() methods are essentially regular methods
+    that get automatically called by PHP in certain situations. The same is true
+    for other magic methods like __toString(), __get(), __set(), et cetera. You
+    can implement these methods in the same was as you would do for other methods.
 </p>
