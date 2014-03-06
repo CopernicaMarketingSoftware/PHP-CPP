@@ -113,11 +113,11 @@ string
 </p>
 <p>
     We've mentioned that there are four types of native functions that can be
-    added to the extension object. We've showed you two examples of function
-    that both did not accept any parameters. Let's round up with the most 
+    added to the extension object. We've showed you two example functions
+    that did not accept any parameters. Let's round up with the most 
     complicated function: one that accepts parameters and also returns a result. 
-    The following example function that takes a variable number of parameters, 
-    and sums up the integer value of each of the parameters:
+    The following example function takes a variable number of parameters, 
+    and returns the sum of all its parameters:
 </p>
 <pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 
@@ -143,8 +143,8 @@ extern "C" {
     stored in the parameters vector (it are Php::Value objects, of course).
 </p>
 <p>
-    And in this example you can again see how powerful the Php::Value class is. It can 
-    for example be used on the right hand side of a += operator to be added to 
+    And in this example you can again see how powerful the Php::Value class is. 
+    It can be used on the right hand side of a += operator to be added to 
     an integer value, and the final integer result variable is automatically 
     converted back into a Php::Value object when the function returns - just as if 
     you are working with regular PHP $variables. But remember, this is C++ code and 
