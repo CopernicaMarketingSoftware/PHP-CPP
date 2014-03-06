@@ -5,7 +5,7 @@
     like '__NAMESPACE__', they are internally very simple.
 </p>
 <p>
-    A namespace is nothing else than a class prefix. If you want your classes
+    A namespace is nothing else than a class or function prefix. If you want your classes
     or functions to appear in a specific namespace, you simply have to add 
     a prefix to the class or function name. The following code creates a
     function "myFunction" in the "myNamespace" namespace.
@@ -24,7 +24,8 @@ extern "C" {
         // create extension object
         static Php::Extension extension("my_extension", "1.0");
         
-        // add the myFunction function to the extension, and put it in namespace "myNamespace"
+        // add the myFunction function to the extension, 
+        // and put it in namespace "myNamespace"
         extension.add("myNamespace\\myFunction", myFunction);
         
         // return the extension
@@ -33,9 +34,9 @@ extern "C" {
 }</code></pre>
 </p>
 <p>
-    If you like, you can use the Php::Namespace utility class for this. This is an
-    object with exactly the same signature as the Php::Extension object, and
-    that you can use to register your functions.
+    If you like, you can use the Php::Namespace utility class for this. This is a
+    class with exactly the same signature as the Php::Extension class, and
+    that you can use to register classes and functions too.
 </p>
 <p>
 <pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
@@ -82,7 +83,7 @@ extern "C" {
 </p>
 <p>
     In the example we used the std::move() function to move the nested namespace
-    the parent namespace, and to move the first namespace into the extension.
+    into the parent namespace, and to move the first namespace into the extension.
     Moving is more efficient that adding, although a regular extension.add(myNamespace) 
     would have been valid too.
 </p>

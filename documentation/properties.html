@@ -1,1 +1,23 @@
 <h1>Class properties</h1>
+<p>
+    When you define a class completely in PHP, you can add properties (member 
+    variables) to it. When you add member variables to a native C++ class however, 
+    you better use regular C++ member variables for that, instead of PHP variables.
+    Native variables have an immensely better performance than PHP variables,
+    and it would be insane to store integers or strings in Php::Value objects
+    if you can store them in int's and std::string objects as well.
+</p>
+<p>
+    To access these member variables you could create getX() and setX()
+    methods, or alternatively implement __get() and __set() methods if you 
+    want to make your native member variables look like public or protected 
+    properties.
+</p>
+<p>
+    I can not imagine that there is anyone in the world who would like to create
+    a native class, with regular public PHP properties on it. But still, in this 
+    article we explain how you can do that.
+</p>
+<p>
+    ... this article is not finished yet
+</p>
