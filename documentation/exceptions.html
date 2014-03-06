@@ -117,9 +117,8 @@ extern "C" {
     The callMe() function from this example extension receives one single
     parameter: a callback function that it will immediately call, and from which
     the return value is also returned by the callMe() function. If this callback 
-    that is passed to the callMe() somehow throws an exception, it will be caught 
-    by the callMe() function, and the callMe() function will return an alternative 
-    string instead ("Exception caught!").
+    somehow throws an exception, it will be caught by the callMe() function, and 
+    an alternative string will be returned instead ("Exception caught!").
 </p>
 <p>
 <pre class="language-php"><code>
@@ -149,4 +148,11 @@ echo("$output\n");
     This PHP script uses our extension and calls the callMe() function two times
     in a row. First with a normal function that returns a string, but then with
     a function that throws an exception - which will be caught by the extension.
+    The output is as you would expect.
+</p>
+<p>
+<pre>
+First call
+Exception caught!
+</pre>
 </p>
