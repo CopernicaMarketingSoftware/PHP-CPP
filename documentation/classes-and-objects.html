@@ -2,7 +2,7 @@
 <p>
     Serious business now. C++ and PHP are both object oriented programming 
     languages, in which you can create classes and objects. The PHP-CPP library
-    gives you the tools to combine these two and make a native C++ class 
+    gives you the tools to combine these two and make a native C++ classes 
     accessible from PHP.
 </p>
 <p>
@@ -96,14 +96,12 @@ Php::Value YourClass::example8(Php::Parameters &amp;params) const;
     class to instantiate the moment the "new" operator is used inside a PHP script.
 </p>
 <p>
-    The Php::Class constructor receives a string parameter, with the name of 
-    the class in PHP. After you've created an instance of the Php::Class object,
-    you should specify all methods that you want to make accessible from PHP,
-    and finally, when all methods have been registered, you should add the 
-    class to your extension object so that it will be accessible from PHP.
-    Notice that in our example we have used the C++11 std::move() function for this, so
-    that the class object is actually <i>moved</i> into the extension object,
-    which is a more efficient operation than copying.
+    The Php::Class constructor needs a string parameter, with the name of 
+    the class in PHP. The method Php::Class::method() can be used to register
+    the methods that you want to make accessible from PHP. Notice that in our 
+    example we have used the C++11 std::move() function to add the class to the
+    extension, so that the class object is actually <i>moved</i> into the extension 
+    object, which is a more efficient operation than copying.
 </p>
 <h2>Method parameters</h2>
 <p>
@@ -195,7 +193,7 @@ echo($counter->value()."\n");
 </p>
 <p>
     In the example code we have not shown how to use the Php::ByRef class, but
-    that works exaclty the same as in methods, so we thought that an example 
+    that works exaclty the same as in function, so we thought that an example 
     was not really necessary.
 </p>
 <h2>Access modifiers</h2>
