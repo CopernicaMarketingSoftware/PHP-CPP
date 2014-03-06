@@ -67,14 +67,16 @@ exception caught
 </p>
 <p>
     The example shows how amazingly simple it is to throw exceptions from your
-    C++ code, and catch them in your PHP script. Just as if you're not even
-    working in two different languages at the same time, you can simply throw
-    a Php::Exception object, and catch it in the PHP script.
+    C++ code, and to catch them in your PHP script. The PHP-CPP library will 
+    internally catch your C++ exception and convert it into a PHP exception,
+    but this all happens under the hood. For you, the extension programmer, it
+    is as if you're not even working in two different languages, and you can 
+    simply throw a Php::Exception object as if it was a regular PHP exception.
 </p>
 <h2>Catching exceptions in C++</h2>
 <p>
     But it works the other way around too. If your extensions calls a PHP 
-    function, and the function happens to throw an exception, you can catch it
+    function, and that PHP function happens to throw an exception, you can catch it
     just as if it was a normal C++ exception. 
 </p>
 <p>
@@ -90,7 +92,7 @@ Php::Value callMe(Php::Parameters &params)
     }
     catch (Php::Exception &exception)
     {
-        return "Exception caught!";
+        return "Exception caught!\n";
     }
 }
 
@@ -113,10 +115,11 @@ extern "C" {
 </p>
 <p>
     The callMe() function from this example extension receives one single
-    parameter: a callback function that it will immediately call, and whose
-    return value is returned. If this callback function (which was supplied by
-    the user) throws an exception, it is detected by the callMe() function, and
-    it will return an alternative string ("Exception caught!") in stead.
+    parameter: a callback function that it will immediately call, and from which
+    the return value is also returned by the callMe() function. If this callback 
+    that is passed to the callMe() somehow throws an exception, it will be caught 
+    by the callMe() function, and the callMe() function will return an alternative 
+    string instead ("Exception caught!").
 </p>
 <p>
 <pre class="language-php"><code>
@@ -124,14 +127,15 @@ extern "C" {
 
 // call "callMe" for the first time, and supply a function that returns "first call"
 echo(callMe(function() {
-    return "first call";
+    return "first call\n";
 }));
 
 // call "callMe" for the second time, but throw an exception this time
 echo(callMe(function() {
-    throw new Exception("Sorry...");
-    return "second call";
+    throw new Exception("Sorry...\n");
+    return "second call\n";
 }));
+?&gt;
 </code></pre>
 </p>
 <p>
