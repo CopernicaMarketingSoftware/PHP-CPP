@@ -13,6 +13,7 @@
 </p>
 <h2>Zval's</h2>
 <p>
+    But we start with sharing one of our frustrations. 
     If you have ever spent time on writing PHP extensions in plain C, or if you've
     ever read something about the internals of PHP, you must have heard about zval's.
     A zval is a C structure in which PHP variables are stored. Internally, this zval
@@ -28,7 +29,7 @@
 </p>
 <p>
     And to make things even worse, there are literally hundreds of different 
-    undocumented macro's and functions in the Zend engine that can manipulate these 
+    undocumented (!) macro's and functions in the Zend engine that can manipulate these 
     zval variables. There are special macro's that work on zval's, macro's for 
     pointers-to-zval's, macro's for pointer-to-pointer-to-zval's and even macro's 
     that deal with pointer-to-pointer-to-pointer-to-zval's.
@@ -43,9 +44,9 @@
 </p>
 <p>
     And that is exactly what we did with PHP-CPP. We have introduced the Php::Value
-    object with a very simple interface, and the takes away all the problems of zval 
+    object with a very simple interface, and that takes away all the problems of zval 
     handling. Internally, the Php::Value object is a wrapper around a zval variable, 
-    and the completely hides the complexity of zval handling.
+    but it completely hides the complexity of zval handling.
 </p>
 <p>
     So, everything that you always wanted to ask about the internals of PHP, but
@@ -54,13 +55,92 @@
 </p>
 <h2>Scalar variables</h2>
 <p>
-    The Php::Value object can be used to store scalar variables. Integers
-    
-    
+    The Php::Value object can be used to store scalar variables. Scalar variables
+    are variables like integers, doubles, strings, booleans and null values.
+    To create such a scalar variable, just assign it to a Php::Value object.
 </p>
-
-
-
+<p>
+<pre class="language-c++"><code>
+Php::Value value1 = 1234;
+Php::Value value2 = "this is a string";
+Php::Value value3 = std::string("another string");
+Php::Value value4 = nullptr;
+Php::Value value5 = 123.45;
+Php::Value value6 = true;
+</code></pre>
+</p>
+<p>
+    The Php::Value class has casting operators to cast the object to almost
+    every thinkable native type. When you have access to a Php::Value object,
+    but want to store it in a (much faster) native variable, you can simply
+    assign it.
+</p>
+<p>
+<pre class="language-c++"><code>
+void myFunction(const Php::Value &amp;value)
+{
+    int value1 = value;
+    std::string value2 = value;
+    double value3 = value;
+    bool value4 = value;
+}
+</code></pre>
+</p>
+<p>
+    If the Php::Value object holds an object, and you cast it to a string, the
+    __toString() method of the object gets called, exactly what would happen
+    if you had casted the variable to a string in a PHP script.
+</p>
+<p>
+    Many different operators are overloaded too so that you can use a Php::Value
+    object directly in arithmetric operations, compare it with other variables,
+    or send it to an output stream.
+</p>
+<p>
+<pre class="language-c++"><code>
+void myFunction(Php::Value &amp;value)
+{
+    value += 10;
+    std::cout &lt;&lt; value &lt;&lt; std::endl;
+    if (value == "some string")
+    {
+        
+    }
+    
+    int result = value - 8;
+}
+</code></pre>
+</p>
+<p>
+    The Php::Value object has implicit constructors for most types. This means
+    that every function that accepts a Php::Value as parameter can also be
+    called with a native type, and in functions that should return a Php::Value
+    you can simply specify a scalar return value - which will automatically be
+    converted into a Php::Value object by the compiler.
+</p>
+<p>
+<pre class="language-c++"><code>
+Php::Value myFunction(const Php::Value &amp;value)
+{
+    if (value == 12)
+    {
+        return "abc";
+    }
+    else if (value > 100)
+    {
+        return myFunction(12);
+    }
+    
+    return nullptr;
+}
+</code></pre>
+</p>
+<p>
+    As you can see in the examples, you can do almost anything with Php::Value
+    objects. Internally it does all the zval manipulation, and sometimes that
+    can become complicated, but for you, the extension programmer, there is
+    nothing to worry about.
+</p>
 <h2>Arrays</h2>
 <p>
     This section is not finished yet
