@@ -179,7 +179,7 @@ assoc2["z"][2] = "c";
 </p>
 <p>
     Reading from arrays is just as simple. You can use the array access 
-    variables for this too.
+    operators (square brackets) for this too.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -208,17 +208,67 @@ Php::Value array2 = array1;
 array1 = 100;
 </code></pre>
 </p>
+<p>
+    @todo explain how to iterate over arrays
+</p>
 <h2>Objects</h2>
 <p>
-    This section is not finished yet
+    Just like the Php::Array class that is an extended Php::Value that initializes
+    to an empty array, there also is a Php::Object class that becomes an
+    object when constructed. By default this is an instance of stdClass - PHP's
+    most simple class.
 </p>
+<p>
+<pre class="language-c++"><code>
+// create empty object of type stdClass
+Php::Object object;
 
+// Php::Value is the base class, so you can assign Php::Object objects
+Php::Value value = object;
 
+// impossible, a Php::Object must always be an object
+object = "test";
 
+// object properties can be accessed with square brackets
+object["property1"] = "value1";
+object["property2"] = "value2";
+
+// to create an object of a different type, pass in the class name 
+// to the constructor with optional constructor parameters
+object = Php::Object("DateTime", "now");
+
+// methods can be called with the call() method
+std::cout &lt;&lt; object.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
+
+// all these methods can be called on a Php::Value object too
+Php::Value value = Php::Object("DateTime", "now");
+std::cout &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
+</code></pre>
 <h2>Functions</h2>
 <p>
-    This section is not finished yet
+    When a Php::Value holds a <i>callable</i>, you can use the () operator
+    to call this function or method.
 </p>
+<p>
+<pre class="language-c++"><code>
+// create a string with a function name
+Php::Value date = "date";
 
+// "date" is a builtin PHP function and thus can it be called
+std::cout &lt;&lt; date("Y-m-d H:i:s") &lt;&lt; std::endl;
 
+// create a date-time object
+Php::Object now = Php::Object("DateTime","now");
 
+// create an array with two members, the datetime object
+// and the name of a method
+Php::Array array();
+array[0] = now;
+array[1] = "format";
+
+// an array with two members can be called too, the first
+// member is seen as the object, and the second as the
+// name of the method
+std::cout &lt;&lt; array("Y-m-d H:i:s") &lt;&lt; std::endl;
+</code></pre>
+</p>
