@@ -1,11 +1,11 @@
 <h1>Constructors and destructors</h1>
 <p>
-    There is a small but important difference between constructor and destructors 
-    in C++, and the __construct() and __destruct() methods in PHP.
+    There is a small but very important difference between constructor and 
+    destructors in C++, and the __construct() and __destruct() methods in PHP.
 </p>
 <p>
     A C++ constructor is called on an object that is <i>being</i> initialized,
-    but that is not in an initialized state yet. You can experience this by
+    but that is <i>not</i> in an initialized state <i>yet</i>. You can experience this by
     calling a pure virtual method from a constructor. This will make your 
     program crash, even when the pure virtual method was implemented in the
     derived class. The reason for this is that inside the C++ constructor the 
@@ -36,12 +36,13 @@ public:
 // define a derived class
 class DERIVED : public BASE 
 {
+public:
     // implementation of the virtual function
     virtual void doSomething() override 
     {
         std::cout &lt;&lt; "doSomething()" &lt;&lt; std::endl;
     }
-}
+};
 
 // main procedure
 int main()
@@ -52,17 +53,18 @@ int main()
 </code></pre>
 </p>
 <p>
-    The above program crashes. Unlike similar code in PHP. In PHP, when the 
-    __construct() method gets called, the object is already fully initialized 
-    and it is perfectly legal to make calls to abstract methods that are 
-    implemented in derived classes. 
+    The above program crashes (some compilers even refuse to compile this). 
+    Unlike similar code in PHP. In PHP however, when the __construct() method 
+    gets called, the object is already fully initialized and it is perfectly 
+    legal to make calls to abstract methods that are implemented in derived 
+    classes, as you can see in the following example.
 </p>
 <p>
 <pre class="language-php"><code>
-&lt?php
+&lt;?php
 
-// base class in PHP, we call an abstract method from the constructor
-class BASE 
+// base class in PHP, in which the an abstract method is called
+abstract class BASE 
 {
     // constructor
     public function __construct() 
@@ -90,9 +92,84 @@ $d = new DERIVED();
 ?&gt;    
 </code></pre>
 </p>
-<p>    
+<p>
+    This PHP script correctly outputs 'doSomething()'. This happens because the 
+    __construct() method in PHP is not a real constructor. It constructs nothing, it 
+    has access to all members (that already are constructed), and (when available) 
+    also the base class and overridden methods. In fact, __construct() is a 
+    normal method that just happens to be the very first method that is called right 
+    after the object was constructed, and that is called automatically.
+</p>
+<p>
+    This difference is important for you as a C++ programmer, because you should
+    never confuse your C++ constructor with the __construct() method. In the real
+    constructor, the C++ object is being constructed while the
+    PHP object does not yet exist. After the constructor is finished, the PHP
+    object is created, and the __construct() method gets called. It is therefore
+    valid to have both a C++ constructor and a __construct() method in your class.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+// actual class implementation
+class Counter : public Php::Base
+{
+private:
+    int _value = 0;
+
+public:
+    // c++ constructor
+    Counter() {}
     
-    The __construct() method is thus not part of
-    the object construction process (like the C++ constructor is), but simply is 
-    the first method to be called <i>after</i> the object was fully initialized.
+    // c++ destructor
+    virtual ~Counter() {}
+    
+    // php "constructor"
+    void __construct(Php::Parameters &params)
+    {
+        // copy first parameter (if available)
+        if (params.size() > 0) _value = params[0];
+    }
+
+    // functions to increment and decrement
+    Php::Value increment() { return ++_value; }
+    Php::Value decrement() { return --_value; }
+    Php::Value value() const { return _value; }
+};
+
+extern "C" {
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        counter.method("__construct", &Counter::__construct);
+        counter.method("increment", &Counter::increment);
+        counter.method("decrement", &Counter::decrement);
+        counter.method("value", &Counter::value);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The code above shows that __construct() is registered as if it was 
+    a regular method - and that's what it is. The counter example that we've 
+    used before is now extended so that it is possible to give it an initial
+    value.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+$counter = new Counter(10);
+$counter-&gt;increment();
+echo($counter."\n");
+?&gt;
+</code></pre>
 </p>
