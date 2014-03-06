@@ -191,15 +191,16 @@ echo($counter->value()."\n");
 </p>
 <p>
     In the example code we have not shown how to use the Php::ByRef class, but
-    that works exaclty the same as in function, so we thought that an example 
-    was not really necessary.
+    that works exaclty the same <a href="functions">as for functions</a>, so we 
+    thought that an example was not really necessary (and we're not a big fan
+    of parameters-by-reference either).
 </p>
 <h2>Access modifiers</h2>
 <p>
     In PHP (and in C++ too) you can mark methods as public, private or protected.
     To achieve this for your native class too, you should pass in an additional 
     flags parameter when you add the method to the Php::Class object. Image that
-    you want to make the increment and decrement methods in our previous example
+    you want to make the increment and decrement methods in the previous example
     protected, then you can simply add a flag:
 </p>
 <p>
@@ -236,17 +237,17 @@ extern "C" {
 <p>
     By default, every method (and every property too, but we deal with that later) 
     is public. You can pass in an additional Php::Protected or Php::Private flag
-    if you want to mark a method as being either protected or private. The flag
+    if you want to mark a method as either protected or private. The flag
     parameter can be bitwise-or'ed with Php::Abstract or Php::Final if you also 
-    want to mark your method as being either abstract or final. We did this with
+    want to mark your method as either abstract or final. We did this with
     the value() method, so that it becomes impossible to override this method in a
     derived class.
 </p>
 <p>
     Remember that the exported methods in your C++ class must always be public - even
-    when you've marked them as being private or protected in PHP. This makes sense,
+    when you've marked them as private or protected in PHP. This makes sense,
     because after all, your methods are called by the PHP-CPP library, and if you make
-    them private, the becomes invisible for the library.
+    them private, they becomes invisible for the library.
 </p>
 <h2>Abstract and final</h2>
 <p>
@@ -275,7 +276,7 @@ extern "C" {
 </p>
 <p>
     It may seem strange that you have to pass in the address of a real C++ method
-    when you mark a method as being abstract. Abstract methods do normally not 
+    when you register an abstract method. Abstract methods do normally not 
     have an implementation, so what do you need this C++ implementation for?
     Luckily, there also is a different way for registering abstract methods.
 </p>

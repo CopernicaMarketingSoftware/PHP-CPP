@@ -54,7 +54,7 @@ int main()
 </p>
 <p>
     The above program crashes (some compilers even refuse to compile this). 
-    Unlike similar code in PHP. In PHP, when the __construct() method 
+    In PHP however, when the __construct() method 
     gets called, the object is already fully initialized and it is perfectly 
     legal to make calls to abstract methods that are implemented in derived 
     classes, as you can see in the following example.
@@ -95,8 +95,9 @@ $d = new DERIVED();
 <p>
     This PHP script correctly outputs 'doSomething()'. This happens because the 
     __construct() method in PHP is not a real constructor. It constructs nothing, it 
-    has access to all members (that already are constructed), and (when available) 
-    also the base class and overridden methods. In fact, __construct() is a very
+    has access to all members, and (when available) 
+    also the base class and overridden methods. In fact, __construct() is not a 
+    constructor at all, but a very
     normal method that just happens to be the first method that is called right 
     after the object is constructed, and that is called automatically.
 </p>
