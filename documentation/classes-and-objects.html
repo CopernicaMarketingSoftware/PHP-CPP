@@ -141,8 +141,18 @@ extern "C" {
         
         // description of the class so that PHP knows which methods are accessible
         Php::Class&lt;Counter&gt; counter("Counter");
-        counter.method("increment", &Counter::increment, { Php::ByVal("change", Php::Type::Numeric, false) });
-        counter.method("decrement", &Counter::decrement, { Php::ByVal("change", Php::Type::Numeric, false) });
+        
+        // register the increment method, and specify its parameters
+        counter.method("increment", &Counter::increment, { 
+            Php::ByVal("change", Php::Type::Numeric, false) 
+        });
+        
+        // register the decrement, and specify its parameters
+        counter.method("decrement", &Counter::decrement, { 
+            Php::ByVal("change", Php::Type::Numeric, false) 
+        });
+        
+        // register the value method
         counter.method("value", &Counter::value);
         
         // add the class to the extension
