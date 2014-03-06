@@ -11,9 +11,52 @@
     variables back into non-typed PHP variables. The PHP-CPP library offers the 
     Php::Value class that makes this a very simple task.
 </p>
+<h2>Zval's</h2>
+<p>
+    If you have ever spent time on writing PHP extensions in plain C, or if you've
+    ever read something about the internals of PHP, you must have heard about zval's.
+    A zval is a C structure in which PHP variables are stored. Internally, this zval
+    keeps a refcount, a union with the possible types and a number of other members
+    too. Every time that you access such a zval, make a copy of it, or write to
+    it, you must break your head to correctly update the refcount, and/or split the 
+    zval into different zvals, explicitly call copy constructors, allocate or 
+    free memory (using special memory allocation routines), or choose not to 
+    do this and leave the zval alone.
+</p>
+<p>
+    This all is crazy difficult and a big source for mistakes and all sorts of bugs.
+</p>
+<p>
+    And to make things even worse, there are literally hundreds of different 
+    undocumented macro's and functions in the Zend engine that can manipulate these 
+    zval variables. There are special macro's that work on zval's, macro's for 
+    pointers-to-zval's, macro's for pointer-to-pointer-to-zval's and even macro's 
+    that deal with pointer-to-pointer-to-pointer-to-zval's.
+</p>
+<p>
+    Every single PHP module, every PHP extension, and every builtin PHP function
+    is busy manipulating these zval structures. It is a big surprise that nobody
+    ever took the time to wrap such a zval into a simple C++ class that does all 
+    this administration for you. C++ is such a nice language with constructors, 
+    destructors, casting operators and operator overloading that can encapsulate all
+    this complicated zval handling.
+</p>
+<p>
+    And that is exactly what we did with PHP-CPP. We have introduced the Php::Value
+    object with a very simple interface, and the takes away all the problems of zval 
+    handling. Internally, the Php::Value object is a wrapper around a zval variable, 
+    and the completely hides the complexity of zval handling.
+</p>
+<p>
+    So, everything that you always wanted to ask about the internals of PHP, but
+    were afraid to ask: just forget about it. Sit back and relax, and take a look
+    how simple life is if you use PHP-CPP.
+</p>
 <h2>Scalar variables</h2>
 <p>
-    This section is not finished yet
+    The Php::Value object can be used to store scalar variables. Integers
+    
+    
 </p>
 
 
