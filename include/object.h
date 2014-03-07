@@ -22,7 +22,7 @@ public:
     /**
      *  Constructor for an empty stdClass object
      */
-    Object() : Value() { setType(Type::Object); }
+    Object() : Value(Type::Object) {}
 
     /**
      *  Move constructor is passed to the parent

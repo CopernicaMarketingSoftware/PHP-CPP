@@ -22,7 +22,7 @@ public:
     /**
      *  Constructor
      */
-    Array() : Value() { setType(Type::Array); }
+    Array() : Value(Type::Array) {}
     
     /**
      *  Copy constructor from a value object
@@ -43,6 +43,20 @@ public:
         // type must be valid
         if (value.type() != Type::Array) throw Php::Exception("Moving a non-array to an array variable");
     }
+
+    /**
+     *  Constructors from a vector (this will create an array)
+     *  @param  value
+     */
+    template <typename T>
+    Array(const std::vector<T> &input) : Value(input) {}
+    
+    /**
+     *  Constructor from a map (this will create an associative array)
+     *  @param  value
+     */
+    template <typename T>
+    Array(const std::map<std::string,T> &value) : Value(value) {}
     
     /**
      *  Destructor
