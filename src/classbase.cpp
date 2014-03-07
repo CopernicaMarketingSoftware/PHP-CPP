@@ -250,7 +250,7 @@ void ClassBase::initialize(const std::string &prefix)
     // mark the interfaces as being implemented
     for (auto &interface : _interfaces) 
     {
-        std::cout << "interface: " << interface << std::endl;
+        // implement interface
         zend_do_implement_interface(_entry, *interface);
     }
     

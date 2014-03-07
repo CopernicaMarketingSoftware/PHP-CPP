@@ -76,9 +76,6 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
     entry->num_args = _argc;
     entry->flags = flags;
 
-    std::cout << entry->fname << " num_args " << entry->num_args << std::endl;
-    std::cout << entry->fname << " flags " << entry->flags << std::endl;
-
     // we should fill the first argument as well
 #if PHP_VERSION_ID >= 50400
     initialize((zend_internal_function_info *)entry->arg_info, classname);
@@ -103,8 +100,6 @@ void Callable::initialize(zend_internal_function_info *info, const char *classna
     // number of required arguments, and the expected return type
     info->required_num_args = _required;
     info->_type_hint = (unsigned char)_return;
-
-    std::cout << "required_num_args " << info->required_num_args << std::endl;
 
     // we do not support return-by-reference
     info->return_reference = false;
