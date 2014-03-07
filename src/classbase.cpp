@@ -248,7 +248,11 @@ void ClassBase::initialize(const std::string &prefix)
     _entry->ce_flags = (int)_type;
     
     // mark the interfaces as being implemented
-    for (auto &interface : _interfaces) zend_do_implement_interface(_entry, interface);
+    for (auto &interface : _interfaces) 
+    {
+        std::cout << "interface: " << interface << std::endl;
+        zend_do_implement_interface(_entry, *interface);
+    }
     
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);

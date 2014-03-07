@@ -25,17 +25,11 @@ class Countable
 {
 public:
     /**
-     *  Implementation of the countable interface
-     *  @return zend_class_entry*
-     *  @internal
-     */
-    static struct _zend_class_entry *implementation();
-
-    /**
      *  Retrieve the number of items in the class
      *  @return Value
      */
     virtual Value count() = 0;
+
 };
     
 /**

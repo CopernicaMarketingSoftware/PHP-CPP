@@ -16,6 +16,12 @@
  */
 
 /**
+ *  Zend/SPL interfaces that we support
+ */
+extern struct _zend_class_entry *spl_ce_Countable;
+extern struct _zend_class_entry *spl_ce_ArrayAccess;
+
+/**
  *  Set up namespace
  */
 namespace Php {
@@ -38,7 +44,35 @@ public:
     Class(const char *name) : ClassBase(name)
     {
         // check for special classes
-        if (std::is_base_of<Countable, T>::value) ClassBase::interface(Countable::implementation());
+        if (std::is_base_of<Countable, T>::value)
+        {
+            // register the interface (we register a pointer-to-a-pointer here,
+            // because when this code runs (during the get_module() call), the 
+            // interfaces are not yet initialized by the zend engine, this 
+            // happens later when the all classes are registered (after the
+            // get_module() call)
+            interface(&spl_ce_Countable);
+            
+            // add the count method
+            method("count", &T::count, {});
+        }
+        
+        // check for special classes
+        if (std::is_base_of<ArrayAccess, T>::value)
+        {
+            // register the interface (we register a pointer-to-a-pointer here,
+            // because when this code runs (during the get_module() call), the 
+            // interfaces are not yet initialized by the zend engine, this 
+            // happens later when the all classes are registered (after the
+            // get_module() call)
+            interface(&spl_ce_ArrayAccess);
+            
+            // add the count method
+            method("count", &T::offsetSet);
+            method("count", &T::offsetGet);
+            method("count", &T::offsetUnset);
+            method("count", &T::offsetExists);
+        }
     }
     
     /**

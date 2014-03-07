@@ -19,6 +19,7 @@
  */
 struct _zend_object_value;
 struct _zend_object_handlers;
+struct _zend_class_entry;
 
 /**
  *  Set up namespace
@@ -66,6 +67,7 @@ public:
         _type(that._type), 
         _methods(that._methods), 
         _members(that._members), 
+        _interfaces(that._interfaces),
         _entry(nullptr) {}
 
     /**
@@ -77,6 +79,7 @@ public:
         _type(that._type), 
         _methods(std::move(that._methods)), 
         _members(std::move(that._members)), 
+        _interfaces(std::move(that._interfaces)),
         _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
@@ -188,9 +191,16 @@ protected:
      *  It does however make sense to support implementing extension-specific
      *  interface. We may add this feature in the future.
      * 
+     *  This method is called _during_ the get_module() call when all classes
+     *  are defined by the extension. However, at that time the Zend engine has
+     *  not yet initialized the zend_class_entry's with the interface addresses.
+     *  That's why we ask for a pointer-to-a-pointer. Later, when the classes
+     *  are really registered, the Zend engine is with registering interfaces
+     *  and the pointers point to a valid variable.
+     * 
      *  @param  interface
      */
-    void interface(struct _zend_class_entry *interface)
+    void interface(struct ::_zend_class_entry **interface)
     {
         // register the interface
         _interfaces.push_back(interface);
@@ -274,7 +284,7 @@ private:
      *  All interfaces that are implemented
      *  @var    std::list
      */
-    std::list<struct _zend_class_entry*> _interfaces;
+    std::list<struct ::_zend_class_entry**> _interfaces;
     
 };
     
