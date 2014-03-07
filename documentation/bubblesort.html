@@ -1,0 +1,47 @@
+<h1>How fast is a C++ extension</h1>
+<p>
+    Native extensions are fast. But how fast are they? We can demonstrate this
+    with a very simple extension: bubblesort.
+</p>
+<p>
+    Bubblesort is a very inefficient sorting algorithm that is never used in
+    real world software - but that is often used in universities to demonstrate
+    algorithms. We will show you an implementation of this algorithm in PHP
+    and in C++ - and see how much faster the C++ code is.
+</p>
+<p>
+<pre class="language-php">
+&lt;?php
+ 
+/**
+ *  Bubblesort function in parameter
+ *
+ *  This function takes an unsorted array as input, sorts it, and returns
+ *  the output. It only uses normal PHP operation, and does not rely on
+ *  any builting PHP functions or on functions from extensions
+ *
+ *  @param  array       An unsorted array of integers
+ *  @return array       A sorted array
+ */
+function bubblesort(array $input)
+{
+    // number of elements in the array
+    $count = count($input);
+    
+    // loop through the array
+    for ($i = 0; $i &lt; $count; $i++)
+    {
+        // loop through the elements that were already processed
+        for ($j = 0; $j &lt; $count - $i; $j++)
+        {
+            // move on if smaller
+            if ($input[$j] &lt;= $input[$j+1]) continue;
+    
+            // swap elements
+            $temp = $input[$j];
+            $input[$j] = $input[$j+1];
+            $input[$j+1] = $temp;
+        }
+    }
+}
+?&gt;
