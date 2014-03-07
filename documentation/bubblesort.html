@@ -4,7 +4,7 @@
     with a very simple extension: bubblesort.
 </p>
 <p>
-    Bubblesort is a very inefficient sorting algorithm that is never used in
+    Bubblesort is an extremely inefficient sorting algorithm that is never used in
     real world software - but that is often used in universities to demonstrate
     algorithms. We will show you an implementation of this algorithm in PHP
     and in C++ - and see how much faster the C++ code is.
@@ -158,8 +158,25 @@ $scripted = microtime(true);
 
 // show the results
 echo("Native:   ".($native - $start)." seconds\n");
-echo("Scripted: ".($scriped - $native)." seconds\n");
+echo("Scripted: ".($scripted - $native)." seconds\n");
 
 ?&gt;
 </code></pre>
+</p>
+<p>
+    This is the output on from a regular laptop. You can see that the native C++ 
+    implementation is about ten times as fast as the PHP implementation.
+<p>
+<pre>
+Native:   0.79793095588684 seconds
+Scripted: 8.9202060699463 seconds
+</pre>
+</p>
+<h2>Summary</h2>
+<p>
+    C++ is faster - much faster - than code in PHP, even for very simple scripts.
+    The source code for an extension written in C++ is almost identical to the
+    source of the same algorithm in PHP. Every programmer that is capable of
+    writing a PHP script, could just as well write it in C++ and get a ten times
+    better performance.
 </p>
