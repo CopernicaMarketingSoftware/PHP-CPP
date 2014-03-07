@@ -16,7 +16,7 @@
  *  Bubblesort function in PHP
  *
  *  This function takes an unsorted array as input, sorts it, and returns
- *  the output. It only uses normal PHP operation, and does not rely on
+ *  the output. It only uses normal PHP operations, and does not rely on
  *  any builtin PHP functions or on functions from extensions
  *
  *  @param  array       An unsorted array of integers
@@ -147,7 +147,7 @@ extern "C" {
 // fill an array with random numbers
 $count = 10000;
 $x = array();
-for ($i=0; $i<$count; $i++) $x[] = rand(0, 1000000);
+for ($i=0; $i&lt;$count; $i++) $x[] = rand(0, 1000000);
 
 // run the native and scripted bubblesort functions
 $start = microtime(true);
@@ -162,3 +162,4 @@ echo("Scripted: ".($scriped - $native)." seconds\n");
 
 ?&gt;
 </code></pre>
+</p>
