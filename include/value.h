@@ -58,6 +58,34 @@ public:
     Value(const std::string &value);
     Value(const char *value, int size = -1);
     Value(double value);
+
+    /**
+     *  Construct to a specific type
+     *  @param  value
+     */
+    Value(Type type) : Value() { setType(type); }
+    
+    /**
+     *  Constructors from a vector (this will create an array)
+     *  @param  value
+     */
+    template <typename T>
+    Value(const std::vector<T> &input) : Value(Type::Array)
+    {
+        // set all elements
+        for (size_t i=0; i<input.size(); i++) setRaw(i, input[i]);
+    }
+    
+    /**
+     *  Constructor from a map (this will create an associative array)
+     *  @param  value
+     */
+    template <typename T>
+    Value(const std::map<std::string,T> &value)
+    {
+        // set all elements
+        for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
+    }
     
     /**
      *  Wrap object around zval
@@ -111,7 +139,7 @@ public:
     Value &operator=(const std::string &value);
     Value &operator=(const char *value);
     Value &operator=(double value);
-    
+
     /**
      *  Add a value to the object
      *  @param  value
@@ -267,11 +295,11 @@ public:
      *  @param  value
      */
     template <typename T> bool operator==(const T &value) const { return (T)*this == value; }
-    template <typename T> bool operator!=(const T &value) const { return (T)*this == value; }
-    template <typename T> bool operator<=(const T &value) const { return (T)*this == value; }
-    template <typename T> bool operator>=(const T &value) const { return (T)*this == value; }
-    template <typename T> bool operator< (const T &value) const { return (T)*this == value; }
-    template <typename T> bool operator> (const T &value) const { return (T)*this == value; }
+    template <typename T> bool operator!=(const T &value) const { return (T)*this != value; }
+    template <typename T> bool operator<=(const T &value) const { return (T)*this <= value; }
+    template <typename T> bool operator>=(const T &value) const { return (T)*this >= value; }
+    template <typename T> bool operator< (const T &value) const { return (T)*this <  value; }
+    template <typename T> bool operator> (const T &value) const { return (T)*this >  value; }
 
     /**
      *  The type of object
@@ -342,6 +370,64 @@ public:
      *  @return double
      */
     double floatValue() const;
+    
+    /**
+     *  Convert the object to a vector
+     * 
+     *  This only works for regular arrays that are indexed by a number, start
+     *  with position 0 and have no empty spaces.
+     *  
+     *  @return std::vector
+     */
+    template <typename T>
+    std::vector<T> vectorValue() const
+    {
+        // only works for arrays, other types return an empty vector
+        if (!isArray()) return std::vector<T>();
+
+        // allocate a result
+        std::vector<T> result;
+        
+        // reserve enough space
+        size_t count = size();
+        result.reserve(count);
+        
+        // and fill the result vector
+        for (size_t i = 0; i<count; i++) 
+        {
+            // check if the index exists, then add it
+            if (contains(i)) result.push_back((T)get(i));
+        }
+        
+        // done
+        return result;
+    }
+    
+    /**
+     *  Convert the object to a map with string index and Php::Value value
+     *  @return std::map
+     */
+    std::map<std::string,Php::Value> mapValue() const;
+    
+    /**
+     *  Convert the object to a map with string index and a specific type as value
+     *  @return std::map
+     */
+    template <typename T>
+    std::map<std::string,T> mapValue() const
+    {
+        // must be an array or an object, otherwise the map is empty
+        if (!isArray() && !isObject()) return std::map<std::string,T>();
+        
+        // get the original map value
+        std::map<std::string,Php::Value> map(mapValue());
+        
+        // result variable
+        std::map<std::string,T> result;
+        
+        // done
+        return result;
+    }
     
     /**
      *  The number of members in case of an array or object
@@ -453,6 +539,35 @@ public:
     operator double () const
     {
         return floatValue();
+    }
+
+    /**
+     *  Convert the object to a vector
+     *  @return std::vector
+     */
+    template <typename T>
+    operator std::vector<T>() const
+    {
+        return vectorValue<T>();
+    }
+
+    /**
+     *  Convert the object to a map with string index and Php::Value value
+     *  @return std::map
+     */
+    operator std::map<std::string,Php::Value> () const
+    {
+        return mapValue();
+    }
+
+    /**
+     *  Convert the object to a map with string index and Php::Value value
+     *  @return std::map
+     */
+    template <typename T>
+    operator std::map<std::string,T> () const
+    {
+        return mapValue<T>();
     }
     
     /**
@@ -672,12 +787,26 @@ protected:
     struct _zval_struct *_val;
     
     /**
-     *  Validate the value
-     *  This is a overridable function that is implemented in base classes to
-     *  ensure that a value of certain type stays valid
-     *  @return Value
+     *  Set a certain property without running any checks (you must already know
+     *  for sure that this is an array, and that the index is not yet in use)
+     * 
+     *  @param  index       Index of the property to set
+     *  @param  value       Value to set
+     *  @return Value       The value that was set
      */
-    virtual Value &validate() { return *this; }
+    const Value &setRaw(int index, const Value &value);
+    
+    /**
+     *  Set a certain property without any checks (you must already know for
+     *  sure that this is either an object or an array, and that the index is
+     *  not yet in use)
+     * 
+     *  @param  key         Key of the property to set
+     *  @param  size        Size of the key
+     *  @param  value       Value to set
+     *  @return Value       The value that was set
+     */
+    const Value &setRaw(const char *key, int size, const Value &value);
     
     /**
      *  The Globals and Member classes can access the zval directly

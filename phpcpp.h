@@ -20,6 +20,7 @@
 #include <memory>
 #include <list>
 #include <exception>
+#include <map>
 
 /**
  *  Include all headers files that are related to this library

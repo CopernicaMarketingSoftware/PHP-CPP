@@ -1,4 +1,4 @@
-<h1>How fast is a C++ extension</h1>
+<h1>How fast is a C++ extension?</h1>
 <p>
     Native extensions are fast. But how fast are they? We can demonstrate this
     with a very simple extension: bubblesort.
@@ -42,6 +42,9 @@ function scripted_bubblesort(array $input)
             $input[$j-1] = $temp;
         }
     }
+    
+    // done
+    return $input;
 }
 ?&gt;
 </code></pre>
@@ -80,11 +83,14 @@ Php::Value native_bubblesort(Php::Parameters &params)
             if (input[j-1] &lt;= input[j]) continue;
     
             // swap elements
-            temp = input[j];
+            int temp = input[j];
             input[j] = input[j-1];
             input[j-1] = temp;
         }
     }
+    
+    // done
+    return input;
 }
 
 /**
@@ -109,7 +115,7 @@ extern "C" {
         // extension that the function receives one parameter by value, and
         // that that parameter must be an array
         extension.add("native_bubblesort", native_bubblesort, { 
-            ByVal("input", Php::Type::Array)
+            Php::ByVal("input", Php::Type::Array)
         });
         
         // return the extension
@@ -125,8 +131,34 @@ extern "C" {
     is simple, and you can easily port your PHP functions to C++.
 </p>
 <p>
-    You also see an additional get_module() function in the extension call. This
-    is the startup function that is called by the Zend engine when PHP starts up.
-    It is supposed to return information to the Zend engine about the extension,
-    so that the "native_bubblesort" function is accessible for PHP scripts.
+    You also see an additional get_module() function in the source code. This
+    is the <a href="loading-extensions">startup function</a> that is called by the 
+    Zend engine when PHP starts up. It is supposed to return information to the 
+    Zend engine about the extension, so that the "native_bubblesort" function is 
+    accessible for PHP scripts.
 </p>
+<p>
+    Let's run the two functions with an array filled with random numbers.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+
+// fill an array with random numbers
+$count = 10000;
+$x = array();
+for ($i=0; $i<$count; $i++) $x[] = rand(0, 1000000);
+
+// run the native and scripted bubblesort functions
+$start = microtime(true);
+$y = native_bubblesort($x);
+$native = microtime(true);
+$x = scripted_bubblesort($x);
+$scripted = microtime(true);
+
+// show the results
+echo("Native:   ".($native - $start)." seconds\n");
+echo("Scripted: ".($scriped - $native)." seconds\n");
+
+?&gt;
+</code></pre>

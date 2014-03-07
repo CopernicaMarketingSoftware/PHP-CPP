@@ -1405,6 +1405,40 @@ int Value::size() const
 }
 
 /**
+ *  Convert the object to a map with string index and Php::Value value
+ *  @return std::map
+ */
+std::map<std::string,Php::Value> Value::mapValue() const
+{
+    // check type
+    if (isArray())
+    {
+        // result variable
+        std::map<std::string,Php::Value> result;
+
+        // @todo    loop through the zval key/value pairs, and return a map
+        
+        // done
+        return result;
+    }
+    else if (isObject())
+    {
+        // result variable
+        std::map<std::string,Php::Value> result;
+
+        // @todo    convert the properties to a map
+        
+        // done
+        return result;
+    }
+    else
+    {
+        // return an empty map
+        return std::map<std::string,Php::Value>();
+    }
+}
+
+/**
  *  Does the array contain a certain index?
  *  @param  index
  *  @return bool
@@ -1519,6 +1553,29 @@ Value Value::get(const char *key, int size) const
 }
 
 /**
+ *  Set a certain property without performing any checks
+ *  This method can be used when it is already known that the object is an array
+ *  @param  index
+ *  @param  value
+ *  @return Value
+ */
+const Value &Value::setRaw(int index, const Value &value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    
+    // add the value (this will decrement refcount on any current variable)
+    add_index_zval(_val, index, value._val);
+
+    // the variable has one more reference (the array entry)
+    Z_ADDREF_P(value._val);
+    
+    // done
+    return value;
+}
+
+
+/**
  *  Set a certain property
  *  @param  index
  *  @param  value
@@ -1539,15 +1596,43 @@ const Value &Value::set(int index, const Value &value)
     // must be an array
     setType(Type::Array);
 
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
-    
-    // add the value (this will decrement refcount on any current variable)
-    add_index_zval(_val, index, value._val);
+    // set property
+    return setRaw(index, value);
+}
 
-    // the variable has one more reference (the array entry)
-    Z_ADDREF_P(value._val);
-    
+/**
+ *  Set a certain property without running any checks
+ *  @param  key
+ *  @param  size
+ *  @param  value
+ *  @return Value
+ */
+const Value &Value::setRaw(const char *key, int size, const Value &value)
+{
+    // is this an object?
+    if (isObject())
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // retrieve the class entry
+        auto *entry = zend_get_class_entry(_val);
+
+        // update the property (cast necessary for php 5.3)
+        zend_update_property(entry, _val, (char *)key, size, value._val);
+    }
+    else
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // add the value (this will reduce the refcount of the current value)
+        add_assoc_zval_ex(_val, key, size+1, value._val);
+
+        // the variable has one more reference (the array entry)
+        Z_ADDREF_P(value._val);
+    }
+
     // done
     return value;
 }
@@ -1571,35 +1656,11 @@ const Value &Value::set(const char *key, int size, const Value &value)
         if (value._val == *current) return value;
     }
     
-    // is this an object?
-    if (isObject())
-    {
-        // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
-
-        // retrieve the class entry
-        auto *entry = zend_get_class_entry(_val);
-
-        // update the property (cast necessary for php 5.3)
-        zend_update_property(entry, _val, (char *)key, size, value._val);
-    }
-    else
-    {
-        // must be an array
-        setType(Type::Array);
-
-        // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
-
-        // add the value (this will reduce the refcount of the current value)
-        add_assoc_zval_ex(_val, key, size+1, value._val);
-
-        // the variable has one more reference (the array entry)
-        Z_ADDREF_P(value._val);
-    }
-
+    // this should be an object or an array
+    if (!isObject()) setType(Type::Array);
+    
     // done
-    return value;
+    return setRaw(key, size, value);
 }
 
 /**

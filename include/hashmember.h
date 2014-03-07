@@ -317,6 +317,17 @@ public:
     Value operator%(double value)               { return this->value() % value; }
     
     /**
+     *  Comparison operators
+     *  @param  value
+     */
+    template <typename T> bool operator==(const T &value) const { return (T)*this == value; }
+    template <typename T> bool operator!=(const T &value) const { return (T)*this != value; }
+    template <typename T> bool operator<=(const T &value) const { return (T)*this <= value; }
+    template <typename T> bool operator>=(const T &value) const { return (T)*this >= value; }
+    template <typename T> bool operator< (const T &value) const { return (T)*this <  value; }
+    template <typename T> bool operator> (const T &value) const { return (T)*this >  value; }
+
+    /**
      *  Handle calls to the hash member
      *  @param  param0
      *  @param  param1
