@@ -12,13 +12,12 @@
 <p>
 <pre class="language-php"><code>
 &lt;?php
- 
 /**
  *  Bubblesort function in PHP
  *
  *  This function takes an unsorted array as input, sorts it, and returns
  *  the output. It only uses normal PHP operation, and does not rely on
- *  any builting PHP functions or on functions from extensions
+ *  any builtin PHP functions or on functions from extensions
  *
  *  @param  array       An unsorted array of integers
  *  @return array       A sorted array
@@ -48,8 +47,7 @@ function scripted_bubblesort(array $input)
 </code></pre>
 </p>
 <p>
-    And now exactly the same algorithm, but not as a PHP script, but a native
-    C++ extension.
+    And exactly the same algorithm in C++:
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -70,7 +68,7 @@ function scripted_bubblesort(array $input)
 Php::Value native_bubblesort(Php::Parameters &params)
 {
     // there is one input array, cast the PHP variable to a vector of ints
-    std::vector<int> input = params[0];
+    std::vector&lt;int&gt; input = params[0];
     
     // loop through the array
     for (size_t i = 0; i &lt; input.size(); i++)
@@ -107,8 +105,12 @@ extern "C" {
         // create an instance of the Php::Extension class
         static Php::Extension extension("bubblesort", "1.0");
         
-        // add the bubblesort function to the extension
-        extension.add("native_bubblesort", native_bubblesort);
+        // add the bubblesort function to the extension, we also tell the 
+        // extension that the function receives one parameter by value, and
+        // that that parameter must be an array
+        extension.add("native_bubblesort", native_bubblesort, { 
+            ByVal("input", Php::Type::Array)
+        });
         
         // return the extension
         return extension;
@@ -116,4 +118,15 @@ extern "C" {
 }
 
 </code></pre>
+</p>
+<p>
+    You may be surprised how simple the C++ function looks. It is almost identical
+    to the PHP code. That's true indeed, writing native extensions with PHP-CPP 
+    is simple, and you can easily port your PHP functions to C++.
+</p>
+<p>
+    You also see an additional get_module() function in the extension call. This
+    is the startup function that is called by the Zend engine when PHP starts up.
+    It is supposed to return information to the Zend engine about the extension,
+    so that the "native_bubblesort" function is accessible for PHP scripts.
 </p>
