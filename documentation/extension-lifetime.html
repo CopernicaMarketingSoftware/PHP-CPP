@@ -100,14 +100,14 @@ extern "C" {
 <p>
     The onRequest() is not the only method in the Php::Extension object to
     register a callback. There are in fact
-    four different callbacks on*() methods that you can use.
+    four different on*() methods that you can use.
 </p>
 <p>
     <ul>
-        <li>onStartup(const std::function&lt;void()&gt; &callback);</li>
-        <li>onRequest(const std::function&lt;void()&gt; &callback);</li>
-        <li>onIdle(const std::function&lt;void()&gt; &callback);</li>
-        <li>onShutdown(const std::function&lt;void()&gt; &callback);</li>
+        <li>void onStartup(const std::function&lt;void()&gt; &callback);</li>
+        <li>void onRequest(const std::function&lt;void()&gt; &callback);</li>
+        <li>void onIdle(const std::function&lt;void()&gt; &callback);</li>
+        <li>void onShutdown(const std::function&lt;void()&gt; &callback);</li>
     </ul>
 </p>
 <p>
@@ -118,12 +118,12 @@ extern "C" {
     initialization code.
 </p>
 <p>
-    After the extension is initialized, requests will be processed by it. In the
-    example above we've used the onRequest() method to register a callback that is
-    called in front of each request. There is also a callback that gets called
-    <i>after</i> each request, when the extension moves to an idle state - waiting
-    for the next request. This callback can be registered with the onIdle()
-    method on the Php::Extension object.
+    After the Zend engine is initialized, it is ready to process requests. In the
+    example above we used the onRequest() method to register a callback that is
+    called in front of each request. Next to that, you can also install a callback that gets called
+    <i>after</i> each request, when the Zend engine moves to an idle state - waiting
+    for the next request. This can be accomplished with the onIdle()
+    method in the Php::Extension object.
 </p>
 <p>
     The fourth callback that you can register is a callback that gets called 
