@@ -51,6 +51,17 @@ public:
     {
         return 33;
     }
+
+    void loop(Php::Parameters &params)
+    {
+        std::cout << "Array/Object contains " << params[0].size() << " items" << std::endl;
+        auto m = params[0].mapValue();
+
+        std::cout << "map contains " << m.size() << " items" << std::endl;
+        for(auto &i: m) {
+            std::cout << "key: " << i.first << " \t\tval: " << i.second << std::endl;
+        }
+    }
     
     Php::Value myMethod(Php::Parameters &params)
     {
@@ -124,6 +135,13 @@ extern "C"
         customClass.method("myMethod2", &MyCustomClass::myMethod);
         customClass.property("property1", "prop1");
         customClass.property("property2", "prop2", Php::Protected);
+
+        customClass.method("loopArray", &MyCustomClass::loop, {
+            Php::ByVal("arr", Php::Type::Array)
+        });
+        customClass.method("loopObject", &MyCustomClass::loop, {
+            Php::ByVal("obj", Php::Type::Object)
+        });
         
         // add the class to the extension
         extension.add(customClass);
