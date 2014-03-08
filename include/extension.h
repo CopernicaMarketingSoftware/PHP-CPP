@@ -69,10 +69,10 @@ public:
      * 
      *  @param  callback
      */
-    void onReady(const Callback &callback)
+    void onStartup(const Callback &callback)
     {
         // copy callback
-        _onReady = callback;
+        _onStartup = callback;
     }
     
     /**
@@ -83,10 +83,10 @@ public:
      * 
      *  @param  callback
      */
-    void onFinalize(const Callback &callback)
+    void onShutdown(const Callback &callback)
     {
         // copy callback
-        _onFinalize = callback;
+        _onShutdown = callback;
     }
     
     /**
@@ -110,13 +110,15 @@ public:
      * 
      *  The callback will be called after _each_ request, so that you can clean up
      *  certain things and make your extension ready to handle the next request.
+     *  This method is called onIdle because the extension is idle in between
+     *  requests.
      * 
      *  @param  callback
      */
-    void onCleanup(const Callback &callback)
+    void onIdle(const Callback &callback)
     {
         // copy callback
-        _onCleanup = callback;
+        _onIdle = callback;
     }
     
     /**
@@ -155,7 +157,7 @@ private:
      *  pageviews are going to be handled
      *  @var    Callback
      */
-    Callback _onReady;
+    Callback _onStartup;
     
     /**
      *  Callback that is called in front of each request
@@ -167,26 +169,45 @@ private:
      *  Callback that is called right after each request
      *  @var    Callback
      */
-    Callback _onCleanup;
+    Callback _onIdle;
     
     /**
      *  Callback that is called right before the engine is closing down
      *  @var    Callback
      */
-    Callback _onFinalize;
-    
+    Callback _onShutdown;
+
     /**
-     *  Callback that is called before each request
-     *  @var request_callback
+     *  Function that is called when the extension initializes
+     *  @param  type        Module type
+     *  @param  number      Module number
+     *  @return int         0 on success
      */
-    request_callback _start;
-    
+    static int onStartup(int type, int module_number);
+
     /**
-     *  Callback that is called after each request
-     *  @var request_callback
+     *  Function that is called when the extension is about to be stopped
+     *  @param  type        Module type
+     *  @param  number      Module number
+     *  @return int
      */
-    request_callback _stop;
+    static int onShutdown(int type, int module_number);
     
+        /**
+    *  Function that is called when a request starts
+    *  @param  type        Module type
+    *  @param  number      Module number
+    *  @return int         0 on success
+    */
+    static int onRequest(int type, int module_number);
+
+    /**
+    *  Function that is called when a request is ended
+    *  @param  type        Module type
+    *  @param  number      Module number
+    *  @return int         0 on success
+    */
+    static int onIdle(int type, int module_number);
 };
 
 /**

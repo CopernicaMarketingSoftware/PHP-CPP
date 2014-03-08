@@ -7,40 +7,41 @@
 </p>
 <p>
     After this get_module() call, your extension is loaded and will be used to handle
-    <i>multiple pageviews</i>. This is an important difference between standard
+    <i>multiple</i> pageviews. This is an important difference between standard
     PHP scripts and native extensions, because standard PHP scripts handle only a single
-    pageview. Extension can be used to serve multiple pageviews after 
-    each other.
+    pageview. But extensions serve multiple pageviews after each other.
 </p>
 <p>
-    This difference is especially important when you use global variables. Global
-    variables are initialized when the extension is loaded - and not at the beginning
-    of each pageview. Changes that you make to global variables keep their value,
-    and subsequent requests will see the updated value. If you do not want this, 
-    you can register callback functions that get called in front of each
-    request and right after each request. In these callback you can then 
-    re-initialize the global variables.
+    This difference is especially important if you use global <i>C++</i> variables. 
+    Such global variables are initialized when the extension is loaded - and not at 
+    the beginning of each pageview. Changes that you make to global variables keep 
+    their value, and subsequent requests will therefore see this updated value. 
+</p>
+<p>
+    This, by the way, only happens to global C++ variables. The Php::GLOBALS object,
+    with all the global PHP variables, is re-initialized at the beginning of 
+    each request. You do not have to worry about changes that you make to these
+    global PHP variables: at the beginning of the next request, you will have a 
+    fresh and new Php::GLOBALS object, and the changes that you made during the
+    previous request are no longer stored in it.
+</p>
+<p>
+    Back to the global C++ variables. If you want to reset a global variable
+    at the beginning of a new request, you can register a special callback function 
+    that gets called in front of each request.
 </p>
 <p>
 <pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
-#include &lt;iostream&gt;
 
 /**
- *  Global value that keeps track of the number 
- *  of requests that have been handled
- *  @var    int
- */
-int requestCount = 0;
-
-/**
- *  Global value that stores the number of times 
+ *  Global variable that stores the number of times 
  *  the function updateCounters() has been called in total
  *  @var    int
  */
 int invokeTotalCount = 0;
 
 /**
- *  Global value that keeps track how many times the
+ *  Global variable that keeps track how many times the
  *  function updateCounters() was called during the
  *  current request
  *  @var    int
@@ -75,39 +76,59 @@ extern "C" {
         // the extension object
         static Php::Extension extension("my_extension", "1.0");
         
-        // install a callback function that is called when the PHP engine
-        // is fully initialized
-        extension.onReady([]() {
-            
-            // set global variables to their initial values
-            requestCount = 0;
-            invokeTotalCount = 0;
-        });
-        
-        // install a callback that is called at the beginning of each
-        // request
+        // install a callback that is called at the beginning 
+        // of each request
         extension.onRequest([]() {
             
             // re-initialize the counter
             invokeDuringRequestCount = 0;
         });
         
-        // install a callback that is called after each request
-        extension.onCleanup([]() {
-            
-            // @todo add your own implementation
-            
-        });
-        
-        // install a callback that is called when the Zend engine
-        // is closing down
-        extension.onFinalize([]() {
-            
-            // @todo add your own implementation
-        });
+        // add the updateCounter method to the extension
+        extension.add("updateCounter", updateCounter);
         
         // return the extension details
         return extension;
     }
 }</code></pre>
 </p>
+<p>
+    The Php::Extension class has a method onRequest() that is used in the
+    above example to register a callback function. This callback is called right 
+    before every pageview/request. As you can see in the example, it is 
+    permitted to use lambda functions. In the above example the global variable
+    invokeDuringRequestCount is re-initialized.
+</p>
+<p>
+    The onRequest() is not the only callback that can be registered. There are
+    four different callbacks on*() methods that you can call to register callbacks.
+</p>
+<p>
+    <ul>
+        <li>onStartup(const std::function&lt;void()&gt; &callback);</li>
+        <li>onRequest(const std::function&lt;void()&gt; &callback);</li>
+        <li>onIdle(const std::function&lt;void()&gt; &callback);</li>
+        <li>onShutdown(const std::function&lt;void()&gt; &callback);</li>
+    </ul>
+</p>
+<p>
+    The startup callback is called when the Zend engine has loaded your extension 
+    and all functions and classes in it were registered. If you want to initialize 
+    additional variables in your extension before the functions are going to get called, 
+    you can use the onStartup() function to register a callback to run this
+    initialization code.
+</p>
+<p>
+    After the extension is initialized, requests will be processed by it. In the
+    example above we've used the onRequest() method to register a callback that is
+    called in front of each request. There is also a callback that gets called
+    <i>after</i> each request, when the extension moves to an idle state - waiting
+    for the next request. This callback can be registered with the onIdle()
+    method on the Php::Extension object.
+</p>
+<p>
+    The fourth callback that you can register is a callback that gets called 
+    right before PHP shuts down. If there is anything to clean up, you can install
+    such a callback and run the cleanup code from it.
+</p>
+    

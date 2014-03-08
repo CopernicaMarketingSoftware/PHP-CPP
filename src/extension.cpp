@@ -81,7 +81,7 @@ static int match_module(_zend_module_entry *entry)
  *  @param  number
  *  @return Extension*
  */
-static Extension *extension(int number)
+static Extension *find(int number)
 {
     // do we already have an extension with this number?
     auto iter = number2extension.find(number);
@@ -104,13 +104,22 @@ static Extension *extension(int number)
  *  @param  number      Module number
  *  @return int         0 on success
  */
-static int extension_startup(INIT_FUNC_ARGS)
+int Extension::onStartup(int type, int module_number)
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
     
-    // initialize the extension
-    return BOOL2SUCCESS(extension(module_number)->initialize());
+    // get the extension
+    Extension *extension = find(module_number);
+    
+    // initialize namespace
+    extension->initialize("");
+    
+    // is the callback registered?
+    if (extension->_onStartup) extension->_onStartup();
+    
+    // done
+    return BOOL2SUCCESS(true);
 }
 
 /**
@@ -119,10 +128,16 @@ static int extension_startup(INIT_FUNC_ARGS)
  *  @param  number      Module number
  *  @return int
  */
-static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
+int Extension::onShutdown(int type, int module_number)
 {
-    // finalize the extension
-    return BOOL2SUCCESS(extension(module_number)->finalize());
+    // get the extension
+    Extension *extension = find(module_number);
+    
+    // is the callback registered?
+    if (extension->_onShutdown) extension->_onShutdown();
+    
+    // done
+    return BOOL2SUCCESS(true);
 }
 
 /**
@@ -131,10 +146,16 @@ static int extension_shutdown(SHUTDOWN_FUNC_ARGS)
  *  @param  number      Module number
  *  @return int         0 on success
  */
-static int request_startup(INIT_FUNC_ARGS)
+int Extension::onRequest(int type, int module_number)
 {
-    // start the request
-    return extension(module_number)->startRequest();
+    // get the extension
+    Extension *extension = find(module_number);
+    
+    // is the callback registered?
+    if (extension->_onRequest) extension->_onRequest();
+    
+    // done
+    return BOOL2SUCCESS(true);
 }
 
 /**
@@ -143,10 +164,16 @@ static int request_startup(INIT_FUNC_ARGS)
  *  @param  number      Module number
  *  @return int         0 on success
  */
-static int request_shutdown(INIT_FUNC_ARGS)
+int Extension::onIdle(int type, int module_number)
 {
-    // end the request
-    return BOOL2SUCCESS(extension(module_number)->endRequest());
+    // get the extension
+    Extension *extension = find(module_number);
+    
+    // is the callback registered?
+    if (extension->_onIdle) extension->_onIdle();
+    
+    // done
+    return BOOL2SUCCESS(true);
 }
 
 /**
@@ -156,8 +183,7 @@ static int request_shutdown(INIT_FUNC_ARGS)
  *  @param  start       Request start callback
  *  @param  stop        Request stop callback
  */
-Extension::Extension(const char *name, const char *version, request_callback start, request_callback stop) : 
-    Namespace(""), _start(start), _stop(stop)
+Extension::Extension(const char *name, const char *version) : Namespace("")
 {
     // keep extension pointer based on the name
     name2extension[name] = this;
@@ -177,10 +203,10 @@ Extension::Extension(const char *name, const char *version, request_callback sta
     _entry->deps = NULL;                                    // dependencies on other modules
     _entry->name = name;                                    // extension name
     _entry->functions = NULL;                               // functions supported by this module (none for now)
-    _entry->module_startup_func = extension_startup;        // startup function for the whole extension
-    _entry->module_shutdown_func = extension_shutdown;      // shutdown function for the whole extension
-    _entry->request_startup_func = request_startup;         // startup function per request
-    _entry->request_shutdown_func = request_shutdown;       // shutdown function per request
+    _entry->module_startup_func = &Extension::onStartup;    // startup function for the whole extension
+    _entry->module_shutdown_func = &Extension::onShutdown;  // shutdown function for the whole extension
+    _entry->request_startup_func = &Extension::onRequest;   // startup function per request
+    _entry->request_shutdown_func = &Extension::onIdle;     // shutdown function per request
     _entry->info_func = NULL;                               // information for retrieving info
     _entry->version = version;                              // version string
     _entry->globals_size = 0;                               // size of the global variables
