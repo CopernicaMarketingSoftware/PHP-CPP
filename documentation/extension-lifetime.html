@@ -2,8 +2,7 @@
 <p>
     As we <a href="loading-extension">explained before</a>, the get_module()
     function is called when your extension is started. It returns a memory address 
-    where the Zend engine can find all relevant information about your extension, so
-    that your functions and classes can be seen from PHP scripts.
+    where the Zend engine can find all relevant information about your extension.
 </p>
 <p>
     After this get_module() call, your extension is loaded and will be used to handle
@@ -12,18 +11,18 @@
     pageview. But extensions serve multiple pageviews after each other.
 </p>
 <p>
-    This difference is especially important if you use global <i>C++</i> variables. 
+    This difference is especially important if you use global C++ variables. 
     Such global variables are initialized when the extension is loaded - and not at 
     the beginning of each pageview. Changes that you make to global variables keep 
     their value, and subsequent requests will therefore see this updated value. 
 </p>
 <p>
-    This, by the way, only happens to global C++ variables. The Php::GLOBALS object,
-    with all the global PHP variables, is re-initialized at the beginning of 
-    each request. You do not have to worry about changes that you make to these
-    global PHP variables: at the beginning of the next request, you will have a 
-    fresh and new Php::GLOBALS object, and the changes that you made during the
-    previous request are no longer stored in it.
+    This, by the way, only happens to <i>native</i> variables. Global PHP variables,
+    stored in the Php::GLOBALS object, are re-initialized at the beginning of 
+    each request. You do not have to worry about changes that you make to 
+    global PHP variables: at the beginning of the next request, the Php::GLOBALS
+    object is fresh and new, and the changes that you made during the
+    previous request are no longer visible.
 </p>
 <p>
     Back to the global C++ variables. If you want to reset a global variable
