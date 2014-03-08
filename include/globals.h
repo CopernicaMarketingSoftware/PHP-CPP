@@ -53,34 +53,7 @@ public:
      */
     Global operator[](const std::string &name);
     
-    /**
-     *  Call a function in PHP
-     *  We have ten variants of this function, depending on the number of parameters
-     *  @param  name        Name of the function
-     *  @return Value
-     */
-    Value call(const Value &name);
-    Value call(const Value &name, Value p0);
-    Value call(const Value &name, Value p0, Value p1);
-    Value call(const Value &name, Value p0, Value p1, Value p2);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
-    Value call(const Value &name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
-
 private:
-    /**
-     *  Call function with a number of parameters
-     *  @param  name        Function name
-     *  @param  argc        Number of parameters
-     *  @param  argv        The parameters
-     *  @return Value
-     */
-    Value exec(const Value &name, int argc, struct _zval_struct ***params);
-
     /**
      *  Constructor
      */
@@ -98,7 +71,7 @@ public:
  *  We always have one instance
  *  @var    Globals
  */
-extern Globals &globals;
+extern Globals &GLOBALS;
 
 /**
  *  End of namespace

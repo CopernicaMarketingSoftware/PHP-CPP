@@ -1174,28 +1174,17 @@ Value Value::exec(int argc, zval ***params) const
  */
 Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
 {
+    // wrap the name in a Php::Value object to get a zval
+    Value method(name);
+    
     // the method to call and the return value
-    zval *method;
     zval *retval;
-
-    // construct the method, this is done similarly to how in PHP we can call
-    // a member function using call_user_func: pass in an array with the object
-    // and the method to call as the first parameter
-    MAKE_STD_ZVAL(method);
-    array_init(method);
-
-    // add the object and the method to call
-    add_index_zval(method, 0, _val);
-    add_index_stringl(method, 1, name, strlen(name), 0);
 
     // the current exception
     zval *oldException = EG(exception);
 
     // call the function
-    if (call_user_function_ex(CG(function_table), NULL, method, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
-
-    // free the method
-    FREE_ZVAL(method);
+    if (call_user_function_ex(CG(function_table), &_val, method._val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
 
     // was an exception thrown?
     if (oldException != EG(exception)) throw OrigException(EG(exception));

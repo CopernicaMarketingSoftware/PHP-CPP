@@ -68,6 +68,7 @@
 #include "../include/interface.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"
+#include "../include/call.h"
 #include "../include/init.h"
 
 /**
