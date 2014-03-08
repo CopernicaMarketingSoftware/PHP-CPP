@@ -27,7 +27,7 @@
 void example_function(Php::Parameters &amp;params)
 {
     // first parameter is an array
-    Php::Value array == params[0];
+    Php::Value array = params[0];
     
     // call the PHP array_keys() function to get the parameter keys
     std::vector&lt;std::string&gt; keys = Php::array_keys(array);
@@ -40,7 +40,7 @@ void example_function(Php::Parameters &amp;params)
     }
     
     // call a function from user space
-    Php::Value data = Php::call("some_method", "some_parameter");
+    Php::Value data = Php::call("some_function", "some_parameter");
     
     // create an object (this will also call __construct())
     Php::Object time("DateTime", "now");
@@ -87,7 +87,7 @@ extern "C" {
 }</code></pre>
 </p>
 <p>
-    In above example you can see quite some different ways how to call PHP 
+    In above example you can see quite some different ways to call PHP 
     functions from C++. The first one is the call to Php::array_keys(). The
     PHP-CPP internally has a long list of all important PHP functions, and
     you can call these functions directly from your extension. Php::array_keys()
@@ -105,19 +105,18 @@ extern "C" {
     can. User space functions, or functions from optional PHP extensions are not
     automatically forwarded by the PHP-CPP library. Such functions can still be
     called by using the Php::call() function. You must supply the name of the 
-    fuinction to call, and a list of optional arguments to call a function
-    from user space.
+    function to call, and an optional list of arguments.
 </p>
 <p>
     The Php::Object class (which is derived from Php::Value) can be used to 
     create objects, and implicitly call the __construct() method. To call a 
-    method on an object, you can use the method Php::Value::call() method, which 
+    method on an object, you can use the Php::Value::call() method, which 
     is used in the example to call the PHP method DateTime::format().
 </p>
 <p>
     In PHP scripts you can create an array with two members: and object and 
-    the name of a method. This array then automatically becomes callable. You
-    can do similar things in C++ as well, as we showed in the example with the
+    the name of a method. This array can then be used as if it was a regular
+    function. You can do similar things in C++, as we showed in the example with the
     "time_format" variable.
 </p>
 <p>
@@ -126,6 +125,12 @@ extern "C" {
 <p>
 <pre class="language-php"><code>
 &lt;?php
+    // define a user space function
+    function some_function($param)
+    {
+        echo("userspace function called with $param\n");
+    }
+
     // example input
     $input = array(
         'x' =>  10,
@@ -133,8 +138,8 @@ extern "C" {
         'z' =>  30
     );
     
-    example_function($input, function($param) {
-        echo("callback called with param $param\n");
+    example_function($input, function($param1, $param2) {
+        echo("lambda function called with param $param1 $param2\n");
     });
 ?&gt;</code></pre>
 </p>

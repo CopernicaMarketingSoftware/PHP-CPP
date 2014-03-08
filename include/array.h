@@ -59,6 +59,12 @@ public:
     Array(const std::map<std::string,T> &value) : Value(value) {}
     
     /**
+     *  Constructor from an initializer list
+     *  @param  value
+     */
+    Array(const std::initializer_list<Value> &value) : Value(value) {}
+    
+    /**
      *  Destructor
      */
     virtual ~Array() {}

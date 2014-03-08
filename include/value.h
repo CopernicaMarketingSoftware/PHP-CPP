@@ -72,8 +72,25 @@ public:
     template <typename T>
     Value(const std::vector<T> &input) : Value(Type::Array)
     {
+        // index
+        int i = 0;
+        
         // set all elements
-        for (size_t i=0; i<input.size(); i++) setRaw(i, input[i]);
+        for (auto &elem : input) setRaw(i++, elem);
+    }
+
+    /**
+     *  Constructor from an initializer list
+     *  @param  value
+     */
+    template <typename T>
+    Value(const std::initializer_list<T> &value) : Value(Type::Array) 
+    {
+        // index
+        int i = 0;
+
+        // set all elements
+        for (auto &elem : value) setRaw(i++, elem);
     }
     
     /**
@@ -395,8 +412,14 @@ public:
         // and fill the result vector
         for (size_t i = 0; i<count; i++) 
         {
-            // check if the index exists, then add it
-            if (contains(i)) result.push_back((T)get(i));
+            // check if the index exists
+            if (!contains(i)) continue;
+            
+            // get the value object
+            Value value(get(i));
+            
+            // add it to the vector
+            result.push_back(value);
         }
         
         // done

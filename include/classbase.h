@@ -240,7 +240,7 @@ private:
      *  @param  count
      *  @return int
      */
-    static int countElements(zval *object, long *count TSRMLS_DC);
+    static int countElements(struct _zval *object, long *count);
 
     /**
      *  Retrieve pointer to our own object handlers
