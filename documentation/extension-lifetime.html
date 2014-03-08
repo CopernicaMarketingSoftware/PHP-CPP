@@ -14,7 +14,7 @@
     This difference is especially important if you use global C++ variables. 
     Such global variables are initialized when the extension is loaded - and not at 
     the beginning of each pageview. Changes that you make to global variables keep 
-    their value, and subsequent requests will therefore see this updated value. 
+    their value, and subsequent requests will therefore see the updated values. 
 </p>
 <p>
     This, by the way, only happens to <i>native</i> variables. Global PHP variables,
@@ -94,13 +94,13 @@ extern "C" {
 <p>
     The Php::Extension class has a method onRequest() that is used in the
     above example to register a callback function. This callback is called right 
-    before every pageview/request. As you can see in the example, it is 
-    permitted to use lambda functions. In the above example the global variable
-    invokeDuringRequestCount is re-initialized.
+    before every pageview/request. And as you can see, it is 
+    permitted to use lambda functions.
 </p>
 <p>
-    The onRequest() is not the only callback that can be registered. There are
-    four different callbacks on*() methods that you can call to register callbacks.
+    The onRequest() is not the only method in the Php::Extension object to
+    register a callback. There are in fact
+    four different callbacks on*() methods that you can use.
 </p>
 <p>
     <ul>
