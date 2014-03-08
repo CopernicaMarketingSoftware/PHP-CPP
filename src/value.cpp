@@ -1411,17 +1411,120 @@ int Value::size() const
  */
 std::map<std::string,Php::Value> Value::mapValue() const
 {
-    // check type
-    if (isArray())
-    {
-        // result variable
-        std::map<std::string,Php::Value> result;
+    // result variable
+    std::map<std::string,Php::Value> result;
 
-        // @todo    loop through the zval key/value pairs, and return a map
+    // check type
+    if (isArray() || isObject())
+    {
+
+
+        // loop through the zval key/value pairs, and return a map
+
+        zval **value;
+        char *key;
+        unsigned long ind;
         
-        // done
-        return result;
+
+        // get access to the internal hash table of _val
+        // Zend/zend_API.h 723
+        //HashTable *arr = HASH_OF(_val);
+        HashTable *arr = isArray() ? Z_ARRVAL_P(_val) : Z_OBJ_HT_P(_val)->get_properties((_val) TSRMLS_CC);
+        //#define HASH_OF(p) (Z_TYPE_P(p)==IS_ARRAY ? Z_ARRVAL_P(p) : ((Z_TYPE_P(p)==IS_OBJECT ? Z_OBJ_HT_P(p)->get_properties((p) TSRMLS_CC) : NULL)))
+
+        // similarly php: reset($array):
+        // Maybe make it optional?
+        // If the following line to remove, then repeated calling the Value::mapValue() will return an empty map
+        zend_hash_internal_pointer_reset(arr);
+
+        //HashPosition pos;
+
+        if(zend_hash_has_more_elements(arr)  == FAILURE) {
+            return result;
+        }
+
+        //while( zend_hash_has_more_elements_ex(arr, pos)  != FAILURE ) {
+        //while( zend_hash_has_more_elements(arr)  != FAILURE ) {
+        //zend_hash_get_current_key_ex(const HashTable *ht, char **str_index, uint *str_length, ulong *num_index, zend_bool duplicate, HashPosition *pos);
+        /*
+        #define HASH_KEY_IS_STRING 1
+        #define HASH_KEY_IS_LONG 2
+        #define HASH_KEY_NON_EXISTENT 3
+        */
+        uint r;
+        //while( (r = zend_hash_get_current_key_type(arr)) != HASH_KEY_NON_EXISTENT ) {
+        while( (r = zend_hash_get_current_key(arr, &key, &ind, 0)) != HASH_KEY_NON_EXISTENT ) {
+
+            //zend_hash_get_current_key(arr, &key, &ind, 0);
+            zend_hash_get_current_data(arr, (void **) &value);
+            
+
+            
+            if(HASH_KEY_IS_LONG == r) {
+                //result[std::to_string(ind)] = Value(*value);
+                //std::cout << "std::to_string("   <<ind<< ")=" << std::to_string(ind) << std::endl;
+                
+                std::cout << "HASH_KEY_IS_LONG"   << "\tkey:" << ind << std::endl;
+
+                result[std::to_string(ind)] = Value(*value);
+
+
+            } else { // HASH_KEY_IS_STRING
+                std::cout << "HASH_KEY_IS_STRING" << "\tkey:" << key << std::endl;
+                result[key] = Value(*value);
+            }
+            //std::cout << "\tkey:" << key << "\tind:" << ind << std::endl;
+            //zval_add_ref(value);
+
+            zend_hash_move_forward(arr);
+
+        }
+
+    /**
+     *  Wrap object around zval
+     *  @param  zval        Zval to wrap
+     *  @param  ref         Force this to be a reference
+        Value(struct _zval_struct *zval, bool ref = false);
+     */
+
+/*
+#define zend_hash_get_current_data(ht, pData) \
+    zend_hash_get_current_data_ex(ht, pData, NULL)
+ZEND_API int zend_hash_move_forward_ex(HashTable *ht, HashPosition *pos);
+#define zend_hash_move_forward(ht) \
+    zend_hash_move_forward_ex(ht, NULL)
+#define zend_hash_get_current_key(ht, str_index, num_index, duplicate) \
+    zend_hash_get_current_key_ex(ht, str_index, NULL, num_index, duplicate, NULL)
+*/
+
+
+
+
+
+
+        // Zend/zend_hash.h 174
+        /* 
+        * traversing 
+        *
+            #define zend_hash_has_more_elements_ex(ht, pos) \
+                (zend_hash_get_current_key_type_ex(ht, pos) == HASH_KEY_NON_EXISTENT ? FAILURE : SUCCESS)
+            ZEND_API int zend_hash_move_forward_ex(HashTable *ht, HashPosition *pos);
+            ZEND_API int zend_hash_move_backwards_ex(HashTable *ht, HashPosition *pos);
+            ZEND_API int zend_hash_get_current_key_ex(const HashTable *ht, char **str_index, uint *str_length, ulong *num_index, zend_bool duplicate, HashPosition *pos);
+            ZEND_API void zend_hash_get_current_key_zval_ex(const HashTable *ht, zval *key, HashPosition *pos);
+            ZEND_API int zend_hash_get_current_key_type_ex(HashTable *ht, HashPosition *pos);
+            ZEND_API int zend_hash_get_current_data_ex(HashTable *ht, void **pData, HashPosition *pos);
+            *ZEND_API void zend_hash_internal_pointer_reset_ex(HashTable *ht, HashPosition *pos);
+            ZEND_API void zend_hash_internal_pointer_end_ex(HashTable *ht, HashPosition *pos);
+            ZEND_API int zend_hash_update_current_key_ex(HashTable *ht, int key_type, const char *str_index, uint str_length, ulong num_index, int mode, HashPosition *pos);
+        */
+
+
+
+        
+
     }
+    /*
     else if (isObject())
     {
         // result variable
@@ -1437,6 +1540,9 @@ std::map<std::string,Php::Value> Value::mapValue() const
         // return an empty map
         return std::map<std::string,Php::Value>();
     }
+    */
+    // done
+    return result;
 }
 
 /**
