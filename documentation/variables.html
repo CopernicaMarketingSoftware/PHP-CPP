@@ -156,13 +156,20 @@ array[0] = "apple";
 array[1] = "banana";
 array[2] = "tomato";
 
+// an initializer list can be used to create a filled array 
+Php::Value filled({ "a", "b", "c", "d"});
+
+// you can cast an array to a vector, template parameter can be
+// any type that a Value object is compatible with (string, int, etc)
+std::vector<std::string> fruit = array;
+
 // create an associative array
 Php::Value assoc;
 assoc["apple"] = "green";
 assoc["banana"] = "yellow";
 assoc["tomato"] = "green";
 
-// array values do not all have to be of the same type
+// the variables in an array do not all have to be of the same type
 Php::Value assoc2;
 assoc2["x"] = "info@example.com";
 assoc2["y"] = nullptr;
@@ -175,6 +182,10 @@ assoc2["y"] = nullptr;
 assoc2["z"][0] = "a";
 assoc2["z"][1] = "b";
 assoc2["z"][2] = "c";
+
+// assoc arrays can be cast to a map, indexed by string
+std::map<std::string,std::string> map = assoc2;
+
 </code></pre>
 </p>
 <p>
@@ -271,4 +282,37 @@ array[1] = "format";
 // name of the method
 std::cout &lt;&lt; array("Y-m-d H:i:s") &lt;&lt; std::endl;
 </code></pre>
+</p>
+<h2>Global variables</h2>
+<p>
+    To read or update global PHP variables, you can use the Php::GLOBALS 
+    variable. This variable works more or less the same as the $_GLOBALS
+    variable in a PHP script.
+</p>
+<p>
+<pre class="language-c++"><code>
+// set a global PHP variable
+Php::GLOBALS["a"] = 12345;
+
+// global variables can be of any type
+Php::GLOBALS["b"] = Php::Array({1,2,3,4});
+
+// nested calls are (of course) supported
+Php::GLOBALS["b"][4] = 5;
+
+// and global variables can also be read
+std::cout &lt;&lt; Php::GLOBALS["b"] &lt;&lt; std::endl;
+</code></pre>
+</p>
+<p>
+    Unlike PHP scripts, that handles only single pageviews, an extension is
+    used to handle multiple pageviews after each other. This means that when
+    you use global C++ (!) variables in your extension, that these variables are 
+    not set back to their initial value in between the pageviews. The 
+    Php::GLOBALS variable however, is always re-initialized at the beginning
+    of every new pageview.
+</p>
+<p>
+    You can read more about this in the article about the 
+    <a href="extension-lifetime">the extension lifetime</a>.
 </p>

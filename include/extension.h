@@ -11,11 +11,8 @@
  *  as module in a webserver) many requests are handled by the same extension
  *  instance.
  * 
- *  This is a template class. You need to pass in the type of an object
- *  that you use for storing request specific state information.
- * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013, 2014 Copernica BV
  */
 
 /**
@@ -34,10 +31,9 @@ namespace Php {
 class Extension;
 
 /**
- *  Optional callback types for starting and stopping the request
- *  @param  extension
+ *  Signature of a callback
  */
-typedef bool    (*request_callback)(Extension *extension);
+using Callback = std::function<void()>;
 
 /**
  *  Class definition
@@ -49,10 +45,8 @@ public:
      *  Constructor that defines a number of functions right away
      *  @param  name        Extension name
      *  @param  version     Extension version string
-     *  @param  callback    Function that is called when request starts
-     *  @param  callback    Function that is called when request ends
      */
-    Extension(const char *name = NULL, const char *version = NULL, request_callback start = NULL, request_callback stop = NULL);
+    Extension(const char *name = NULL, const char *version = NULL);
     
     /**
      *  No copy'ing and no moving
@@ -66,69 +60,63 @@ public:
     virtual ~Extension();
     
     /**
-     *  Initialize the extension after it was registered
+     *  Register a function to be called when the PHP engine is ready
      * 
-     *  You can override this method to add your own initialization code. The
-     *  default implementation registers all classes and namespaces
+     *  The callback will be called after all extensions are loaded, and all 
+     *  functions and classes are available, but before the first pageview/request
+     *  is handled. You can register this callback if you want to be notified
+     *  when the engine is ready, for example to initialize certain things.
      * 
-     *  @return bool
+     *  @param  callback
      */
-    virtual bool initialize()
+    void onReady(const Callback &callback)
     {
-        // initialize the namespace
-        Namespace::initialize("");
-        
-        // ok
-        return true;
+        // copy callback
+        _onReady = callback;
     }
     
     /**
-     *  Finalize the extension after it was registered
-     *
-     *  You can override this method to do your own cleanup right before the
-     *  extension object is going to be destructed
+     *  Register a function to be called when the PHP engine is going to stop
      * 
-     *  @return bool
+     *  The callback will be called right before the process is going to stop.
+     *  You can register a function if you want to clean up certain things.
+     * 
+     *  @param  callback
      */
-    virtual bool finalize()
+    void onFinalize(const Callback &callback)
     {
-        // ok
-        return true;
-    }
-
-    /**
-     *  Start a request
-     * 
-     *  This method is called when the zend engine is about to start a new
-     *  request. Internally, it calls the request() method to instantiate
-     *  a new request object, and after that it initializes the request.
-     * 
-     *  @return boolean
-     */
-    virtual bool startRequest()
-    {
-        // ok if no callback was set
-        if (!_start) return true;
-        
-        // call the callback function
-        return _start(this);
+        // copy callback
+        _onFinalize = callback;
     }
     
     /**
-     *  End a request
+     *  Register a callback that is called at the beginning of each pageview/request
      * 
-     *  This method is called when the Zend engine is ready with a request.
-     *  Internally, it destructs the request
-     *
-     *  @return boolean
+     *  You can register a callback if you want to initialize certain things
+     *  at the beginning of each request. Remember that the extension can handle
+     *  multiple requests after each other, and you may want to set back certain
+     *  global variables to their initial variables in front of each request
+     * 
+     *  @param  callback
      */
-    virtual bool endRequest()
+    void onRequest(const Callback &callback)
     {
-        // ok if no callback is set
-        if (!_stop) return true;
-        
-        // call callback
-        return _stop(this);
+        // copy callback
+        _onRequest = callback;
+    }
+    
+    /**
+     *  Register a callback that is called to cleanup things after a pageview/request
+     * 
+     *  The callback will be called after _each_ request, so that you can clean up
+     *  certain things and make your extension ready to handle the next request.
+     * 
+     *  @param  callback
+     */
+    void onCleanup(const Callback &callback)
+    {
+        // copy callback
+        _onCleanup = callback;
     }
     
     /**
@@ -161,6 +149,31 @@ private:
      *  @var zend_module_entry
      */
     _zend_module_entry *_entry;
+    
+    /**
+     *  Callback that is called after the engine is initialized and before the
+     *  pageviews are going to be handled
+     *  @var    Callback
+     */
+    Callback _onReady;
+    
+    /**
+     *  Callback that is called in front of each request
+     *  @var    Callback
+     */
+    Callback _onRequest;
+    
+    /**
+     *  Callback that is called right after each request
+     *  @var    Callback
+     */
+    Callback _onCleanup;
+    
+    /**
+     *  Callback that is called right before the engine is closing down
+     *  @var    Callback
+     */
+    Callback _onFinalize;
     
     /**
      *  Callback that is called before each request

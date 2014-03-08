@@ -1,0 +1,113 @@
+<h1>The lifetime of an extension</h1>
+<p>
+    As we <a href="loading-extension">explained before</a>, the get_module()
+    function is called when your extension is started. It returns a memory address 
+    where the Zend engine can find all relevant information about your extension, so
+    that your functions and classes can be seen from PHP scripts.
+</p>
+<p>
+    After this get_module() call, your extension is loaded and will be used to handle
+    <i>multiple pageviews</i>. This is an important difference between standard
+    PHP scripts and native extensions, because standard PHP scripts handle only a single
+    pageview. Extension can be used to serve multiple pageviews after 
+    each other.
+</p>
+<p>
+    This difference is especially important when you use global variables. Global
+    variables are initialized when the extension is loaded - and not at the beginning
+    of each pageview. Changes that you make to global variables keep their value,
+    and subsequent requests will see the updated value. If you do not want this, 
+    you can register callback functions that get called in front of each
+    request and right after each request. In these callback you can then 
+    re-initialize the global variables.
+</p>
+<p>
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
+#include &lt;iostream&gt;
+
+/**
+ *  Global value that keeps track of the number 
+ *  of requests that have been handled
+ *  @var    int
+ */
+int requestCount = 0;
+
+/**
+ *  Global value that stores the number of times 
+ *  the function updateCounters() has been called in total
+ *  @var    int
+ */
+int invokeTotalCount = 0;
+
+/**
+ *  Global value that keeps track how many times the
+ *  function updateCounters() was called during the
+ *  current request
+ *  @var    int
+ */
+int invokeDuringRequestCount = 0;
+
+/**
+ *  Native function that is callable from PHP
+ *
+ *  This function updates a number of global variables that count
+ *  the number of times a function was called
+ */
+void updateCounters()
+{
+    // increment global counters
+    invokeTotalCount++;
+    invokeDuringRequestCount++;
+}
+
+/**
+ *  Switch to C context, because the Zend engine expects get get_module()
+ *  to have a C style function signature
+ */
+extern "C" {
+    /**
+     *  Startup function that is automatically called by the Zend engine
+     *  when PHP starts, and that should return the extension details
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() 
+    {
+        // the extension object
+        static Php::Extension extension("my_extension", "1.0");
+        
+        // install a callback function that is called when the PHP engine
+        // is fully initialized
+        extension.onReady([]() {
+            
+            // set global variables to their initial values
+            requestCount = 0;
+            invokeTotalCount = 0;
+        });
+        
+        // install a callback that is called at the beginning of each
+        // request
+        extension.onRequest([]() {
+            
+            // re-initialize the counter
+            invokeDuringRequestCount = 0;
+        });
+        
+        // install a callback that is called after each request
+        extension.onCleanup([]() {
+            
+            // @todo add your own implementation
+            
+        });
+        
+        // install a callback that is called when the Zend engine
+        // is closing down
+        extension.onFinalize([]() {
+            
+            // @todo add your own implementation
+        });
+        
+        // return the extension details
+        return extension;
+    }
+}</code></pre>
+</p>
