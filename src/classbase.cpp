@@ -38,6 +38,16 @@ static ClassBase *cpp_class(zend_class_entry *entry)
 }
 
 /**
+ *  Retrieve our C++ implementation object
+ *  @param  val
+ *  @return ClassBase
+ */
+static ClassBase *cpp_class(const zval *val)
+{
+    return cpp_class(zend_get_class_entry(val));
+}
+
+/**
  *  Retrieve pointer to our own object handlers
  *  @return zend_object_handlers
  */
@@ -53,10 +63,11 @@ zend_object_handlers *ClassBase::objectHandlers()
     if (initialized) return &handlers;
     
     // initialize the handlers
-    memcpy(&handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+    memcpy(&handlers, &std_object_handlers, sizeof(zend_object_handlers));
     
     // install custom clone function
     handlers.clone_obj = &ClassBase::cloneObject;
+    handlers.count_elements = &ClassBase::countElements;
     
     // remember that object is now initialized
     initialized = true;
@@ -104,6 +115,34 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     
     // done
     return result;
+}
+
+/**
+ *  Function that is used to count the number of elements in the object
+ * 
+ *  If the user has implemented the Countable interface, this method will 
+ *  call the count() method
+ * 
+ *  @param  val
+ *  @param  count
+ *  @return int
+ */
+int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
+{
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(object);
+    
+    // does it implement the countable interface?
+    Countable *countable = dynamic_cast<Countable*>(meta);
+    
+    // if it does not implement the Countable interface, we rely on the default implementation
+    if (!countable) return std_object_handlers.count_elements(object, count);
+    
+    // call the count function
+    *count = countable->count();
+    
+    // done
+    return SUCCESS;
 }
 
 /**

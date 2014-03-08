@@ -233,6 +233,16 @@ private:
     static struct _zend_object_value createObject(struct _zend_class_entry *entry);
 
     /**
+     *  Function that is used to count the number of elements in the object
+     *  If the user has implemented the Countable interface, this method will 
+     *  call the count() method
+     *  @param  val
+     *  @param  count
+     *  @return int
+     */
+    static int countElements(zval *object, long *count TSRMLS_DC);
+
+    /**
      *  Retrieve pointer to our own object handlers
      *  @return zend_object_handlers
      */

@@ -7,7 +7,7 @@
  *  class MyClass : public Php::Base, public Php::Countable { ... }
  * 
  *  You will have to implement the count() method, which should return the
- *  number of elements in the class
+ *  number of elements in the object
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV
@@ -26,9 +26,9 @@ class Countable
 public:
     /**
      *  Retrieve the number of items in the class
-     *  @return Value
+     *  @return long
      */
-    virtual Value count() = 0;
+    virtual long count() = 0;
 
 };
     
