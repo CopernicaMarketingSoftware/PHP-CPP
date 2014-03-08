@@ -57,7 +57,7 @@ void example_function(Php::Parameters &amp;params)
     // in PHP it is possible to create an array with two parameters, the first
     // parameter being an object, and the second parameter should be the name
     // of the method, we can do that in PHP-CPP too
-    Php::Array time_format(time, "format");
+    Php::Array time_format({time, "format"});
     
     // call the method that is stored in the array
     std::cout &lt;&lt; time_format("Y-m-d H:i:s") &lt;&lt; std::endl;
@@ -142,4 +142,17 @@ extern "C" {
         echo("lambda function called with param $param1 $param2\n");
     });
 ?&gt;</code></pre>
+</p>
+<p>
+    This above script will generate output similar to this:
+<p>
+<pre>
+key: x
+key: y
+key: z
+userspace function called with some_parameter
+2014-03-08 13:55:54
+lambda function called with param some parameter
+2014-03-08 13:55:54
+</pre>
 </p>

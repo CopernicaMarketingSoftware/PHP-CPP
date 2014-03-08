@@ -240,7 +240,7 @@ private:
      *  @param  count
      *  @return int
      */
-    static int countElements(struct _zval *object, long *count);
+    static int countElements(struct _zval_struct *object, long *count);
 
     /**
      *  Retrieve pointer to our own object handlers

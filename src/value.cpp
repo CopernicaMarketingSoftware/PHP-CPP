@@ -1142,12 +1142,14 @@ Value Value::call(const char *name, Value p0, Value p1, Value p2, Value p3, Valu
 }
 
 /**
- *  Call function with a number of parameters
- *  @param  argc        Number of parameters
- *  @param  argv        The parameters
+ *  Helper function that runs the actual call
+ *  @param  object      The object to call it on
+ *  @param  method      The function or method to call
+ *  @param  args        Number of arguments
+ *  @param  params      The parameters
  *  @return Value
  */
-Value Value::exec(int argc, zval ***params) const
+static Value do_exec(zval **object, zval *method, int argc, zval ***params)
 {
     // the return zval
     zval *retval = nullptr;
@@ -1156,13 +1158,35 @@ Value Value::exec(int argc, zval ***params) const
     zval *oldException = EG(exception);
     
     // call the function
-    if (call_user_function_ex(CG(function_table), NULL, _val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
+    if (call_user_function_ex(CG(function_table), object, method, &retval, argc, params, 1, NULL) != SUCCESS)
+    {
+        // throw an exception, the function does not exist
+        throw Exception("Invalid call to "+Value(method).stringValue());
+        
+        // unreachable, but let's return at least something to prevent compiler warnings
+        return nullptr;
+    }
+    else
+    {
+        // was an exception thrown inside the function? In that case we throw a C++ new exception 
+        // to give the C++ code the chance to catch it
+        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
 
-    // was an exception thrown? we throw a C++ new exception to give the C++ the chance to catch it
-    if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
+        // no (additional) exception was thrown
+        return retval ? Value(retval) : nullptr;
+    }
+}
 
-    // no (additional) exception was thrown
-    return retval ? Value(retval) : nullptr;
+/**
+ *  Call function with a number of parameters
+ *  @param  argc        Number of parameters
+ *  @param  argv        The parameters
+ *  @return Value
+ */
+Value Value::exec(int argc, zval ***params) const
+{
+    // call helper function
+    return do_exec(nullptr, _val, argc, params);
 }
 
 /**
@@ -1177,20 +1201,8 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
     // wrap the name in a Php::Value object to get a zval
     Value method(name);
     
-    // the method to call and the return value
-    zval *retval;
-
-    // the current exception
-    zval *oldException = EG(exception);
-
-    // call the function
-    if (call_user_function_ex(CG(function_table), &_val, method._val, &retval, argc, params, 1, NULL) != SUCCESS) return nullptr;
-
-    // was an exception thrown?
-    if (oldException != EG(exception)) throw OrigException(EG(exception));
-
-    // no (additional) exception was thrown
-    return retval ? Value(retval) : nullptr;
+    // call helper function
+    return do_exec(&_val, method._val, argc, params);
 }
 
 /**
