@@ -198,7 +198,7 @@ Php::Object counter1("Counter");
 // the __construct() is being called with value 10
 Php::Object counter2("Counter", 10);
 
-// new builtin DateTime object, constructed with "now"
+// new built-in DateTime object, constructed with "now"
 Php::Object time("DateTime", "now");
 
 // valid, a Php::Object is an extended Php::Value, and 
@@ -212,7 +212,7 @@ Php::Object copy2 = counter0;
 <p>
     The constructor of a Php::Object takes the name of a class, and an optional
     list of parameters that will be passed to the __construct() function. You 
-    can use names from builtin PHP classes and other extensions (like DateTime), 
+    can use names from built-in PHP classes and other extensions (like DateTime), 
     classes from your extension (like Counter), and even classes from PHP user 
     space.
 </p>

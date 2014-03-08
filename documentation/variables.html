@@ -35,7 +35,7 @@
     that deal with pointer-to-pointer-to-pointer-to-zval's.
 </p>
 <p>
-    Every single PHP module, every PHP extension, and every builtin PHP function
+    Every single PHP module, every PHP extension, and every built-in PHP function
     is busy manipulating these zval structures. It is a big surprise that nobody
     ever took the time to wrap such a zval in a simple C++ class that does all 
     this administration for you. C++ is such a nice language with constructors, 
@@ -254,7 +254,7 @@ std::cout &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 // create a string with a function name
 Php::Value date = "date";
 
-// "date" is a builtin PHP function and thus can it be called
+// "date" is a built-in PHP function and thus can it be called
 std::cout &lt;&lt; date("Y-m-d H:i:s") &lt;&lt; std::endl;
 
 // create a date-time object

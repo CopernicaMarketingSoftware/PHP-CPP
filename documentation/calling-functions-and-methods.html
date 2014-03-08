@@ -1,0 +1,140 @@
+<h1>Calling PHP functions</h1>
+<p>
+    Let's get one thing clear first. Running native code is much faster than
+    running PHP code. So, once your C++ function or your C++ method finally
+    gets called, you normally cast the parameters to native variables, and 
+    you start running your own fast algorithm. And you don't want to call 
+    other PHP functions from that moment on.
+</p>
+<p>
+    If, however, you would like to make a call to a PHP function - whether that
+    is a function that is built-in in the Zend engine, that is defined in an
+    extension, or even a function that comes from PHP user space - you can do
+    so.
+</p>
+<p>
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
+#include &lt;iostream&gt;
+
+/**
+ *  Native function that is callable from PHP
+ *
+ *  This function gets two parameters: an associative array and a callback.
+ *  It does not do anything meaningful, it is just a demonstration function.
+ *
+ *  @param  params      The parameters passed to the function
+ */
+void example_function(Php::Parameters &amp;params)
+{
+    // first parameter is an array
+    Php::Value array == params[0];
+    
+    // call the PHP array_keys() function to get the parameter keys
+    std::vector&lt;std::string&gt; keys = Php::array_keys(array);
+    
+    // loop through the keys
+    for (auto &key : keys) 
+    {
+        // output key
+        std::cout &lt;&lt; "key: " &lt;&lt; key &lt;&lt; std::endl;
+    }
+    
+    // call a function from user space
+    Php::Value data = Php::call("some_method", "some_parameter");
+    
+    // create an object (this will also call __construct())
+    Php::Object time("DateTime", "now");
+    
+    // call a method on the datetime object
+    std::cout &lt;&lt; time.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
+    
+    // second parameter is a callback function
+    Php::Value callback = params[1];
+    
+    // call the callback function
+    callback("some","parameter");
+    
+    // in PHP it is possible to create an array with two parameters, the first
+    // parameter being an object, and the second parameter should be the name
+    // of the method, we can do that in PHP-CPP too
+    Php::Array time_format(time, "format");
+    
+    // call the method that is stored in the array
+    std::cout &lt;&lt; time_format("Y-m-d H:i:s") &lt;&lt; std::endl;
+}
+
+/**
+ *  Switch to C context, because the Zend engine expects get get_module()
+ *  to have a C style function signature
+ */
+extern "C" {
+    /**
+     *  Startup function that is automatically called by the Zend engine
+     *  when PHP starts, and that should return the extension details
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() 
+    {
+        // the extension object
+        static Php::Extension extension("my_extension", "1.0");
+        
+        // add the example function so that it can be called from PHP scripts
+        extension.add("example_function", example_function);
+        
+        // return the extension details
+        return extension;
+    }
+}</code></pre>
+</p>
+<p>
+    In above example you can see quite some different ways how to call PHP 
+    functions from C++. The first one is the call to Php::array_keys(). The
+    PHP-CPP internally has a long list of all important PHP functions, and
+    you can call these functions directly from your extension. Php::array_keys()
+    is one of them.
+</p>
+<p>
+    Many of the built-in function functions (like Php::array_keys()) return a
+    Php::Value object. In the example however, you saw that we assigned the
+    return value directly to a std::vector. This works because the Php::Value 
+    object has an implicit casting operator to automatically transform the 
+    object to a vector.
+</p>
+<p>
+    Not every PHP function can of course be called like the built-in functions 
+    can. User space functions, or functions from optional PHP extensions are not
+    automatically forwarded by the PHP-CPP library. Such functions can still be
+    called by using the Php::call() function. You must supply the name of the 
+    fuinction to call, and a list of optional arguments to call a function
+    from user space.
+</p>
+<p>
+    The Php::Object class (which is derived from Php::Value) can be used to 
+    create objects, and implicitly call the __construct() method. To call a 
+    method on an object, you can use the method Php::Value::call() method, which 
+    is used in the example to call the PHP method DateTime::format().
+</p>
+<p>
+    In PHP scripts you can create an array with two members: and object and 
+    the name of a method. This array then automatically becomes callable. You
+    can do similar things in C++ as well, as we showed in the example with the
+    "time_format" variable.
+</p>
+<p>
+    The following script runs the example.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+    // example input
+    $input = array(
+        'x' =>  10,
+        'y' =>  20,
+        'z' =>  30
+    );
+    
+    example_function($input, function($param) {
+        echo("callback called with param $param\n");
+    });
+?&gt;</code></pre>
+</p>
