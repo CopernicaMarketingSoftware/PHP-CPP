@@ -2,8 +2,8 @@
 <p>
     PHP classes have a number of magic methods that you can implement to 
     enable special features. These are methods like __toString(), __get(), __set(), 
-    __invoke(), etcetera. The PHP-CPP library also allows you to implement these 
-    magic methods.
+    __invoke(), etcetera. With the PHP-CPP library you can implement these 
+    magic methods too.
 </p>
 <p>
     Besides that, a core PHP installation also comes with a number of interfaces
@@ -13,13 +13,14 @@
     PHP-CPP.
 </p>
 <p>
-    There does not seem to be any uniformity in the Zend engine in the choice 
-    between magic methods and interfaces. To us it is unclear why some special features 
+    So there are magic methods and interfaces. Strangely enough,
+    there does not seem to be any uniformity in the Zend engine in the choice 
+    between these magic methods and interfaces. To us it is unclear why some special features 
     are implemented with magic methods, while others are activated by implementing
     interfaces. In our eyes the Serializable interface could just as well have 
     been implemented with magic __serialize() and __unserialize() methods, or the
     __invoke() method could just as well have been an "Invokable" interface. 
-    PHP is not a standardized language, and some things just seem to the way they
+    PHP is not a standardized language, and some things just seem to be the way they
     are because someone felt like implementing it this way or another...
 </p>
 <p>
@@ -61,7 +62,7 @@
  *  The famous counter class, now also implements 
  *  the Php::Countable interface
  */
-class Counter : public Php::Base, Php::Countable
+class Counter : public Php::Base, public Php::Countable
 {
 private:
     /**
@@ -152,5 +153,154 @@ echo(count($counter)."\n");
 </pre></code>
 </p>
 <p>
-    The output is, as expected, te value 3.
+    The output is, as expected, the value 3.
+</p>
+<h2>The ArrayAccess interface</h2>
+<p>
+    A PHP object can be turned into a variable that behaves like an array by
+    implementing the Php::ArrayAccess interface. When you do this, objects
+    can be accessed by with the array access operator ($object["property"]).
+</p>
+<p>
+    In the following example we use the Php::Countable and the Php::ArrayAccess
+    interfaces to create a class that acts like an associative array than can
+    be used for storing strings (remember: this is just an example, PHP already
+    has support for associative arrays, so it is debatable how useful the
+    example is).
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  A sample Map class, that can be used to map string-to-strings
+ */
+class Map : public Php::Base, public Php::Countable, public Php::ArrayAccess
+{
+private:
+    /**
+     *  Internally, a C++ map is used
+     *  @var    std::map&lt;std::string,std::string&gt;
+     */
+    std::map&lt;std::string,std::string&gt; _map;
+
+public:
+    /**
+     *  C++ constructor and C++ destructpr
+     */
+    Map() {}
+    virtual ~Map() {}
+    
+    /**
+     *  Method from the Php::Countable interface that 
+     *  returns the number of elements in the map
+     *  @return long
+     */
+    virtual long count() override 
+    { 
+        return _map.size(); 
+    }
+
+    /**
+     *  Method from the Php::ArrayAccess interface that is
+     *  called to check if a certain key exists in the map
+     *  @param  key
+     *  @return bool
+     */
+    virtual bool offsetExists(const Php::Value &key) override
+    {
+        return _map.find(key) != _map.end();
+    }
+    
+    /**
+     *  Set a member
+     *  @param  key
+     *  @param  value
+     */
+    virtual void offsetSet(const Php::Value &key, const Php::Value &value) override
+    {
+        _map[key] = value;
+    }
+    
+    /**
+     *  Retrieve a member
+     *  @param  key
+     *  @return value
+     */
+    virtual Php::Value offsetGet(const Php::Value &key) override
+    {
+        return _map[key];
+    }
+    
+    /**
+     *  Remove a member
+     *  @param key
+     */
+    virtual void offsetUnset(const Php::Value &key) override
+    {
+        _map.erase(key);
+    }
+};
+
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        
+        // extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows 
+        // which methods are accessible
+        Php::Class&lt;Map&gt; map("Map");
+        
+        // add the class to the extension
+        myExtension.add(std::move(map));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The Php::ArrayAccess has four pure virtual methods that have to be 
+    implemented. These are methods to retrieve and overwrite an element,
+    to check if an element with a certain key exists, and a method to
+    remove an element. In the example these methods have all been implemented
+    to be forwarded to a regular C++ std::map object.
+</p>
+<p>
+    The Map object from the example does not have any regular methods at all.
+    It only implements the Php::Countable interface and Php::ArrayAccess interface,
+    so it is perfectly usable to store and retrieve properties, but it does not
+    have any methods. The following script shows how to use it.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// create a map
+$map = new Map();
+
+// store some values
+$map["a"] = 1234;
+$map["b"] = "xyz";
+$map["c"] = new stdClass();
+
+// show the values
+echo($map["a"]."\n");
+echo($map["b"]."\n");
+echo($map["c"]."\n");
+
+// access a value that does not exist
+echo($map["d"]."\n");
+?&gt;
+</pre></code>
 </p>
