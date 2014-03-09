@@ -60,6 +60,8 @@
 #include "../include/base.h"
 #include "../include/countable.h"
 #include "../include/arrayaccess.h"
+#include "../include/iterator.h"
+#include "../include/traversable.h"
 #include "../include/classtype.h"
 #include "../include/classbase.h"
 #include "../include/class.h"

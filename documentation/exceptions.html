@@ -12,6 +12,11 @@
 <p>
 <pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
 
+/**
+ *  Simple function that takes two numeric parameters,
+ *  and that divides them. Division by zero is of course
+ *  not permitted - it will throw an exception then
+ */
 Php::Value myDiv(Php::Parameters &params)
 {
     // division by zero is not permitted, throw an exception when this happens
@@ -75,7 +80,7 @@ exception caught
 </p>
 <h2>Catching exceptions in C++</h2>
 <p>
-    And this works the other way around too. If your extensions calls a PHP 
+    And this works the other way around too. If your extension calls a PHP 
     function, and that PHP function happens to throw an exception, you can catch it
     just as if it was a normal C++ exception. 
 </p>
@@ -111,7 +116,7 @@ extern "C" {
     be used just like a normal PHP $variable is used, and you can thus store 
     integers, strings, objects, arrays, et cetera in it. But this also means
     that you can use it to store functions - because PHP variables can 
-    be used to store function too! And that's exactly what we're doing here.
+    be used to store functions too! And that's exactly what we're doing here.
 </p>
 <p>
     The callMe() function from this example extension receives one single

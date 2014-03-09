@@ -159,11 +159,11 @@ echo(count($counter)."\n");
 <p>
     A PHP object can be turned into a variable that behaves like an array by
     implementing the Php::ArrayAccess interface. When you do this, objects
-    can be accessed by with the array access operator ($object["property"]).
+    can be accessed with array access operators ($object["property"]).
 </p>
 <p>
     In the following example we use the Php::Countable and the Php::ArrayAccess
-    interfaces to create a class that acts like an associative array than can
+    interfaces to create an associative array class than can
     be used for storing strings (remember: this is just an example, PHP already
     has support for associative arrays, so it is debatable how useful the
     example is).
@@ -278,10 +278,12 @@ extern "C" {
     to be forwarded to a regular C++ std::map object.
 </p>
 <p>
-    The Map object from the example does not have any regular methods at all.
-    It only implements the Php::Countable interface and Php::ArrayAccess interface,
-    so it is perfectly usable to store and retrieve properties, but it does not
-    have any methods. The following script shows how to use it.
+    Inside the get_module() function, the Map is registered and added to the
+    extension. But unlike many other examples, none of the class methods are
+    exported to PHP. It only implements the Php::Countable interface and 
+    Php::ArrayAccess interface, so it is perfectly usable to store and retrieve 
+    properties, but from a PHP script it does not have any callable methods. 
+    The following script shows how to use it.
 </p>
 <p>
 <pre class="language-php"><code>
@@ -292,7 +294,7 @@ $map = new Map();
 // store some values
 $map["a"] = 1234;
 $map["b"] = "xyz";
-$map["c"] = new stdClass();
+$map["c"] = 0;
 
 // show the values
 echo($map["a"]."\n");
@@ -301,6 +303,11 @@ echo($map["c"]."\n");
 
 // access a value that does not exist
 echo($map["d"]."\n");
+
 ?&gt;
 </pre></code>
+</p>
+<p>
+    The output speaks for itself. The map has three members, "1234" (a string
+    variable), "xyz" and "0".
 </p>

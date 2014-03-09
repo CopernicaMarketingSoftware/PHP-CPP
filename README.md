@@ -3,7 +3,7 @@ PHP-CPP
 
 The PHP-CPP library is a C++ library for developing PHP extensions. It offers a collection
 of well documented and easy-to-use classes that can be used and extended to build native
-extensions for PHP.
+extensions for PHP. The full documentation can be found on http://www.php-cpp.com.
 
 Unlike regular PHP extensions - which are really hard to implement and require a deep
 knowledge of the Zend engine and pointer manipulation - extensions built with PHP-CPP
@@ -81,11 +81,5 @@ function get_complex_array()
 }
 ```
 
-However, this library is currently a work in progress, and it is an open
-source project. We are looking for people who'd like to contribute to it.
-
-PHP-CPP is an initiative from Copernica BV.
-
-For more information, contact me at [emiel.bruijntjes@copernica.com](mailto:emiel.bruijntjes@copernica.com?Subject=PHP-CPP).
-
-Emiel Bruijntjes (1 September 2013)
+More information and more examples are available on the official website:
+http://www.php-cpp.com.

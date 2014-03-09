@@ -50,8 +50,10 @@ MixedObject *Base::store(zend_class_entry *entry)
     
     // store the class entry in the newly created object
     result->php.ce = entry;
+    
+    // @todo is this really necessary - and when do we destruct this data?
+    // (if we remove this code, everything breaks down in a for ($object as $k => $v) loop)
 
-#if PHP_VERSION_ID < 50399
     // the original create_object fills the initial object with the default properties,
     // we're going to do exactly the same. start with setting up a hashtable for the props
     ALLOC_HASHTABLE(result->php.properties);
@@ -59,6 +61,7 @@ MixedObject *Base::store(zend_class_entry *entry)
     // initialize the hash table
     zend_hash_init(result->php.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
 
+#if PHP_VERSION_ID < 50399
     // initialize the properties
     zend_hash_copy(result->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval*));
 #else

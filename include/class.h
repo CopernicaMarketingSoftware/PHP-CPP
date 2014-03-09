@@ -154,7 +154,7 @@ private:
      *  Construct a new instance of the object
      *  @return Base
      */
-    virtual Base* construct() override
+    virtual Base* construct() const override
     {
         // construct an instance
         return new T();
@@ -165,13 +165,23 @@ private:
      *  @param  orig
      *  @return Base
      */
-    virtual Base *clone(Base *orig) override
+    virtual Base *clone(Base *orig) const override
     {
         // cast to the original object
         T *t = (T *)orig;
         
         // construct a new base by calling the copy constructor
         return new T(*t);
+    }
+    
+    /**
+     *  Is this class traversable?
+     *  @return bool
+     */
+    virtual bool traversable() const override
+    {
+        // check if the templated class overrides from the base
+        return std::is_base_of<Traversable,T>::value;
     }
     
     /**

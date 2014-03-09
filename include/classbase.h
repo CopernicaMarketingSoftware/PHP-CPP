@@ -97,14 +97,20 @@ public:
      *  Construct a new instance of the object
      *  @return Base
      */
-    virtual Base* construct() = 0;
+    virtual Base* construct() const = 0;
     
     /**
      *  Create a clone of an object
      *  @param  orig
      *  @return Base
      */
-    virtual Base *clone(Base *orig) = 0;
+    virtual Base *clone(Base *orig) const = 0;
+
+    /**
+     *  Is this a traversable class?
+     *  @return bool
+     */
+    virtual bool traversable() const = 0;
 
     /**
      *  Initialize the class, given its name
@@ -281,6 +287,15 @@ private:
      *  @return zend_object_handlers
      */
     static struct _zend_object_handlers *objectHandlers();
+
+    /**
+     *  Function to create a new iterator to iterate over an object
+     *  @param  entry                   The class entry
+     *  @param  object                  The object to iterate over
+     *  @param  by_ref                  ?????
+     *  @return zend_object_iterator*   Pointer to the iterator
+     */
+    static struct _zend_object_iterator *getIterator(struct _zend_class_entry *entry, struct _zval_struct *object, int by_ref);
 
     /**
      *  Name of the class

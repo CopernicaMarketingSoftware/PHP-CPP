@@ -359,6 +359,30 @@ zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
 }
 
 /**
+ *  Function to create a new iterator to iterate over an object
+ *  @param  entry                   The class entry
+ *  @param  object                  The object to iterate over
+ *  @param  by_ref                  ?????
+ *  @return zend_object_iterator*   Pointer to the iterator
+ */
+zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *object, int by_ref)
+{
+    std::cout << "call to getIterator" << std::endl;
+    
+    // by-ref is not possible (copied from SPL)
+    if (by_ref) throw Php::Exception("Foreach by ref is not possible");
+    
+    // retrieve the traversable object
+    Traversable *traversable = dynamic_cast<Traversable*>(cpp_object(object));
+    
+    // create an iterator
+    auto *iterator = traversable->getIterator();
+    
+    // return the implementation
+    return iterator->implementation();
+}
+
+/**
  *  Destructor
  */
 ClassBase::~ClassBase()
@@ -435,6 +459,10 @@ void ClassBase::initialize(const std::string &prefix)
 
     // we need a special constructor
     entry.create_object = &ClassBase::createObject;
+    
+    // and a special function for retrieving the iterator (but only if this is
+    // a traversable class)
+    if (traversable()) entry.get_iterator = &ClassBase::getIterator;
     
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);

@@ -862,6 +862,7 @@ protected:
     friend class Globals;
     friend class Member;
     friend class ClassBase;
+    friend class Iterator;
 };
 
 /**

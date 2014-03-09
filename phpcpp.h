@@ -42,6 +42,8 @@
 #include <phpcpp/base.h>
 #include <phpcpp/countable.h>
 #include <phpcpp/arrayaccess.h>
+#include <phpcpp/iterator.h>
+#include <phpcpp/traversable.h>
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
 #include <phpcpp/class.h>

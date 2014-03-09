@@ -19,8 +19,12 @@ namespace Php {
  */
 class Traversable
 {
-
-
+public:
+    /**
+     *  Retrieve an instance of the iterator
+     *  @return Iterator
+     */
+    virtual Iterator *getIterator() = 0;
 };
 
 /**
