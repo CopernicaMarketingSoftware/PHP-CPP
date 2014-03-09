@@ -1,0 +1,156 @@
+<h1>Magic methods and interfaces</h1>
+<p>
+    PHP classes have a number of magic methods that you can implement to 
+    enable special features. These are methods like __toString(), __get(), __set(), 
+    __invoke(), etcetera. The PHP-CPP library also allows you to implement these 
+    magic methods.
+</p>
+<p>
+    Besides that, a core PHP installation also comes with a number of interfaces
+    that you can implement to add even more special features to a class. These
+    are interfaces with names like 'Countable', 'ArrayAccess' and 'Serializable'.
+    The features that these interfaces bring, can also be implemented using
+    PHP-CPP.
+</p>
+<p>
+    There does not seem to be any uniformity in the Zend engine in the choice 
+    between magic methods and interfaces. To us it is unclear why some special features 
+    are implemented with magic methods, while others are activated by implementing
+    interfaces. In our eyes the Serializable interface could just as well have 
+    been implemented with magic __serialize() and __unserialize() methods, or the
+    __invoke() method could just as well have been an "Invokable" interface. 
+    PHP is not a standardized language, and some things just seem to the way they
+    are because someone felt like implementing it this way or another...
+</p>
+<p>
+    The PHP-CPP library tries to stay as close to PHP as possible. That's why in
+    your C++ classes you can also override the magic methods and implement the
+    special interfaces - and because C++ does not have interfaces like PHP has,
+    we use classes with pure virtual methods instead.
+</p>
+<h2>Support for the SPL</h2>
+<p>
+    A standard PHP installation comes with the Standard PHP Library (SPL). This
+    is an extension that is built on top of the Zend engine and that uses features
+    from the Zend engine to create classes and interfaces like Countable, Iterator
+    and ArrayAccess.
+</p>
+<p>
+    The PHP-CPP library also has interfaces with these names, and they behave in
+    more or less the same way as the SPL interfaces. But internally, the PHP-CPP
+    does not depend on the SPL. If you implement a C++ interface like 
+    Php::ArrayAccess or Php::Countable, it is something different than writing
+    a class in PHP that implements a SPL interface.
+</p>
+<p>
+    Both PHP-CPP and the SPL are directly built on top of the Zend core and 
+    offer the same sort of features, but they do not rely on each other. You can 
+    thus safely use PHP-CPP if you have not loaded the SPL extension.
+</p>
+<h2>The Countable interface</h2>
+<p>
+    By implementing the Php::Countable interface, you can create objects that
+    can be passed to the PHP count() function. You have to implement a count()
+    method that returns the value that you want the count() function to return.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  The famous counter class, now also implements 
+ *  the Php::Countable interface
+ */
+class Counter : public Php::Base, Php::Countable
+{
+private:
+    /**
+     *  The internal counter value
+     *  @var int
+     */
+    int _value = 0;
+
+public:
+    /**
+     *  C++ constructor and C++ destructpr
+     */
+    Counter() {}
+    virtual ~Counter() {}
+    
+    /**
+     *  Methods to increment and decrement the counter
+     */
+    Php::Value increment() { return ++_value; }
+    Php::Value decrement() { return --_value; }
+
+    /**
+     *  Method from the Php::Countable interface, that
+     *  is used when a Counter instance is passed to the
+     *  PHP count() function
+     *  
+     *  @return long
+     */
+    virtual long count() override { return _value; }
+};
+
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        
+        // extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows 
+        // which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        
+        // add methods
+        counter.method("increment", &Counter::increment);
+        counter.method("decrement", &Counter::decrement);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The Counter class that we used before has been modified to
+    show how to make classes that implement the Php::Countable interface.
+    It is very simple, all you have to to is add the Php::Countable class
+    as base class. This Php::Countable class has one pure virtual method,
+    count(), that has to be implemented.
+</p>
+<p>
+    And that's is all that you have to do. There is no need to register the
+    special count() function inside the get_module() function, adding
+    Php::Countable as base class is sufficient.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// create a counter
+$counter = new Counter();
+$counter->increment();
+$counter->increment();
+$counter->increment();
+
+// show the current value
+echo(count($counter)."\n");
+?&gt;
+</pre></code>
+</p>
+<p>
+    The output is, as expected, te value 3.
+</p>
