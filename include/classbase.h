@@ -243,6 +243,40 @@ private:
     static int countElements(struct _zval_struct *object, long *count);
 
     /**
+     *  Function that is called when the object is used as an array in PHP
+     *  @param  object          The object on which it is called
+     *  @param  offset          The name of the property
+     *  @param  type            The type of the variable???
+     *  @return zval
+     */
+    static struct _zval_struct *readDimension(struct _zval_struct *object, struct _zval_struct *offset, int type);
+
+    /**
+     *  Function that is called when the object is used as an array in PHP
+     *  @param  object          The object on which it is called
+     *  @param  offset          The name of the property
+     *  @param  value           The new value
+     *  @return zval
+     */
+    static void writeDimension(struct _zval_struct *object, struct _zval_struct *offset, struct _zval_struct *value);
+
+    /**
+     *  Function that is called when the object is used as an array in PHP
+     *  @param  object          The object on which it is called
+     *  @param  member          The member to check
+     *  @param  check_empty     ????
+     *  @return bool
+     */
+    static int hasDimension(struct _zval_struct *object, struct _zval_struct *member, int check_empty);
+
+    /**
+     *  Function that is called when the object is used as an array in PHP
+     *  @param  object          The object on which it is called
+     *  @param  member          The member to remove
+     */
+    static void unsetDimension(struct _zval_struct *object, struct _zval_struct *member);
+
+    /**
      *  Retrieve pointer to our own object handlers
      *  @return zend_object_handlers
      */

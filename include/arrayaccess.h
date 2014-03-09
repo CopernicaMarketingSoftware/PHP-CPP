@@ -47,44 +47,6 @@ public:
      *  @param key
      */
     virtual void offsetUnset(const Php::Value &key) = 0;
-    
-    /**
-     *  Alternative offsetExists as it is initially called
-     *  @param  params
-     *  @return bool
-     */
-    virtual Php::Value offsetExists(Php::Parameters &params)
-    {
-        return offsetExists(params[0]);
-    }
-    
-    /**
-     *  Alternative set member function as it is initially called
-     *  @param  params
-     */
-    virtual void offsetSet(const Php::Parameters &params)
-    {
-        offsetSet(params[0], params[1]);
-    }
-    
-    /**
-     *  Alternative retrieve member function that is initially called
-     *  @param  params
-     *  @return value
-     */
-    virtual Php::Value offsetGet(Php::Parameters &params)
-    {
-        return offsetGet(params[0]);
-    }
-    
-    /**
-     *  Alternative function to remove a member that is initally called
-     *  @param params
-     */
-    virtual void offsetUnset(Php::Parameters &params)
-    {
-        return offsetUnset(params[0]);
-    }
 };
     
 /**

@@ -52,7 +52,7 @@ public:
         // interfaces are not yet initialized by the zend engine, this only
         // happens later when the all classes are registered (after the
         // get_module() call)
-        if (std::is_base_of<ArrayAccess, T>::value) interface(&zend_ce_arrayaccess);
+//        if (std::is_base_of<ArrayAccess, T>::value) interface(&zend_ce_arrayaccess);
     }
     
     /**

@@ -38,13 +38,17 @@ static ClassBase *cpp_class(zend_class_entry *entry)
 }
 
 /**
- *  Retrieve our C++ implementation object
+ *  Retrieve the CPP object
  *  @param  val
- *  @return ClassBase
+ *  @return Base
  */
-static ClassBase *cpp_class(const zval *val)
+static Base *cpp_object(const zval *val)
 {
-    return cpp_class(zend_get_class_entry(val));
+    // retrieve the old object, which we are going to copy
+    MixedObject *object = (MixedObject *)zend_object_store_get_object(val);
+
+    // return the cpp object
+    return object->cpp;
 }
 
 /**
@@ -68,6 +72,10 @@ zend_object_handlers *ClassBase::objectHandlers()
     // install custom clone function
     handlers.clone_obj = &ClassBase::cloneObject;
     handlers.count_elements = &ClassBase::countElements;
+    handlers.write_dimension = &ClassBase::writeDimension;
+    handlers.read_dimension = &ClassBase::readDimension;
+    handlers.has_dimension = &ClassBase::hasDimension;
+    handlers.unset_dimension = &ClassBase::unsetDimension;
     
     // remember that object is now initialized
     initialized = true;
@@ -129,20 +137,192 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
  */
 int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
 {
-    // we need the C++ class meta-information object
-    ClassBase *meta = cpp_class(object);
-    
     // does it implement the countable interface?
-    Countable *countable = dynamic_cast<Countable*>(meta);
-    
+    Countable *countable = dynamic_cast<Countable*>(cpp_object(object));
+
     // if it does not implement the Countable interface, we rely on the default implementation
-    if (!countable) return std_object_handlers.count_elements(object, count);
+    if (countable) 
+    {
+        // call the count function
+        *count = countable->count();
+        
+        // done
+        return SUCCESS;
+    }
+    else
+    {
+        // Countable interface was not implemented, check if there is a default
+        if (!std_object_handlers.count_elements) return FAILURE;
+        
+        // call default
+        return std_object_handlers.count_elements(object, count);
+    }
+}
+
+/**
+ *  Function that is called when the object is used as an array in PHP
+ * 
+ *  This is the [] operator in PHP, and mapped to the offsetGet() method 
+ *  of the ArrayAccess interface
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  offset          The name of the property
+ *  @param  type            The type of the variable???
+ *  @return zval
+ */
+zval *ClassBase::readDimension(zval *object, zval *offset, int type)
+{
+    // what to do with the type?
+    //
+    // the type parameter tells us whether the dimension was read in READ
+    // mode, WRITE mode, READWRITE mode or UNSET mode. 
+    // 
+    // In 99 out of 100 situations, it is called in regular READ mode (value 0), 
+    // only when it is called from a PHP script that has statements like 
+    // $x =& $object["x"], $object["x"]["y"] = "something" or unset($object["x"]["y"]), 
+    // the type parameter is set to a different value.
+    //
+    // But we must ask ourselves the question what we should be doing with such
+    // cases. Internally, the object most likely has a full native implementation,
+    // and the property that is returned is just a string or integer or some
+    // other value, that is temporary WRAPPED into a zval to make it accessible
+    // from PHP. If someone wants to get a reference to such an internal variable,
+    // that is in most cases simply impossible.
     
-    // call the count function
-    *count = countable->count();
+     
+    // does it implement the arrayaccess interface?
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
     
-    // done
-    return SUCCESS;
+    // if it does not implement the ArrayAccess interface, we rely on the default implementation
+    if (arrayaccess) 
+    {
+        // ArrayAccess is implemented, call function
+        Value value = arrayaccess->offsetGet(offset);
+        
+        // because we do not want the value object to destruct the zval when
+        // it falls out of scope, we detach the zval from it, if this is a regular
+        // read operation we can do this right away
+        if (type == 0) return value.detach();
+        
+        // this is a more complicated read operation, the scripts wants to get
+        // deeper access to the returned value. This, however, is only possible
+        // if the value has more than once reference (if it has a refcount of one,
+        // the value object that we have here is the only instance of the zval,
+        // and it is simply impossible to return a reference or so
+        if (value.refcount() <= 1) return value.detach(); 
+        
+        // we're dealing with an editable zval, return a reference variable
+        return Value(value.detach(), true).detach();
+    }
+    else
+    {
+        // ArrayAccess not implemented, check if there is a default handler
+        if (!std_object_handlers.read_dimension) return nullptr;
+        
+        // call default
+        return std_object_handlers.read_dimension(object, offset, type);
+    }
+}
+
+/**
+ *  Function that is called when the object is used as an array in PHP
+ * 
+ *  This is the [] operator in PHP, and mapped to the offsetSet() method 
+ *  of the ArrayAccess interface
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  offset          The name of the property
+ *  @param  value           The new value
+ *  @return zval
+ */
+void ClassBase::writeDimension(zval *object, zval *offset, zval *value)
+{
+    // does it implement the arrayaccess interface?
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    
+    // if it does not implement the ArrayAccess interface, we rely on the default implementation
+    if (arrayaccess) 
+    {
+        // set the value
+        arrayaccess->offsetSet(offset, value);
+    }
+    else
+    {
+        // ArrayAccess not interface, check if there is a default handler
+        if (!std_object_handlers.write_dimension) return;
+        
+        // call the default
+        std_object_handlers.write_dimension(object, offset, value);
+    }
+}
+
+/**
+ *  Function that is called when the object is used as an array in PHP
+ * 
+ *  This is the [] operator in PHP, and mapped to the offsetExists() method
+ *  of the ArrayAccess interface
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  member          The member to check
+ *  @param  check_empty     Was this an isset() call, or an empty() call?
+ *  @return bool
+ */
+int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
+{
+    // does it implement the arrayaccess interface?
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    
+    // if it does not implement the ArrayAccess interface, we rely on the default implementation
+    if (arrayaccess) 
+    {
+        // check if the member exists
+        if (!arrayaccess->offsetExists(member)) return false;
+        
+        // we know for certain that the offset exists, but should we check
+        // more, like whether the value is empty or not?
+        if (!check_empty) return true;
+        
+        // it should not be empty
+        return !arrayaccess->offsetGet(member).isEmpty();
+    }
+    else
+    {
+        // ArrayAccess interface is not implemented, check if there is a default handler
+        if (!std_object_handlers.has_dimension) return 0;
+
+        // call default
+        return std_object_handlers.has_dimension(object, member, check_empty);
+    }
+}
+
+/**
+ *  Function that is called when the object is used as an array in PHP
+ * 
+ *  This is the [] operator in PHP, and mapped to the offsetUnset() method
+ *  of the ArrayAccess interface
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  member          The member to remove
+ */
+void ClassBase::unsetDimension(zval *object, zval *member)
+{
+    // does it implement the arrayaccess interface?
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    
+    // if it does not implement the ArrayAccess interface, we rely on the default implementation
+    if (arrayaccess) 
+    {
+        // remove the member
+        arrayaccess->offsetUnset(member);
+    }
+    else
+    {
+        // ArrayAccess is not implemented, is a default handler available?
+        if (!std_object_handlers.unset_dimension) return;
+        
+        // call the default
+        std_object_handlers.unset_dimension(object, member);
+    }
 }
 
 /**

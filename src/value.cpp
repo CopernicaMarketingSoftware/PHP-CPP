@@ -290,6 +290,41 @@ Value::~Value()
 }
 
 /**
+ *  Detach the zval
+ * 
+ *  This will unlink the zval internal structure from the Value object,
+ *  so that the destructor will not reduce the number of references and/or
+ *  deallocate the zval structure. This is used for functions that have to
+ *  return a zval pointer, that would otherwise be deallocated the moment
+ *  the function returns.
+ * 
+ *  @return zval
+ */
+zval *Value::detach()
+{
+    // copy return value
+    zval *result = _val;
+    
+    // decrement reference counter
+    Z_DELREF_P(_val);
+    
+    // reset internal object
+    _val = nullptr;
+    
+    // done
+    return result;
+}
+
+/**
+ *  Retrieve the refcount
+ *  @return int
+ */
+int Value::refcount()
+{
+    return Z_REFCOUNT_P(_val);
+}
+
+/**
  *  Move operator
  *  @param  value
  *  @return Value
@@ -1255,7 +1290,28 @@ bool Value::isCallable() const
 {
     // we can not rely on the type, because strings can be callable as well
     return zend_is_callable(_val, 0, NULL);
-}   
+}
+
+/**
+ *  Is the variable empty?
+ *  @return bool
+ */
+bool Value::isEmpty() const
+{
+    switch (type()) {
+    case    Type::Null:     return  true;
+    case    Type::Numeric:  return  numericValue() == 0;
+    case    Type::Float:    return  floatValue() == 0.0;
+    case    Type::Bool:     return  boolValue() == false;
+    case    Type::Array:    return  size() == 0;
+    case    Type::Object:   return  false;
+    case    Type::String:   return  size() == 0;
+    case    Type::Callable: return  false;
+    default:                return  false;
+    }
+    
+    // for the time being we consider resources and consts to be not-empty
+}
 
 /**
  *  Make a clone of the type

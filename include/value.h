@@ -357,6 +357,12 @@ public:
     bool isCallable()   const;
     
     /**
+     *  Is the variable empty?
+     *  @return bool
+     */
+    bool isEmpty() const;
+    
+    /**
      *  Retrieve the value as number
      *  @return long
      */
@@ -802,12 +808,31 @@ private:
      */
     Value exec(const char *name, int argc, struct _zval_struct ***params);
 
+    /**
+     *  Refcount - the number of references to the value
+     *  @return int
+     */
+    int refcount();
+
 protected:
     /**
      *  The wrapped zval
      *  @var struct zval
      */
     struct _zval_struct *_val;
+    
+    /**
+     *  Detach the zval
+     * 
+     *  This will unlink the zval internal structure from the Value object,
+     *  so that the destructor will not reduce the number of references and/or
+     *  deallocate the zval structure. This is used for functions that have to
+     *  return a zval pointer, that would otherwise be deallocated the moment
+     *  the function returns.
+     * 
+     *  @return zval
+     */
+    struct _zval_struct *detach();
     
     /**
      *  Set a certain property without running any checks (you must already know
@@ -836,6 +861,7 @@ protected:
      */
     friend class Globals;
     friend class Member;
+    friend class ClassBase;
 };
 
 /**
