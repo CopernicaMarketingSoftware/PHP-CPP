@@ -1425,6 +1425,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
         // get access to the internal hash table of _val
         // see Zend/zend_API.h 723: HASH_OF(_val)
         HashTable *arr = isArray() ? Z_ARRVAL_P(_val) : Z_OBJ_HT_P(_val)->get_properties((_val) TSRMLS_CC);
+        
 
         // similarly php: reset($array):
         // The definition of this and the following functions can be found in Zend/zend_hash.h 174
@@ -1432,28 +1433,45 @@ std::map<std::string,Php::Value> Value::mapValue() const
         // If the following line to remove, then repeated calling the Value::mapValue() will return an empty map
         zend_hash_internal_pointer_reset(arr);
 
-        // check empty array/object
-        if(zend_hash_has_more_elements(arr)  == FAILURE) {
-            return result;
-        }
-
-        unsigned int hash_key_type;
-        while( (hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0)) != HASH_KEY_NON_EXISTENT ) 
+        if (isArray())
         {
-            zend_hash_get_current_data(arr, (void **) &value);
-
-            if(HASH_KEY_IS_LONG == hash_key_type) 
+            unsigned int hash_key_type;
+            while( (hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0)) != HASH_KEY_NON_EXISTENT )
             {
-                result[std::to_string(ind)] = Value(*value);
-            } 
-            else // hash_key_type == HASH_KEY_IS_STRING
-            { 
-                result[key] = Value(*value);
-            }
+                zend_hash_get_current_data(arr, (void **) &value);
 
-            // next iteration
-            zend_hash_move_forward(arr);
+                if(HASH_KEY_IS_LONG == hash_key_type)
+                {
+                    result[std::to_string(ind)] = Value(*value);
+                }
+                else // hash_key_type == HASH_KEY_IS_STRING
+                {
+                    result[key] = Value(*value);
+                }
+
+                // next iteration
+                zend_hash_move_forward(arr);
+            }
         }
+        else
+        {
+            // For obtaining a hashtable of the object meets function void rebuild_object_properties(zend_object *zobj)
+            // Zend/zend_object_handlers.c 66
+            // hashtable of object's properties always has string (no integer) keys
+            while( zend_hash_get_current_key(arr, &key, &ind, 0) != HASH_KEY_NON_EXISTENT )
+            {
+                // if propertie is accessible (i.e. propertie access type is public. See rebuild_object_properties )
+                if('\0' != *key)
+                {
+                    zend_hash_get_current_data(arr, (void **) &value);
+                    result[key] = Value(*value);
+                }
+
+                // next iteration
+                zend_hash_move_forward(arr);
+            }
+        }
+
     }
     
     // done
