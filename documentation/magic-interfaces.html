@@ -1,33 +1,28 @@
-<h1>Magic methods and interfaces</h1>
+<h1>Magic interfaces</h1>
 <p>
-    PHP classes have a number of magic methods that you can implement to 
-    enable special features. These are methods like __toString(), __get(), __set(), 
-    __invoke(), etcetera. With the PHP-CPP library you can implement these 
-    magic methods too.
-</p>
-<p>
-    Besides that, a core PHP installation also comes with a number of interfaces
-    that you can implement to add even more special features to a class. These
+    A core PHP installation comes with a number of special "magic" PHP interfaces
+    that script writers can implement to add special features to a class. These
     are interfaces with names like 'Countable', 'ArrayAccess' and 'Serializable'.
     The features that these interfaces bring, can also be implemented using
     PHP-CPP.
 </p>
 <p>
-    So there are magic methods and interfaces. Strangely enough,
-    there does not seem to be any uniformity in the Zend engine in the choice 
-    between these magic methods and interfaces. To us it is unclear why some special features 
-    are implemented with magic methods, while others are activated by implementing
-    interfaces. In our eyes the Serializable interface could just as well have 
-    been implemented with magic __serialize() and __unserialize() methods, or the
-    __invoke() method could just as well have been an "Invokable" interface. 
-    PHP is not a standardized language, and some things just seem to be the way they
-    are because someone felt like implementing it this way or another...
+    You may wonder why PHP sometimes uses <a href="magic-methods">magic methods</a> 
+    (for example __set and __unset) and sometimes uses interfaces to change the 
+    behavior of a class. There does not seem to be any uniformity in the choice 
+    between these magic methods and interfaces. To us it is unclear why some 
+    special features are implemented with magic methods, while others are activated 
+    by implementing interfaces. In our eyes the Serializable interface could just 
+    as well have been implemented with magic __serialize() and __unserialize() 
+    methods, or the __invoke() method could just as well have been an "Invokable" 
+    interface. PHP is not a standardized language, and some things just seem to be 
+    the way they are because someone felt like implementing it this way or another...
 </p>
 <p>
     The PHP-CPP library tries to stay as close to PHP as possible. That's why in
-    your C++ classes you can also override the magic methods and implement the
-    special interfaces - and because C++ does not have interfaces like PHP has,
-    we use classes with pure virtual methods instead.
+    your C++ classes you can also use the special interfaces - and because C++ 
+    does not have interfaces like PHP has, classes with pure virtual methods are
+    used instead.
 </p>
 <h2>Support for the SPL</h2>
 <p>
@@ -51,8 +46,7 @@
 <h2>The Countable interface</h2>
 <p>
     By implementing the Php::Countable interface, you can create objects that
-    can be passed to the PHP count() function. You have to implement a count()
-    method that returns the value that you want the count() function to return.
+    can be passed to the PHP count() function.
 </p>
 <p>
 <pre class="language-c++"><code>
