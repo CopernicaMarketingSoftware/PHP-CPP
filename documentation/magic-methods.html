@@ -92,7 +92,11 @@ public:
             std::string email = value;
             
             // must have a '@' character in it
-            if (email.find('@') == std::string::npos) throw Php::Exception("Invalid email address");
+            if (email.find('@') == std::string::npos) 
+            {
+                // email address is invalid, throw exception
+                throw Php::Exception("Invalid email address");
+            }
             
             // store the member
             _email = email;
@@ -127,7 +131,11 @@ public:
     virtual void __unset(const Php::Value &amp;name) override
     {
         // name and email can not be unset
-        if (name == "name" || name == "email") throw Php::Exception("Name and email address can not be removed");
+        if (name == "name" || name == "email") 
+        {
+            // warn the user with an exception that this is impossible
+            throw Php::Exception("Name and email address can not be removed");
+        }
         
         // fallback to default
         Php::Base::__unset(name);
