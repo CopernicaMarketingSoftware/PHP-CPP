@@ -19,8 +19,6 @@ namespace Php {
  */
 void Iterator::destructor(zend_object_iterator *iter)
 {
-    std::cout << "destruct iterator" << std::endl;
-    
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
     
@@ -39,8 +37,6 @@ void Iterator::destructor(zend_object_iterator *iter)
  */
 int Iterator::valid(zend_object_iterator *iter)
 {
-    std::cout << "Iterator::valid" << std::endl;
-    
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
     
@@ -55,20 +51,15 @@ int Iterator::valid(zend_object_iterator *iter)
  */
 void Iterator::current(zend_object_iterator *iter, zval ***data)
 {
-    std::cout << "get current value " << std::endl;
-    
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
 
-    // retrieve the value
-    Value value(iterator->current());
+    // retrieve the value (and store it in a member so that it is not
+    // destructed when the function returns)
+    iterator->_current = iterator->current();
 
-    std::cout << "detach value " << value << std::endl;
-
-    zval *val = value.detach();
-    
     // copy the value
-    *data = &val;
+    *data = &iterator->_current._val;
 }
 
 /**
@@ -77,50 +68,57 @@ void Iterator::current(zend_object_iterator *iter, zval ***data)
  *  this handler is not provided auto-incrementing integer keys will be
  *  used.
  *  @param  iter
- *  @param  retval
+ *  @param  key
  */
-void Iterator::key(zend_object_iterator *iter, zval *retval)
+void Iterator::key(zend_object_iterator *iter, zval *key)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
     
-    // wrap data into a result object
-//    Value result(data);
+    // retrieve the key
+    Value retval(iterator->key());
+
+    // detach the underlying zval
+    zval *zval = retval.detach();
     
-//    ZVAL_LONG(data, 123);
+    // copy it to the key
+    ZVAL_ZVAL(key, zval, 1, 1);
+}
+
+/**
+ *  Function to retrieve the current key, php 5.3 style
+ *  @param  iter
+ *  @param  str_key
+ *  @param  str_key_len
+ *  @param  int_key
+ *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
+ */
+int Iterator::key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key)
+{
+    // get the actual iterator
+    Iterator *iterator = (Iterator *)iter->data;
+
+    // retrieve the key
+    Value retval(iterator->key());
     
-//    return;
-//    std::cout << "retrieve key " << result.refcount() << std::endl;
-    
-    // retrieve the key as key
-    Value keyValue = iterator->key();
-
-    std::cout << "got key " << keyValue << " " << keyValue.refcount() << std::endl;
-
-//    zval *zval = key.detach();
-
-
-    std::cout << "ret key " << retval << " " << Z_REFCOUNT_P(retval) << std::endl;
-    
-    ZVAL_LONG(retval, rand());
-    
-//    ZVAL_ZVAL(data, zval, 1, 1);
-
-    return;
-
-    // copy the key into the other zval, but we use a string or numeric for
-    // this operation, because we have looked at the implementation of Value
-    // and assigning a full value to the result variable will cause the zval
-    // to be destructed and re-allocated (which we do not need)
-//    if (key.isString()) ZVAL_STRING(data, key.stringValue();
-//    else ZVAL_LONG(data, key.numericValue());
-//    
-//    std::cout << "key is copied" << std::endl;
-//
-//    // detach from result
-//    result.detach();
-//    
-    std::cout << "detached" << std::endl;
+    // is this a numeric string?
+    if (retval.isString())
+    {
+        // copy the key and the from the value
+        *str_key = estrndup(retval.rawValue(), retval.size());
+        *str_key_len = retval.size() + 1;
+        
+        // done
+        return HASH_KEY_IS_STRING;
+    }
+    else
+    {
+        // convert to a numeric
+        *int_key = retval.numericValue();
+        
+        // done
+        return HASH_KEY_IS_LONG;
+    }
 }
 
 /**
@@ -129,8 +127,6 @@ void Iterator::key(zend_object_iterator *iter, zval *retval)
  */
 void Iterator::next(zend_object_iterator *iter)
 {
-    std::cout << "Iterator::next" << std::endl;
-    
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
 
@@ -144,8 +140,6 @@ void Iterator::next(zend_object_iterator *iter)
  */
 void Iterator::rewind(zend_object_iterator *iter)
 {
-    std::cout << "Iterator::rewind" << std::endl;
-    
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
     

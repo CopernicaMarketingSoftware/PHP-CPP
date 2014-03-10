@@ -367,8 +367,6 @@ zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
  */
 zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *object, int by_ref)
 {
-    std::cout << "call to getIterator" << std::endl;
-    
     // by-ref is not possible (copied from SPL)
     if (by_ref) throw Php::Exception("Foreach by ref is not possible");
     

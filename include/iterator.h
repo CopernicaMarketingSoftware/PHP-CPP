@@ -74,6 +74,16 @@ private:
     Value _object;
     
     /**
+     *  The current() method that is called by the Zend engine wants a 
+     *  pointer-to-pointer-to-a-zval. Because of this, we have to keep the 
+     *  current value in memory after the current() method returns because 
+     *  the pointer would otherwise fall out of scope. This is (once again)
+     *  odd behavior of the Zend engine, but we'll have to live with that
+     *  @var    Value
+     */
+    Value _current;
+    
+    /**
      *  Internal method that returns the implementation object
      *  @return zend_object_iterator
      */
@@ -109,6 +119,16 @@ private:
      *  @param  data
      */
     static void key(struct _zend_object_iterator *iter, struct _zval_struct *data);
+
+    /**
+     *  Function to retrieve the current key, php 5.3 style
+     *  @param  iter
+     *  @param  str_key
+     *  @param  str_key_len
+     *  @param  int_key
+     *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
+     */
+    static int key(struct _zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key);
 
     /**
      *  Step forwards to the next element

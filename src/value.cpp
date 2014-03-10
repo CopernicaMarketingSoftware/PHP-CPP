@@ -1479,25 +1479,43 @@ std::map<std::string,Php::Value> Value::mapValue() const
         // reset iterator to beginning of the hash table
         zend_hash_internal_pointer_reset(arr);
         
-        // pointer that will be set to hash key and index
-        char *key;
-        unsigned long ind;
-
-        // key type
-        int hash_key_type;
-
-        // loop through the recors
-        while ((hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0)) != HASH_KEY_NON_EXISTENT)
+        // loop through the records
+        while (true)
         {
+            // pointer that will be set to hash key and index
+            char *key;
+            unsigned long ind;
+
+            // get current key
+            int hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0);
+
             // required variable
             zval **value;
             
-            // retrieve data
-            zend_hash_get_current_data(arr, (void **) &value);
+            // check the type
+            switch (hash_key_type) {
+            
+            // was it a string?
+            case HASH_KEY_IS_STRING:
 
-            // check the type of key
-            if (HASH_KEY_IS_LONG != hash_key_type) result[key] = Value(*value);
-            else result[std::to_string(ind)] = Value(*value);
+                // retrieve data, and add to result
+                zend_hash_get_current_data(arr, (void **) &value);
+                result[key] = Value(*value);
+                break;
+                
+            // was it numeric?
+            case HASH_KEY_IS_LONG:
+
+                // retrieve data, and add to result
+                zend_hash_get_current_data(arr, (void **) &value);
+                result[std::to_string(ind)] = Value(*value);
+                break;
+                
+            default:
+            
+                // we're ready
+                return result;
+            }
 
             // next iteration
             zend_hash_move_forward(arr);
@@ -1511,24 +1529,37 @@ std::map<std::string,Php::Value> Value::mapValue() const
         // reset iterator to beginning of the hash table
         zend_hash_internal_pointer_reset(arr);
         
-        // pointer that will be set to hash key and index
-        char *key;
-        unsigned long ind;
-        
         // loop through the records
-        while( zend_hash_get_current_key(arr, &key, &ind, 0) != HASH_KEY_NON_EXISTENT )
+        while (true)
         {
-            // if property is accessible (i.e. propertie access type is public. See rebuild_object_properties )
-            if('\0' != *key)
-            {
+            // pointer that will be set to hash key and index
+            char *key;
+            unsigned long ind;
+
+            // get current key
+            int hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0);
+
+            // check the type
+            switch (hash_key_type) {
+            
+            // was it a string?
+            case HASH_KEY_IS_STRING:
+
+                // inaccessible properties (privates) start with a null character
+                if (*key == '\0') break;
+
                 // required variable
                 zval **value;
 
-                // retrieve property
+                // retrieve data, and add to result
                 zend_hash_get_current_data(arr, (void **) &value);
-                
-                // append to mape
                 result[key] = Value(*value);
+                break;
+                
+            default:
+            
+                // we're ready
+                return result;
             }
 
             // next iteration
