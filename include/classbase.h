@@ -302,8 +302,10 @@ private:
      *  @param  object          The object on which it is called
      *  @param  offset          The name of the property
      *  @param  type            The type of the variable???
+     *  @param  key             ???
      *  @return zval
      */
+    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type, const struct _zend_literal *key);
     static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type);
 
     /**
@@ -311,8 +313,10 @@ private:
      *  @param  object          The object on which it is called
      *  @param  name            The name of the property
      *  @param  value           The new value
+     *  @param  key             ???
      *  @return zval
      */
+    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value, const struct _zend_literal *key);
     static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value);
 
     /**
@@ -322,6 +326,7 @@ private:
      *  @param  has_set_exists  See above
      *  @return bool
      */
+    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists, const struct _zend_literal *key);
     static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists);
 
     /**
@@ -329,6 +334,7 @@ private:
      *  @param  object          The object on which it is called
      *  @param  member          The member to remove
      */
+    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member, const struct _zend_literal *key);
     static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member);
 
     /**

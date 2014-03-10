@@ -390,13 +390,18 @@ void ClassBase::unsetDimension(zval *object, zval *member)
 }
 
 /**
- *  Function that is called when a property is being read
- *  @param  object          The object on which it is called
- *  @param  offset          The name of the property
- *  @param  type            The type of the variable???
- *  @return zval
+ *  Function that is called when a property is read
+ *  @param  object
+ *  @param  name
+ *  @param  type
+ *  @param  key
+ *  @return val
  */
+#if PHP_VERSION_ID < 50399
 zval *ClassBase::readProperty(zval *object, zval *name, int type)
+#else
+zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _zend_literal *key)
+#endif
 {
     // what to do with the type?
     //
@@ -443,7 +448,11 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type)
         if (!std_object_handlers.read_property) return nullptr;
         
         // call default
+#if PHP_VERSION_ID < 50399
         return std_object_handlers.read_property(object, name, type);
+#else
+        return std_object_handlers.read_property(object, name, type, key);
+#endif
     }
     catch (Exception &exception)
     {
@@ -465,9 +474,14 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type)
  *  @param  object          The object on which it is called
  *  @param  name            The name of the property
  *  @param  value           The new value
+ *  @param  key             ???
  *  @return zval
  */
+#if PHP_VERSION_ID < 50399
 void ClassBase::writeProperty(zval *object, zval *name, zval *value)
+#else
+void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struct _zend_literal *key)
+#endif
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __set method
@@ -482,7 +496,11 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value)
         if (!std_object_handlers.write_property) return;
         
         // call the default
+#if PHP_VERSION_ID < 50399
         std_object_handlers.write_property(object, name, value);
+#else
+        std_object_handlers.write_property(object, name, value, key);
+#endif
     }
     catch (Exception &exception)
     {
@@ -508,9 +526,14 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value)
  *  @param  object          The object on which it is called
  *  @param  name            The name of the property to check
  *  @param  has_set_exists  See above
+ *  @param  key             ???
  *  @return bool
  */
+#if PHP_VERSION_ID < 50399
 int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists)
+#else
+int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const struct _zend_literal *key)
+#endif
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __isset method
@@ -540,7 +563,11 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists)
         if (!std_object_handlers.has_property) return 0;
 
         // call default
+#if PHP_VERSION_ID < 50399
         return std_object_handlers.has_property(object, name, has_set_exists);
+#else
+        return std_object_handlers.has_property(object, name, has_set_exists, key);
+#endif
     }
     catch (Exception &exception)
     {
@@ -560,8 +587,13 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists)
  * 
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
+ *  @param  key
  */
+#if PHP_VERSION_ID < 50399
 void ClassBase::unsetProperty(zval *object, zval *member)
+#else
+void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_literal *key)
+#endif
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __unset method
@@ -576,7 +608,11 @@ void ClassBase::unsetProperty(zval *object, zval *member)
         if (!std_object_handlers.unset_property) return;
         
         // call the default
+#if PHP_VERSION_ID < 50399
         std_object_handlers.unset_property(object, member);
+#else
+        std_object_handlers.unset_property(object, member, key);
+#endif
     }
     catch (Exception &exception)
     {
