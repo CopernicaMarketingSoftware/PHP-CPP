@@ -71,11 +71,21 @@ zend_object_handlers *ClassBase::objectHandlers()
     
     // install custom clone function
     handlers.clone_obj = &ClassBase::cloneObject;
+    
+    // functions for the Countable interface
     handlers.count_elements = &ClassBase::countElements;
+    
+    // functions for the ArrayAccess interface
     handlers.write_dimension = &ClassBase::writeDimension;
     handlers.read_dimension = &ClassBase::readDimension;
     handlers.has_dimension = &ClassBase::hasDimension;
     handlers.unset_dimension = &ClassBase::unsetDimension;
+    
+    // functions for the magic properties handlers (__get, __set, __isset and __unset)
+    handlers.write_property = &ClassBase::writeProperty;
+    handlers.read_property = &ClassBase::readProperty;
+    handlers.has_property = &ClassBase::hasProperty;
+    handlers.unset_property = &ClassBase::unsetProperty;
     
     // remember that object is now initialized
     initialized = true;
@@ -322,6 +332,173 @@ void ClassBase::unsetDimension(zval *object, zval *member)
         
         // call the default
         std_object_handlers.unset_dimension(object, member);
+    }
+}
+
+/**
+ *  Function that is called when a property is being read
+ *  @param  object          The object on which it is called
+ *  @param  offset          The name of the property
+ *  @param  type            The type of the variable???
+ *  @return zval
+ */
+zval *ClassBase::readProperty(zval *object, zval *name, int type)
+{
+    // what to do with the type?
+    //
+    // the type parameter tells us whether the property was read in READ
+    // mode, WRITE mode, READWRITE mode or UNSET mode. 
+    // 
+    // In 99 out of 100 situations, it is called in regular READ mode (value 0), 
+    // only when it is called from a PHP script that has statements like 
+    // $x =& $object->x, $object->x->y = "something" or unset($object->x->y)
+    // the type parameter is set to a different value.
+    //
+    // But we must ask ourselves the question what we should be doing with such
+    // cases. Internally, the object most likely has a full native implementation,
+    // and the property that is returned is just a string or integer or some
+    // other value, that is temporary WRAPPED into a zval to make it accessible
+    // from PHP. If someone wants to get a reference to such an internal variable,
+    // that is in most cases simply impossible.
+
+    // the default implementation throws an exception, so by catching 
+    // the exception we know if the object was implemented by the user or not
+    try
+    {
+        // retrieve value
+        Value value = cpp_object(object)->__get(name);
+
+        // because we do not want the value object to destruct the zval when
+        // it falls out of scope, we detach the zval from it, if this is a regular
+        // read operation we can do this right away
+        if (type == 0) return value.detach();
+        
+        // this is a more complicated read operation, the scripts wants to get
+        // deeper access to the returned value. This, however, is only possible
+        // if the value has more than once reference (if it has a refcount of one,
+        // the value object that we have here is the only instance of the zval,
+        // and it is simply impossible to return a reference or so
+        if (value.refcount() <= 1) return value.detach(); 
+        
+        // we're dealing with an editable zval, return a reference variable
+        return Value(value.detach(), true).detach();
+    }
+    catch (const NotImplemented &exception)
+    {
+        // __get() function was not overridden by the user
+        if (!std_object_handlers.read_property) return nullptr;
+        
+        // call default
+        return std_object_handlers.read_property(object, name, type);
+    }
+}
+
+/**
+ *  Function that is called when a property is set / updated
+ * 
+ *  This is the handler for the __set() function, and is called when a property
+ *  is updated.
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  name            The name of the property
+ *  @param  value           The new value
+ *  @return zval
+ */
+void ClassBase::writeProperty(zval *object, zval *name, zval *value)
+{
+    // the default implementation throws an exception, if we catch that
+    // we know for sure that the user has not overridden the __set method
+    try
+    {
+        // call the default
+        cpp_object(object)->__set(name, value);
+    }
+    catch (const NotImplemented &exception)
+    {
+        // __set() function was not overridden by user, check if there is a default
+        if (!std_object_handlers.write_property) return;
+        
+        // call the default
+        std_object_handlers.write_property(object, name, value);
+    }
+}
+
+/**
+ *  Function that is called to check whether a certain property is set
+ *  for an object
+ * 
+ *  This is the handler for the __isset() function, and is called when a PHP
+ *  script checks if a certain property is set.
+ * 
+ *  The has_set_exists parameter can have the following values:
+ *
+ *      0 (has) whether property exists and is not NULL
+ *      1 (set) whether property exists and is true
+ *      2 (exists) whether property exists
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  name            The name of the property to check
+ *  @param  has_set_exists  See above
+ *  @return bool
+ */
+int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists)
+{
+    // the default implementation throws an exception, if we catch that
+    // we know for sure that the user has not overridden the __isset method
+    try
+    {
+        // get the cpp object
+        Base *base = cpp_object(object);
+        
+        // call the C++ object
+        if (!base->__isset(name)) return false;
+        
+        // property exists, but what does the user want to know
+        if (has_set_exists == 2) return true;
+        
+        // we have to retrieve the property
+        Value value = base->__get(name);
+        
+        // should we check on NULL?
+        switch (has_set_exists) {
+        case 0:     return value.type() != Type::Null;
+        default:    return value.boolValue();
+        }
+    }
+    catch (const NotImplemented &exception)
+    {
+        // __isset was not implemented, do we have a default?
+        if (!std_object_handlers.has_property) return 0;
+
+        // call default
+        return std_object_handlers.has_property(object, name, has_set_exists);
+    }
+}
+
+/**
+ *  Function that is called when a property is removed from the project
+ * 
+ *  This is the handler for the __unset() method
+ * 
+ *  @param  object          The object on which it is called
+ *  @param  member          The member to remove
+ */
+void ClassBase::unsetProperty(zval *object, zval *member)
+{
+    // the default implementation throws an exception, if we catch that
+    // we know for sure that the user has not overridden the __unset method
+    try
+    {
+        // call the __unset method
+        cpp_object(object)->__unset(member);
+    }
+    catch (const NotImplemented &exception)
+    {
+        // __unset was not implemented, do we have a default?
+        if (!std_object_handlers.unset_property) return;
+        
+        // call the default
+        std_object_handlers.unset_property(object, member);
     }
 }
 

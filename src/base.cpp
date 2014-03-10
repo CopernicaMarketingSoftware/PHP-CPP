@@ -78,6 +78,72 @@ MixedObject *Base::store(zend_class_entry *entry)
 }
 
 /**
+ *  Overridable method that is called to check if a property is set
+ * 
+ *  The default implementation does nothing, and the script will fall back
+ *  to accessing the regular object properties
+ * 
+ *  @param  key
+ *  @return bool
+ */
+bool Base::__isset(const Php::Value &key)
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the unset function can be called
+    throw NotImplemented();
+}
+
+/**
+ *  Overridable method that is called to set a new property
+ * 
+ *  The default implementation does nothing, and the script will fall back
+ *  to accessing the regular object properties
+ * 
+ *  @param  key
+ *  @param  value
+ */
+void Base::__set(const Php::Value &key, const Php::Value &value)
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the unset function can be called
+    throw NotImplemented();
+}
+
+/**
+ *  Retrieve a property
+ * 
+ *  The default implementation does nothing, and the script will fall back
+ *  to accessing the regular object properties
+ * 
+ *  @param  key
+ *  @return value
+ */
+Php::Value Base::__get(const Php::Value &key)
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return nullptr;
+}
+
+/**
+ *  Remove a member
+ * 
+ *  The default implementation does nothing, and the script will fall back
+ *  to accessing the regular object properties
+ * 
+ *  @param key
+ */
+void Base::__unset(const Php::Value &key)
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+}
+
+/**
  *  End namespace
  */
 }

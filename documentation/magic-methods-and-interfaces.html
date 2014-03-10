@@ -390,7 +390,7 @@ public:
      *  @param  object      The object that is being iterated over
      *  @param  map         The internal C++ map that is being iterated over
      */
-    MapIterator(Php::Base *object, const std::map&lt;std::string,std::string&gt; &map) :
+    MapIterator(Map *object, const std::map&lt;std::string,std::string&gt; &map) :
         Php::Iterator(object), _map(map), _iter(map.begin()) {}
         
     /**
@@ -563,11 +563,11 @@ extern "C" {
     properties.
 </p>
 <p>
-    For this to work, we has to add the Php::Traversable class as base class
+    For this to work, we had to add the Php::Traversable class as base class
     to the Map class, and implement the getIterator() method. This method
     returns a new MapIterator class, which is allocated on the heap. Don't
     worry about memory management: the PHP-CPP library will destruct your
-    operator the moment the foreach loop is finished.
+    iterator the moment the foreach loop is finished.
 </p>
 <p>
     The MapIterator class is derived from the Php::Iterator class, and
@@ -581,5 +581,5 @@ extern "C" {
 <p>
     Our MapIterator implementation internally is just a small wrapper around
     a C++ iterator class. It is of course up to you to create more complex
-    implementation when needed.
+    iterators when needed.
 </p>

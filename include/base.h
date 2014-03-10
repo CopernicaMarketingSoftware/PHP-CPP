@@ -111,6 +111,50 @@ public:
     {
         return Value(this)[name];
     }
+
+    /**
+     *  Overridable method that is called to check if a property is set
+     * 
+     *  The default implementation does nothing, and the script will fall back
+     *  to accessing the regular object properties
+     * 
+     *  @param  key
+     *  @return bool
+     */
+    virtual bool __isset(const Php::Value &key);
+    
+    /**
+     *  Overridable method that is called to set a new property
+     * 
+     *  The default implementation does nothing, and the script will fall back
+     *  to accessing the regular object properties
+     * 
+     *  @param  key
+     *  @param  value
+     */
+    virtual void __set(const Php::Value &key, const Php::Value &value);
+    
+    /**
+     *  Retrieve a property
+     * 
+     *  The default implementation does nothing, and the script will fall back
+     *  to accessing the regular object properties
+     * 
+     *  @param  key
+     *  @return value
+     */
+    virtual Php::Value __get(const Php::Value &key);
+    
+    /**
+     *  Remove a member
+     * 
+     *  The default implementation does nothing, and the script will fall back
+     *  to accessing the regular object properties
+     * 
+     *  @param key
+     */
+    virtual void __unset(const Php::Value &key);
+
     
 private:
     /**

@@ -298,6 +298,40 @@ private:
     static struct _zend_object_iterator *getIterator(struct _zend_class_entry *entry, struct _zval_struct *object, int by_ref);
 
     /**
+     *  Function that is called when a property is being read
+     *  @param  object          The object on which it is called
+     *  @param  offset          The name of the property
+     *  @param  type            The type of the variable???
+     *  @return zval
+     */
+    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type);
+
+    /**
+     *  Function that is called when a property is set / updated
+     *  @param  object          The object on which it is called
+     *  @param  name            The name of the property
+     *  @param  value           The new value
+     *  @return zval
+     */
+    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value);
+
+    /**
+     *  Function that is called to check whether a certain property is set
+     *  @param  object          The object on which it is called
+     *  @param  name            The name of the property to check
+     *  @param  has_set_exists  See above
+     *  @return bool
+     */
+    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists);
+
+    /**
+     *  Function that is called when a property is removed from the project
+     *  @param  object          The object on which it is called
+     *  @param  member          The member to remove
+     */
+    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member);
+
+    /**
      *  Name of the class
      *  @var    string
      */

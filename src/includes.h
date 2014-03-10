@@ -88,6 +88,7 @@
 #include "floatmember.h"
 #include "arithmetic.h"
 #include "origexception.h"
+#include "notimplemented.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \
