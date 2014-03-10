@@ -68,7 +68,7 @@ public:
         if (name == "email") return _email;
         
         // property not supported, fall back on default
-        Php::Base::__get(name);
+        return Php::Base::__get(name);
     }
     
     /**
@@ -82,7 +82,7 @@ public:
         if (name == "name") 
         {
             // store member
-            _name = value;
+            _name = value.stringValue();
         }
         
         // we check emails for validity

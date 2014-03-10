@@ -43,17 +43,10 @@ static void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
         // get the result
         result = callable->invoke(params);
     }
-    catch (Php::OrigException &exception)
+    catch (Exception &exception)
     {
-        // we caught an exception that was original thrown by PHP code, and not 
-        // processed by C++ code, this means that we're going to restore this 
-        // exception so that it can be further handled by PHP
-        exception.restore();
-    }
-    catch (Php::Exception &exception)
-    {
-        // an exception originally thrown by C++ should be passed on to PHP
-        zend_throw_exception(zend_exception_get_default(), (char*)exception.message().c_str(), 0 TSRMLS_CC);
+        // process the exception
+        exception.process();
     }
 }
 

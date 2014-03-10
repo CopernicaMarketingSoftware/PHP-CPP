@@ -153,11 +153,23 @@ int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
     // if it does not implement the Countable interface, we rely on the default implementation
     if (countable) 
     {
-        // call the count function
-        *count = countable->count();
-        
-        // done
-        return SUCCESS;
+        // the user function may throw an exception that needs to be processed
+        try
+        {
+            // call the count function
+            *count = countable->count();
+            
+            // done
+            return SUCCESS;
+        }
+        catch (Exception &exception)
+        {
+            // process the exception
+            exception.process();
+            
+            // unreachable
+            return FAILURE;
+        }
     }
     else
     {
@@ -206,23 +218,35 @@ zval *ClassBase::readDimension(zval *object, zval *offset, int type)
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
     {
-        // ArrayAccess is implemented, call function
-        Value value = arrayaccess->offsetGet(offset);
-        
-        // because we do not want the value object to destruct the zval when
-        // it falls out of scope, we detach the zval from it, if this is a regular
-        // read operation we can do this right away
-        if (type == 0) return value.detach();
-        
-        // this is a more complicated read operation, the scripts wants to get
-        // deeper access to the returned value. This, however, is only possible
-        // if the value has more than once reference (if it has a refcount of one,
-        // the value object that we have here is the only instance of the zval,
-        // and it is simply impossible to return a reference or so
-        if (value.refcount() <= 1) return value.detach(); 
-        
-        // we're dealing with an editable zval, return a reference variable
-        return Value(value.detach(), true).detach();
+        // the C++ code may throw an exception
+        try
+        {
+            // ArrayAccess is implemented, call function
+            Value value = arrayaccess->offsetGet(offset);
+            
+            // because we do not want the value object to destruct the zval when
+            // it falls out of scope, we detach the zval from it, if this is a regular
+            // read operation we can do this right away
+            if (type == 0) return value.detach();
+            
+            // this is a more complicated read operation, the scripts wants to get
+            // deeper access to the returned value. This, however, is only possible
+            // if the value has more than once reference (if it has a refcount of one,
+            // the value object that we have here is the only instance of the zval,
+            // and it is simply impossible to return a reference or so
+            if (value.refcount() <= 1) return value.detach(); 
+            
+            // we're dealing with an editable zval, return a reference variable
+            return Value(value.detach(), true).detach();
+        }
+        catch (Exception &exception)
+        {
+            // process the exception (send it to user space)
+            exception.process();
+            
+            // unreachable
+            return Value(nullptr).detach();
+        }
     }
     else
     {
@@ -253,8 +277,17 @@ void ClassBase::writeDimension(zval *object, zval *offset, zval *value)
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
     {
-        // set the value
-        arrayaccess->offsetSet(offset, value);
+        // method may throw an exception
+        try
+        {
+            // set the value
+            arrayaccess->offsetSet(offset, value);
+        }
+        catch (Exception &exception)
+        {
+            // process the exception (send it to user space
+            exception.process();
+        }
     }
     else
     {
@@ -285,15 +318,27 @@ int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
     {
-        // check if the member exists
-        if (!arrayaccess->offsetExists(member)) return false;
-        
-        // we know for certain that the offset exists, but should we check
-        // more, like whether the value is empty or not?
-        if (!check_empty) return true;
-        
-        // it should not be empty
-        return !arrayaccess->offsetGet(member).isEmpty();
+        // user implemented callbacks could throw an exception
+        try
+        {
+            // check if the member exists
+            if (!arrayaccess->offsetExists(member)) return false;
+            
+            // we know for certain that the offset exists, but should we check
+            // more, like whether the value is empty or not?
+            if (!check_empty) return true;
+            
+            // it should not be empty
+            return !arrayaccess->offsetGet(member).isEmpty();
+        }
+        catch (Exception &exception)
+        {
+            // process the exception (send it to user space)
+            exception.process();
+            
+            // unreachable
+            return false;
+        }
     }
     else
     {
@@ -322,8 +367,17 @@ void ClassBase::unsetDimension(zval *object, zval *member)
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
     {
-        // remove the member
-        arrayaccess->offsetUnset(member);
+        // user implemented code could throw an exception
+        try
+        {
+            // remove the member
+            arrayaccess->offsetUnset(member);
+        }
+        catch (Exception &exception)
+        {
+            // process the exception (send it to user space)
+            exception.process();
+        }
     }
     else
     {
@@ -391,6 +445,15 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type)
         // call default
         return std_object_handlers.read_property(object, name, type);
     }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its magic method 
+        // implementation, send it to user space
+        exception.process();
+        
+        // unreachable
+        return Value(nullptr).detach();
+    }
 }
 
 /**
@@ -420,6 +483,12 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value)
         
         // call the default
         std_object_handlers.write_property(object, name, value);
+    }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its magic method 
+        // implementation, send it to user space
+        exception.process();
     }
 }
 
@@ -473,6 +542,15 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists)
         // call default
         return std_object_handlers.has_property(object, name, has_set_exists);
     }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its magic method 
+        // implementation, send it to user space
+        exception.process();
+        
+        // unreachable
+        return false;
+    }
 }
 
 /**
@@ -499,6 +577,12 @@ void ClassBase::unsetProperty(zval *object, zval *member)
         
         // call the default
         std_object_handlers.unset_property(object, member);
+    }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its magic method 
+        // implementation, send it to user space
+        exception.process();
     }
 }
 
@@ -550,11 +634,24 @@ zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *obje
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(cpp_object(object));
     
-    // create an iterator
-    auto *iterator = traversable->getIterator();
-    
-    // return the implementation
-    return iterator->implementation();
+    // user may throw an exception in the getIterator() function
+    try
+    {
+        // create an iterator
+        auto *iterator = traversable->getIterator();
+        
+        // return the implementation
+        return iterator->implementation();
+    }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its method 
+        // implementation, send it to user space
+        exception.process();
+        
+        // unreachable
+        return nullptr;
+    }
 }
 
 /**

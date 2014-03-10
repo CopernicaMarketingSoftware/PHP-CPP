@@ -54,6 +54,16 @@ public:
     {
         return _message;
     }
+
+    /**
+     *  Process the exception
+     * 
+     *  This method is called only from withing the PHP-CPP library,
+     *  and will turn the exception into a PHP exception
+     * 
+     *  @internal
+     */
+    virtual void process();
 };
 
 /**

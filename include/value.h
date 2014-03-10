@@ -308,6 +308,17 @@ public:
     Value operator%(double value);
     
     /**
+     *  Comparison operators for hardcoded strings
+     *  @param  value
+     */
+    bool operator==(const char *value) const { return stringValue() == value; }
+    bool operator!=(const char *value) const { return stringValue() != value; }
+    bool operator<=(const char *value) const { return stringValue() <= value; }
+    bool operator>=(const char *value) const { return stringValue() >= value; }
+    bool operator< (const char *value) const { return stringValue() <  value; }
+    bool operator> (const char *value) const { return stringValue() >  value; }
+
+    /**
      *  Comparison operators
      *  @param  value
      */
