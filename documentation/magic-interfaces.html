@@ -9,8 +9,8 @@
 <p>
     You may wonder why PHP sometimes uses <a href="magic-methods">magic methods</a> 
     (for example __set and __unset) and sometimes uses interfaces to change the 
-    behavior of a class. There does not seem to be any uniformity in the choice 
-    between these magic methods and interfaces. To us it is unclear why some 
+    behavior of a class. There does not seem to be any uniformity in this choice. 
+    To us it is unclear why some 
     special features are implemented with magic methods, while others are activated 
     by implementing interfaces. In our eyes the Serializable interface could just 
     as well have been implemented with magic __serialize() and __unserialize() 
@@ -19,7 +19,7 @@
     the way they are because someone felt like implementing it this way or another...
 </p>
 <p>
-    The PHP-CPP library tries to stay as close to PHP as possible. That's why in
+    Nevertheless, the PHP-CPP library tries to stay as close to PHP as possible. That's why in
     your C++ classes you can also use the special interfaces - and because C++ 
     does not have interfaces like PHP has, classes with pure virtual methods are
     used instead.
@@ -34,7 +34,7 @@
 <p>
     The PHP-CPP library also has interfaces with these names, and they behave in
     more or less the same way as the SPL interfaces. But internally, the PHP-CPP
-    does not depend on the SPL. If you implement a C++ interface like 
+    library does not depend on the SPL. If you implement a C++ interface like 
     Php::ArrayAccess or Php::Countable, it is something different than writing
     a class in PHP that implements a SPL interface.
 </p>
@@ -298,6 +298,10 @@ echo($map["c"]."\n");
 // access a value that does not exist
 echo($map["d"]."\n");
 
+// this will result in a fatal error,
+// the ArrayAccess methods are not exported to user space
+echo($map->offsetGet("a")."\n");
+
 ?&gt;
 </pre></code>
 </p>
@@ -333,7 +337,7 @@ foreach ($map as $key => $value)
     the SPL does, and that you are used to if you have been working with PHP.
     In PHP, to make a class traversable (usable in foreach loops), you have to
     implement either the Iterator interface, or the IteratorAggregate interface.
-    This is a peculiar architecture - if not to say faulty. When you think of it,
+    This is a peculiar architecture - if not to say faulty. When you think about it,
     it is not the container object itself that is the iterator, that container object is 
     only iterat<i>able</i>! It is <i>being iterated over</i>. In our above example, 
     the $map variable is not the actual iterator, but the container that is 
@@ -352,7 +356,8 @@ foreach ($map as $key => $value)
     The Php::Iterator object has five methods that are needed for
     running the foreach loop. Note that your Iterator class does not have to 
     be a class that is accessible from PHP, and does not have to be derived from
-    Php::Base. It is an internal class that is used by foreach loops.
+    Php::Base. It is an internal class that is used by foreach loops, but that
+    does not (have to) exist in PHP user space.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -553,7 +558,7 @@ extern "C" {
 <p>
     The above example further extends the Map class. It now implements 
     Php::Countable, Php::ArrayAccess and Php::Traversable. This means that
-    Map objects can now also be used inside foreach loop to iterate over the
+    Map objects can now also be used inside foreach loops to iterate over the
     properties.
 </p>
 <p>
