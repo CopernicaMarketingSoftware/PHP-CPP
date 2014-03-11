@@ -344,15 +344,25 @@ whatever a b
 invoke parameter passed to invoke
 </pre>
 </p>
-<h2>__toString and other casting methods</h2>
+<h2>Casting methods (__toString and more)</h2>
 <p>
     In PHP you can add a __toString() method to a class. This method is automatically
-    called when you cast an object to a string. And of course, PHP-CPP also supports
-    this __toString() method. But there is more. Internally, the Zend engine
-    also has methods for casting objects to integers, booleans and floating point
-    values. For one reason or the other, only the casting to a string (__toString)
-    method is offered to user space PHP scripts. But with the PHP-CPP library you 
-    can implement all these casting functions.
+    called when an object is casted to a string, or when an object is used in a string
+    context. PHP-CPP supports this __toString() method too. But there are more casting 
+    methods offered by PHP-CPP.
+</p>
+<p>
+    Internally, the Zend engine has special casting routines to cast objects 
+    to integers, to booleans and to floating point values. For one reason or another, 
+    PHP scripts can only implement the __toString() method to cast objects to strings,
+    while all other casting operations are kept away from user space PHP scripts. The
+    PHP-CPP library solves this limitation, and allows one to also implement
+    other casting functions as well.
+</p>
+<p>
+    One of the design goals of the PHP-CPP library is to stay as close to PHP as 
+    possible. For that reason the casting functions have been given names that match
+    the __toString() method: __toInteger(), __toFloat(), and __toBool().
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -434,9 +444,4 @@ extern "C" {
     }
 }
 </code></pre>
-</p>
-<p>
-    The magic __toInteger(), __toFloat() and __toBool() methods are special
-    methods added by the PHP-CPP library, and are not available in regular
-    PHP scripts.
 </p>
