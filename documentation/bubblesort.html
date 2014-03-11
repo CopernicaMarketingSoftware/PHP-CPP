@@ -137,8 +137,27 @@ extern "C" {
     Zend engine about the extension, so that the "native_bubblesort" function is 
     accessible for PHP scripts.
 </p>
+<h2>We start with a silly question</h2>
 <p>
-    Let's run the two functions with an array filled with random numbers.
+    How would the native bubblesort function compare to the built-in sort()
+    function of PHP? This is a silly question. Bubblesort is an extremely 
+    inefficient algorithm, which should never be user for real sorting. We have 
+    only used it here to demonstrate the performance difference between PHP and 
+    C++, when you implement <i>exactly the same</i> algorithm in the two languages.
+</p>
+<p>
+    The built-in sort() function of PHP is much faster than bubblesort. It is
+    based on quicksort, one of the best and most famous sorting algorithms there
+    is. And on top of that: the built-in sort() function is implemented in C!
+    Thus, when you compare the example C++ bubblesort function with the built-in 
+    PHP sort() function, you are comparing two <i>different</i> algorithms, and
+    <i>both</i> have a <i>native implementation</i>. And we want to do exactly 
+    the opposite: we want to compare two <i>identical</i> algorithms, one of which
+    is written in PHP, and the other one completely in C++.
+</p>
+<p>
+    Ok. It's time for the results. Let's run the two functions with an array 
+    filled with random numbers.
 </p>
 <p>
 <pre class="language-php"><code>
@@ -172,24 +191,6 @@ echo("Scripted: ".($scripted - $native)." seconds\n");
 Native:   0.79793095588684 seconds
 Scripted: 8.9202060699463 seconds
 </pre>
-</p>
-<h2>And now a silly question</h2>
-<p>
-    How would the native bubblesort function compare to the built-in sort
-    function of PHP? This - as you will hopefully understand - is not a very
-    smart question. Bubblesort is an extremely inefficient algorithm, which 
-    should never be user for real sorting. We have only used it here to demonstrate
-    the performance difference between PHP and C++ if you run <i>exactly the same</i>
-    algorithm in the two languages.
-</p>
-<p>
-    The built-in sort() function of PHP is much faster than bubblesort. It is
-    based on quicksort, one of the best and most famous sorting algorithms there
-    is. And on top of that: the built-in sort() function is implemented in C!
-    Thus, when you compare the example C++ bubblesort function with the built-in 
-    PHP sort() function, you are comparing two native implementations, and not
-    the performance difference between PHP with C++. And of these native sorting algorithms,
-    quicksort wins big time!
 </p>
 <h2>Summary</h2>
 <p>
