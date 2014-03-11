@@ -354,9 +354,9 @@ invoke parameter passed to invoke
 <p>
     Internally, the Zend engine has special casting routines to cast objects 
     to integers, to booleans and to floating point values. For one reason or another, 
-    PHP scripts can only implement the __toString() method to cast objects to strings,
-    while all other casting operations are kept away from user space PHP scripts. The
-    PHP-CPP library solves this limitation, and allows one to also implement
+    a PHP script can only implement the __toString() method,
+    while all other casting operations are kept away from it. The
+    PHP-CPP library solves this limitation, and allows one to implement the
     other casting functions as well.
 </p>
 <p>
