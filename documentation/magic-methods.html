@@ -192,14 +192,23 @@ unset($user->email);
 ?&gt;
 </code></pre>
 </p>
-<h2>Magic method __call()</h2>
+<h2>Magic methods __call() and __invoke()</h2>
 <p>
     C++ methods need to be registered explicitly in your extension get_module() 
-    startup function to make them accessible. However, when you override the __call() 
-    method, you can accept all possible method calls. It does not matter what
-    the name of the method is, when something that looks like a method is called
-    from PHP user space, it will trigger a call to your __call() method.
+    startup function to be accessible from PHP user space. However, when you override the __call() 
+    method, you can accept all calls - even calls to methods that do not exist. 
+    When someone makes a call from user space to something that looks like a method, 
+    it will be passed to this __call() method. In a script you can thus use
+    $object->something(), $object->whatever() or $object->anything() - it does not 
+    matter what the name of the method is, all these calls are passed on to the 
+    __call() method in the C++ class.
 </p>
+<p>
+    Next to the magic __call() function, the PHP-CPP library also supports the
+    __invoke() method. This is a method that gets called when an object instance
+    is used <i>as if</i> it was a function. This can be compared with overloading
+    the operator () in a C++ class. By implementing the __invoke() method, scripts
+    from PHP user space can create a method, and then use it as a function.
 <p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
@@ -217,12 +226,22 @@ public:
     virtual ~MyClass() {}
 
     /**
-     *  Override the __call() method to accept all method calls
+     *  Regular method
+     *  @param  params      Parameters that were passed to the method
+     *  @return Value       The return value
+     */
+    Php::Value regular(Php::Parameters &amp;params)
+    {
+        return "this is a regular method";
+    }
+
+    /**
+     *  Overriden __call() method to accept all method calls
      *  @param  name        Name of the method that is called
      *  @param  params      Parameters that were passed to the method
      *  @return Value       The return value
      */
-    Php::Value __call(const char *name, Php::Parameters &amp;params)
+    virtual Php::Value __call(const char *name, Php::Parameters &amp;params) override
     {
         // the return value
         std::string retval = name;
@@ -237,6 +256,28 @@ public:
         // done
         return retval;
     }
+
+    /**
+     *  Overridden __invoke() method so that objects can be called directly
+     *  @param  params      Parameters that were passed to the method
+     *  @return Value       The return value
+     */
+    virtual Php::Value __invoke(Php::Parameters &amp;params) override
+    {
+        // the return value
+        std::string retval = "invoke";
+
+        // loop through the parameters
+        for (auto &amp;param : params)
+        {
+            // append parameter string value to return value
+            retval += " " + param.stringValue();
+        }
+        
+        // done
+        return retval;
+    }
+
 };
 
 /**
@@ -257,6 +298,9 @@ extern "C" {
         // description of the class so that PHP knows 
         // which methods are accessible
         Php::Class&lt;MyClass&gt; myClass("MyClass");
+        
+        // register the regular method
+        myClass.method("regular", &amp;MyClass::regular);
         
         // add the class to the extension
         myExtension.add(std::move(myClass));

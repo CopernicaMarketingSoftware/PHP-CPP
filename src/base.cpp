@@ -165,6 +165,25 @@ Value Base::__call(const char *method, Parameters &params)
 }
 
 /**
+ *  Call the class as if it was a function
+ * 
+ *  This method is called when a an object is used with () operators:
+ *  $object(). You can override this method to make objects callable.
+ * 
+ *  @param  params      The parameters that were passed to the function
+ *  @return Value       The return value
+ */
+Value Base::__invoke(Parameters &params)
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return nullptr;
+}
+    
+/**
  *  End namespace
  */
 }

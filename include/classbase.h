@@ -352,9 +352,26 @@ private:
     static int callMethod(const char *method, int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
     static int callMethod(char *method, int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
 
-    
+    /**
+     *  Method that returns information about the function signature of a undefined method
+     *  @param  object_ptr
+     *  @param  method
+     *  @param  method_len
+     *  @param  key
+     *  @return zend_function
+     */
     static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, const struct _zend_literal *key);
     static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len);
+
+    /**
+     *  Method that returns information about the __invoke() method
+     *  @param  object
+     *  @param  entry
+     *  @param  func
+     *  @param  object_ptr
+     *  @return int
+     */
+    static int getClosure(struct _zval_struct *object, struct _zend_class_entry **entry, union _zend_function **func, struct _zval_struct **object_ptr);
 
     /**
      *  Name of the class

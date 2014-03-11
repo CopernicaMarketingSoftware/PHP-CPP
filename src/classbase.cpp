@@ -53,7 +53,7 @@ static Base *cpp_object(const zval *val)
 
 /**
  *  Handler function that runs the __call function
- *  @param  ??
+ *  @param  ...     All normal parameters for function calls
  */
 static void call_method(INTERNAL_FUNCTION_PARAMETERS)
 {
@@ -97,6 +97,48 @@ static void call_method(INTERNAL_FUNCTION_PARAMETERS)
 }
 
 /**
+ *  Handler function that runs the __invoke function
+ *  @param  ...     All normal parameters for function calls
+ */
+static void call_invoke(INTERNAL_FUNCTION_PARAMETERS)
+{
+    // retrieve the originally called (and by us allocated) function object
+    // (this was copied from the zend engine source code, code looks way too
+    // ugly to be made by me)
+    zend_internal_function *func = (zend_internal_function *)EG(current_execute_data)->function_state.function;
+
+    // we no longer need it (question: why have we allocated this on the heap???)
+    efree(func);
+
+    // the function could throw an exception
+    try
+    {
+        // wrap the return value
+        Value result(return_value, true);
+
+        // construct parameters
+        Parameters params(this_ptr, ZEND_NUM_ARGS());
+
+        // retrieve the base object
+        Base *base = params.object();
+
+        // call the actual __invoke method on the base object
+        result = base->__invoke(params);
+    }
+    catch (const NotImplemented &exception)
+    {
+        // because of the two-step nature, we are going to report the error ourselves
+        zend_error(E_ERROR, "Function name must be a string");
+
+    }
+    catch (Exception &exception)
+    {
+        // process the exception
+        exception.process();
+    }
+}
+
+/**
  *  Method that returns the function definition of the __call function
  *  @param  object_ptr
  *  @param  method_name
@@ -116,12 +158,20 @@ zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int me
     // after that, this returned handler is also called. The call_method property
     // of the object_handlers structure however, never gets called. Typical.
     
+    // first we'll check if the default handler does not have an implementation,
+    // in that case the method is probably already implemented as a regular method
+#if PHP_VERSION_ID < 50399
+    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len);
+#else
+    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len, key);
+#endif
+
+    // did the default implementation do anything?
+    if (defaultFunction) return defaultFunction;
+    
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(*object_ptr);
 
-    // we need the C++ class meta-information object
-    ClassBase *meta = cpp_class(entry);
-    
     // this is peculiar behavior of the zend engine, we first are going to dynamically 
     // allocate memory holding all the properties of the __call method (we initially
     // had an implementation here that used a static variable, and that worked too,
@@ -131,19 +181,66 @@ zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int me
     auto *function = (zend_internal_function *)emalloc(sizeof(zend_internal_function));
     
     // we're going to set all properties
-	function->type = ZEND_INTERNAL_FUNCTION;
-	function->module = nullptr;
-	function->handler = call_method;
-	function->arg_info = nullptr;
-	function->num_args = 0;
-	function->scope = meta->_entry;
-	function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
-	function->function_name = method_name;
+    function->type = ZEND_INTERNAL_FUNCTION;
+    function->module = nullptr;
+    function->handler = call_method;
+    function->arg_info = nullptr;
+    function->num_args = 0;
+    function->scope = entry;
+    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
+    function->function_name = method_name;
     
     // done (cast to zend_function* is allowed, because a zend_function is a union
     // that has one member being a zend_internal_function)
     return (zend_function *)function;
 }
+
+/**
+ *  Method that returns the closure -- this is the __invoke handler!
+ *  @param  object
+ *  @param  entry_ptr
+ *  @param  func
+ *  @param  object_ptr
+ *  @return int
+ */
+int ClassBase::getClosure(zval *object, zend_class_entry **entry_ptr, zend_function **func, zval **object_ptr)
+{
+    // it is really unbelievable how the Zend engine manages to implement every feature
+    // in a complete different manner. You would expect the __invoke() and the
+    // __call() functions not to be very different from each other. However, they
+    // both have a completely different API. This getClosure method is supposed
+    // to fill the function parameter with all information about the invoke()
+    // method that is going to get called
+    
+    // retrieve the class entry linked to this object
+    auto *entry = zend_get_class_entry(object);
+
+    // just like we did for getMethod(), we're going to dynamically allocate memory
+    // with all information about the function
+    auto *function = (zend_internal_function *)emalloc(sizeof(zend_internal_function));
+    
+    // we're going to set all properties
+    function->type = ZEND_INTERNAL_FUNCTION;
+    function->module = nullptr;
+    function->handler = call_invoke;
+    function->arg_info = nullptr;
+    function->num_args = 0;
+    function->scope = entry;
+    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
+    function->function_name = nullptr;
+    
+    // assign this dynamically allocated variable to the func parameter
+    // the case is ok, because zend_internal_function is a member of the
+    // zend_function union
+    *func = (zend_function *)function;
+ 
+    // the object_ptr should be filled with the object on which the method is 
+    // called (otherwise the Zend engine tries to call the method statically)
+    *object_ptr = object;
+    
+    // done
+    return SUCCESS;
+};
 
 /**
  *  Retrieve pointer to our own object handlers
@@ -181,8 +278,9 @@ zend_object_handlers *ClassBase::objectHandlers()
     handlers.has_property = &ClassBase::hasProperty;
     handlers.unset_property = &ClassBase::unsetProperty;
     
-    // when a method is called (__call)
+    // when a method is called (__call and __invoke)
     handlers.get_method = &ClassBase::getMethod;
+    handlers.get_closure = &ClassBase::getClosure;
     
     // remember that object is now initialized
     initialized = true;

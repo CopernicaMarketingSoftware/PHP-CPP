@@ -168,6 +168,16 @@ public:
      */
     virtual Value __call(const char *method, Parameters &params);
 
+    /**
+     *  Call the class as if it was a function
+     * 
+     *  This method is called when a an object is used with () operators:
+     *  $object(). You can override this method to make objects callable.
+     * 
+     *  @param  params      The parameters that were passed to the function
+     *  @return Value       The return value
+     */
+    virtual Value __invoke(Parameters &params);
     
 private:
     /**
