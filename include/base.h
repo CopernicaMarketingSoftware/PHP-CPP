@@ -179,6 +179,47 @@ public:
      */
     virtual Value __invoke(Parameters &params);
     
+    /**
+     *  Cast the object to a string
+     * 
+     *  This method is called when an object is casted to a string, or when
+     *  it is used in a string context
+     * 
+     *  @return Value       The object as a string
+     */
+    virtual Value __toString();
+    
+    /**
+     *  Cast the object to an integer
+     * 
+     *  This method is called when an object is casted to an integer, or when
+     *  it is used in an integer context
+     * 
+     *  @return int         Integer value
+     */
+    virtual long __toInteger();
+    
+    /**
+     *  Cast the object to a float
+     * 
+     *  This method is called when an object is casted to a float, or when it
+     *  is used in a float context
+     * 
+     *  @return double      Floating point value
+     */
+    virtual double __toFloat();
+    
+    /**
+     *  Cast the object to a boolean
+     * 
+     *  This method is called when an object is casted to a bool, or when it
+     *  is used in a boolean context
+     * 
+     *  @return bool
+     */
+    virtual bool __toBool();
+    
+    
 private:
     /**
      *  Store the object in the zend object cache

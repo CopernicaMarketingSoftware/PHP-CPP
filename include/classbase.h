@@ -374,6 +374,15 @@ private:
     static int getClosure(struct _zval_struct *object, struct _zend_class_entry **entry, union _zend_function **func, struct _zval_struct **object_ptr);
 
     /**
+     *  Function to cast the object to a different type
+     *  @param  object
+     *  @param  retval
+     *  @param  type
+     *  @return int
+     */
+    static int cast(struct _zval_struct *object, struct _zval_struct *retval, int type);
+
+    /**
      *  Name of the class
      *  @var    string
      */

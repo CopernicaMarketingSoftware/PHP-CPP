@@ -282,11 +282,80 @@ zend_object_handlers *ClassBase::objectHandlers()
     handlers.get_method = &ClassBase::getMethod;
     handlers.get_closure = &ClassBase::getClosure;
     
+    // handler to cast to a different type
+    handlers.cast_object = &ClassBase::cast;
+    
     // remember that object is now initialized
     initialized = true;
     
     // done
     return &handlers;
+}
+
+/**
+ *  Function to cast the object to a different type
+ *  @param  object
+ *  @param  retval
+ *  @param  type
+ *  @return int
+ */
+int ClassBase::cast(zval *object, zval *retval, int type)
+{
+    // get the base object
+    Base *base = cpp_object(object);
+    
+    // retval it not yet initialized --- and again feelings of disbelief,
+    // frustration, wonder and anger come up when you see that there are not two
+    // functions in the Zend engine that have a comparable API
+    INIT_PZVAL(retval);
+    
+    // wrap zval in value object
+    Value result(retval, true);
+    
+    // when the magic function it not implemented, an exception will be thrown,
+    // and the extension may throw a Php::Exception
+    try
+    {
+        // the result zval
+        zval *result = nullptr;
+        
+        // check type
+        switch ((Type)type) {
+        case Type::Numeric:     result = Value(base->__toInteger()).detach();               break;
+        case Type::Float:       result = Value(base->__toFloat()).detach();                 break;
+        case Type::Bool:        result = Value(base->__toBool()).detach();                  break;
+        case Type::String:      result = base->__toString().setType(Type::String).detach(); break;
+        default:                throw NotImplemented();                                     break;
+        }
+        
+        // @todo do we turn into endless conversion if the __toString object returns 'this' ??
+        // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
+        
+        // is the object overwritten?
+        if (object == retval) zval_dtor(object);
+        
+        // overwrite the result
+        ZVAL_ZVAL(retval, result, 1, 1);
+    
+        // done
+        return SUCCESS;
+    }
+    catch (const NotImplemented &exception)
+    {
+        // is there a default?
+        if (std_object_handlers.cast_object) return FAILURE;
+        
+        // call default
+        return std_object_handlers.cast_object(object, retval, type);
+    }
+    catch (Exception &exception)
+    {
+        // pass on the exception to php userspace
+        exception.process();
+        
+        // done
+        return FAILURE;
+    }
 }
     
 /**

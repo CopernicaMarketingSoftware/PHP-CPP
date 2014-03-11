@@ -182,7 +182,79 @@ Value Base::__invoke(Parameters &params)
     // unreachable code
     return nullptr;
 }
+
+/**
+ *  Cast the object to a string
+ * 
+ *  This method is called when an object is casted to a string, or when
+ *  it is used in a string context
+ * 
+ *  @return Value       The object as a string
+ */
+Value Base::__toString()
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
     
+    // unreachable code
+    return nullptr;
+}    
+
+/**
+ *  Cast the object to an integer
+ * 
+ *  This method is called when an object is casted to an integer, or when
+ *  it is used in an integer context
+ * 
+ *  @return int         Integer value
+ */
+long Base::__toInteger()
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return 0;
+}
+
+/**
+ *  Cast the object to a float
+ * 
+ *  This method is called when an object is casted to a float, or when it
+ *  is used in a float context
+ * 
+ *  @return double      Floating point value
+ */
+double Base::__toFloat()
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return 0.0;
+}
+
+/**
+ *  Cast the object to a boolean
+ * 
+ *  This method is called when an object is casted to a bool, or when it
+ *  is used in a boolean context
+ * 
+ *  @return bool
+ */
+bool Base::__toBool()
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return false;
+}
+
 /**
  *  End namespace
  */
