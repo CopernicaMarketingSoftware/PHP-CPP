@@ -208,7 +208,7 @@ unset($user->email);
     __invoke() method. This is a method that gets called when an object instance
     is used <i>as if</i> it was a function. This can be compared with overloading
     the operator () in a C++ class. By implementing the __invoke() method, scripts
-    from PHP user space can create a method, and then use it as a function.
+    from PHP user space can create an object, and then use it as a function.
 <p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
@@ -316,9 +316,17 @@ extern "C" {
 &lt;?php
 // initialize an object
 $object = new MyClass();
+
+// call a regular method
+echo($object->regular()."\n");
+
+// call some pseudo-methods
 echo($object->something()."\n");
 echo($object->myMethod(1,2,3,4)."\n");
 echo($object->whatever("a","b")."\n");
+
+// call the object as if it was a function
+echo($object("parameter","passed","to","invoke")."\n");
 ?&gt;
 </code></pre>
 </p>
