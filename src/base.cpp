@@ -144,6 +144,27 @@ void Base::__unset(const Php::Value &key)
 }
 
 /**
+ *  Call a method
+ * 
+ *  This method is called when a method is called from the PHP script that
+ *  was not explicitly defined. You can use this to catch variable method
+ *  names, or to support all thinkable method names.
+ * 
+ *  @param  method      Name of the method that was called
+ *  @param  params      The parameters that were passed to the function
+ *  @return Value       The return value
+ */
+Value Base::__call(const char *method, Parameters &params)
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return nullptr;
+}
+
+/**
  *  End namespace
  */
 }

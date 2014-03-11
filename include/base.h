@@ -155,6 +155,19 @@ public:
      */
     virtual void __unset(const Php::Value &key);
 
+    /**
+     *  Call a method
+     * 
+     *  This method is called when a method is called from the PHP script that
+     *  was not explicitly defined. You can use this to catch variable method
+     *  names, or to support all thinkable method names.
+     * 
+     *  @param  method      Name of the method that was called
+     *  @param  params      The parameters that were passed to the function
+     *  @return Value       The return value
+     */
+    virtual Value __call(const char *method, Parameters &params);
+
     
 private:
     /**

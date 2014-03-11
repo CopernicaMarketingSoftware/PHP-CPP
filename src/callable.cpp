@@ -15,7 +15,7 @@ namespace Php {
 
 /**
  *  Function that is called by the Zend engine every time that a function gets called
- *  @param  ht      
+ *  @param  ht
  *  @param  return_value
  *  @param  return_value_ptr
  *  @param  this_ptr

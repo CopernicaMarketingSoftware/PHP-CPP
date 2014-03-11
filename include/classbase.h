@@ -20,6 +20,7 @@
 struct _zend_object_value;
 struct _zend_object_handlers;
 struct _zend_class_entry;
+union _zend_function;
 
 /**
  *  Set up namespace
@@ -336,6 +337,24 @@ private:
      */
     static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member, const struct _zend_literal *key);
     static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member);
+
+    /**
+     *  Method that is called when a undefined method is invoked
+     *  @param  method
+     *  @param  ht
+     *  @param  return_value
+     *  @param  return_value_ptr
+     *  @param  this_ptr
+     *  @param  return_value_used
+     *  @param  tsrm_ls
+     *  @return integer
+     */
+    static int callMethod(const char *method, int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
+    static int callMethod(char *method, int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
+
+    
+    static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, const struct _zend_literal *key);
+    static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len);
 
     /**
      *  Name of the class

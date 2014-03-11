@@ -52,6 +52,95 @@ static Base *cpp_object(const zval *val)
 }
 
 /**
+ *  Handler function that runs the __call function
+ *  @param  ??
+ */
+static void call_method(INTERNAL_FUNCTION_PARAMETERS)
+{
+    // retrieve the originally called (and by us allocated) function object
+    // (this was copied from the zend engine source code, code looks way too
+    // ugly to be made by me)
+    zend_internal_function *func = (zend_internal_function *)EG(current_execute_data)->function_state.function;
+
+    // retrieve the function name
+    const char *name = func->function_name;
+    
+    // the function structure was allocated by ourselves in the get_method function,
+    // we no longer need it now
+    efree(func);
+
+    // the function could throw an exception
+    try
+    {
+        // wrap the return value
+        Value result(return_value, true);
+
+        // construct parameters
+        Parameters params(this_ptr, ZEND_NUM_ARGS());
+
+        // retrieve the base object
+        Base *base = params.object();
+
+        // call the actual __call method on the base object
+        result = base->__call(name, params);
+    }
+    catch (const NotImplemented &exception)
+    {
+        // because of the two-step nature, we are going to report the error ourselves
+        zend_error(E_ERROR, "Undefined method %s", name);
+    }
+    catch (Exception &exception)
+    {
+        // process the exception
+        exception.process();
+    }
+}
+
+/**
+ *  Method that returns the function definition of the __call function
+ *  @param  object_ptr
+ *  @param  method_name
+ *  @param  method_len
+ *  @return zend_function
+ */
+zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len)
+{
+    // something strange about the Zend engine (once more). The structure with
+    // object-handlers has a get_method and call_method member. When a function is
+    // called, the get_method function is called first, but the call_method function
+    // will later never be called again -- this is typical
+    
+    
+    // retrieve the class entry linked to this object
+    auto *entry = zend_get_class_entry(*object_ptr);
+
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(entry);
+    
+    // this is peculiar behavior of the zend engine, we first are going to dynamically 
+    // allocate memory holding all the properties of the __call method (we initially
+    // had an implementation here that used a static variable, and that worked too,
+    // but we'll follow thread safe implementation of the Zend engine here, although
+    // it is strange to allocate and free memory in one and the same method call (free()
+    // call happens in call_method())
+    auto *function = (zend_internal_function *)emalloc(sizeof(zend_internal_function));
+    
+    // we're going to set all properties
+	function->type = ZEND_INTERNAL_FUNCTION;
+	function->module = nullptr;
+	function->handler = call_method;
+	function->arg_info = nullptr;
+	function->num_args = 0;
+	function->scope = meta->_entry;
+	function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
+	function->function_name = method_name;
+    
+    // done (cast to zend_function* is allowed, because a zend_function is a union
+    // that has one member being a zend_internal_function)
+    return (zend_function *)function;
+}
+
+/**
  *  Retrieve pointer to our own object handlers
  *  @return zend_object_handlers
  */
@@ -86,6 +175,9 @@ zend_object_handlers *ClassBase::objectHandlers()
     handlers.read_property = &ClassBase::readProperty;
     handlers.has_property = &ClassBase::hasProperty;
     handlers.unset_property = &ClassBase::unsetProperty;
+    
+    // when a method is called (__call)
+    handlers.get_method = &ClassBase::getMethod;
     
     // remember that object is now initialized
     initialized = true;
