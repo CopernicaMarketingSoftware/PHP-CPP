@@ -224,7 +224,18 @@ public:
      */
     Php::Value __call(const char *name, Php::Parameters &amp;params)
     {
-        return std::string("method: ")+name;
+        // the return value
+        std::string retval = name;
+        
+        // loop through the parameters
+        for (auto &amp;param : params)
+        {
+            // append parameter string value to return value
+            retval += " " + param.stringValue();
+        }
+        
+        // done
+        return retval;
     }
 };
 
@@ -257,16 +268,24 @@ extern "C" {
 </code></pre>
 </p>
 <p>
-    The following PHP script calls some method on this class.
-</p>
-<p>
 <pre code="language-php"><code>
 &lt;?php
 // initialize an object
 $object = new MyClass();
 echo($object->something()."\n");
-echo($object->myMethod()."\n");
-echo($object->whatever()."\n");
+echo($object->myMethod(1,2,3,4)."\n");
+echo($object->whatever("a","b")."\n");
 ?&gt;
 </code></pre>
+</p>
+<p>
+    The above PHP script calls some method on this class. And will generate
+    the following output:
+</p>
+<p>
+<pre>
+something
+myMethod 1 2 3 4
+whatever a b
+</pre>
 </p>
