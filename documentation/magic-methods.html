@@ -192,3 +192,81 @@ unset($user->email);
 ?&gt;
 </code></pre>
 </p>
+<h2>Magic method __call()</h2>
+<p>
+    C++ methods need to be registered explicitly in your extension get_module() 
+    startup function to make them accessible. However, when you override the __call() 
+    method, you can accept all possible method calls. It does not matter what
+    the name of the method is, when something that looks like a method is called
+    from PHP user space, it will trigger a call to your __call() method.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  A sample class, that accepts all thinkable method calls
+ */
+class MyClass : public Php::Base
+{
+public:
+    /**
+     *  C++ constructor and C++ destructpr
+     */
+    MyClass() {}
+    virtual ~MyClass() {}
+
+    /**
+     *  Override the __call() method to accept all method calls
+     *  @param  name        Name of the method that is called
+     *  @param  params      Parameters that were passed to the method
+     *  @return Value       The return value
+     */
+    Php::Value __call(const char *name, Php::Parameters &amp;params)
+    {
+        return std::string("method: ")+name;
+    }
+};
+
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        
+        // extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows 
+        // which methods are accessible
+        Php::Class&lt;MyClass&gt; myClass("MyClass");
+        
+        // add the class to the extension
+        myExtension.add(std::move(myClass));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The following PHP script calls some method on this class.
+</p>
+<p>
+<pre code="language-php"><code>
+&lt;?php
+// initialize an object
+$object = new MyClass();
+echo($object->something()."\n");
+echo($object->myMethod()."\n");
+echo($object->whatever()."\n");
+?&gt;
+</code></pre>
+</p>

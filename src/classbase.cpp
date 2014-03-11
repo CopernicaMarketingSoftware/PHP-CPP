@@ -103,13 +103,18 @@ static void call_method(INTERNAL_FUNCTION_PARAMETERS)
  *  @param  method_len
  *  @return zend_function
  */
+#if PHP_VERSION_ID < 50399
 zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len)
+#else
+zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len, const struct _zend_literal *key)
+#endif
 {
     // something strange about the Zend engine (once more). The structure with
     // object-handlers has a get_method and call_method member. When a function is
-    // called, the get_method function is called first, but the call_method function
-    // will later never be called again -- this is typical
-    
+    // called, the get_method function is called first, to retrieve information
+    // about the method (like the handler that should be called to execute it),
+    // after that, this returned handler is also called. The call_method property
+    // of the object_handlers structure however, never gets called. Typical.
     
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(*object_ptr);
