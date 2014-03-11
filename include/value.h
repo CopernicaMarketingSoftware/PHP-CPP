@@ -29,6 +29,11 @@ struct _zval_struct;
 namespace Php {
 
 /**
+ *  Forward declaration
+ */
+class ValueIterator;
+
+/**
  *  Forward definitions
  */
 class Base;
@@ -814,12 +819,34 @@ private:
      */
     int refcount();
 
+public:    
+    typedef ValueIterator iterator;
+    
+    /**
+     *  Iterator to beginning
+     *  @return ValueIterator&
+     */
+    iterator& begin();
+
+    /**
+     *  Iterator to end
+     *  @return ValueIterator&
+     */
+    iterator& end() const;
+
+
 protected:
     /**
      *  The wrapped zval
      *  @var struct zval
      */
     struct _zval_struct *_val;
+
+    /**
+     *  ValueIterator pointer
+     *  @var ValueIterator*
+     */
+    iterator *_iterator = nullptr;
     
     /**
      *  Detach the zval
