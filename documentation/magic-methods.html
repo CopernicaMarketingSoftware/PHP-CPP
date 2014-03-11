@@ -209,6 +209,7 @@ unset($user->email);
     is used <i>as if</i> it was a function. This can be compared with overloading
     the operator () in a C++ class. By implementing the __invoke() method, scripts
     from PHP user space can create an object, and then use it as a function.
+</p>
 <p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
@@ -342,4 +343,100 @@ myMethod 1 2 3 4
 whatever a b
 invoke parameter passed to invoke
 </pre>
+</p>
+<h2>__toString and other casting methods</h2>
+<p>
+    In PHP you can add a __toString() method to a class. This method is automatically
+    called when you cast an object to a string. And of course, PHP-CPP also supports
+    this __toString() method. But there is more. Internally, the Zend engine
+    also has methods for casting objects to integers, booleans and floating point
+    values. For one reason or the other, only the casting to a string (__toString)
+    method is offered to user space PHP scripts. But with the PHP-CPP library you 
+    can implement all these casting functions.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  A sample class, with methods to cast objects to scalars
+ */
+class MyClass : public Php::Base
+{
+public:
+    /**
+     *  C++ constructor and C++ destructpr
+     */
+    MyClass() {}
+    virtual ~MyClass() {}
+
+    /**
+     *  Cast to a string
+     *  @return Value
+     */
+    virtual Php::Value __toString() override
+    {
+        return "abcd";
+    }
+    
+    /**
+     *  Cast to a integer
+     *  @return long
+     */
+    virtual long __toInteger() override
+    {
+        return 1234;
+    }
+    
+    /**
+     *  Cast to a floating point number
+     *  @return double
+     */
+    virtual double __toFloat() override
+    {
+        return 88.88;
+    }
+    
+    /**
+     *  Cast to a boolean
+     *  @return bool
+     */
+    virtual bool __toBool() override
+    {
+        return true;
+    }
+};
+
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        
+        // extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows 
+        // which methods are accessible
+        Php::Class&lt;MyClass&gt; myClass("MyClass");
+        
+        // add the class to the extension
+        myExtension.add(std::move(myClass));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The magic __toInteger(), __toFloat() and __toBool() methods are special
+    methods added by the PHP-CPP library, and are not available in regular
+    PHP scripts.
 </p>
