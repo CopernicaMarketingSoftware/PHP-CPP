@@ -285,11 +285,60 @@ zend_object_handlers *ClassBase::objectHandlers()
     // handler to cast to a different type
     handlers.cast_object = &ClassBase::cast;
     
+    // method to compare two objects
+    handlers.compare_objects = &ClassBase::compare;
+    
     // remember that object is now initialized
     initialized = true;
     
     // done
     return &handlers;
+}
+
+/**
+ *  Function to compare two objects
+ *  @param  object1
+ *  @param  object2
+ *  @return int
+ */
+int ClassBase::compare(zval *object1, zval *object2)
+{
+    // prevent exceptions
+    try
+    {
+        // retrieve the class entry linked to this object
+        auto *entry = zend_get_class_entry(object1);
+
+        // other object must be of the same type
+        if (entry != zend_get_class_entry(object2)) throw NotImplemented();
+
+        // we need the C++ class meta-information object
+        ClassBase *meta = cpp_class(entry);
+        
+        // get the base objects
+        Base *base1 = cpp_object(object1);
+        Base *base2 = cpp_object(object2);
+        
+        // run the compare method
+        return meta->compare(base1, base2);
+    }
+    catch (const NotImplemented &exception)
+    {
+        // it was not implemented, do we have a default?
+        if (!std_object_handlers.compare_objects) return 1;
+        
+        // call default
+        return std_object_handlers.compare_objects(object1, object2);
+    }
+    catch (Exception &exception)
+    {
+        // a Php::Exception was thrown by the extension __compare function, 
+        // pass this on to user space
+        exception.process();
+        
+        // what shall we return here...
+        return 1;
+    }
 }
 
 /**
@@ -343,7 +392,7 @@ int ClassBase::cast(zval *object, zval *retval, int type)
     catch (const NotImplemented &exception)
     {
         // is there a default?
-        if (std_object_handlers.cast_object) return FAILURE;
+        if (!std_object_handlers.cast_object) return FAILURE;
         
         // call default
         return std_object_handlers.cast_object(object, retval, type);

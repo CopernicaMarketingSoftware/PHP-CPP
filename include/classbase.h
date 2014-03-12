@@ -108,6 +108,14 @@ public:
     virtual Base *clone(Base *orig) const = 0;
 
     /**
+     *  Compare two objects
+     *  @param  object1
+     *  @param  object2
+     *  @return int
+     */
+    virtual int compare(Base *object1, Base *object2) const = 0;
+
+    /**
      *  Is this a traversable class?
      *  @return bool
      */
@@ -381,6 +389,14 @@ private:
      *  @return int
      */
     static int cast(struct _zval_struct *object, struct _zval_struct *retval, int type);
+
+    /**
+     *  Function to compare two objects
+     *  @param  object1
+     *  @param  object2
+     *  @return int
+     */
+    static int compare(struct _zval_struct *object1, struct _zval_struct *object2);
 
     /**
      *  Name of the class

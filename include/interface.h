@@ -71,6 +71,18 @@ private:
     }
 
     /**
+     *  Compare two objects
+     *  @param  object1
+     *  @param  object2
+     *  @return int
+     */
+    virtual int compare(Base *object1, Base *object2) const override
+    {
+        // this is never called for interfaces
+        return 0;
+    }
+
+    /**
      *  Namespaces have access to the private base class
      */
     friend class Namespace;

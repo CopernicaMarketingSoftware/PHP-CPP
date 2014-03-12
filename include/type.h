@@ -21,7 +21,7 @@ enum class Type : unsigned char {
     Null            =   0,
     Numeric         =   1,
     Float           =   2,
-    Boolean         =   3,
+    Bool            =   3,
     Array           =   4,
     Object          =   5,
     String          =   6,

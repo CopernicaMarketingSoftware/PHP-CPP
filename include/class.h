@@ -185,6 +185,22 @@ private:
     }
     
     /**
+     *  Compare two objects
+     *  @param  object1
+     *  @param  object2
+     *  @return int
+     */
+    virtual int compare(Base *object1, Base *object2) const override
+    {
+        // cast to the actual implementation type
+        T *t1 = (T *)object1;
+        T *t2 = (T *)object2;
+        
+        // compare the two objects
+        return t1->__compare(*t2);
+    }
+    
+    /**
      *  Namespaces have access to the private base class
      */
     friend class Namespace;

@@ -256,6 +256,28 @@ bool Base::__toBool()
 }
 
 /**
+ *  Compare the object with a different object of the same type
+ *  
+ *  This method should return 0 if both objects are equal, a negative value
+ *  if the 'this' object is smaller, and a positive value if the 'this'
+ *  object is bigger.
+ * 
+ *  The passed in object is an instance of base
+ * 
+ *  @param  that        Object to compare with
+ *  @return int
+ */
+bool Base::__compare(const Base &that) const
+{
+    // throw an exception that will be caught in the ClassBase class, 
+    // so that the default implementation of the function can be called
+    throw NotImplemented();
+    
+    // unreachable code
+    return 1;
+}
+
+/**
  *  End namespace
  */
 }
