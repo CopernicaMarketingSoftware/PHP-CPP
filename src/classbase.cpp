@@ -1133,7 +1133,7 @@ void ClassBase::initialize(const std::string &prefix)
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_0 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1146,7 +1146,7 @@ void ClassBase::method(const char *name, method_callback_0 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_1 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1159,7 +1159,7 @@ void ClassBase::method(const char *name, method_callback_1 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_2 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1172,7 +1172,7 @@ void ClassBase::method(const char *name, method_callback_2 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_3 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1185,7 +1185,7 @@ void ClassBase::method(const char *name, method_callback_3 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_4 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1198,7 +1198,7 @@ void ClassBase::method(const char *name, method_callback_4 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_5 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1211,7 +1211,7 @@ void ClassBase::method(const char *name, method_callback_5 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_6 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
@@ -1224,10 +1224,62 @@ void ClassBase::method(const char *name, method_callback_6 callback, int flags, 
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, method_callback_7 callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+}
+
+/**
+ *  Add a static method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, const native_callback_0 &method, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+}
+
+/**
+ *  Add a static method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, const native_callback_1 &method, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+}
+
+/**
+ *  Add a static method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, const native_callback_2 &method, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+}
+
+/**
+ *  Add a static method to the class
+ *  @param  name        Name of the method
+ *  @param  method      The actual method
+ *  @param  flags       Optional flags
+ *  @param  args        Description of the supported arguments
+ */
+void ClassBase::method(const char *name, const native_callback_3 &method, int flags, const Arguments &args)
+{
+    // add the method
+    _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
 }
 
 /**
@@ -1241,6 +1293,8 @@ void ClassBase::method(const char *name, int flags, const Arguments &args)
     // add the method
     _methods.push_back(std::make_shared<Method>(name, Abstract | flags, args));
 }
+
+
 
 /**
  *  Add a property to the class

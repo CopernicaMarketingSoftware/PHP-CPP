@@ -28,6 +28,16 @@ union _zend_function;
 namespace Php {
 
 /**
+ *  A couple of predefined native callback functions that can be registered.
+ *  These are functions that optional accept a Request and/or Parameters object,
+ *  and that either return void or a Value object. 
+ */
+typedef void    (*native_callback_0)();
+typedef void    (*native_callback_1)(Parameters &);
+typedef Value   (*native_callback_2)();
+typedef Value   (*native_callback_3)(Parameters &);
+
+/**
  *  Method signatures
  */
 typedef void    (Base::*method_callback_0)();
@@ -151,14 +161,31 @@ protected:
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, method_callback_0, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_1, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_2, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_3, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_4, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_5, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_6, int flags=0, const Arguments &args = {});
-    void method(const char *name, method_callback_7, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {});
+
+    /**
+     *  Add a static method to the class
+     * 
+     *  Because a C++ static method is just a regular function, that happens to
+     *  have access to the private variables of the class at compile time, you
+     *  can register any function that matches one of the function signatures
+     *  
+     *  @param  name        Name of the method
+     *  @param  method      The actual method
+     *  @param  flags       Optional flags
+     *  @param  args        Description of the supported arguments
+     */
+    void method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {});
 
     /**
      *  Add an abstract method to the class

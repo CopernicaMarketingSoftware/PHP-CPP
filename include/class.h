@@ -73,7 +73,7 @@ public:
     virtual ~Class() {}
     
     /**
-     *  Add a method to the class
+     *  Add a regular method to the class
      *  
      *  The method will be accessible as one of the class methods in your PHP
      *  code. When the method is called, it will automatically be forwarded
@@ -103,6 +103,30 @@ public:
     void method(const char *name, void  (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), Public, args); }
     void method(const char *name, Value (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), Public, args); }
     void method(const char *name, Value (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), Public, args); }
+
+    /**
+     *  Add a static method to a class
+     * 
+     *  In C++ a static method is just a plain function, that only at compile
+     *  time has access to the private variables. You can therefore also supply
+     *  global functions as static method, and real static methods (that do not
+     *  even have to come from the same class.
+     * 
+     *  In PHP scripts, the function will only be callable as real static method
+     * 
+     *  @param  name        Name of the method
+     *  @param  method      The actual method
+     *  @param  flags       Optional flags
+     *  @param  args        Argument descriptions
+     */
+    void method(const char *name, const native_callback_0 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); }
+    void method(const char *name, const native_callback_1 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); }
+    void method(const char *name, const native_callback_2 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); }
+    void method(const char *name, const native_callback_3 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); }
+    void method(const char *name, const native_callback_0 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); }
+    void method(const char *name, const native_callback_1 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); }
+    void method(const char *name, const native_callback_2 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); }
+    void method(const char *name, const native_callback_3 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); }
 
     /**
      *  Add an abstract method to the class
@@ -198,7 +222,7 @@ private:
         
         // compare the two objects
         if (*t1 < *t2) return -1;
-        if (*t1 > *t2) return  1;
+        if (*t2 < *t1) return  1;
         
         // they must be identical
         return 0;

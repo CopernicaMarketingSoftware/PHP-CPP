@@ -39,6 +39,11 @@ Parameters::Parameters(zval *this_ptr, int argc TSRMLS_DC) : _this(this_ptr)
  */
 Base *Parameters::object()
 {
+    // do we have a this pointer in the first place? The member is not set
+    // when static methods are being called, or when a regular function is
+    // called in a static context
+    if (!_this) return nullptr;
+    
     // get the mixed object
     MixedObject *obj = (MixedObject *)zend_object_store_get_object(_this TSRMLS_CC);
     

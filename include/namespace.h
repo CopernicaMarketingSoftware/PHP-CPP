@@ -14,16 +14,6 @@
 namespace Php {
 
 /**
- *  A couple of predefined native callback functions that can be registered.
- *  These are functions that optional accept a Request and/or Parameters object,
- *  and that either return void or a Value object. 
- */
-typedef void    (*native_callback_0)();
-typedef void    (*native_callback_1)(Parameters &);
-typedef Value   (*native_callback_2)();
-typedef Value   (*native_callback_3)(Parameters &);
-
-/**
  *  Forward declaration
  */
 class Function;
@@ -71,10 +61,10 @@ public:
      *  @param  function    The function to add
      *  @param  arguments   Optional argument specification
      */
-    void add(const char *name, native_callback_0 function, const Arguments &arguments = {});
-    void add(const char *name, native_callback_1 function, const Arguments &arguments = {});
-    void add(const char *name, native_callback_2 function, const Arguments &arguments = {});
-    void add(const char *name, native_callback_3 function, const Arguments &arguments = {});
+    void add(const char *name, const native_callback_0 &function, const Arguments &arguments = {});
+    void add(const char *name, const native_callback_1 &function, const Arguments &arguments = {});
+    void add(const char *name, const native_callback_2 &function, const Arguments &arguments = {});
+    void add(const char *name, const native_callback_3 &function, const Arguments &arguments = {});
     
     /**
      *  Add a native class to the extension by moving it

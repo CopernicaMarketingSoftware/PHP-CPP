@@ -19,7 +19,7 @@ namespace Php {
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
  */
-void Namespace::add(const char *name, native_callback_0 function, const Arguments &arguments)
+void Namespace::add(const char *name, const native_callback_0 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
@@ -31,7 +31,7 @@ void Namespace::add(const char *name, native_callback_0 function, const Argument
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
  */
-void Namespace::add(const char *name, native_callback_1 function, const Arguments &arguments)
+void Namespace::add(const char *name, const native_callback_1 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
@@ -43,7 +43,7 @@ void Namespace::add(const char *name, native_callback_1 function, const Argument
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
  */
-void Namespace::add(const char *name, native_callback_2 function, const Arguments &arguments)
+void Namespace::add(const char *name, const native_callback_2 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
@@ -55,7 +55,7 @@ void Namespace::add(const char *name, native_callback_2 function, const Argument
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
  */
-void Namespace::add(const char *name, native_callback_3 function, const Arguments &arguments)
+void Namespace::add(const char *name, const native_callback_3 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
