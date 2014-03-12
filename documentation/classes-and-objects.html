@@ -96,8 +96,7 @@ extern "C" {
     If you want to make a class method accessible from PHP, you must
     ensure that it matches one of the supported signatures. These are essentially
     the same signatures as <a href="functions">exportable plain functions</a>,
-    can have, but with versions for const and non-const methods, and signatures
-    for static methods.
+    can have, but with versions for const and non-const methods.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -126,11 +125,11 @@ Php::Value  YourClass::example8(Php::Parameters &amp;params) const;
 </p>
 <p>
     The Php::Class constructor needs a string parameter, with the name of 
-    the class in PHP. The method Php::Class::method() can be used to register
-    the methods that you want to make accessible from PHP. Notice that in our 
-    example we have used the C++11 std::move() function to add the class to the
-    extension, so that the class object is actually <i>moved</i> into the extension 
-    object, which is a more efficient operation than copying.
+    the class in PHP. The method Php::Class::method() can then be, as you can
+    see in the example above, to register methods that you want to make accessible 
+    from PHP. Did you see that in the example we used the C++11 std::move() function 
+    to add the class to the extension? This will actually <i>move</i> the class
+    obect into the extension, which is a more efficient operation than copying.
 </p>
 <h2>Method parameters</h2>
 <p>
@@ -149,7 +148,7 @@ class Counter : public Php::Base
 {
 private:
     /**
-     *  The initial value
+     *  The internal value
      *  @var    int
      */
     int _value = 0;
@@ -264,20 +263,21 @@ echo($counter->value()."\n");
 <h2>Static methods</h2>
 <p>
     Static methods are supported too. A static method is a method that does
-    not have access to a 'this' pointer when it is called. In C++, such a static method
-    is therefore identical to a regular function, which also does not
-    have a 'this' pointer. The only difference between static C++ methods and 
-    regular C++ functions is at compile time. The compiler allows the static 
-    method to access private data. The signature of a static method is however
+    not have access to a 'this' pointer. In C++, such static methods
+    are therefore identical to regular functions, that also do not have access 
+    to a 'this' pointer. The only difference between static C++ methods and 
+    regular C++ functions is at compile time: the compiler allows static 
+    methods to access private data. The signature of a static method is however
     completely identical to the signature of a regular function.
 </p>
 <p>
-    PHP-CPP allows you to register static methods. But because the signature of
-    a static method is identical to the signature of a regular function, the static 
-    PHP method that you register does not even have to be a static method of the 
-    C++ class. Regular functions and static methods of other classes
-    have the same signature and can be registered too! From a software architectural
-    standpoint, it of course is better to use only static methods of the same class.
+    PHP-CPP allows you to register static methods. But because of the fact that
+    the signature of a static method is identical to the signature of a regular 
+    function, the method that you register does not even have to be a method of 
+    the same class. Regular functions and static methods of other classes
+    have exactly the same signature and can be registered too! From a software 
+    architectural standpoint, it is better to use only static methods of the 
+    same class, but C++ allows you to do much more.
 </p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
