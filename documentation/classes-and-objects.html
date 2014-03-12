@@ -324,7 +324,7 @@ public:
 /**
  *  A very simple class that will be exported to PHP
  */
-class PublicClass : Php::Base
+class PublicClass : public Php::Base
 {
 public:
     /**
@@ -380,7 +380,7 @@ extern "C" {
         myClass.method("static3", &amp;PrivateClass::staticMethod);
         
         // add the class to the extension
-        myExtension.add(std::move(counter));
+        myExtension.add(std::move(myClass));
         
         // In fact, because a static method has the same signature
         // as a regular function, you can also register static
@@ -397,7 +397,25 @@ extern "C" {
     It is questionable how useful this all is. It is probably advisable to keep 
     your code clean, simple and maintainable, and only register static PHP methods 
     that are also in C++ static methods of the same class. But C++ does not forbid
-    you to do it completely different.
+    you to do it completely different. Let's round up with an example how to 
+    call the static methods
+</p>
+<p>
+<pre class="language-c++"><code>
+&lt;?php
+// this will call PublicClass::staticMethod()
+MyClass::static1();
+
+// this will call PrivateClass::staticMethod()
+MyClass::static2();
+
+// this will call regularFunction
+MyClass::static3();
+
+// this will call PrivateClass::staticMethod
+myFunction();
+?&gt;
+</code></pre>
 </p>
 <h2>Access modifiers</h2>
 <p>
