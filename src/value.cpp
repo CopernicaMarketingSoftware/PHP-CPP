@@ -1579,6 +1579,13 @@ std::map<std::string,Php::Value> Value::mapValue() const
  *  @return ValueIterator&
  */
 Value::iterator& Value::begin() {
+    
+    // if already exist
+    if(_iterator) {
+       _iterator->reset();
+       return *_iterator;
+    }
+
     // check type
     if (isArray())
     {
@@ -1605,7 +1612,7 @@ Value::iterator& Value::begin() {
  *  Empty iterator. Used to finish the iterations
  *  @var ValueIterator
  */
-ValueIterator ValueIterator::null;
+Value::iterator Value::iterator::null;
 
 /**
  *  Iterator to end

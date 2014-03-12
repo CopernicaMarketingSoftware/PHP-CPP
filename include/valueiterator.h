@@ -30,7 +30,8 @@ public:
      *  Constructor for empty ValueIterator.
      *  Used only for build ValueIterator::null
      */
-    ValueIterator() {
+    ValueIterator() 
+    {
         _pair.reset();
     }
 
@@ -80,6 +81,11 @@ public:
     ValuePair* operator ->() {
         return &_pair;
     }
+
+    /**
+     *  reset iterator to beginning of the hash table
+     */
+    void reset();
 
     // Empty iterator. Used to finish the iterations
     static ValueIterator null;

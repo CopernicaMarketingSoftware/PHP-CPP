@@ -19,10 +19,18 @@ namespace Php {
  */
 ValueIterator::ValueIterator(_hashtable *arr, bool isArray): _arr(arr), _isArray(isArray) {
     // reset iterator to beginning of the hash table
-    zend_hash_internal_pointer_reset(arr);
+    reset();
 
     // filling _pair
     setPair();
+}
+
+/**
+ *  reset iterator to beginning of the hash table
+ */
+void ValueIterator::reset() {
+    // reset iterator to beginning of the hash table
+    zend_hash_internal_pointer_reset(_arr);
 }
 
 /**
