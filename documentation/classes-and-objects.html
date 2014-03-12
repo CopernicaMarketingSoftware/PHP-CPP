@@ -95,7 +95,7 @@ extern "C" {
 <p>
     If you want to make a class method accessible from PHP, you must
     ensure that it matches one of the supported signatures. These are essentially
-    the same signatures as <a href="functions">exportable plain functions</a>,
+    the same signatures as <a href="functions">exportable plain functions</a>
     can have, but with versions for const and non-const methods.
 </p>
 <p>
@@ -125,11 +125,11 @@ Php::Value  YourClass::example8(Php::Parameters &amp;params) const;
 </p>
 <p>
     The Php::Class constructor needs a string parameter, with the name of 
-    the class in PHP. The method Php::Class::method() can then be, as you can
+    the class in PHP. The method Php::Class::method() can then be used, as you can
     see in the example above, to register methods that you want to make accessible 
     from PHP. Did you see that in the example we used the C++11 std::move() function 
     to add the class to the extension? This will actually <i>move</i> the class
-    obect into the extension, which is a more efficient operation than copying.
+    object into the extension, which is a more efficient operation than copying.
 </p>
 <h2>Method parameters</h2>
 <p>
