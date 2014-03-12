@@ -10,7 +10,9 @@
     classes. With C++ you can achieve the same, but by using technologies like
     operator overloading, implicit constructors and casting operators. The
     PHP __invoke() method for example, is more or less identical to operator () 
-    in C++.
+    in C++. The question that we asked ourselves was whether we should automatically 
+    pass the __invoke PHP method to a C++ operator() call - or use the same 
+    __invoke() method name in C++ too?
 </p>
 <p>
     We have decided to follow the PHP conventions, and use magic methods
@@ -19,7 +21,8 @@
     pretty. But by using magic methods the switch from PHP to C++ is kept simpler
     for starting C++ programmers. And on top of that, not all magic methods and
     interfaces could have been implemented with core C++ features, so we did have 
-    to use <i>some</i> magic methods and/or interfaces anyway.
+    to use <i>some</i> magic methods and/or interfaces anyway - so we could just
+    as well follow PHP completely in this.
 </p>
 <p>
     Besides the magic methods and functions, the Zend engine has additional 
@@ -32,7 +35,7 @@
 </p>
 <p>
     If you compare two objects in PHP with comparison operators like &lt; ==, !=
-    &gt; (and some others), the Zend engine runs an object comparison function.
+    &gt; (and the obvious others), the Zend engine runs an object comparison function.
     The PHP-CPP library interupts this method, and passes the comparison method
     to the &lt; operator of your class. In other words, if you want to install
     a custom comparison operator, you can do so by implementing operator&lt;.
