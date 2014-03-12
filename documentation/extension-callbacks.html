@@ -1,4 +1,4 @@
-<h1>The lifetime of an extension</h1>
+<h1>Extension callbacks</h1>
 <p>
     As we <a href="loading-extension">explained before</a>, the get_module()
     function is called when your extension is started. It returns a memory address 
@@ -95,7 +95,7 @@ extern "C" {
     The Php::Extension class has a method onRequest() that is used in the
     above example to register a callback function. This callback is called right 
     before every pageview/request. And as you can see, it is 
-    permitted to use lambda functions.
+    permitted to use C++ lambda functions.
 </p>
 <p>
     The onRequest() is not the only method in the Php::Extension object to
@@ -114,7 +114,7 @@ extern "C" {
     The startup callback is called when the Zend engine has loaded your extension 
     and all functions and classes in it were registered. If you want to initialize 
     additional variables in your extension before the functions are going to get called, 
-    you can use the onStartup() function to register a callback to run this
+    you can use the onStartup() function and register a callback to run this
     initialization code.
 </p>
 <p>
