@@ -197,7 +197,11 @@ private:
         T *t2 = (T *)object2;
         
         // compare the two objects
-        return t1->__compare(*t2);
+        if (*t1 < *t2) return -1;
+        if (*t1 > *t2) return  1;
+        
+        // they must be identical
+        return 0;
     }
     
     /**

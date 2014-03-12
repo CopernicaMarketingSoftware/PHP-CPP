@@ -220,18 +220,14 @@ public:
     virtual bool __toBool();
 
     /**
-     *  Compare the object with a different object of the same type
+     *  Comparison operator
      *  
-     *  This method should return 0 if both objects are equal, a negative value
-     *  if the 'this' object is smaller, and a positive value if the 'this'
-     *  object is bigger.
-     * 
-     *  The passed in object is an instance of base
+     *  Check how a different object compares to this object
      * 
      *  @param  that        Object to compare with
      *  @return int
      */
-    virtual bool __compare(const Base &that) const;
+    bool operator<(const Base &that) const;
     
     
 private:
