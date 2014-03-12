@@ -16,23 +16,52 @@
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
 
-// actual class implementation
+/**
+ *  Counter class that can be used for counting
+ */
 class Counter : public Php::Base
 {
 private:
+    /**
+     *  The initial value
+     *  @var    int
+     */
     int _value = 0;
 
 public:
+    /**
+     *  C++ constructor and destructor
+     */
     Counter() {}
     virtual ~Counter() {}
     
+    /**
+     *  Update methods to increment or decrement the counter
+     *  Both methods return the NEW value of the counter
+     *  @return int
+     */
     Php::Value increment() { return ++_value; }
     Php::Value decrement() { return --_value; }
+    
+    /**
+     *  Method to retrieve the current counter value
+     *  @return int
+     */
     Php::Value value() const { return _value; }
 };
 
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
@@ -40,6 +69,7 @@ extern "C" {
         counter.method("increment", &Counter::increment);
         counter.method("decrement", &Counter::decrement);
         counter.method("value", &Counter::value);
+        counter.method("instantiate", &Counter::instantiate);
         
         // add the class to the extension
         myExtension.add(std::move(counter));
@@ -63,28 +93,29 @@ extern "C" {
     of the counter after the operation, the value() method returns the current value.
 </p>
 <p>
-    If you want to make a class method that is accessible from PHP, you must
-    ensure that it has one of the eight supported signatures (which are the same
-    signatures that <a href="functions">exportable plain functions</a> can have),
-    plus their const variant.
+    If you want to make a class method accessible from PHP, you must
+    ensure that it matches one of the supported signatures. These are essentially
+    the same signatures as <a href="functions">exportable plain functions</a>,
+    can have, but with versions for const and non-const methods, and signatures
+    for static methods.
 </p>
 <p>
 <pre class="language-c++"><code>
-void YourClass::example1();
-void YourClass::example2(Php::Parameters &amp;params);
-Php::Value YourClass::example3();
-Php::Value YourClass::example4(Php::Parameters &amp;params);
-void YourClass::example5() const;
-void YourClass::example6(Php::Parameters &amp;params) const;
-Php::Value YourClass::example7() const;
-Php::Value YourClass::example8(Php::Parameters &amp;params) const;
+// signatures of supported regular methods
+void        YourClass::example1();
+void        YourClass::example2(Php::Parameters &amp;params);
+Php::Value  YourClass::example3();
+Php::Value  YourClass::example4(Php::Parameters &amp;params);
+void        YourClass::example5() const;
+void        YourClass::example6(Php::Parameters &amp;params) const;
+Php::Value  YourClass::example7() const;
+Php::Value  YourClass::example8(Php::Parameters &amp;params) const;
 </code></pre>
 </p>
 <p>
     Methods work exactly the same as <a href="functions">regular functions</a>, with the 
     difference that in a method you have (of course) access to the member
-    variables of the object (and in C++ you you do not have to use "this->"
-    to access member variables).
+    variables of the object.
 </p>
 <p>
     To make the class accessible from PHP, you must add it to the extension
@@ -111,51 +142,86 @@ Php::Value YourClass::example8(Php::Parameters &amp;params) const;
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
 
-// actual class implementation
+/**
+ *  Counter class that can be used for counting
+ */
 class Counter : public Php::Base
 {
 private:
+    /**
+     *  The initial value
+     *  @var    int
+     */
     int _value = 0;
 
 public:
+    /**
+     *  C++ constructor and destructor
+     */
     Counter() {}
     virtual ~Counter() {}
     
-    Php::Value increment(Php::Parameters &params) 
+    /**
+     *  Increment operation
+     *  This method gets one optional parameter holding the change
+     *  @param  int     Optional increment value
+     *  @return int     New value
+     */
+    Php::Value increment(Php::Parameters &amp;params) 
     { 
         return _value += params.size() > 0 ? (int)params[0] : 1; 
     }
-    
-    Php::Value decrement(Php::Parameters &params) 
+
+    /**
+     *  Decrement operation
+     *  This method gets one optional parameter holding the change
+     *  @param  int     Optional decrement value
+     *  @return int     New value
+     */
+    Php::Value decrement(Php::Parameters &amp;params) 
     { 
         return _value -= params.size() > 0 ? (int)params[0] : 1; 
     }
     
+    /**
+     *  Method to retrieve the current value
+     *  @return int
+     */
     Php::Value value() const 
     { 
         return _value; 
     }
 };
 
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
         Php::Class&lt;Counter&gt; counter("Counter");
         
         // register the increment method, and specify its parameters
-        counter.method("increment", &Counter::increment, { 
+        counter.method("increment", &amp;Counter::increment, { 
             Php::ByVal("change", Php::Type::Numeric, false) 
         });
         
         // register the decrement, and specify its parameters
-        counter.method("decrement", &Counter::decrement, { 
+        counter.method("decrement", &amp;Counter::decrement, { 
             Php::ByVal("change", Php::Type::Numeric, false) 
         });
         
         // register the value method
-        counter.method("value", &Counter::value);
+        counter.method("value", &amp;Counter::value, {});
         
         // add the class to the extension
         myExtension.add(std::move(counter));
@@ -195,6 +261,144 @@ echo($counter->value()."\n");
     thought that an example was not really necessary (and we're not a big fan
     of parameters-by-reference either).
 </p>
+<h2>Static methods</h2>
+<p>
+    Static methods are supported too. A static method is a method that does
+    not have access to a 'this' pointer when it is called. In C++, such a static method
+    is therefore identical to a regular function, which also does not
+    have a 'this' pointer. The only difference between static C++ methods and 
+    regular C++ functions is at compile time. The compiler allows the static 
+    method to access private data. The signature of a static method is however
+    completely identical to the signature of a regular function.
+</p>
+<p>
+    PHP-CPP allows you to register static methods. But because the signature of
+    a static method is identical to the signature of a regular function, the static 
+    PHP method that you register does not even have to be a static method of the 
+    C++ class. Regular functions and static methods of other classes
+    have the same signature and can be registered too! From a software architectural
+    standpoint, it of course is better to use only static methods of the same class.
+</p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  Regular function
+ *
+ *  Because a regular function does not have a 'this' pointer,
+ *  it has the same signature as static methods
+ *
+ *  @param  params      Parameters passed to the function
+ */
+void regularFunction(Php::Parameters &amp;params)
+{
+    // @todo add implementation
+}
+
+/**
+ *  A very simple class that will <b>not</b> be exported to PHP
+ */
+class PrivateClass
+{
+public:
+    /**
+     *  C++ constructor and destructor
+     */
+    PrivateClass() {}
+    virtual ~PrivateClass() {}
+
+    /** 
+     *  Static method
+     *
+     *  A static method also has no 'this' pointer and has
+     *  therefore a signature identical to regular functions
+     *
+     *  @param  params      Parameters passed to the method
+     */
+    static void staticMethod(Php::Parameters &amp;params)
+    {
+        // @todo add implementation
+    }
+};
+
+/**
+ *  A very simple class that will be exported to PHP
+ */
+class PublicClass : Php::Base
+{
+public:
+    /**
+     *  C++ constructor and destructor
+     */
+    PublicClass() {}
+    virtual ~PublicClass() {}
+
+    /** 
+     *  Another static method
+     *
+     *  This static has exactly the same signature as the
+     *  regular function and static method that were mentioned
+     *  before
+     *
+     *  @param  params      Parameters passed to the method
+     */
+    static void staticMethod(Php::Parameters &amp;params)
+    {
+        // @todo add implementation
+    }
+};
+
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;PublicClass&gt; myClass("MyClass");
+        
+        // register the PublicClass::staticMethod to be a
+        // static method callable from PHP
+        myClass.method("static1", &amp;PublicClass::staticMethod);
+        
+        // regular functions have the same signatures as 
+        // static methods. So nothing forbids you to register
+        // a normal function as static method too
+        myClass.method("static2", regularFunction);
+        
+        // and even static methods from completely different
+        // classes have the same function signature and can
+        // thus be registered
+        myClass.method("static3", &amp;PrivateClass::staticMethod);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // In fact, because a static method has the same signature
+        // as a regular function, you can also register static
+        // C++ methods as regular global PHP functions
+        myExtension.add("myFunction", &amp;PrivateClass::staticMethod);
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    It is questionable how useful this all is. It is probably advisable to keep 
+    your code clean, simple and maintainable, and only register static PHP methods 
+    that are also in C++ static methods of the same class. But C++ does not forbid
+    you to do it completely different.
+</p>
 <h2>Access modifiers</h2>
 <p>
     In PHP (and in C++ too) you can mark methods as public, private or protected.
@@ -205,8 +409,18 @@ echo($counter->value()."\n");
 </p>
 <p>
 <pre class="language-c++"><code>
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
@@ -258,8 +472,18 @@ extern "C" {
 </p>
 <p>
 <pre class="language-c++"><code>
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
@@ -282,8 +506,18 @@ extern "C" {
 </p>
 <p>
 <pre class="language-c++"><code>
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
