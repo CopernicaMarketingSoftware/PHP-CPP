@@ -159,11 +159,11 @@ else
 </pre>
 </p>
 <p>
-    Although we have considered to implement this comparison function as a
-    magic method (for example __compare), or as a magic interface (for example
-    Php::Comparable) we have decided to go for the operator&lt; approach that
-    better fits the C++ language. The big advantage of this choice is that your
-    objects can now also be used in many C++ STL algorithms, because they use
-    operator&lt; too.
+    We have thought about implementing the comparison method as a
+    magic method (for example __compare()), or as a magic interface (for example
+    Php::Comparable). In the end we have decided to go for the operator&lt; 
+    approach. It better fits the C++ language, and the big advantage is that your
+    objects can also be used in many C++ STL algorithms, because these algorithms
+    also rely on operator&lt;.
 </p>
 
