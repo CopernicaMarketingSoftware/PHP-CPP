@@ -198,7 +198,7 @@ private:
         
         // compare the two objects
         if (*t1 < *t2) return -1;
-        if (*t1 > *t2) return  1;
+        if (*t2 < *t1) return  1;
         
         // they must be identical
         return 0;
