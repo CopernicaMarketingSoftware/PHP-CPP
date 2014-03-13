@@ -242,7 +242,7 @@ private:
      *  @param  params
      *  @return Value
      */
-    virtual Value call(Base *base, const char *name, Parameters &params) const override
+    virtual Value callCall(Base *base, const char *name, Parameters &params) const override
     {
         // cast to the user object
         T *object = (T *)base;
@@ -308,7 +308,7 @@ private:
      *  @param  params      Parameters passed to the function
      *  @return Value
      */
-    virtual Value callStatic(const char *name, Parameters &params) const override
+    virtual Value callCallStatic(const char *name, Parameters &params) const override
     {
         return maybeCallStatic<T>(name, params);
     }
@@ -319,7 +319,7 @@ private:
      *  @param  params      Parameters to pass
      *  @return Value
      */
-    virtual Value invoke(Base *object, Parameters &params) const override
+    virtual Value callInvoke(Base *object, Parameters &params) const override
     {
         // cast to actual object
         T *obj = (T *)object;
@@ -333,13 +333,13 @@ private:
      *  @param  base
      *  @return Value
      */
-    virtual Value toString(Base *base) const override
+    virtual Value callToString(Base *base) const override
     {
         // cast to actual object
         T *obj = (T *)base;
         
         // pass on
-        return obj->__toString().setType(Type::String);
+        return Value(obj->__toString()).setType(Type::String);
     }
     
     /**
@@ -347,13 +347,13 @@ private:
      *  @param  base
      *  @return Value
      */
-    virtual Value toInteger(Base *base) const override
+    virtual Value callToInteger(Base *base) const override
     {
         // cast to actual object
         T *obj = (T *)base;
         
         // pass on
-        return obj->__toInteger().setType(Type::Numeric);
+        return Value(obj->__toInteger()).setType(Type::Numeric);
     }
     
     /**
@@ -361,13 +361,13 @@ private:
      *  @param  base
      *  @return Value
      */
-    virtual Value toFloat(Base *base) const override 
+    virtual Value callToFloat(Base *base) const override 
     {
         // cast to actual object
         T *obj = (T *)base;
         
         // pass on
-        return obj->__toFloat().setType(Type::Float);
+        return Value(obj->__toFloat()).setType(Type::Float);
     }
 
     /**
@@ -375,13 +375,13 @@ private:
      *  @param  base
      *  @return Value
      */
-    virtual Value toBool(Base *base) const override
+    virtual Value callToBool(Base *base) const override
     {
         // cast to actual object
         T *obj = (T *)base;
         
         // pass on
-        return obj->__toBool().setType(Type::Bool);
+        return Value(obj->__toBool()).setType(Type::Bool);
     }
 
     /**
@@ -391,7 +391,7 @@ private:
      *  @param  value
      *  @return Value
      */
-    virtual Value get(Base *base, const Value &name) const override
+    virtual Value callGet(Base *base, const Value &name) const override
     {
         // cast to actual object
         T *obj = (T *)base;
@@ -406,7 +406,7 @@ private:
      *  @param  name
      *  @param  value
      */
-    virtual void set(Base *base, const Value &name, const Value &value) const override
+    virtual void callSet(Base *base, const Value &name, const Value &value) const override
     {
         // cast to actual object
         T *obj = (T *)base;
@@ -420,7 +420,7 @@ private:
      *  @param  base
      *  @param  name
      */
-    virtual void unset(Base *base, const Value &name) const override
+    virtual void callUnset(Base *base, const Value &name) const override
     {
         // cast to actual object
         T *obj = (T *)base;
@@ -450,7 +450,7 @@ private:
      *  @param  object2
      *  @return int
      */
-    virtual int compare(Base *object1, Base *object2) const override
+    virtual int callCompare(Base *object1, Base *object2) const override
     {
         // cast to the actual implementation type
         T *t1 = (T *)object1;
