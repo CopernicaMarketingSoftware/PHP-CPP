@@ -5,10 +5,18 @@
     names like __set(), __isset(), __call(), etcetera.
 </p>
 <p>
-    The PHP-CPP library also has support for these magic methods. The methods
-    are already defined in the Php::Base class (which is the base class for
-    all classes that are written using the PHP-CPP library), and can be 
-    overridden in your derived class.
+    The PHP-CPP library also has support for these magic methods. Using some
+    C++ compiler tricks, the C++ compiler detects whether the methods exist
+    in your class, and if they do, they will be compiled into your extension
+    and called when they are accessed from PHP.
+</p>
+<p>
+    The signature of the methods is flexible. Most of the methods accept 
+    Php::Value objects and also return Php::Value objects, but if your own
+    magic methods have a slightly different signature (they return an integer
+    for example) it will be picked up by the compiler too because the Php::Value
+    has many implicit constructors to convert other types into Php::Value
+    objects.
 </p>
 <p>
     The nice thing about magic methods implemented with PHP-CPP is that they
@@ -61,7 +69,7 @@ public:
      *  @param  name        Name of the property
      *  @return Value       Property value
      */
-    virtual Php::Value __get(const Php::Value &amp;name) override
+    Php::Value __get(const Php::Value &amp;name)
     {
         // check if the property name is supported
         if (name == "name") return _name;
@@ -76,7 +84,7 @@ public:
      *  @param  name        Name of the property
      *  @param  value       New property value
      */
-    virtual void __set(const Php::Value &amp;name, const Php::Value &amp;value) override
+    void __set(const Php::Value &amp;name, const Php::Value &amp;value) 
     {
         // check the property name
         if (name == "name") 
@@ -115,7 +123,7 @@ public:
      *  @param  name        Name of the property
      *  @return bool
      */
-    virtual bool __isset(const Php::Value &amp;name) override
+    bool __isset(const Php::Value &amp;name) 
     {
         // true for name and email address
         if (name == "name" || name == "email") return true;
@@ -128,7 +136,7 @@ public:
      *  Remove a property
      *  @param  name        Name of the property to remove
      */
-    virtual void __unset(const Php::Value &amp;name) override
+    void __unset(const Php::Value &amp;name)
     {
         // name and email can not be unset
         if (name == "name" || name == "email") 
@@ -192,7 +200,7 @@ unset($user->email);
 ?&gt;
 </code></pre>
 </p>
-<h2 id="call-and-invoke">Magic methods __call() and __invoke()</h2>
+<h2 id="call-and-invoke">Magic methods __call(), __callStatic() and __invoke()</h2>
 <p>
     C++ methods need to be registered explicitly in your extension get_module() 
     startup function to be accessible from PHP user space. However, when you override the __call() 
@@ -204,9 +212,14 @@ unset($user->email);
     __call() method in the C++ class.
 </p>
 <p>
-    Next to the magic __call() function, the PHP-CPP library also supports the
-    __invoke() method. This is a method that gets called when an object instance
-    is used <i>as if</i> it was a function. This can be compared with overloading
+    The __callStatic() method is similar to the __call() method, but works for
+    static methods. A static call to YourClass::someMethod() can be automatically
+    passed on to the __callStatic() method of your C++ class.
+</p>
+<p>
+    Next to the magic __call() and __callStatic functions, the PHP-CPP library also 
+    supports the __invoke() method. This is a method that gets called when an object 
+    instance is used <i>as if</i> it was a function. This can be compared with overloading
     the operator () in a C++ class. By implementing the __invoke() method, scripts
     from PHP user space can create an object, and then use it as a function.
 </p>
@@ -242,10 +255,32 @@ public:
      *  @param  params      Parameters that were passed to the method
      *  @return Value       The return value
      */
-    virtual Php::Value __call(const char *name, Php::Parameters &amp;params) override
+    Php::Value __call(const char *name, Php::Parameters &amp;params)
     {
         // the return value
-        std::string retval = name;
+        std::string retval = std::string("__call ") + name;
+        
+        // loop through the parameters
+        for (auto &amp;param : params)
+        {
+            // append parameter string value to return value
+            retval += " " + param.stringValue();
+        }
+        
+        // done
+        return retval;
+    }
+
+    /**
+     *  Overriden __callStatic() method to accept all static method calls
+     *  @param  name        Name of the method that is called
+     *  @param  params      Parameters that were passed to the method
+     *  @return Value       The return value
+     */
+    static Php::Value __callStatic(const char *name, Php::Parameters &amp;params)
+    {
+        // the return value
+        std::string retval = std::string("__callStatic ") + name;
         
         // loop through the parameters
         for (auto &amp;param : params)
@@ -263,7 +298,7 @@ public:
      *  @param  params      Parameters that were passed to the method
      *  @return Value       The return value
      */
-    virtual Php::Value __invoke(Php::Parameters &amp;params) override
+    Php::Value __invoke(Php::Parameters &amp;params)
     {
         // the return value
         std::string retval = "invoke";
@@ -326,6 +361,11 @@ echo($object->something()."\n");
 echo($object->myMethod(1,2,3,4)."\n");
 echo($object->whatever("a","b")."\n");
 
+// call some pseudo-methods in a static context
+echo(MyClass::something()."\n");
+echo(MyClass::myMethod(5,6,7)."\n");
+echo(MyClass::whatever("x","y")."\n");
+
 // call the object as if it was a function
 echo($object("parameter","passed","to","invoke")."\n");
 ?&gt;
@@ -338,31 +378,20 @@ echo($object("parameter","passed","to","invoke")."\n");
 <p>
 <pre>
 regular
-something
-myMethod 1 2 3 4
-whatever a b
+__call something
+__call myMethod 1 2 3 4
+__call whatever a b
+__callStatic something
+__callStatic myMethod 5 6 7
+__callStatic whatever x y
 invoke parameter passed to invoke
 </pre>
 </p>
-<h2 id="casting">Casting methods (__toString and more)</h2>
+<h2 id="casting">Casting to a string</h2>
 <p>
     In PHP you can add a __toString() method to a class. This method is automatically
     called when an object is casted to a string, or when an object is used in a string
-    context. PHP-CPP supports this __toString() method too. But there are more casting 
-    methods offered by PHP-CPP.
-</p>
-<p>
-    Internally, the Zend engine has special casting routines to cast objects 
-    to integers, to booleans and to floating point values. For one reason or another, 
-    a PHP script can only implement the __toString() method,
-    while all other casting operations are kept away from it. The
-    PHP-CPP library solves this limitation, and allows one to implement the
-    other casting functions as well.
-</p>
-<p>
-    One of the design goals of the PHP-CPP library is to stay as close to PHP as 
-    possible. For that reason the casting functions have been given names that match
-    the __toString() method: __toInteger(), __toFloat(), and __toBool().
+    context. PHP-CPP supports this __toString() method too.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -384,36 +413,9 @@ public:
      *  Cast to a string
      *  @return Value
      */
-    virtual Php::Value __toString() override
+    Php::Value __toString()
     {
         return "abcd";
-    }
-    
-    /**
-     *  Cast to a integer
-     *  @return long
-     */
-    virtual long __toInteger() override
-    {
-        return 1234;
-    }
-    
-    /**
-     *  Cast to a floating point number
-     *  @return double
-     */
-    virtual double __toFloat() override
-    {
-        return 88.88;
-    }
-    
-    /**
-     *  Cast to a boolean
-     *  @return bool
-     */
-    virtual bool __toBool() override
-    {
-        return true;
     }
 };
 
@@ -444,4 +446,13 @@ extern "C" {
     }
 }
 </code></pre>
+</p>
+<p>
+    Next to the magic methods described here, and that you probably already know 
+    from writing PHP scripts, the PHP-CPP library also introduces a number of
+    additional magic methods. These include extra casting methods, and a method
+    to compare objects.
+</p>
+<p>
+    You can read more about these additional features in the <a href="special-features">next section</a>.
 </p>

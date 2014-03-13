@@ -436,7 +436,7 @@ private:
      *  @return bool
      */
     virtual bool callIsset(Base *base, const Value &name) const override
-    { 
+    {
         // cast to actual object
         T *obj = (T *)base;
         
@@ -457,11 +457,7 @@ private:
         T *t2 = (T *)object2;
         
         // compare the two objects
-        if (*t1 < *t2) return -1;
-        if (*t2 < *t1) return  1;
-        
-        // they must be identical
-        return 0;
+        return t1->__compare(*t2);
     }
 
     /**
