@@ -484,8 +484,8 @@ extern "C" {
 <p>
     In the previous section we showed how to use the Php::Final and Php::Abstract
     flags to create a final or abstract method. If you want to make your entire
-    class abstract or final, you can do so by using Php::FinalClass or 
-    Php::AbstractClass instead of Php::Class.
+    class abstract or final, you can do so by passing that flag to the Php::Class
+    constructor.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -504,7 +504,7 @@ extern "C" {
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
-        Php::FinalClass&lt;Counter&gt; counter("Counter");
+        Php::Class&lt;Counter&gt; counter("Counter", Php::Final);
         
         // register methods
         ...
