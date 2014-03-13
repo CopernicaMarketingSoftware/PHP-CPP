@@ -11,7 +11,7 @@
     variables back into non-typed PHP variables. The PHP-CPP library offers the 
     Php::Value class that makes this a very simple task.
 </p>
-<h2>Zval's</h2>
+<h2 id="zvals">Zval's</h2>
 <p>
     But we start with sharing one of our frustrations. 
     If you have ever spent time on writing PHP extensions in plain C, or if you've
@@ -53,7 +53,7 @@
     were afraid to ask: just forget about it. Sit back and relax, and take a look
     how simple life is with PHP-CPP.
 </p>
-<h2>Scalar variables</h2>
+<h2 id="scalar-variables">Scalar variables</h2>
 <p>
     The Php::Value object can be used to store scalar variables. Scalar variables
     are variables like integers, doubles, strings, booleans and null values.
@@ -141,7 +141,7 @@ Php::Value myFunction(const Php::Value &amp;value)
     can become complicated, but for you, the extension programmer, there is
     nothing to worry about.
 </p>
-<h2>Arrays</h2>
+<h2 id="arrays">Arrays</h2>
 <p>
     PHP supports two array types: regular arrays (indexed by numbers) and
     associative arrays (indexed by strings). The Php::Value object supports
@@ -222,7 +222,7 @@ array1 = 100;
 <p>
     @todo explain how to iterate over arrays
 </p>
-<h2>Objects</h2>
+<h2 id="objects">Objects</h2>
 <p>
     Just like the Php::Array class that is an extended Php::Value that initializes
     to an empty array, there also is a Php::Object class that becomes an
@@ -255,7 +255,7 @@ std::cout &lt;&lt; object.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 Php::Value value = Php::Object("DateTime", "now");
 std::cout &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 </code></pre>
-<h2>Functions</h2>
+<h2 id="functions">Functions</h2>
 <p>
     When a Php::Value object holds a <i>callable</i>, you can use the () operator
     to call this function or method.
@@ -283,7 +283,7 @@ array[1] = "format";
 std::cout &lt;&lt; array("Y-m-d H:i:s") &lt;&lt; std::endl;
 </code></pre>
 </p>
-<h2>Global variables</h2>
+<h2 id="global-variables">Global variables</h2>
 <p>
     To read or update global PHP variables, you can use the Php::GLOBALS 
     variable. This variable works more or less the same as the $_GLOBALS

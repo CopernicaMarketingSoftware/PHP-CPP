@@ -24,7 +24,7 @@
     does not have interfaces like PHP has, classes with pure virtual methods are
     used instead.
 </p>
-<h2>Support for the SPL</h2>
+<h2 id="support-for-spl">Support for the SPL</h2>
 <p>
     A standard PHP installation comes with the Standard PHP Library (SPL). This
     is an extension that is built on top of the Zend engine and that uses features
@@ -43,7 +43,7 @@
     offer the same sort of features, but they do not rely on each other. You can 
     thus safely use PHP-CPP if you have not loaded the SPL extension.
 </p>
-<h2>The Countable interface</h2>
+<h2 id="countable">The Countable interface</h2>
 <p>
     By implementing the Php::Countable interface, you can create objects that
     can be passed to the PHP count() function.
@@ -149,7 +149,7 @@ echo(count($counter)."\n");
 <p>
     The output is, as expected, the value 3.
 </p>
-<h2>The ArrayAccess interface</h2>
+<h2 id="arrayaccess">The ArrayAccess interface</h2>
 <p>
     A PHP object can be turned into a variable that behaves like an array by
     implementing the Php::ArrayAccess interface. When you do this, objects
@@ -309,7 +309,7 @@ echo($map->offsetGet("a")."\n");
     The output speaks for itself. The map has three members, "1234" (a string
     variable), "xyz" and "0".
 </p>
-<h2>The Traversable interface</h2>
+<h2 id="traversable">The Traversable interface</h2>
 <p>
     Classes can also be used in foreach loops, just like regular arrays. If you
     want to enable this feature, your class should extend from the Php::Traverable 
@@ -581,4 +581,134 @@ extern "C" {
     Our MapIterator implementation internally is just a small wrapper around
     a C++ iterator class. It is of course up to you to create more complex
     iterators when needed.
+</p>
+<h2 id="serializable">The Serializable interface</h2>
+<p>
+    By implementing the interface "Php::Serializable" you can create custom
+    serialize and unserialize handlers for a class. The built-in PHP 
+    serialize() function - you probably already know - is a function that
+    can turn a complex data structure full of arrays and objects into a simple 
+    string. The unserialize() method does exactly the opposite, and turns such
+    a string back into a complex data structure.
+</p>
+<p>
+    The default serializer turns all publicly visible object properties into a
+    string. But because your class has a native implementation, you may want to 
+    install a custom serialize method that also stores the native variables. To 
+    do this, you can implement the Php::Serialize interface, and implement the 
+    serialize() and unserialize() methods.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  Counter class that can be used for counting
+ */
+class Counter : public Php::Base, public Php::Serializable
+{
+private:
+    /**
+     *  The initial value
+     *  @var    int
+     */
+    int _value = 0;
+
+public:
+    /**
+     *  C++ constructor and destructor
+     */
+    Counter() {}
+    virtual ~Counter() {}
+    
+    /**
+     *  Update methods to increment or decrement the counter
+     *  Both methods return the NEW value of the counter
+     *  @return int
+     */
+    Php::Value increment() { return ++_value; }
+    Php::Value decrement() { return --_value; }
+    
+    /**
+     *  Method to retrieve the current counter value
+     *  @return int
+     */
+    Php::Value value() const { return _value; }
+    
+    /**
+     *  Serialize the object into a string
+     *  @return std::string
+     */
+    virtual std::string serialize() override
+    {
+        return std::to_string(_value);
+    }
+    
+    /**
+     *  Unserialize the object from a string
+     *  @param  buffer
+     *  @param  size
+     */
+    virtual void unserialize(const char *buffer, size_t size) override
+    {
+        _value = ::atoi(buffer);
+    }
+};
+
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        counter.method("increment", &Counter::increment);
+        counter.method("decrement", &Counter::decrement);
+        counter.method("value", &Counter::value);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The above example takes the Counter example that you've seen before, and 
+    turns it into a Serializable object. A counter can now be stored in a string
+    (and thus in a database, or on disk) and later be revived using the
+    PHP serialize() and unserialize() functions.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// create an empty counter and increment it a few times
+$counter = new Counter();
+$counter->increment();
+$counter->increment();
+
+// turn the counter into a storable string
+$serializedCounter = serialize($counter);
+
+// revive the counter back into an object
+$revivedCounter = unserialize($serializedCounter);
+
+// show the counter value
+echo($revivedCounter->value()."\n");
+?&gt;
+</code></pre>
+</p>
+<p>
+    Does anyone know what the output is? It's 2.    
 </p>

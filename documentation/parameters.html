@@ -42,7 +42,7 @@ extern "C" {
     will be filled with three members, and that two of them are objects of the 
     appropriate type.
 </p>
-<h2>Can you really enforce scalar parameters?</h2>
+<h2 id="enforce-scalar-parameters">Can you really enforce scalar parameters?</h2>
 <p>
     You may be surprised to see that we specified the first parameter to be of
     type Numeric. After all, in PHP there is no offical way to enforce the type of a 
@@ -114,7 +114,7 @@ example("x", "y", "z");
     The PHP engine will trigger an error if your function is called with wrong
     parameters, and will not make the actual call to the native function.
 </p>
-<h2>The Php::ByVal class further explained</h2>
+<h2 id="byval-explained">The Php::ByVal class further explained</h2>
 <p>
     The Php::ByVal class that we showed can be constructed in two ways.
     Let's look at the first constructor from the C++ header file:
@@ -221,7 +221,7 @@ extern "C" {
 }
 </pre></code>
 </p>
-<h2>Parameters by reference</h2>
+<h2 id="parameters-by-reference">Parameters by reference</h2>
 <p>
     By the name of the Php::ByVal class you may have concluded that there
     must also be a Php::ByRef class - and you could not have been more right than that. 
@@ -278,7 +278,7 @@ swap(10,20);
 ?&gt;
 </code></pre>
 </p>
-<h2>Summary</h2>
+<h2 id="summary">Summary</h2>
 <p>
     When you add your native functions to the extension object, you may supply
     an optional third parameter with a list of Php::ByVal and Php::ByRef objects

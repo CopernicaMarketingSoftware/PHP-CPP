@@ -1046,7 +1046,7 @@ int ClassBase::unserialize(zval **object, zend_class_entry *entry, const unsigne
     Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(*object));
     
     // call the unserialize method on it
-    serializable->unserialize(buffer, buf_len);
+    serializable->unserialize((const char *)buffer, buf_len);
     
     // done
     return SUCCESS;

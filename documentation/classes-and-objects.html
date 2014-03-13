@@ -69,7 +69,6 @@ extern "C" {
         counter.method("increment", &Counter::increment);
         counter.method("decrement", &Counter::decrement);
         counter.method("value", &Counter::value);
-        counter.method("instantiate", &Counter::instantiate);
         
         // add the class to the extension
         myExtension.add(std::move(counter));
@@ -131,7 +130,7 @@ Php::Value  YourClass::example8(Php::Parameters &amp;params) const;
     to add the class to the extension? This will actually <i>move</i> the class
     object into the extension, which is a more efficient operation than copying.
 </p>
-<h2>Method parameters</h2>
+<h2 id="method-parameters">Method parameters</h2>
 <p>
     Methods are just like functions, and just how you use the
     Php::ByVal and the Php::ByRef classes to <a href="parameters">specify the 
@@ -260,7 +259,7 @@ echo($counter->value()."\n");
     thought that an example was not really necessary (and we're not a big fan
     of parameters-by-reference either).
 </p>
-<h2>Static methods</h2>
+<h2 id="static-methods">Static methods</h2>
 <p>
     Static methods are supported too. A static method is a method that does
     not have access to a 'this' pointer. In C++, such static methods
@@ -417,7 +416,7 @@ myFunction();
 ?&gt;
 </code></pre>
 </p>
-<h2>Access modifiers</h2>
+<h2 id="access-modifiers">Access modifiers</h2>
 <p>
     In PHP (and in C++ too) you can mark methods as public, private or protected.
     To achieve this for your native class too, you should pass in an additional 
@@ -481,7 +480,7 @@ extern "C" {
     because after all, your methods are called by the PHP-CPP library, and if you make
     them private, they becomes invisible for the library.
 </p>
-<h2>Abstract and final</h2>
+<h2 id="abstract-and-final">Abstract and final</h2>
 <p>
     In the previous section we showed how to use the Php::Final and Php::Abstract
     flags to create a final or abstract method. If you want to make your entire

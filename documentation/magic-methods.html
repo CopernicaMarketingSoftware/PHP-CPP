@@ -17,7 +17,7 @@
     can not be called explicitly from PHP scripts - but they do get called
     when a property is accessed.
 </p>
-<h2>Pseudo properties</h2>
+<h2 id="pseudo-properties">Pseudo properties</h2>
 <p>
     With the methods __get(), __set(), __unset() and __isset() you can define 
     pseudo properties. It allows you to, for example, create read-only properties,
@@ -192,7 +192,7 @@ unset($user->email);
 ?&gt;
 </code></pre>
 </p>
-<h2>Magic methods __call() and __invoke()</h2>
+<h2 id="call-and-invoke">Magic methods __call() and __invoke()</h2>
 <p>
     C++ methods need to be registered explicitly in your extension get_module() 
     startup function to be accessible from PHP user space. However, when you override the __call() 
@@ -344,7 +344,7 @@ whatever a b
 invoke parameter passed to invoke
 </pre>
 </p>
-<h2>Casting methods (__toString and more)</h2>
+<h2 id="casting">Casting methods (__toString and more)</h2>
 <p>
     In PHP you can add a __toString() method to a class. This method is automatically
     called when an object is casted to a string, or when an object is used in a string
