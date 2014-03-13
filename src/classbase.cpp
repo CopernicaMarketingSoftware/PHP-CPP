@@ -52,22 +52,39 @@ static Base *cpp_object(const zval *val)
 }
 
 /**
+ *  Extended zend_internal_function structure that we use to store an
+ *  instance of the ClassBase object. We need this for static method calls
+ */
+struct CallData
+{
+    // the internal function is the first member, so
+    // that it is possible to cast an instance of this 
+    // struct to a zend_internal_function
+    zend_internal_function func;
+    
+    // and a pointer to the ClassBase object
+    ClassBase *self;
+};
+
+/**
  *  Handler function that runs the __call function
  *  @param  ...     All normal parameters for function calls
  */
-static void call_method(INTERNAL_FUNCTION_PARAMETERS)
+void ClassBase::callMethod(INTERNAL_FUNCTION_PARAMETERS)
 {
     // retrieve the originally called (and by us allocated) function object
     // (this was copied from the zend engine source code, code looks way too
     // ugly to be made by me)
-    zend_internal_function *func = (zend_internal_function *)EG(current_execute_data)->function_state.function;
+    CallData *data = (CallData *)EG(current_execute_data)->function_state.function;
+    zend_internal_function *func = &data->func;
 
     // retrieve the function name
     const char *name = func->function_name;
+    ClassBase *meta = data->self;
     
-    // the function structure was allocated by ourselves in the get_method function,
-    // we no longer need it now
-    efree(func);
+    // the data structure was allocated by ourselves in the getMethod or 
+    // getStaticMethod functions, we no longer need it now
+    efree(data);
 
     // the function could throw an exception
     try
@@ -80,9 +97,10 @@ static void call_method(INTERNAL_FUNCTION_PARAMETERS)
 
         // retrieve the base object
         Base *base = params.object();
-
-        // call the actual __call method on the base object
-        result = base->__call(name, params);
+        
+        // is this a static, or a non-static call?
+        if (base) result = meta->callCall(base, name, params);
+        else result = meta->callCallStatic(name, params);
     }
     catch (const NotImplemented &exception)
     {
@@ -100,15 +118,19 @@ static void call_method(INTERNAL_FUNCTION_PARAMETERS)
  *  Handler function that runs the __invoke function
  *  @param  ...     All normal parameters for function calls
  */
-static void call_invoke(INTERNAL_FUNCTION_PARAMETERS)
+void ClassBase::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
 {
     // retrieve the originally called (and by us allocated) function object
     // (this was copied from the zend engine source code, code looks way too
     // ugly to be made by me)
-    zend_internal_function *func = (zend_internal_function *)EG(current_execute_data)->function_state.function;
+    CallData *data = (CallData *)EG(current_execute_data)->function_state.function;
 
-    // we no longer need it (question: why have we allocated this on the heap???)
-    efree(func);
+    // get self reference
+    ClassBase *meta = data->self;
+
+    // the data structure was allocated by ourselves in the getMethod or 
+    // getStaticMethod functions, we no longer need it now
+    efree(data);
 
     // the function could throw an exception
     try
@@ -123,7 +145,7 @@ static void call_invoke(INTERNAL_FUNCTION_PARAMETERS)
         Base *base = params.object();
 
         // call the actual __invoke method on the base object
-        result = base->__invoke(params);
+        result = meta->callInvoke(base, params);
     }
     catch (const NotImplemented &exception)
     {
@@ -178,21 +200,68 @@ zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int me
     // but we'll follow thread safe implementation of the Zend engine here, although
     // it is strange to allocate and free memory in one and the same method call (free()
     // call happens in call_method())
-    auto *function = (zend_internal_function *)emalloc(sizeof(zend_internal_function));
+    auto *data = (CallData *)emalloc(sizeof(CallData));
+    auto *function = &data->func;
     
     // we're going to set all properties
     function->type = ZEND_INTERNAL_FUNCTION;
     function->module = nullptr;
-    function->handler = call_method;
+    function->handler = &ClassBase::callMethod;
     function->arg_info = nullptr;
     function->num_args = 0;
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = method_name;
     
+    // store pointer to ourselves
+    data->self = cpp_class(entry);
+    
     // done (cast to zend_function* is allowed, because a zend_function is a union
     // that has one member being a zend_internal_function)
-    return (zend_function *)function;
+    return (zend_function *)data;
+}
+
+/**
+ *  Method that is called right before a static method call is attempted
+ *  @param  entry
+ *  @param  method
+ *  @param  method_len
+ *  @return zend_function
+ */
+zend_function *ClassBase::getStaticMethod(zend_class_entry *entry, char* method, int method_len)
+{
+    // first we'll check if the default handler does not have an implementation,
+    // in that case the method is probably already implemented as a regular method
+#if PHP_VERSION_ID < 50399
+    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len);
+#else
+    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len, nullptr);
+#endif
+
+    // did the default implementation do anything?
+    if (defaultFunction) return defaultFunction;
+
+    // just like we did in getMethod() (see comment there) we are going to dynamically
+    // allocate data holding information about the function
+    auto *data = (CallData *)emalloc(sizeof(CallData));
+    auto *function = &data->func;
+    
+    // we're going to set all properties
+    function->type = ZEND_INTERNAL_FUNCTION;
+    function->module = nullptr;
+    function->handler = ClassBase::callMethod;
+    function->arg_info = nullptr;
+    function->num_args = 0;
+    function->scope = nullptr;
+    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
+    function->function_name = method;
+    
+    // store pointer to ourselves
+    data->self = cpp_class(entry);
+    
+    // done (cast to zend_function* is allowed, because a zend_function is a union
+    // that has one member being a zend_internal_function)
+    return (zend_function *)data;
 }
 
 /**
@@ -217,22 +286,26 @@ int ClassBase::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
 
     // just like we did for getMethod(), we're going to dynamically allocate memory
     // with all information about the function
-    auto *function = (zend_internal_function *)emalloc(sizeof(zend_internal_function));
+    auto *data = (CallData *)emalloc(sizeof(CallData));
+    auto *function = &data->func;
     
     // we're going to set all properties
     function->type = ZEND_INTERNAL_FUNCTION;
     function->module = nullptr;
-    function->handler = call_invoke;
+    function->handler = &ClassBase::callInvoke;
     function->arg_info = nullptr;
     function->num_args = 0;
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = nullptr;
     
+    // store pointer to ourselves
+    data->self = cpp_class(entry);
+    
     // assign this dynamically allocated variable to the func parameter
     // the case is ok, because zend_internal_function is a member of the
     // zend_function union
-    *func = (zend_function *)function;
+    *func = (zend_function *)data;
  
     // the object_ptr should be filled with the object on which the method is 
     // called (otherwise the Zend engine tries to call the method statically)
@@ -320,7 +393,7 @@ int ClassBase::compare(zval *object1, zval *object2)
         Base *base2 = cpp_object(object2);
         
         // run the compare method
-        return meta->compare(base1, base2);
+        return meta->callCompare(base1, base2);
     }
     catch (const NotImplemented &exception)
     {
@@ -353,6 +426,12 @@ int ClassBase::cast(zval *object, zval *retval, int type)
     // get the base object
     Base *base = cpp_object(object);
     
+    // retrieve the class entry linked to this object
+    auto *entry = zend_get_class_entry(object);
+
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(entry);
+    
     // retval it not yet initialized --- and again feelings of disbelief,
     // frustration, wonder and anger come up when you see that there are not two
     // functions in the Zend engine that have a comparable API
@@ -370,11 +449,11 @@ int ClassBase::cast(zval *object, zval *retval, int type)
         
         // check type
         switch ((Type)type) {
-        case Type::Numeric:     result = Value(base->__toInteger()).detach();               break;
-        case Type::Float:       result = Value(base->__toFloat()).detach();                 break;
-        case Type::Bool:        result = Value(base->__toBool()).detach();                  break;
-        case Type::String:      result = base->__toString().setType(Type::String).detach(); break;
-        default:                throw NotImplemented();                                     break;
+        case Type::Numeric:     result = meta->callToInteger(base).detach();  break;
+        case Type::Float:       result = meta->callToFloat(base).detach();    break;
+        case Type::Bool:        result = meta->callToBool(base).detach();     break;
+        case Type::String:      result = meta->callToString(base).detach();   break;
+        default:                throw NotImplemented();             break;
         }
         
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
@@ -733,12 +812,21 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _
     // from PHP. If someone wants to get a reference to such an internal variable,
     // that is in most cases simply impossible.
 
+    // retrieve the object and class
+    Base *base = cpp_object(object);
+    
+    // retrieve the class entry linked to this object
+    auto *entry = zend_get_class_entry(object);
+
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(entry);
+
     // the default implementation throws an exception, so by catching 
     // the exception we know if the object was implemented by the user or not
     try
     {
         // retrieve value
-        Value value = cpp_object(object)->__get(name);
+        Value value = meta->callGet(base, name);
 
         // because we do not want the value object to destruct the zval when
         // it falls out of scope, we detach the zval from it, if this is a regular
@@ -796,12 +884,21 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value)
 void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struct _zend_literal *key)
 #endif
 {
+    // retrieve the object and class
+    Base *base = cpp_object(object);
+    
+    // retrieve the class entry linked to this object
+    auto *entry = zend_get_class_entry(object);
+
+    // we need the C++ class meta-information object
+    ClassBase *meta = cpp_class(entry);
+
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __set method
     try
     {
         // call the default
-        cpp_object(object)->__set(name, value);
+        meta->callSet(base, name, value);
     }
     catch (const NotImplemented &exception)
     {
@@ -855,14 +952,20 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const s
         // get the cpp object
         Base *base = cpp_object(object);
         
+        // retrieve the class entry linked to this object
+        auto *entry = zend_get_class_entry(object);
+
+        // we need the C++ class meta-information object
+        ClassBase *meta = cpp_class(entry);
+
         // call the C++ object
-        if (!base->__isset(name)) return false;
+        if (!meta->callIsset(base, name)) return false;
         
         // property exists, but what does the user want to know
         if (has_set_exists == 2) return true;
         
         // we have to retrieve the property
-        Value value = base->__get(name);
+        Value value = meta->callGet(base, name);
         
         // should we check on NULL?
         switch (has_set_exists) {
@@ -912,8 +1015,14 @@ void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_lit
     // we know for sure that the user has not overridden the __unset method
     try
     {
+        // retrieve the class entry linked to this object
+        auto *entry = zend_get_class_entry(object);
+
+        // we need the C++ class meta-information object
+        ClassBase *meta = cpp_class(entry);
+
         // call the __unset method
-        cpp_object(object)->__unset(member);
+        meta->callUnset(cpp_object(object), member);
     }
     catch (const NotImplemented &exception)
     {
@@ -1130,6 +1239,9 @@ void ClassBase::initialize(const std::string &prefix)
     // we need a special constructor
     entry.create_object = &ClassBase::createObject;
     
+    // register function that is called for static method calls
+    entry.get_static_method = &ClassBase::getStaticMethod;
+    
     // for traversable classes we install a special method to get the iterator
     if (traversable()) entry.get_iterator = &ClassBase::getIterator;
     
@@ -1180,6 +1292,16 @@ void ClassBase::initialize(const std::string &prefix)
     
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);
+}
+
+/**
+ *  Function that can be called by a derived method when a certain function
+ *  is not implemented
+ */
+void ClassBase::notImplemented()
+{
+    // throw an exception
+    throw NotImplemented();
 }
 
 /**

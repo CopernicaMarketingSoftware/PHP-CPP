@@ -107,39 +107,6 @@ public:
     virtual ~ClassBase();
 
     /**
-     *  Construct a new instance of the object
-     *  @return Base
-     */
-    virtual Base* construct() const = 0;
-    
-    /**
-     *  Create a clone of an object
-     *  @param  orig
-     *  @return Base
-     */
-    virtual Base *clone(Base *orig) const = 0;
-
-    /**
-     *  Compare two objects
-     *  @param  object1
-     *  @param  object2
-     *  @return int
-     */
-    virtual int compare(Base *object1, Base *object2) const = 0;
-
-    /**
-     *  Is this a traversable class?
-     *  @return bool
-     */
-    virtual bool traversable() const = 0;
-
-    /**
-     *  Is this a serializable class?
-     *  @return bool
-     */
-    virtual bool serializable() const = 0;
-    
-    /**
      *  Initialize the class, given its name
      * 
      *  The module functions are registered on module startup, but classes are
@@ -152,8 +119,71 @@ public:
      */
     void initialize(const std::string &ns);
 
+protected:
+    /**
+     *  Construct a new instance of the object, or to clone the object
+     *  @return Base
+     */
+    virtual Base* construct() const { return nullptr; }
+    virtual Base *clone(Base *orig) const { return nullptr; }
+
+    /**
+     *  Methods to check if a certain interface is overridden
+     *  @return bool
+     */
+    virtual bool traversable() const { return false; }
+    virtual bool serializable() const { return false; }
+
+    /**
+     *  Compare two objects
+     *  @param  object1
+     *  @param  object2
+     *  @return int
+     */
+    virtual int callCompare(Base *object1, Base *object2) const { return 1; }
+    
+    /**
+     *  Call the __call(), __invoke() or __callStatic() method
+     *  @param  base        Object to call on
+     *  @param  name        Name of the method
+     *  @param  params      Parameters to pass to the method
+     *  @return Value
+     */
+    virtual Value callCall(Base *base, const char *name, Parameters &params) const { return nullptr; }
+    virtual Value callInvoke(Base *base, Parameters &params) const { return nullptr; }
+    virtual Value callCallStatic(const char *name, Parameters &params) const { return nullptr; }
+    
+    /**
+     *  Casting functions
+     *  @param  base
+     *  @return Value
+     */
+    virtual Value callToString(Base *base) const { return Value(Type::String); }
+    virtual Value callToInteger(Base *base) const { return Value(Type::Numeric); }
+    virtual Value callToFloat(Base *base) const { return Value(Type::Float); }
+    virtual Value callToBool(Base *base) const { return Value(Type::Bool); }
+    
+    /**
+     *  Function to get and set properties
+     *  @param  base
+     *  @param  name
+     *  @param  value
+     *  @return Value
+     */
+    virtual Value callGet(Base *base, const Value &name) const { return nullptr; }
+    virtual void  callSet(Base *base, const Value &name, const Value &value) const {}
+    virtual void  callUnset(Base *base, const Value &name) const {}
+    virtual bool  callIsset(Base *base, const Value &name) const { return false; }
+    
+
     
 protected:
+    /**
+     *  Function that can be called by a derived method when a certain function
+     *  is not implemented
+     */
+    static void notImplemented();
+
     /**
      *  Add a method to the class
      *  
@@ -268,19 +298,24 @@ private:
     const struct _zend_function_entry *entries();
 
     /**
-     *  Static member functions to clone objects based on this class
+     *  Static member functions to create or clone objects based on this class
+     *  @param  entry                   Pointer to class information
      *  @param  val                     The object to be cloned
      *  @return zend_object_value       Object info
      */
+    static struct _zend_object_value createObject(struct _zend_class_entry *entry);
     static struct _zend_object_value cloneObject(struct _zval_struct *val);
 
     /**
-     *  Function that is called when an instance of the class needs to be created.
-     *  This function will create the C++ class, and the PHP object
-     *  @param  entry                   Pointer to the class information
-     *  @return zend_object_value       The newly created object
+     *  Static member function that get called when a method or object is called
+     *  @param  ht                      ??
+     *  @param  return_value            Zval holding the variable to store the return value in
+     *  @param  return_value_ptr        Pointer to the same zval
+     *  @param  this_ptr                Object being called
+     *  @param  return_value_used       Is the return value used or not?
      */
-    static struct _zend_object_value createObject(struct _zend_class_entry *entry);
+    static void callMethod(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
+    static void callInvoke(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
 
     /**
      *  Function that is used to count the number of elements in the object
@@ -382,20 +417,6 @@ private:
     static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member);
 
     /**
-     *  Method that is called when a undefined method is invoked
-     *  @param  method
-     *  @param  ht
-     *  @param  return_value
-     *  @param  return_value_ptr
-     *  @param  this_ptr
-     *  @param  return_value_used
-     *  @param  tsrm_ls
-     *  @return integer
-     */
-    static int callMethod(const char *method, int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
-    static int callMethod(char *method, int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
-
-    /**
      *  Method that returns information about the function signature of a undefined method
      *  @param  object_ptr
      *  @param  method
@@ -405,6 +426,16 @@ private:
      */
     static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, const struct _zend_literal *key);
     static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len);
+
+    /**
+     *  Method that returns information about the function signature of an undefined static method
+     *  @param  object_ptr
+     *  @param  method
+     *  @param  method_len
+     *  @param  key
+     *  @return zend_function
+     */
+    static union _zend_function *getStaticMethod(struct _zend_class_entry *entry, char* method, int method_len);
 
     /**
      *  Method that returns information about the __invoke() method

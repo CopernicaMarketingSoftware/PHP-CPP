@@ -86,7 +86,7 @@ MixedObject *Base::store(zend_class_entry *entry)
  *  @param  key
  *  @return bool
  */
-bool Base::__isset(const Php::Value &key)
+bool Base::__isset(const Php::Value &key) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the unset function can be called
@@ -102,7 +102,7 @@ bool Base::__isset(const Php::Value &key)
  *  @param  key
  *  @param  value
  */
-void Base::__set(const Php::Value &key, const Php::Value &value)
+void Base::__set(const Php::Value &key, const Php::Value &value) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the unset function can be called
@@ -118,7 +118,7 @@ void Base::__set(const Php::Value &key, const Php::Value &value)
  *  @param  key
  *  @return value
  */
-Php::Value Base::__get(const Php::Value &key)
+Php::Value Base::__get(const Php::Value &key) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -136,7 +136,7 @@ Php::Value Base::__get(const Php::Value &key)
  * 
  *  @param key
  */
-void Base::__unset(const Php::Value &key)
+void Base::__unset(const Php::Value &key) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -154,7 +154,7 @@ void Base::__unset(const Php::Value &key)
  *  @param  params      The parameters that were passed to the function
  *  @return Value       The return value
  */
-Value Base::__call(const char *method, Parameters &params)
+Value Base::__call(const char *method, Parameters &params) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -173,7 +173,7 @@ Value Base::__call(const char *method, Parameters &params)
  *  @param  params      The parameters that were passed to the function
  *  @return Value       The return value
  */
-Value Base::__invoke(Parameters &params)
+Value Base::__invoke(Parameters &params) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -191,7 +191,7 @@ Value Base::__invoke(Parameters &params)
  * 
  *  @return Value       The object as a string
  */
-Value Base::__toString()
+Value Base::__toString() const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -209,7 +209,7 @@ Value Base::__toString()
  * 
  *  @return int         Integer value
  */
-long Base::__toInteger()
+Value Base::__toInteger() const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -227,7 +227,7 @@ long Base::__toInteger()
  * 
  *  @return double      Floating point value
  */
-double Base::__toFloat()
+Value Base::__toFloat() const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -245,7 +245,7 @@ double Base::__toFloat()
  * 
  *  @return bool
  */
-bool Base::__toBool()
+Value Base::__toBool() const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called
@@ -256,14 +256,14 @@ bool Base::__toBool()
 }
 
 /**
- *  Comparison operator
+ *  Compare the object with a different object
  *  
  *  Check how a different object compares to this object
  * 
  *  @param  that        Object to compare with
  *  @return int
  */
-bool Base::operator<(const Base &that) const
+int Base::__compare(const Base &that) const
 {
     // throw an exception that will be caught in the ClassBase class, 
     // so that the default implementation of the function can be called

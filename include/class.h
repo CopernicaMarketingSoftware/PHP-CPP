@@ -25,6 +25,23 @@ extern struct _zend_class_entry *zend_ce_arrayaccess;
 //extern struct _zend_class_entry *zend_ce_serializable;
 
 /**
+ *  SFINAE test to check if the __callStatic method is defined
+ *  @see http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
+ */
+template <typename T>
+class HasCallStatic
+{
+    typedef char one;
+    typedef long two;
+
+    template <typename C> static one test( decltype(&C::__callStatic) ) ;
+    template <typename C> static two test(...);
+
+public:
+    static const bool value = sizeof(test<T>(0)) == sizeof(char);
+};
+
+/**
  *  Set up namespace
  */
 namespace Php {
@@ -217,7 +234,216 @@ private:
         // check if the templated class overrides from the Serializable class
         return std::is_base_of<Serializable,T>::value;
     }
+
+    /**
+     *  Call a method
+     *  @param  base        Object to call on
+     *  @param  name        Name of the method
+     *  @param  params
+     *  @return Value
+     */
+    virtual Value call(Base *base, const char *name, Parameters &params) const override
+    {
+        // cast to the user object
+        T *object = (T *)base;
+        
+        // call the method on the base object
+        return base->__call(name, params);
+    }
+
+    /**
+     *  SFINAE test to check if the __callStatic method is defined
+     * 
+     *  This type trait checks if the __callStatic method is defined in class T
+     * 
+     *  @see http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
+     */
+    template <typename X>
+    class HasCallStatic
+    {
+        typedef char one;
+        typedef long two;
+
+        template <typename C> static one test( decltype(&C::__callStatic) ) ;
+        template <typename C> static two test(...);
+
+    public:
+        static const bool value = sizeof(test<X>(0)) == sizeof(char);
+    };
+
+    /**
+     *  Function that only exists if the class T has a __callStatic method
+     *  @param  name        Name of the function
+     *  @param  params      Parameters passed to the function
+     *  @return Value
+     */
+    template<typename X>
+    typename std::enable_if<HasCallStatic<X>::value, Value >::type
+    static maybeCallStatic(const char *name, Parameters &params)
+    {
+        // call the __callStatic() function
+        return X::__callStatic(name, params);
+    }
+
+    /**
+     *  Function that only exists if the class T does not have a __callStatic method
+     *  @param  name        Name of the function
+     *  @param  params      Parameters passed to the function
+     *  @return Value
+     */
+    template<typename X>
+    typename std::enable_if<!HasCallStatic<X>::value, Value >::type
+    static maybeCallStatic(const char *name, Parameters &params)
+    {
+        // this is not implemented
+        notImplemented();
+        
+        // unreachable
+        return nullptr;
+    }
+
+    /**
+     *  Call a the __callStatic() function
+     *  @param  name        Name of the function
+     *  @param  params      Parameters passed to the function
+     *  @return Value
+     */
+    virtual Value callStatic(const char *name, Parameters &params) const override
+    {
+        return maybeCallStatic<T>(name, params);
+    }
+
+    /**
+     *  Call the __invoke() method
+     *  @param  base        Object to call it on
+     *  @param  params      Parameters to pass
+     *  @return Value
+     */
+    virtual Value invoke(Base *object, Parameters &params) const override
+    {
+        // cast to actual object
+        T *obj = (T *)object;
+        
+        // pass on
+        return obj->__invoke(params);
+    }
+
+    /**
+     *  Cast to string function
+     *  @param  base
+     *  @return Value
+     */
+    virtual Value toString(Base *base) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__toString().setType(Type::String);
+    }
     
+    /**
+     *  Cast to integer function
+     *  @param  base
+     *  @return Value
+     */
+    virtual Value toInteger(Base *base) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__toInteger().setType(Type::Numeric);
+    }
+    
+    /**
+     *  Cast to float function
+     *  @param  base
+     *  @return Value
+     */
+    virtual Value toFloat(Base *base) const override 
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__toFloat().setType(Type::Float);
+    }
+
+    /**
+     *  Cast to bool function
+     *  @param  base
+     *  @return Value
+     */
+    virtual Value toBool(Base *base) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__toBool().setType(Type::Bool);
+    }
+
+    /**
+     *  Function to retrieve a property
+     *  @param  base
+     *  @param  name
+     *  @param  value
+     *  @return Value
+     */
+    virtual Value get(Base *base, const Value &name) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__get(name);
+    }
+    
+    /**
+     *  Function to set/overwrite a property
+     *  @param  base
+     *  @param  name
+     *  @param  value
+     */
+    virtual void set(Base *base, const Value &name, const Value &value) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        obj->__set(name, value);
+    }
+        
+    /**
+     *  Function to remove a property
+     *  @param  base
+     *  @param  name
+     */
+    virtual void unset(Base *base, const Value &name) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        obj->__unset(name);
+    }
+
+    /**
+     *  Function to check if a property is set
+     *  @param  base
+     *  @param  name
+     *  @return bool
+     */
+    virtual bool callIsset(Base *base, const Value &name) const override
+    { 
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__isset(name);
+    }
+
     /**
      *  Compare two objects
      *  @param  object1
@@ -237,7 +463,7 @@ private:
         // they must be identical
         return 0;
     }
-    
+
     /**
      *  Namespaces have access to the private base class
      */

@@ -40,59 +40,6 @@ public:
 
 private:
     /**
-     *  Construct a new instance of the object
-     *  @return Base
-     */
-    virtual Base* construct() const override
-    {
-        // this does not occur for interfaces
-        return nullptr;
-    }
-
-    /**
-     *  Construct a clone of the object
-     *  @param  orig
-     *  @return Base
-     */
-    virtual Base* clone(Base *orig) const override
-    {
-        // this does not occur for interfaces
-        return nullptr;
-    }
-    
-    /**
-     *  Is this a traversable interface?
-     *  @return bool
-     */
-    virtual bool traversable() const override
-    {
-        // interfaces are never traversed
-        return false;
-    }
-
-    /**
-     *  Compare two objects
-     *  @param  object1
-     *  @param  object2
-     *  @return int
-     */
-    virtual int compare(Base *object1, Base *object2) const override
-    {
-        // this is never called for interfaces
-        return 0;
-    }
-
-    /**
-     *  Is this a serializable class?
-     *  @return bool
-     */
-    virtual bool serializable() const override
-    {
-        // not called for interfaces
-        return false;
-    }
-
-    /**
      *  Namespaces have access to the private base class
      */
     friend class Namespace;

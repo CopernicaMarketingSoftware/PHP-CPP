@@ -121,7 +121,7 @@ public:
      *  @param  key
      *  @return bool
      */
-    virtual bool __isset(const Php::Value &key);
+    bool __isset(const Php::Value &key) const;
     
     /**
      *  Overridable method that is called to set a new property
@@ -132,7 +132,7 @@ public:
      *  @param  key
      *  @param  value
      */
-    virtual void __set(const Php::Value &key, const Php::Value &value);
+    void __set(const Php::Value &key, const Php::Value &value) const;
     
     /**
      *  Retrieve a property
@@ -143,7 +143,7 @@ public:
      *  @param  key
      *  @return value
      */
-    virtual Php::Value __get(const Php::Value &key);
+    Php::Value __get(const Php::Value &key) const;
     
     /**
      *  Remove a member
@@ -153,7 +153,7 @@ public:
      * 
      *  @param key
      */
-    virtual void __unset(const Php::Value &key);
+    void __unset(const Php::Value &key) const;
 
     /**
      *  Call a method
@@ -166,7 +166,7 @@ public:
      *  @param  params      The parameters that were passed to the function
      *  @return Value       The return value
      */
-    virtual Value __call(const char *method, Parameters &params);
+    Php::Value __call(const char *method, Php::Parameters &params) const;
 
     /**
      *  Call the class as if it was a function
@@ -177,7 +177,7 @@ public:
      *  @param  params      The parameters that were passed to the function
      *  @return Value       The return value
      */
-    virtual Value __invoke(Parameters &params);
+    Php::Value __invoke(Php::Parameters &params) const;
     
     /**
      *  Cast the object to a string
@@ -187,7 +187,7 @@ public:
      * 
      *  @return Value       The object as a string
      */
-    virtual Value __toString();
+    Php::Value __toString() const;
     
     /**
      *  Cast the object to an integer
@@ -197,7 +197,7 @@ public:
      * 
      *  @return int         Integer value
      */
-    virtual long __toInteger();
+    Php::Value __toInteger() const;
     
     /**
      *  Cast the object to a float
@@ -207,7 +207,7 @@ public:
      * 
      *  @return double      Floating point value
      */
-    virtual double __toFloat();
+    Php::Value __toFloat() const;
     
     /**
      *  Cast the object to a boolean
@@ -217,17 +217,17 @@ public:
      * 
      *  @return bool
      */
-    virtual bool __toBool();
+    Value __toBool() const;
 
     /**
-     *  Comparison operator
+     *  Compare the object with a different object
      *  
      *  Check how a different object compares to this object
      * 
      *  @param  that        Object to compare with
      *  @return int
      */
-    bool operator<(const Base &that) const;
+    int __compare(const Base &base) const;
     
     
 private:
