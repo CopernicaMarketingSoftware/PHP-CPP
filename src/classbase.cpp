@@ -1013,8 +1013,19 @@ zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *obje
  */
 int ClassBase::serialize(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data)
 {
-    std::cout << "serialize is called" << std::endl;
+    // get the serializable object
+    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(object));
     
+    // call the serialize method on the object
+    auto value = serializable->serialize();
+
+    // allocate the buffer, and copy the data into it (the zend engine will 
+    // (hopefully) clean up the data for us - the default serialize method does
+    // it like this too)
+    *buffer = (unsigned char*)estrndup(value.c_str(), value.size());
+    *buf_len = value.size();
+
+    // done
     return SUCCESS;
 }
 
@@ -1028,8 +1039,16 @@ int ClassBase::serialize(zval *object, unsigned char **buffer, zend_uint *buf_le
  */
 int ClassBase::unserialize(zval **object, zend_class_entry *entry, const unsigned char *buffer, zend_uint buf_len, zend_unserialize_data *data)
 {
-    std::cout << "unserialize is called" << std::endl;
+    // create the PHP object
+    object_init_ex(*object, entry);
     
+    // turn this into a serializale
+    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(*object));
+    
+    // call the unserialize method on it
+    serializable->unserialize(buffer, buf_len);
+    
+    // done
     return SUCCESS;
 }
 

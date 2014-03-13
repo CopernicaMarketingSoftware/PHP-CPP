@@ -442,8 +442,8 @@ private:
      *  @param  data        Structure describing the serialize/unserialize data
      *  @return int
      */
-    static int serialize(struct _zval_struct *object, unsigned char **buffer, zend_uint *buf_len, struct _zend_serialize_data *data);
-    static int unserialize(struct _zval_struct **object, struct _zend_class_entry *entry, const unsigned char *buffer, zend_uint buf_len, struct _zend_unserialize_data *data);
+    static int serialize(struct _zval_struct *object, unsigned char **buffer, unsigned int *buf_len, struct _zend_serialize_data *data);
+    static int unserialize(struct _zval_struct **object, struct _zend_class_entry *entry, const unsigned char *buffer, unsigned int buf_len, struct _zend_unserialize_data *data);
 
     /**
      *  Name of the class

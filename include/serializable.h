@@ -25,9 +25,9 @@ public:
      *  This method should return a string representation of the object that 
      *  can be passed to the serialize() method and that will revive the object
      *
-     *  @return Php::Value
+     *  @return std::string
      */
-    virtual Php::Value serialize() = 0;
+    virtual std::string serialize() = 0;
     
     /**
      *  Unserialize the object
