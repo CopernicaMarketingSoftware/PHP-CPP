@@ -20,6 +20,8 @@
 struct _zend_object_value;
 struct _zend_object_handlers;
 struct _zend_class_entry;
+struct _zend_serialize_data;
+struct _zend_unserialize_data;
 union _zend_function;
 
 /**
@@ -131,6 +133,12 @@ public:
      */
     virtual bool traversable() const = 0;
 
+    /**
+     *  Is this a serializable class?
+     *  @return bool
+     */
+    virtual bool serializable() const = 0;
+    
     /**
      *  Initialize the class, given its name
      * 
@@ -424,6 +432,18 @@ private:
      *  @return int
      */
     static int compare(struct _zval_struct *object1, struct _zval_struct *object2);
+
+    /**
+     *  Methods that are called to serialize/unserialize an object
+     *  @param  object      The object to be serialized
+     *  @param  entry       The class entry to which the object belongs
+     *  @param  buffer      Buffer in which to store the data
+     *  @param  buf_len     Size of the bufffer
+     *  @param  data        Structure describing the serialize/unserialize data
+     *  @return int
+     */
+    static int serialize(struct _zval_struct *object, unsigned char **buffer, zend_uint *buf_len, struct _zend_serialize_data *data);
+    static int unserialize(struct _zval_struct **object, struct _zend_class_entry *entry, const unsigned char *buffer, zend_uint buf_len, struct _zend_unserialize_data *data);
 
     /**
      *  Name of the class

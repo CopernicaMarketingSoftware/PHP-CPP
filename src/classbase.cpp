@@ -1004,6 +1004,36 @@ zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *obje
 }
 
 /**
+ *  Method that is called to serialize an object
+ *  @param  object      The object to be serialized
+ *  @param  buffer      Buffer in which to store the data
+ *  @param  buf_len     Size of the bufffer
+ *  @param  data        ??
+ *  @return int
+ */
+int ClassBase::serialize(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data)
+{
+    std::cout << "serialize is called" << std::endl;
+    
+    return SUCCESS;
+}
+
+/**
+ *  Method that is called to unserialize an object
+ *  @param  object      The object to be unserialized
+ *  @param  entry       The class entry to which is belongs
+ *  @param  buffer      Buffer holding the unserialized data
+ *  @param  data        All the unserialize data
+ *  @return int
+ */
+int ClassBase::unserialize(zval **object, zend_class_entry *entry, const unsigned char *buffer, zend_uint buf_len, zend_unserialize_data *data)
+{
+    std::cout << "unserialize is called" << std::endl;
+    
+    return SUCCESS;
+}
+
+/**
  *  Destructor
  */
 ClassBase::~ClassBase()
@@ -1081,9 +1111,16 @@ void ClassBase::initialize(const std::string &prefix)
     // we need a special constructor
     entry.create_object = &ClassBase::createObject;
     
-    // and a special function for retrieving the iterator (but only if this is
-    // a traversable class)
+    // for traversable classes we install a special method to get the iterator
     if (traversable()) entry.get_iterator = &ClassBase::getIterator;
+    
+    // for serializable classes, we install callbacks for serializing and unserializing
+    if (serializable())
+    {
+        // add handlers to serialize and unserialize
+        entry.serialize = &ClassBase::serialize;
+        entry.unserialize = &ClassBase::unserialize;
+    }
     
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);

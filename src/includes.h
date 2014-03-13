@@ -60,6 +60,7 @@
 #include "../include/base.h"
 #include "../include/countable.h"
 #include "../include/arrayaccess.h"
+#include "../include/serializable.h"
 #include "../include/iterator.h"
 #include "../include/traversable.h"
 #include "../include/classtype.h"

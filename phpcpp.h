@@ -44,6 +44,7 @@
 #include <phpcpp/arrayaccess.h>
 #include <phpcpp/iterator.h>
 #include <phpcpp/traversable.h>
+#include <phpcpp/serializable.h>
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
 #include <phpcpp/class.h>

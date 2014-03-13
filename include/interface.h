@@ -83,6 +83,16 @@ private:
     }
 
     /**
+     *  Is this a serializable class?
+     *  @return bool
+     */
+    virtual bool serializable() const override
+    {
+        // not called for interfaces
+        return false;
+    }
+
+    /**
      *  Namespaces have access to the private base class
      */
     friend class Namespace;

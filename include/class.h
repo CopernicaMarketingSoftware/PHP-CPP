@@ -204,8 +204,18 @@ private:
      */
     virtual bool traversable() const override
     {
-        // check if the templated class overrides from the base
+        // check if the templated class overrides from the Traversable class
         return std::is_base_of<Traversable,T>::value;
+    }
+
+    /**
+     *  Is this a serializable class?
+     *  @return bool
+     */
+    virtual bool serializable() const override
+    {
+        // check if the templated class overrides from the Serializable class
+        return std::is_base_of<Serializable,T>::value;
     }
     
     /**
