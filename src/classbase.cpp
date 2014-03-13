@@ -555,6 +555,9 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     // had registered that as a visible method)
     zend_objects_clone_members(&new_object->php, result, &old_object->php, Z_OBJ_HANDLE_P(val));
     
+    // was a custom clone method installed? If not we call the magic c++ __clone method
+    if (!entry->clone) meta->callClone(cpp);
+    
     // done
     return result;
 }

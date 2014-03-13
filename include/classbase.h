@@ -150,6 +150,13 @@ protected:
     virtual int callCompare(Base *object1, Base *object2) const { return 1; }
     
     /**
+     *  Call the __clone and __destruct magic methods
+     *  @param  base
+     */
+    virtual void callClone(Base *base) const {}
+    virtual void callDestruct(Base *base) const {}
+    
+    /**
      *  Call the __call(), __invoke() or __callStatic() method
      *  @param  base        Object to call on
      *  @param  name        Name of the method

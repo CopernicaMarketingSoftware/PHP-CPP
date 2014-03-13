@@ -235,6 +235,32 @@ private:
     }
 
     /**
+     *  Call the __clone method
+     *  @param  base
+     */
+    virtual void callClone(Base *base) const 
+    {
+        // cast to the user object
+        T *object = (T *)base;
+        
+        // call the method on the base object
+        return object->__clone();
+    }
+
+    /**
+     *  Call the __destruct method
+     *  @param  base
+     */
+    virtual void callDestruct(Base *base) const
+    {
+        // cast to the user object
+        T *object = (T *)base;
+        
+        // call the method on the base object
+        return object->__destruct();
+    }
+
+    /**
      *  Call a method
      *  @param  base        Object to call on
      *  @param  name        Name of the method
@@ -247,7 +273,7 @@ private:
         T *object = (T *)base;
         
         // call the method on the base object
-        return base->__call(name, params);
+        return object->__call(name, params);
     }
 
     /**

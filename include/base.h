@@ -113,6 +113,20 @@ public:
     }
 
     /**
+     *  Overridable method that is called right after an object is cloned
+     * 
+     *  The default implementation does nothing
+     */
+    void __clone() const {}
+    
+    /**
+     *  Overridable method that is called right before an object is destructed
+     * 
+     *  The default implementation does nothing
+     */
+    void __destruct() const {}
+
+    /**
      *  Overridable method that is called to check if a property is set
      * 
      *  The default implementation does nothing, and the script will fall back
