@@ -107,7 +107,7 @@ public:
      *  php "constructor"
      *  @param  params
      */
-    void __construct(Php::Parameters &params)
+    void __construct(Php::Parameters &amp;params)
     {
         // copy first parameter (if available)
         if (params.size() > 0) _value = params[0];
@@ -267,7 +267,7 @@ public:
      *  php "constructor"
      *  @param  params
      */
-    void __construct(Php::Parameters &params)
+    void __construct(Php::Parameters &amp;params)
     {
         // copy first parameter (if available)
         if (params.size() > 0) _value = params[0];
