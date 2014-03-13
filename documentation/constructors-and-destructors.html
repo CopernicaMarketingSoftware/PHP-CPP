@@ -1,4 +1,4 @@
-<h1>Constructors and destructors</h1>
+<h1>Constructors</h1>
 <p>
     There is a small but very important difference between constructors and 
     destructors in C++, and the __construct() and __destruct() methods in PHP.
@@ -55,54 +55,81 @@ $d = new DERIVED();
 </code></pre>
 </p>
 <p>
-    This script outputs 'doSomething()'. In fact, __construct() is not a 
-    constructor at all, but a very normal method that just happens to be the 
-    first method that is called, and that is called automatically after the
-    object is constructed.
+    This script outputs 'doSomething()'. The reason for this is that  __construct() 
+    is not a constructor at all, but a very normal method that just happens to 
+    be the first method that is called, and that is called automatically <i>after</i>
+    the object is constructed.
 </p>
 <p>
     This difference is important for you as a C++ programmer, because you should
     never confuse your C++ constructor with the PHP __construct() method. In the C++
-    constructor, the object is being constructed and the PHP object does not 
-    yet exist. After the constructor is finished, the PHP engine
-    takes over control and creates the PHP object, and the PHP-CPP library then 
-    links that PHP object to your C++ object. Only after both the PHP object and
-    the C++ object are fully constructed, the __construct() method is called - just 
-    like a normal method. It is therefore not uncommon to have both a C++ constructor 
-    and a __construct() method in your class. The C++ constructor to initialize
-    the member variables, and __construct() to activate the object.
+    constructor the object is being constructed and not all data is yet available. 
+    Virtual methods can not be called, and the object also does not yet exist in
+    PHP user space.
+</p>
+<p>
+    After the constructor is finished, the PHP engine takes over control and creates 
+    the PHP object, and the PHP-CPP library then links that PHP object to your C++ 
+    object. Only after both the PHP object and the C++ object are fully constructed, 
+    the __construct() method is called - just like a normal method. It is therefore 
+    not uncommon to have both a C++ constructor and a __construct() method in your 
+    class. The C++ constructor to initialize the member variables, and __construct() 
+    to activate the object.
 </p>
 <p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
 
-// actual class implementation
+/**
+ *  Simple counter class
+ */
 class Counter : public Php::Base
 {
 private:
+    /**
+     *  Internal value
+     *  @var int
+     */
     int _value = 0;
 
 public:
-    // c++ constructor
+    /**
+     *  c++ constructor
+     */
     Counter() {}
     
-    // c++ destructor
+    /**
+     *  c++ destructor
+     */
     virtual ~Counter() {}
     
-    // php "constructor"
+    /**
+     *  php "constructor"
+     *  @param  params
+     */
     void __construct(Php::Parameters &params)
     {
         // copy first parameter (if available)
         if (params.size() > 0) _value = params[0];
     }
 
-    // functions to increment and decrement
+    /**
+     *  functions to increment and decrement
+     */
     Php::Value increment() { return ++_value; }
     Php::Value decrement() { return --_value; }
     Php::Value value() const { return _value; }
 };
 
+/**
+ *  Switch to C context so that the get_module() function can be
+ *  called by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Startup function for the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
         static Php::Extension myExtension("my_extension", "1.0");
         
@@ -138,6 +165,12 @@ echo($counter->value()."\n");
 ?&gt;
 </code></pre>
 </p>
+<p>
+    Because the __construct() method is seen as a regular method, you can also 
+    specify its parameters, and whether the method is public, private or protected.
+    The __construct() is also directly callable from PHP user space, so that
+    derived methods can explicitly call parent::__construct().
+</p>
 <h2 id="private-constructors">Private constructors</h2>
 <p>
     Just like any other method, the __construct() method can also be
@@ -148,33 +181,140 @@ echo($counter->value()."\n");
     going to fail - and not the actual object construction.
 </p>
 <p>
+    Yes indeed: if you make the __construct() method private, and inside a PHP
+    script a "new Counter()" call is executed, the PHP-CPP library will first
+    instantiate a new instance of your class, then report an error because the
+    __construct() method is private, and then immediately destruct the object
+    (and call the C++ destructor).
+</p>
+<p>
 <pre class="language-c++"><code>
 #include &lt;phpcpp.h&gt;
 
+/**
+ *  Switch to C context so that the get_module() function can be
+ *  called by C programs (which the Zend engine is)
+ */
 extern "C" {
+    /**
+     *  Start point of the extension
+     *  @return void*
+     */
     PHPCPP_EXPORT void *get_module() {
         static Php::Extension myExtension("my_extension", "1.0");
         
         // description of the class so that PHP knows which methods are accessible
         Php::Class&lt;Counter&gt; counter("Counter");
         
-        // add a private __construct and __clone method to the class, so that
-        // objects can not be constructed or cloned from PHP scripts. Be aware
-        // that the C++ constructer does get called - it will be the call to 
-        // the first __construct() function that will fail!
+        // add a private __construct method to the class, so that objects can 
+        // not be constructed from PHP scripts. Be aware that the C++ constructer 
+        // does get called - it will be the call to the first __construct() 
+        // function that will fail, and not the actual object construction.
         counter.method("__construct", &Counter::__construct, Php::Private);
-        counter.method("__clone", &Counter::__construct, Php::Private);
         
         ...
     }
 }
 </code></pre>
 </p>
+<h2 id=cloning">Cloning objects</h2>
 <p>
-    The same happens when you add a private __clone() method. It will then not
-    be possible to clone the object from PHP code, although your C++ class still 
-    needs a copy constructor, which is called when a "clone $object" instruction
-    is given in a PHP script.
+    If your class has a copy constructor, it automatically becomes clonable. If
+    you do not want that your class can be cloned by PHP scripts, you can do
+    two things: you can either remove the copy constructor from your class, or
+    you can register a private __clone() method, just like we registered a 
+    private __construct() method before.
+</p>
+<p>
+<pre class="language-c++"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  Simple counter class
+ */
+class Counter : public Php::Base
+{
+private:
+    /**
+     *  Internal value
+     *  @var int
+     */
+    int _value = 0;
+
+public:
+    /**
+     *  c++ constructor
+     */
+    Counter() {}
+    
+    /**
+     *  Remove the copy constructor
+     *  
+     *  By removing the copy constructor, the PHP clone operator will
+     *  automatically be deactivated. PHP will trigger an error if 
+     *  an object is attempted to be cloned.
+     *  
+     *  @param  counter
+     */
+    Counter(const Counter &amp;counter) = delete;
+    
+    /**
+     *  c++ destructor
+     */
+    virtual ~Counter() {}
+    
+    /**
+     *  php "constructor"
+     *  @param  params
+     */
+    void __construct(Php::Parameters &params)
+    {
+        // copy first parameter (if available)
+        if (params.size() > 0) _value = params[0];
+    }
+
+    /**
+     *  functions to increment and decrement
+     */
+    Php::Value increment() { return ++_value; }
+    Php::Value decrement() { return --_value; }
+    Php::Value value() const { return _value; }
+};
+
+/**
+ *  Switch to C context so that the get_module() function can be
+ *  called by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function for the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Counter&gt; counter("Counter");
+        counter.method("__construct", &Counter::__construct);
+        counter.method("increment", &Counter::increment);
+        counter.method("decrement", &Counter::decrement);
+        counter.method("value", &Counter::value);
+        
+        // alternative way to make an object unclonable
+        counter.method("__clone", Php::Private);
+        
+        // add the class to the extension
+        myExtension.add(std::move(counter));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    In the above example we have shown both ways to make object unclonable. 
+    Using only one of them is already sufficient.    
 </p>
 <h2 id="constructing-objects">Constructing objects</h2>
 <p>

@@ -363,7 +363,7 @@ zend_object_handlers *ClassBase::objectHandlers()
     memcpy(&handlers, &std_object_handlers, sizeof(zend_object_handlers));
     
     // install custom clone function
-    handlers.clone_obj = &ClassBase::cloneObject;
+    handlers.clone_obj = clonable() ? &ClassBase::cloneObject : nullptr;
     
     // functions for the Countable interface
     handlers.count_elements = &ClassBase::countElements;
@@ -534,14 +534,16 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     // create a new base c++ object
     auto *cpp = meta->clone(old_object->cpp);
     
-    // report error on failure
+    // report error on failure (this does not occur because the cloneObject()
+    // method is only installed as handler when we have seen that there is indeed
+    // a copy constructor)
     if (!cpp) throw Php::Exception(std::string("Unable to clone ") + entry->name);
 
     // the thing we're going to return
     zend_object_value result;
     
     // set the handlers
-    result.handlers = ClassBase::objectHandlers();
+    result.handlers = meta->objectHandlers();
     
     // store the object
     MixedObject *new_object = cpp->store(entry);
@@ -549,7 +551,8 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     // store the object in the object cache
     result.handle = cpp->handle();
     
-    // clone the members
+    // clone the members (this will also call the __clone() function if the user
+    // had registered that as a visible method)
     zend_objects_clone_members(&new_object->php, result, &old_object->php, Z_OBJ_HANDLE_P(val));
     
     // done
@@ -1094,7 +1097,7 @@ zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
     zend_object_value result;
     
     // set the handlers
-    result.handlers = ClassBase::objectHandlers();
+    result.handlers = meta->objectHandlers();
     
     // store the object
     cpp->store(entry);

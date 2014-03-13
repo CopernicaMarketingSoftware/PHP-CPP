@@ -133,11 +133,13 @@ protected:
     virtual Base *clone(Base *orig) const { return nullptr; }
 
     /**
-     *  Methods to check if a certain interface is overridden
+     *  Methods to check if a certain interface is overridden, or a copy
+     *  constructor is available
      *  @return bool
      */
     virtual bool traversable() const { return false; }
     virtual bool serializable() const { return false; }
+    virtual bool clonable() const { return false; }
 
     /**
      *  Compare two objects
@@ -341,7 +343,7 @@ private:
      *  Retrieve pointer to our own object handlers
      *  @return zend_object_handlers
      */
-    static struct _zend_object_handlers *objectHandlers();
+    struct _zend_object_handlers *objectHandlers();
 
     /**
      *  Function to create a new iterator to iterate over an object

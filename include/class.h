@@ -169,17 +169,49 @@ private:
     }
     
     /**
+     *  Method to clone the object if it is copy constructable
+     *  @param  orig
+     *  @return Base*
+     */
+    template <typename X = T>
+    typename std::enable_if<std::is_copy_constructible<X>::value, Base*>::type
+    static maybeClone(X *orig)
+    {
+        // create a new instance
+        return new X(*orig);
+    }
+
+    /**
+     *  Method to clone the object if it is copy constructable
+     *  @param  orig
+     *  @return Base*
+     */
+    template <typename X = T>
+    typename std::enable_if<!std::is_copy_constructible<X>::value, Base*>::type
+    static maybeClone(X *orig)
+    {
+        // impossible return null
+        return nullptr;
+    }
+
+    /**
+     *  Is this a clonable class?
+     *  @return bool
+     */
+    virtual bool clonable() const 
+    {
+        return std::is_copy_constructible<T>::value;
+    }
+    
+    /**
      *  Construct a clone
      *  @param  orig
      *  @return Base
      */
     virtual Base *clone(Base *orig) const override
     {
-        // cast to the original object
-        T *t = (T *)orig;
-        
-        // construct a new base by calling the copy constructor
-        return new T(*t);
+        // maybe clone it (if the class has a copy constructor)
+        return maybeClone<T>((T*)orig);
     }
     
     /**

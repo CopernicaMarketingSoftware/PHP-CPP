@@ -18,6 +18,7 @@
 #include <memory>
 #include <list>
 #include <exception>
+#include <type_traits>
 
  // for debug
 #include <iostream>
