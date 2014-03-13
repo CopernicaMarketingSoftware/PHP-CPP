@@ -13,6 +13,9 @@
  *  Forward declaration
  */
 struct _hashtable;
+struct bucket;
+typedef bucket* _HashPosition;
+//struct _HashPointer;
 
 /**
  *  Set up namespace
@@ -30,7 +33,7 @@ public:
      *  Constructor for empty ValueIterator.
      *  Used only for build ValueIterator::null
      */
-    ValueIterator() 
+    ValueIterator() : pos(nullptr)
     {
         _pair.reset();
     }
@@ -44,18 +47,18 @@ public:
     /**
      *  Copy Constructor
      */
-    ValueIterator(const ValueIterator& that) : _arr(that._arr), _pair(that._pair), _isArray(that._isArray) {}
+    ValueIterator(const ValueIterator& that) : _arr(that._arr), _pair(that._pair), _isArray(that._isArray), pos(that.pos) {}
 
     /**
      *  Move Constructor
      */
-    ValueIterator(ValueIterator&& that) :  _arr(std::move(that._arr)), _pair(std::move(that._pair)), _isArray(that._isArray) {}
+    ValueIterator(ValueIterator&& that) :  _arr(std::move(that._arr)), _pair(std::move(that._pair)), _isArray(that._isArray), pos(std::move(that.pos)) {}
 
     /**
      *  Increment operator
      */
     ValueIterator& operator++() {
-        nextIteration();
+        next();
         setPair();
         return *this;
     }
@@ -100,7 +103,7 @@ private:
     /**
      *  next iteration
      */
-    void nextIteration();
+    void next();
     
     // ValueIterator always used through ValuePair
     ValuePair _pair;
@@ -110,6 +113,9 @@ private:
 
     // is Array? (true — yes, false — no, is Object)
     bool _isArray;
+
+    // Position in the internal hash table
+    _HashPosition pos;
     
 };
 

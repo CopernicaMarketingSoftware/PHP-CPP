@@ -1772,6 +1772,10 @@ const Value &Value::set(int index, const Value &value)
     zval **current;
     
     // check if this index is already in the array, otherwise we return NULL
+    /*
+    * may be zend_hash_index_exists(Z_ARRVAL_P(_val), index); ?
+    * What is the purpose of the following construction?
+    */
     if (isArray() && zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&current) != FAILURE)
     {
         // skip if nothing is going to change
@@ -1835,6 +1839,10 @@ const Value &Value::set(const char *key, int size, const Value &value)
     zval **current;
     
     // check if this index is already in the array, otherwise we return NULL
+    /*
+    * may be zend_hash_exists(Z_ARRVAL_P(_val), key, size + 1); ?
+    * What is the purpose of the following construction?
+    */
     if (isArray() && zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&current) != FAILURE)
     {
         // skip if nothing is going to change

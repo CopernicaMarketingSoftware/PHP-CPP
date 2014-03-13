@@ -4,6 +4,9 @@
  *  ValuePair is a simple type that is used only in conjunction with ValueIterator.
  *  Intended for obtaining access to the keys, values, and types of key variable of type Value during iteration
  *
+ *  You are not supposed to instantiate this class.
+ *  An instance of this class is created automatically when you create an object of class Value::iterator
+ *
  *  @copyright 2013 Copernica BV
  */
 #ifndef VALUEPAIR_H

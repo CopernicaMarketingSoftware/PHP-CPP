@@ -30,7 +30,8 @@ ValueIterator::ValueIterator(_hashtable *arr, bool isArray): _arr(arr), _isArray
  */
 void ValueIterator::reset() {
     // reset iterator to beginning of the hash table
-    zend_hash_internal_pointer_reset(_arr);
+    //zend_hash_internal_pointer_reset(_arr);
+    zend_hash_internal_pointer_reset_ex(_arr, &pos);
 }
 
 /**
@@ -42,10 +43,13 @@ void ValueIterator::setPair() {
     unsigned long ind;
 
     // get current key
-    int hash_key_type = zend_hash_get_current_key(_arr, &key, &ind, 0);
+    //int hash_key_type = zend_hash_get_current_key(_arr, &key, &ind, 0);
+    int hash_key_type = zend_hash_get_current_key_ex(_arr, &key, NULL, &ind, 0, &pos);
 
     // if data NO exist
-    if(HASH_KEY_NON_EXISTENT == hash_key_type) {
+    if( !pos ) {
+    //if(HASH_KEY_NON_EXISTENT == hash_key_type) {
+        std::cout << "\n\x1b[0;31m HASH_KEY_NON_EXISTENT \x1b[0m\n";
         _pair.reset();
         return;
     }
@@ -58,7 +62,8 @@ void ValueIterator::setPair() {
     {
         
         // retrieve data, and add to result
-        zend_hash_get_current_data(_arr, (void **) &value);
+        //zend_hash_get_current_data(_arr, (void **) &value);
+        zend_hash_get_current_data_ex(_arr, (void **) &value, &pos);
 
         // check key type
         if (HASH_KEY_IS_STRING == hash_key_type) {
@@ -77,13 +82,14 @@ void ValueIterator::setPair() {
     {
         // inaccessible properties (privates) start with a null character
         if ('\0' == *key) {
-            nextIteration();
+            next();
             setPair();
             return;
         }
 
         // retrieve data, and add to result
-        zend_hash_get_current_data(_arr, (void **) &value);
+        //zend_hash_get_current_data(_arr, (void **) &value);
+        zend_hash_get_current_data_ex(_arr, (void **) &value, &pos);
 
         // fill pair
         _pair.isString = true;
@@ -97,8 +103,9 @@ void ValueIterator::setPair() {
 /**
  *  next iteration
  */
-void ValueIterator::nextIteration() {
-    zend_hash_move_forward(_arr);
+void ValueIterator::next() {
+    //zend_hash_move_forward(_arr);
+    zend_hash_move_forward_ex(_arr, &pos);
 }
             
 
