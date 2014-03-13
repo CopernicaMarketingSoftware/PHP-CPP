@@ -584,19 +584,20 @@ extern "C" {
 </p>
 <h2 id="serializable">The Serializable interface</h2>
 <p>
-    By implementing the interface "Php::Serializable" you can create custom
+    By implementing the interface "Php::Serializable" you can install custom
     serialize and unserialize handlers for a class. The built-in PHP 
     serialize() function - you probably already know - is a function that
-    can turn a complex data structure full of arrays and objects into a simple 
-    string. The unserialize() method does exactly the opposite, and turns such
-    a string back into a complex data structure.
+    can turn arrays or objects (and even nested data structures full of
+    of arrays and objects) into simple strings. The unserialize() method does 
+    exactly the opposite, and turns such a string back into the original
+    data structure.
 </p>
 <p>
-    The default serializer turns all publicly visible object properties into a
-    string. But because your class has a native implementation, you may want to 
-    install a custom serialize method that also stores the native variables. To 
-    do this, you can implement the Php::Serialize interface, and implement the 
-    serialize() and unserialize() methods.
+    The default serialize implementation of a class takes all publicly visible 
+    properties of an object, and concatenates them into a string. But because 
+    your class has a native implementation, and probably no public
+    properties, you may want to install a custom serialize handler. In this
+    handler you can then store the native object members.
 </p>
 <p>
 <pre class="language-c++"><code>
@@ -686,9 +687,12 @@ extern "C" {
 </p>
 <p>
     The above example takes the Counter example that you've seen before, and 
-    turns it into a Serializable object. A counter can now be stored in a string
-    (and thus in a database, or on disk) and later be revived using the
-    PHP serialize() and unserialize() functions.
+    turns it into a serializable object. The Php::Serializable has two pure
+    virtual methods that should be added to your class. The serialize() method
+    is called to turn the object into a string, and the unserialize() method
+    is called on an <i>uninitialized object</i> to revive it from a serialized
+    string. Note that if an object is being revived using unserialize(), the
+    __construct() method will not be called!
 </p>
 <p>
 <pre class="language-php"><code>
