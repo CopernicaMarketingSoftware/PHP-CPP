@@ -66,9 +66,16 @@ protected:
     /**
      *  Protected constructor
      *  @param  classname   Class name
-     *  @param  type        The class type
+     *  @param  flags       Class flags
      */
-    ClassBase(const char *classname, ClassType type = ClassType::Regular) : _name(classname), _type(type) {}
+    ClassBase(const char *classname, int flags);
+        
+    /**
+     *  Protected constructor
+     *  @param  classname   Class name
+     *  @param  type        Class type
+     */
+    ClassBase(const char *classname, ClassType type) : _name(classname), _type(type) {}
     
 public:
     /**
@@ -80,7 +87,6 @@ public:
         _type(that._type), 
         _methods(that._methods), 
         _members(that._members), 
-        _interfaces(that._interfaces),
         _entry(nullptr) {}
 
     /**
@@ -92,7 +98,6 @@ public:
         _type(that._type), 
         _methods(std::move(that._methods)), 
         _members(std::move(that._members)), 
-        _interfaces(std::move(that._interfaces)),
         _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
@@ -256,35 +261,6 @@ protected:
     void property(const char *name, const std::string &value, int flags = Php::Public);
     void property(const char *name, const char *value, int flags = Php::Public);
     void property(const char *name, double value, int flags = Php::Public);
-
-    /**
-     *  Add an implemented interface
-     *  
-     *  This can only be used to register interfaces that are already defined
-     *  by Zend, and not for user space interface or custom extension interfaces.
-     *  This is probably not so much of a problem, as this feature is mostly
-     *  useful for interfaces like 'Countable', 'ArrayAccess', 'Iterator', et
-     *  cetera. Interfaces defined in user space are in normal operations
-     *  inaccessible (user space code normally runs after the extension has been 
-     *  set up) - so we do not need a feature to set these.
-     * 
-     *  It does however make sense to support implementing extension-specific
-     *  interface. We may add this feature in the future.
-     * 
-     *  This method is called _during_ the get_module() call when all classes
-     *  are defined by the extension. However, at that time the Zend engine has
-     *  not yet initialized the zend_class_entry's with the interface addresses.
-     *  That's why we ask for a pointer-to-a-pointer. Later, when the classes
-     *  are really registered, the Zend engine is with registering interfaces
-     *  and the pointers point to a valid variable.
-     * 
-     *  @param  interface
-     */
-    void interface(struct ::_zend_class_entry **interface)
-    {
-        // register the interface
-        _interfaces.push_back(interface);
-    }
 
 private:
     /**
@@ -517,13 +493,6 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
-    
-    /**
-     *  All interfaces that are implemented
-     *  @var    std::list
-     */
-    std::list<struct ::_zend_class_entry**> _interfaces;
-    
 };
     
 /**

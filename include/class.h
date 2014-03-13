@@ -25,23 +25,6 @@ extern struct _zend_class_entry *zend_ce_arrayaccess;
 //extern struct _zend_class_entry *zend_ce_serializable;
 
 /**
- *  SFINAE test to check if the __callStatic method is defined
- *  @see http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
- */
-template <typename T>
-class HasCallStatic
-{
-    typedef char one;
-    typedef long two;
-
-    template <typename C> static one test( decltype(&C::__callStatic) ) ;
-    template <typename C> static two test(...);
-
-public:
-    static const bool value = sizeof(test<T>(0)) == sizeof(char);
-};
-
-/**
  *  Set up namespace
  */
 namespace Php {
@@ -56,21 +39,13 @@ public:
     /**
      *  Constructor
      * 
-     *  The flags can be a combination of Php::Final and Php::Abstract. If no
-     *  flags are set, a regular public class will be formed.
+     *  The flags can be a combination of Php::Final and Php::Abstract.
+     *  If no flags are set, a regular public class will be formed.
      * 
      *  @param  name        Name of the class
+     *  @param  flags       Accessibility flags
      */
-    Class(const char *name) : ClassBase(name)
-    {
-        // check for special classes, and register the interface if it does
-        // register the interface (we register a pointer-to-a-pointer here,
-        // because when this code runs (during the get_module() call), the 
-        // interfaces are not yet initialized by the zend engine, this only
-        // happens later when the all classes are registered (after the
-        // get_module() call)
-//        if (std::is_base_of<ArrayAccess, T>::value) interface(&zend_ce_arrayaccess);
-    }
+    Class(const char *name, int flags = 0) : ClassBase(name, flags) {}
     
     /**
      *  Copy constructor
@@ -182,14 +157,6 @@ public:
     void property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); }
     void property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); }
      
-protected:
-    /**
-     *  Protected constructor
-     *  @param  name
-     *  @param  flags
-     */
-    Class(const char *name, int flags) : ClassBase(name, flags) {}
-
 private:
     /**
      *  Construct a new instance of the object

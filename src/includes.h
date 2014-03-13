@@ -66,8 +66,6 @@
 #include "../include/classtype.h"
 #include "../include/classbase.h"
 #include "../include/class.h"
-#include "../include/abstractclass.h"
-#include "../include/finalclass.h"
 #include "../include/interface.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"

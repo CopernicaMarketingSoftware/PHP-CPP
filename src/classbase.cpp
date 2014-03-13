@@ -52,6 +52,32 @@ static Base *cpp_object(const zval *val)
 }
 
 /**
+ *  Protected constructor
+ *  @param  classname   Class name
+ *  @param  flags       Class flags
+ */
+ClassBase::ClassBase(const char *classname, int flags) : _name(classname)
+{
+    // the flags hold a method-flag-value, this should be converted into a class-type
+    if (flags & Abstract) _type = ClassType::Abstract;
+    if (flags & Final) _type = ClassType::Final;
+}
+
+/**
+ *  Destructor
+ */
+ClassBase::~ClassBase()
+{
+    // destruct the entries
+    if (_entries) delete[] _entries;
+
+    // php 5.3 deallocates the doc_comment by iself
+#if PHP_VERSION_ID >= 50400    
+    if (_comment) free(_comment);
+#endif
+}
+
+/**
  *  Extended zend_internal_function structure that we use to store an
  *  instance of the ClassBase object. We need this for static method calls
  */
@@ -209,6 +235,7 @@ zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int me
     function->handler = &ClassBase::callMethod;
     function->arg_info = nullptr;
     function->num_args = 0;
+    function->required_num_args = 0;
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = method_name;
@@ -252,6 +279,7 @@ zend_function *ClassBase::getStaticMethod(zend_class_entry *entry, char* method,
     function->handler = ClassBase::callMethod;
     function->arg_info = nullptr;
     function->num_args = 0;
+    function->required_num_args = 0;
     function->scope = nullptr;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = method;
@@ -295,6 +323,7 @@ int ClassBase::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     function->handler = &ClassBase::callInvoke;
     function->arg_info = nullptr;
     function->num_args = 0;
+    function->required_num_args = 0;
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = nullptr;
@@ -1162,20 +1191,6 @@ int ClassBase::unserialize(zval **object, zend_class_entry *entry, const unsigne
 }
 
 /**
- *  Destructor
- */
-ClassBase::~ClassBase()
-{
-    // destruct the entries
-    if (_entries) delete[] _entries;
-
-    // php 5.3 deallocates the doc_comment by iself
-#if PHP_VERSION_ID >= 50400    
-    if (_comment) free(_comment);
-#endif
-}
-
-/**
  *  Retrieve an array of zend_function_entry objects that hold the 
  *  properties for each method. This method is called at extension
  *  startup time to register all methods.
@@ -1282,13 +1297,6 @@ void ClassBase::initialize(const std::string &prefix)
 
     // set access types flags for class
     _entry->ce_flags = (int)_type;
-    
-    // mark the interfaces as being implemented
-    for (auto &interface : _interfaces) 
-    {
-        // implement interface
-        zend_do_implement_interface(_entry, *interface);
-    }
     
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);

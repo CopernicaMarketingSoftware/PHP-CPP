@@ -48,8 +48,6 @@
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
 #include <phpcpp/class.h>
-#include <phpcpp/abstractclass.h>
-#include <phpcpp/finalclass.h>
 #include <phpcpp/interface.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
