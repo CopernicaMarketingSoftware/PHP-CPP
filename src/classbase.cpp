@@ -1077,6 +1077,53 @@ void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_lit
 }
 
 /**
+ *  Function that is called when an object is about to be destructed
+ *  This will call the magic __destruct method
+ */
+void ClassBase::destructObject(zend_object *object, zend_object_handle handle)
+{
+    // allocate memory for the object
+    MixedObject *obj = (MixedObject *)object;
+    
+    // get meta info
+    ClassBase *meta = cpp_class(object->ce);
+    
+    // prevent exceptions
+    try
+    {
+        // call the destruct function
+        if (obj->cpp) meta->callDestruct(obj->cpp);
+    }
+    catch (const NotImplemented &exception)
+    {
+        // fallback on the default destructor call
+        zend_objects_destroy_object(object, handle);
+    }
+    catch (Exception &exception)
+    {
+        // a regular Php::Exception was thrown by the extension, pass it on
+        // to PHP user space
+        exception.process();
+    }
+}
+
+/**
+ *  Function that is called to clean up space that is occupied by the object
+ *  @param  object      The object to be deallocated
+ */
+void ClassBase::freeObject(zend_object *object)
+{
+    // allocate memory for the object
+    MixedObject *obj = (MixedObject *)object;
+    
+    // deallocate the cpp object
+    if (obj->cpp) delete obj->cpp;
+    
+    // pass on to the default destructor
+    zend_objects_free_object_storage(object);
+}
+
+/**
  *  Function that is called when an instance of the class needs to be created.
  *  This function will create the C++ class, and the PHP object
  *  @param  entry                   Pointer to the class information

@@ -247,7 +247,7 @@ private:
         T *object = (T *)base;
         
         // call the method on the base object
-        return base->__call(name, params);
+        return object->__call(name, params);
     }
 
     /**
@@ -299,6 +299,19 @@ private:
         
         // unreachable
         return nullptr;
+    }
+
+    /**
+     *  Call the __destruct method
+     *  @param  object
+     */
+    virtual Value callDestruct(Base *base) const override
+    {
+        // cast to actual object
+        T *obj = (T *)base;
+        
+        // pass on
+        return obj->__destruct();
     }
 
     /**

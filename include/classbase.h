@@ -150,6 +150,11 @@ protected:
     virtual int callCompare(Base *object1, Base *object2) const { return 1; }
     
     /**
+     *  Call the __destruct method
+     */
+    virtual Value callDestruct(Base *base) const { return nullptr; }
+    
+    /**
      *  Call the __call(), __invoke() or __callStatic() method
      *  @param  base        Object to call on
      *  @param  name        Name of the method
@@ -283,6 +288,8 @@ private:
      */
     static struct _zend_object_value createObject(struct _zend_class_entry *entry);
     static struct _zend_object_value cloneObject(struct _zval_struct *val);
+    static void destructObject(struct _zend_object *object, unsigned int handle);
+    static void freeObject(struct _zend_object *object);
 
     /**
      *  Static member function that get called when a method or object is called
@@ -495,6 +502,12 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
+    
+    /**
+     *  Base object has access to the members
+     *  This is needed by the Base::store() method
+     */
+    friend class Base;
 };
     
 /**

@@ -111,6 +111,11 @@ public:
     {
         return Value(this)[name];
     }
+    
+    /**
+     *  Overridable method that is called right before an object is destructed
+     */
+    void __destruct() const;
 
     /**
      *  Overridable method that is called to check if a property is set
