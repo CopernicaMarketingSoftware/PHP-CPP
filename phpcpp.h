@@ -27,14 +27,14 @@
  */
 #include <phpcpp/exception.h>
 #include <phpcpp/type.h>
-
 #include <phpcpp/value.h>
 
 #include <phpcpp/valueiterator/hashitem.h>
-//#include <phpcpp/valuepair.h>
 #include <phpcpp/valueiterator/hashpositionwrapper.h>
 #include <phpcpp/valueiterator/hashitemarray.h>
 #include <phpcpp/valueiterator/hashitemobject.h>
+#include <phpcpp/valueiterator/hashitemarrayreverse.h>
+#include <phpcpp/valueiterator/hashitemobjectreverse.h>
 #include <phpcpp/valueiterator/valueiterator.h>
 
 #include <phpcpp/array.h>

@@ -45,14 +45,14 @@
  */
 #include "../include/exception.h"
 #include "../include/type.h"
-
 #include "../include/value.h"
 
 #include "../include/valueiterator/hashitem.h"
-//#include "../include/valuepair.h"
 #include "../include/valueiterator/hashpositionwrapper.h"
 #include "../include/valueiterator/hashitemarray.h"
 #include "../include/valueiterator/hashitemobject.h"
+#include "../include/valueiterator/hashitemarrayreverse.h"
+#include "../include/valueiterator/hashitemobjectreverse.h"
 #include "../include/valueiterator/valueiterator.h"
 
 #include "../include/array.h"

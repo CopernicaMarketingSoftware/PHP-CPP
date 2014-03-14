@@ -825,15 +825,27 @@ public:
     
     /**
      *  Iterator to beginning
-     *  @return ValueIterator&
+     *  @return ValueIterator
      */
     iterator begin();
 
     /**
      *  Iterator to end
-     *  @return ValueIterator&
+     *  @return ValueIterator
      */
     iterator end() const;
+    
+    /**
+     *  Reverse Iterator to beginning
+     *  @return ValueIterator
+     */
+    iterator rbegin();
+
+    /**
+     *  Reverse Iterator to end
+     *  @return ValueIterator
+     */
+    iterator rend() const;
 
 protected:
     /**

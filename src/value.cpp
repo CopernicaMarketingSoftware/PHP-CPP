@@ -1576,11 +1576,10 @@ std::map<std::string,Php::Value> Value::mapValue() const
 
 /**
  *  Iterator to beginning
- *  @return ValueIterator&
+ *  @return ValueIterator
  */
 Value::iterator Value::begin()
 {
-    
     // if already exist
     if(_hashitem) {
        return _hashitem;
@@ -1608,9 +1607,49 @@ Value::iterator Value::begin()
 
 /**
  *  Iterator to end
- *  @return ValueIterator&
+ *  @return ValueIterator
  */
 Value::iterator Value::end() const 
+{
+    return nullptr;
+}
+
+/**
+ *  Reverse Iterator to beginning
+ *  @return ValueIterator
+ */
+Value::iterator Value::rbegin()
+{
+    // if already exist
+    if(_hashitem) {
+       return _hashitem;
+    }
+
+    // check type
+    if (isArray())
+    {
+        // get access to the hast table
+        HashTable *arr = Z_ARRVAL_P(_val);
+        
+        return (_hashitem = new HashItemArrayReverse(arr));
+    }
+    else if (isObject())
+    {
+        // get access to the hast table
+        HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
+
+        return (_hashitem = new HashItemObjectReverse(arr));
+    }
+
+    // for no-iterable types
+    return nullptr;
+}
+
+/**
+ *  Reverse Iterator to end
+ *  @return ValueIterator
+ */
+Value::iterator Value::rend() const 
 {
     return nullptr;
 }
