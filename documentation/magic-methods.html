@@ -10,13 +10,21 @@
     in your class, and if they do, they will be compiled into your extension
     and called when they are accessed from PHP.
 </p>
+<h2 id="compile-time-detection">Compile time detection</h2>
 <p>
-    The signature of the methods is flexible. Most of the methods accept 
-    Php::Value objects and also return Php::Value objects, but if your own
-    magic methods have a slightly different signature (they return an integer
-    for example) it will be picked up by the compiler too because the Php::Value
-    has many implicit constructors to convert other types into Php::Value
-    objects.
+    Although you may think that the magic methods are virtual methods that
+    are overridden from the Php::Base class, they are not. The methods are
+    detected by the C++ compiler at compile time - and are very normal methods
+    that just happen to have a certain name.
+</p>
+<p>
+    Because of the compile time detection, the signature of the methods is 
+    somewhat flexible. The return values of many magic methods are assigned to 
+    Php::Value objects, which means that as long as you make sure
+    that your magic method returns a type that is assignable to a Php::Value,
+    you can use it in your class. Your __toString() method may thus return a
+    char*, a std::string, Php::Value (and even an integer!), because all these
+    types can be assigned to a Php::Value.
 </p>
 <p>
     The nice thing about magic methods implemented with PHP-CPP is that they
@@ -24,6 +32,61 @@
     a function like __set() or __unset() in your C++ class, these functions
     can not be called explicitly from PHP scripts - but they do get called
     when a property is accessed.
+</p>
+<h2 id="constructors">Constructors</h2>
+<p>
+    We start with an exception to the rule. Normally, you do not have to register
+    magic methods to make them work. When you add a magic method like 
+    __toString() or __get() to your class, it will automatically be 
+    called when an object is casted to a string or a property is accessed. There
+    is no need to enable the magic method explicitly in the get_module() startup
+    function.
+</p>
+<p>
+    The only exception to this rule is the __construct() method. This method 
+    does have to be explicitly registered. There are a number of reasons for this.
+    For a start, the __construct() method does not have a fixed signature, and
+    by explicitly adding it to the extension, you can also exactly specify what
+    parameters it accepts, and whether the __construct() method should be 
+    private or protected (if you want to create classes that can not be 
+    instantiated from PHP).
+</p>
+<p>
+    The other reason why you have to explicitly register the __construct() method,
+    is that, unlike other magic methods, the magic __construct method <i>must</i> 
+    be visible from PHP. Inside constructors of derived classes, it often is 
+    necessary to make a call to parent::__construct(). By registering the 
+    __construct() method in the get_module() function you make the function
+    visible from PHP, which makes constructs like this possible.
+</p>
+<p>
+    We have a special article about <a href="constructors-and-destructors">
+    constructors and destructors</a> with multiple examples how to register 
+    the __construct() method.
+<p>
+<h2 id="clone-and-destruct">Clone and destruct</h2>
+<p>
+    The magic __clone() method is very similar to the __construct() method. It
+    is the first method to be called on a new object <i>after</i> it is copy
+    constructed. The __destruct() is the method that gets called right before
+    the object gets destructed (and the C++ destructor runs).
+</p>
+<p>
+    The __clone() and __destruct() methods are regular magic methods. You do
+    not have to register them to make them active. The PHP-CPP library calls
+    them automatically if they are available.
+</p>
+<p>
+    In normal circumstances you probably do not need these methods very often.
+    The C++ copy constructor and the C++ destructor can be used too. The only
+    difference is that the magic methods are called on objects that are in a
+    fully initialized state, while the C++ copy constructor and C++ destructor
+    work on objects that are <i>being initialized</i>, or that are 
+    <i>being destructed</i>.
+</p>
+<p>
+    The article about <a href="constructors-and-destructors">mentioned above</a>
+    as more details and examples.
 </p>
 <h2 id="pseudo-properties">Pseudo properties</h2>
 <p>

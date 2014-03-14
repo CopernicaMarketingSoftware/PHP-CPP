@@ -152,7 +152,7 @@ protected:
     /**
      *  Call the __destruct method
      */
-    virtual Value callDestruct(Base *base) const { return nullptr; }
+    virtual void callDestruct(Base *base) const {}
     
     /**
      *  Call the __call(), __invoke() or __callStatic() method

@@ -305,13 +305,13 @@ private:
      *  Call the __destruct method
      *  @param  object
      */
-    virtual Value callDestruct(Base *base) const override
+    virtual void callDestruct(Base *base) const override
     {
         // cast to actual object
         T *obj = (T *)base;
         
         // pass on
-        return obj->__destruct();
+        obj->__destruct();
     }
 
     /**
