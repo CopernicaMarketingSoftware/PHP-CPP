@@ -52,10 +52,17 @@ typedef Value   (Base::*method_callback_6)() const;
 typedef Value   (Base::*method_callback_7)(Parameters &) const;
 
 /**
+ *  Signatures for getters and setters
+ */
+typedef Value   (Base::*getter_callback)();
+typedef void    (Base::*setter_callback)(const Php::Value &value);
+
+/**
  *  Forward declarations
  */
 class Method;
 class Member;
+class Property;
 
 /**
  *  Class definition
@@ -87,6 +94,7 @@ public:
         _type(that._type), 
         _methods(that._methods), 
         _members(that._members), 
+        _properties(that._properties),
         _entry(nullptr) {}
 
     /**
@@ -98,6 +106,7 @@ public:
         _type(that._type), 
         _methods(std::move(that._methods)), 
         _members(std::move(that._members)), 
+        _properties(std::move(that._properties)),
         _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
@@ -269,6 +278,14 @@ protected:
     void property(const char *name, const char *value, int flags = Php::Public);
     void property(const char *name, double value, int flags = Php::Public);
 
+    /**
+     *  Set property with callbacks
+     *  @param  name        Name of the property
+     *  @param  getter      Getter method
+     *  @param  setter      Setter method
+     */
+    void property(const char *name, const getter_callback &getter, const setter_callback &setter);
+
 private:
     /**
      *  Retrieve an array of zend_function_entry objects that hold the 
@@ -279,6 +296,14 @@ private:
      *  @return zend_function_entry[]
      */
     const struct _zend_function_entry *entries();
+
+    /**
+     *  Helper method to turn a property into a zval
+     *  @param  value
+     *  @param  type
+     *  @return Value
+     */
+    static struct _zval_struct *toZval(Value &&value, int type);
 
     /**
      *  Static member functions to create or clone objects based on this class
@@ -502,6 +527,12 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
+    
+    /**
+     *  Map of dynamically accessible properties
+     *  @var    std::map
+     */
+    std::map<std::string,std::shared_ptr<Property>> _properties;
     
     /**
      *  Base object has access to the members

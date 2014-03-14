@@ -90,6 +90,7 @@
 #include "arithmetic.h"
 #include "origexception.h"
 #include "notimplemented.h"
+#include "property.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

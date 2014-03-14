@@ -646,22 +646,7 @@ zval *ClassBase::readDimension(zval *object, zval *offset, int type)
         try
         {
             // ArrayAccess is implemented, call function
-            Value value = arrayaccess->offsetGet(offset);
-            
-            // because we do not want the value object to destruct the zval when
-            // it falls out of scope, we detach the zval from it, if this is a regular
-            // read operation we can do this right away
-            if (type == 0) return value.detach();
-            
-            // this is a more complicated read operation, the scripts wants to get
-            // deeper access to the returned value. This, however, is only possible
-            // if the value has more than once reference (if it has a refcount of one,
-            // the value object that we have here is the only instance of the zval,
-            // and it is simply impossible to return a reference or so
-            if (value.refcount() <= 1) return value.detach(); 
-            
-            // we're dealing with an editable zval, return a reference variable
-            return Value(value.detach(), true).detach();
+            return toZval(arrayaccess->offsetGet(offset), type);
         }
         catch (Exception &exception)
         {
@@ -814,6 +799,30 @@ void ClassBase::unsetDimension(zval *object, zval *member)
 }
 
 /**
+ *  Helper method to turn a property into a zval
+ *  @param  value
+ *  @param  type
+ *  @return Value
+ */
+zval *ClassBase::toZval(Value &&value, int type)
+{
+    // because we do not want the value object to destruct the zval when
+    // it falls out of scope, we detach the zval from it, if this is a regular
+    // read operation we can do this right away
+    if (type == 0) return value.detach();
+
+    // this is a more complicated read operation, the scripts wants to get
+    // deeper access to the returned value. This, however, is only possible
+    // if the value has more than once reference (if it has a refcount of one,
+    // the value object that we have here is the only instance of the zval,
+    // and it is simply impossible to return a reference or so
+    if (value.refcount() <= 1) return value.detach(); 
+
+    // we're dealing with an editable zval, return a reference variable
+    return Value(value.detach(), true).detach();
+}
+
+/**
  *  Function that is called when a property is read
  *  @param  object
  *  @param  name
@@ -857,23 +866,23 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _
     // the exception we know if the object was implemented by the user or not
     try
     {
-        // retrieve value
-        Value value = meta->callGet(base, name);
-
-        // because we do not want the value object to destruct the zval when
-        // it falls out of scope, we detach the zval from it, if this is a regular
-        // read operation we can do this right away
-        if (type == 0) return value.detach();
+        // convert name to a Value object
+        Value key(name);
         
-        // this is a more complicated read operation, the scripts wants to get
-        // deeper access to the returned value. This, however, is only possible
-        // if the value has more than once reference (if it has a refcount of one,
-        // the value object that we have here is the only instance of the zval,
-        // and it is simply impossible to return a reference or so
-        if (value.refcount() <= 1) return value.detach(); 
+        // is it a property with a callback?
+        auto iter = meta->_properties.find(key);
         
-        // we're dealing with an editable zval, return a reference variable
-        return Value(value.detach(), true).detach();
+        // was it found?
+        if (iter == meta->_properties.end())
+        {
+            // retrieve value from the __get method
+            return toZval(meta->callGet(base, key), type);
+        }
+        else
+        {
+            // get the value
+            return toZval(iter->second->get(base), type);
+        }
     }
     catch (const NotImplemented &exception)
     {
@@ -929,8 +938,26 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struc
     // we know for sure that the user has not overridden the __set method
     try
     {
-        // call the default
-        meta->callSet(base, name, value);
+        // wrap the name
+        Value key(name);
+        
+        // check if the property has a callback
+        auto iter = meta->_properties.find(key);
+        
+        // is it set?
+        if (iter == meta->_properties.end())
+        {
+            // use the __set method
+            meta->callSet(base, key, value);
+        }
+        else
+        {
+            // check if it could be set
+            if (iter->second->set(base, value)) return;
+            
+            // read-only property
+            zend_error(E_ERROR, "Unable to write to read-only property %s", (const char *)key);
+        }
     }
     catch (const NotImplemented &exception)
     {
@@ -989,15 +1016,21 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const s
 
         // we need the C++ class meta-information object
         ClassBase *meta = cpp_class(entry);
+        
+        // convert the name to a Value object
+        Value key(name);
+
+        // check if this is a callback property
+        if (meta->_properties.find(key) != meta->_properties.end()) return true;
 
         // call the C++ object
-        if (!meta->callIsset(base, name)) return false;
+        if (!meta->callIsset(base, key)) return false;
         
         // property exists, but what does the user want to know
         if (has_set_exists == 2) return true;
         
         // we have to retrieve the property
-        Value value = meta->callGet(base, name);
+        Value value = meta->callGet(base, key);
         
         // should we check on NULL?
         switch (has_set_exists) {
@@ -1052,9 +1085,18 @@ void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_lit
 
         // we need the C++ class meta-information object
         ClassBase *meta = cpp_class(entry);
-
-        // call the __unset method
-        meta->callUnset(cpp_object(object), member);
+        
+        // property name
+        Value name(member);
+        
+        // is this a callback property?
+        auto iter = meta->_properties.find(name);
+        
+        // if the property does not exist, we forward to the __unset
+        if (iter == meta->_properties.end()) meta->callUnset(cpp_object(object), member);
+        
+        // callback properties cannot be unset
+        zend_error(E_ERROR, "Property %s can not be unset", (const char *)name);
     }
     catch (const NotImplemented &exception)
     {
@@ -1638,6 +1680,18 @@ void ClassBase::property(const char *name, double value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<FloatMember>(name, value, flags));
+}
+
+/**
+ *  Set property with callbacks
+ *  @param  name        Name of the property
+ *  @param  getter      Getter method
+ *  @param  setter      Setter method
+ */
+void ClassBase::property(const char *name, const getter_callback &getter, const setter_callback &setter)
+{
+    // add property
+    _properties[name] = std::make_shared<Property>(getter,setter);
 }
 
 /**

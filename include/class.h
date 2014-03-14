@@ -156,7 +156,27 @@ public:
     void property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); }
     void property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); }
     void property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); }
-     
+
+    /**
+     *  Properties as methods
+     * 
+     *  This is a smarter way for adding properties to a class. You can define
+     *  a property and a method that gets called every time the property is
+     *  set or unset.
+     * 
+     *  If you do not set a setter method, your property will be read-only.
+     * 
+     *  @param  name        Name of the property
+     *  @param  getter      The getter method
+     *  @param  setter      The setter method
+     */
+    void property(const char *name, Value (T::*getter)()                                                   ) { ClassBase::property(name, static_cast<getter_callback>(getter), nullptr); }
+    void property(const char *name, Value (T::*getter)() const                                             ) { ClassBase::property(name, static_cast<getter_callback>(getter), nullptr); }
+    void property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value)      ) { ClassBase::property(name, static_cast<getter_callback>(getter), static_cast<setter_callback>(setter)); }
+    void property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value)      ) { ClassBase::property(name, static_cast<getter_callback>(getter), static_cast<setter_callback>(setter)); }
+    void property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value) const) { ClassBase::property(name, static_cast<getter_callback>(getter), static_cast<setter_callback>(setter)); }
+    void property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value) const) { ClassBase::property(name, static_cast<getter_callback>(getter), static_cast<setter_callback>(setter)); }
+    
 private:
     /**
      *  Construct a new instance of the object
