@@ -35,8 +35,8 @@
 </p>
 <h2 id="constructors">Constructors</h2>
 <p>
-    We start with an exception to the rule. Normally, you do not have to register
-    magic methods to make them work. When you add a magic method like 
+    Normally, magic methods do not have 
+    to be registered to make them work. When you add a magic method like 
     __toString() or __get() to your class, it will automatically be 
     called when an object is casted to a string or a property is accessed. There
     is no need to enable the magic method explicitly in the get_module() startup
@@ -67,17 +67,24 @@
 <h2 id="clone-and-destruct">Clone and destruct</h2>
 <p>
     The magic __clone() method is very similar to the __construct() method. It
-    is the first method to be called on a new object <i>after</i> it is copy
-    constructed. The __destruct() is the method that gets called right before
-    the object gets destructed (and the C++ destructor runs).
+    also is a method that is called directly <i>after</i> an object is constructed.
+    The difference is that __clone() is called after an object is <i>copy 
+    constructed</i> (or <i>cloned</i/> if you prefer the PHP idiom), while 
+    __construct() is called right after the normal constructor.
 </p>
 <p>
-    The __clone() and __destruct() methods are regular magic methods and you
-    therefore do not have to register them to make them active. The PHP-CPP 
-    library calls them automatically if they are available.
+    The magic __destruct() method gets called right before the object gets 
+    destructed (and right before the C++ destructor runs).
 </p>
 <p>
-    In normal circumstances you probably have not need for these methods.
+    The __clone() and __destruct() methods are regular magic methods (unlike 
+    __construct()) and you therefore do not have to register them to make them 
+    active. If you add one of these two methods to your class, you will not have
+    to make any changes to the get_module() startup function. The PHP-CPP library 
+    calls them automatically if they are available.
+</p>
+<p>
+    In normal circumstances you probably have no need for these methods.
     The C++ copy constructor and the C++ destructor can be used too. The only
     difference is that the magic methods are called on objects that are in a
     fully initialized state, while the C++ copy constructor and C++ destructor
