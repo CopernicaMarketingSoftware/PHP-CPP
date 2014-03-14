@@ -54,8 +54,10 @@ typedef Value   (Base::*method_callback_7)(Parameters &) const;
 /**
  *  Signatures for getters and setters
  */
-typedef Value   (Base::*getter_callback)();
-typedef void    (Base::*setter_callback)(const Php::Value &value);
+typedef Value   (Base::*getter_callback_0)();
+typedef Value   (Base::*getter_callback_1)() const;
+typedef void    (Base::*setter_callback_0)(const Php::Value &value);
+typedef void    (Base::*setter_callback_1)(const Php::Value &value) const;
 
 /**
  *  Forward declarations
@@ -284,7 +286,12 @@ protected:
      *  @param  getter      Getter method
      *  @param  setter      Setter method
      */
-    void property(const char *name, const getter_callback &getter, const setter_callback &setter);
+    void property(const char *name, const getter_callback_0 &getter);
+    void property(const char *name, const getter_callback_1 &getter);
+    void property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter);
+    void property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter);
+    void property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter);
+    void property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter);
 
 private:
     /**

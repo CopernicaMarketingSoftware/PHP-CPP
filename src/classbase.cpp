@@ -1686,13 +1686,72 @@ void ClassBase::property(const char *name, double value, int flags)
  *  Set property with callbacks
  *  @param  name        Name of the property
  *  @param  getter      Getter method
+ */
+void ClassBase::property(const char *name, const getter_callback_0 &getter)
+{
+    // add property
+    _properties[name] = std::make_shared<Property>(getter);
+}
+
+/**
+ *  Set property with callbacks
+ *  @param  name        Name of the property
+ *  @param  getter      Getter method
+ */
+void ClassBase::property(const char *name, const getter_callback_1 &getter)
+{
+    // add property
+    _properties[name] = std::make_shared<Property>(getter);
+}
+
+/**
+ *  Set property with callbacks
+ *  @param  name        Name of the property
+ *  @param  getter      Getter method
  *  @param  setter      Setter method
  */
-void ClassBase::property(const char *name, const getter_callback &getter, const setter_callback &setter)
+void ClassBase::property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter,setter);
 }
+
+/**
+ *  Set property with callbacks
+ *  @param  name        Name of the property
+ *  @param  getter      Getter method
+ *  @param  setter      Setter method
+ */
+void ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter)
+{
+    // add property
+    _properties[name] = std::make_shared<Property>(getter,setter);
+}
+
+/**
+ *  Set property with callbacks
+ *  @param  name        Name of the property
+ *  @param  getter      Getter method
+ *  @param  setter      Setter method
+ */
+void ClassBase::property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter)
+{
+    // add property
+    _properties[name] = std::make_shared<Property>(getter,setter);
+}
+
+/**
+ *  Set property with callbacks
+ *  @param  name        Name of the property
+ *  @param  getter      Getter method
+ *  @param  setter      Setter method
+ */
+void ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter)
+{
+    // add property
+    _properties[name] = std::make_shared<Property>(getter,setter);
+}
+
 
 /**
  *  End namespace
