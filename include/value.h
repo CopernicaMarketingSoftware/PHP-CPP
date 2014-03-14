@@ -855,10 +855,10 @@ protected:
     struct _zval_struct *_val;
 
     /**
-     *  ValueIterator pointer
-     *  @var ValueIterator*
+     *  HashItem pointer
+     *  Pointer to a position in the embedded array (if the internal array does not exist, then nullptr).
+     *  @var HashItem*
      */
-    //iterator *_iterator = nullptr;
      HashItem *_hashitem = nullptr;
     
     /**

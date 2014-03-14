@@ -67,8 +67,6 @@ private:
         if ( !HashPos.isEmpty() && !HashPos.keyAccessible() ) next();
     }
     
-    // Position in the internal hash table
-    //HashPositionWrapper HashPos;
 };
 
 /**

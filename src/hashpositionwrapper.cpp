@@ -54,9 +54,7 @@ Value HashPositionWrapper::value() const {
 /**
  *  return string key
  */
-//const char* HashPositionWrapper::key() const {
 std::string HashPositionWrapper::key() const {
-    //return (0 == pos->nKeyLength) ? "" : pos->arKey;
     return (0 == pos->nKeyLength) ? std::to_string(pos->h) : std::string(pos->arKey, pos->nKeyLength);
 }
 
@@ -105,14 +103,6 @@ void HashPositionWrapper::prev() {
  *  compare operator
  */
 bool HashPositionWrapper::operator==(const HashPositionWrapper& rhs) const {
-    // If one of items is empty
-    /*
-    if( isEmpty() &&  rhs.isEmpty() ) return true;
-    if( isEmpty() && !rhs.isEmpty() ) return false;
-    if(!isEmpty() &&  rhs.isEmpty() ) return false;
-    */
-
-    // If both are not empty
     return (pos->h == rhs.pos->h && pos->nKeyLength == rhs.pos->nKeyLength && pos->arKey == rhs.pos->arKey );
 }
 

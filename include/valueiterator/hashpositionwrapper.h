@@ -112,7 +112,7 @@ private:
     // Position in the internal hash table
     _HashPosition pos;
 
-    // get access to the hast table (class HashTable)
+    // get access to the hast table (struct HashTable)
     _hashtable *ht;
 };
 
