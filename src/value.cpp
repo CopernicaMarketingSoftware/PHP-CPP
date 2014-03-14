@@ -170,6 +170,21 @@ Value::Value(struct _zval_struct *val, bool ref)
 }
 
 /**
+ *  Wrap around a hash table
+ *  @param  ht          Hashtable to wrap
+ */
+Value::Value(HashTable *ht)
+{
+    // construct a zval
+    MAKE_STD_ZVAL(_val);
+    Z_ARRVAL_P(_val) = ht;
+    Z_TYPE_P(_val) = IS_ARRAY;
+
+    // add a reference
+    Z_ADDREF_P(_val);
+}
+
+/**
  *  Wrap around an object
  *  @param  object
  */
@@ -302,6 +317,9 @@ Value::~Value()
  */
 zval *Value::detach()
 {
+    // leap out if already detached
+    if (!_val) return nullptr;
+    
     // copy return value
     zval *result = _val;
     
@@ -313,6 +331,50 @@ zval *Value::detach()
     
     // done
     return result;
+}
+
+/**
+ *  Attach a different zval
+ * 
+ *  This will first detach the current zval, and link the Value object to 
+ *  a different zval.
+ * 
+ *  @param  val
+ */
+void Value::attach(struct _zval_struct *val)
+{
+    // detach first
+    if (_val) detach();
+    
+    // store the zval
+    _val = val;
+    
+    // add one more reference
+    Z_ADDREF_P(_val);
+}
+
+/**
+ *  Attach a different zval
+ * 
+ *  This will first detach the current zval, and link the Value object to 
+ *  a new zval
+ * 
+ *  @param  hashtable
+ */
+void Value::attach(struct _hashtable *hashtable)
+{
+    // detach first
+    if (_val) detach();
+
+    // construct a new zval
+    MAKE_STD_ZVAL(_val);
+    
+    // store pointer to the hashtable, and mark the zval as an array
+    Z_ARRVAL_P(_val) = hashtable;
+    Z_TYPE_P(_val) = IS_ARRAY;
+
+    // add a reference
+    Z_ADDREF_P(_val);
 }
 
 /**

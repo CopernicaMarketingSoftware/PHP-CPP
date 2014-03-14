@@ -55,6 +55,7 @@
 #include "../include/byval.h"
 #include "../include/byref.h"
 #include "../include/global.h"
+#include "../include/super.h"
 #include "../include/hashmember.h"
 #include "../include/parameters.h"
 #include "../include/modifiers.h"

@@ -112,6 +112,12 @@ public:
     Value(struct _zval_struct *zval, bool ref = false);
     
     /**
+     *  Wrap around a hash table
+     *  @param  ht          Hashtable to wrap
+     */
+    Value(struct _hashtable *ht);
+    
+    /**
      *  Wrap around an object implemented by us
      *  @param  object      Object to be wrapped
      */
@@ -846,6 +852,18 @@ protected:
     struct _zval_struct *detach();
     
     /**
+     *  Attach a different zval
+     * 
+     *  This will first detach the current zval, and link the Value object to 
+     *  a different zval. Versions exist to attach to a zval and to an entire
+     *  hash table
+     * 
+     *  @param  val
+     */
+    void attach(struct _zval_struct *val);
+    void attach(struct _hashtable *hashtable);
+    
+    /**
      *  Set a certain property without running any checks (you must already know
      *  for sure that this is an array, and that the index is not yet in use)
      * 
@@ -874,6 +892,7 @@ protected:
     friend class Member;
     friend class ClassBase;
     friend class Iterator;
+    friend class Extension;
 };
 
 /**

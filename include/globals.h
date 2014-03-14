@@ -68,7 +68,7 @@ public:
 };
 
 /**
- *  We always have one instance
+ *  We always have one instance of the GLOBALS instance
  *  @var    Globals
  */
 extern Globals &GLOBALS;

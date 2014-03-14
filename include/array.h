@@ -12,7 +12,7 @@
  *  Set up namespace
  */
 namespace Php {
-    
+
 /**
  *  Class definition
  */
@@ -123,11 +123,6 @@ public:
     }
 };
 
-/**
- *  Define for arrays and objects
- */
-using Array     =   Array;
-    
 /**
  *  End of namespace
  */
