@@ -5,16 +5,15 @@
     system(s).
 </p>
 <p>
-    Luckily, for most of us (those who use Linux environments), this will be
-    a piece of cake. If you're on a different platform however, you are left on 
-    your own, because we (as in me, the PHP-CPP developer), only uses Linux
-    systems. There is however no reason why this library should not also work on 
-    other platforms, because it only uses straight forward C++ code. Thus, if 
-    you are on a different platform and have managed to compile the library on 
-    it, please give us feedback so that we can update these installation 
-    instructions and include other platforms as well.
+    Luckily, for most of us (those who use Linux or Apple environments), this 
+    will be a piece of cake. If you're on a different platform however, you are 
+    left on your own, because we (as in me, the PHP-CPP developer), only uses 
+    Linux systems. There is however no reason why this library should not also 
+    work on other platforms, because it only uses straight forward C++ code. 
+    Thus, if you are on a different platform and have managed to compile the 
+    library on it, please give us feedback so that we can update these 
+    installation instructions and include other platforms as well.
 </p>
-
 
 <h2 id="limitations">Limitations</h2>
 <p>
@@ -85,7 +84,20 @@
     <pre><code>make</code></pre>
 </p>
 <p>
-    The PHP-CPP library has now been built, and all that is left to do is 
+    This will start the compiler and build the library.
+</p>
+
+<h2 id="osx">Compiling on OSX?</h2>
+<p>
+    If you compile the software on OSX, you may run into linking and "unresolved
+    symbol" errors. In that case you will have to make a change to the Makefile.
+    Somewhere in this Makefile there is an option "LINKER_FLAGS". This option
+    should be extended, and the extra flag "-undefined dynamic_lookup" should
+    be added to it.
+</p>
+
+<p>
+    After you ran 'make', and the PHP-CPP library was built, all that is left to do is 
     install it on your system. You can use the "make install" command for it.
     This command should be executed as root, either by using "sudo", or by
     logging on as root first.
@@ -94,6 +106,7 @@
     <pre><code>sudo make install</code></pre>
 </p>
 <p>
-    Congratulations! You are now the happy owner of a system with PHP-CPP installed
-    and nothing can stop you from building your first fast native PHP extension.
+    That was it! After these steps you are now the happy owner of a system with 
+    PHP-CPP installed and nothing can stop you from building your first fast 
+    native PHP extension.
 </p>
