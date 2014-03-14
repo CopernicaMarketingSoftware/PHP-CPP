@@ -286,7 +286,7 @@ std::cout &lt;&lt; array("Y-m-d H:i:s") &lt;&lt; std::endl;
 <h2 id="global-variables">Global variables</h2>
 <p>
     To read or update global PHP variables, you can use the Php::GLOBALS 
-    variable. This variable works more or less the same as the $_GLOBALS
+    variable. This variable works more or less the same as the $GLOBALS
     variable in a PHP script.
 </p>
 <p>
@@ -305,7 +305,25 @@ std::cout &lt;&lt; Php::GLOBALS["b"] &lt;&lt; std::endl;
 </code></pre>
 </p>
 <p>
-    Unlike PHP scripts, that handles only single pageviews, an extension is
+    Next to the $GLOBALS variable, PHP allows you to access variables using
+    the $_GET, $_POST, $_COOKIE, $_FILES, $_SERVER, $_REQUEST and $_ENV variables.
+    In your C++ extension you can do something similar with the global variables 
+    Php::GET, Php::POST, Php::COOKIE, Php::FILES, Php::SERVER, Php::REQUEST and 
+    Php::ENV. These are global, read-only, objects with an overloaded operator[]
+    method. You can thus access them as if it were associative arrays.
+</p>
+<p>
+<pre class="language-c++"><code>
+// retrieve the value of a request variable
+int age = Php::REQUEST["name"];
+
+// or retrieve the value of a server variable
+std::string referer = Php::SERVER["HTTP_REFERER"];
+</code></pre>
+</p>
+<h2 id="global-natives">Be careful with global C++ variables</h2>
+<p>
+    Unlike PHP scripts, that only handle single pageviews, an extension is
     used to handle multiple pageviews after each other. This means that when
     you use global C++ (!) variables in your extension, that these variables are 
     not set back to their initial value in between the pageviews. The 
