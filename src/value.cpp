@@ -289,7 +289,7 @@ Value::~Value()
     zval_ptr_dtor(&_val);
 
     // delete ValueIterator pointer
-    if(_iterator) delete _iterator;
+    if(_hashitem) delete _hashitem;
 }
 
 /**
@@ -1578,12 +1578,13 @@ std::map<std::string,Php::Value> Value::mapValue() const
  *  Iterator to beginning
  *  @return ValueIterator&
  */
-Value::iterator& Value::begin() {
+Value::iterator Value::begin()
+{
     
     // if already exist
-    if(_iterator) {
-       _iterator->reset();
-       return *_iterator;
+    if(_hashitem) {
+       //_hashitem->reset();
+       return _hashitem;
     }
 
     // check type
@@ -1592,34 +1593,27 @@ Value::iterator& Value::begin() {
         // get access to the hast table
         HashTable *arr = Z_ARRVAL_P(_val);
         
-        // return iterator
-        return *(_iterator = new iterator(arr, true));
+        return (_hashitem = new HashItemArray(arr));
     }
     else if (isObject())
     {
         // get access to the hast table
         HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
 
-        // return iterator
-        return *(_iterator = new iterator(arr, false));
+        return (_hashitem = new HashItemObject(arr));
     }
 
     // for no-iterable types
-    return iterator::null;
+    return nullptr;
 }
-
-/**
- *  Empty iterator. Used to finish the iterations
- *  @var ValueIterator
- */
-Value::iterator Value::iterator::null;
 
 /**
  *  Iterator to end
  *  @return ValueIterator&
  */
-Value::iterator& Value::end() const {
-    return Value::iterator::null;
+Value::iterator Value::end() const 
+{
+    return nullptr;
 }
 
 

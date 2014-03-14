@@ -32,6 +32,7 @@ namespace Php {
  *  Forward declaration
  */
 class ValueIterator;
+class HashItem;
 
 /**
  *  Forward definitions
@@ -826,13 +827,15 @@ public:
      *  Iterator to beginning
      *  @return ValueIterator&
      */
-    iterator& begin();
+    //iterator& begin();
+     iterator begin();
 
     /**
      *  Iterator to end
      *  @return ValueIterator&
      */
-    iterator& end() const;
+    //iterator& end() const;
+    iterator end() const;
 
 
 protected:
@@ -846,7 +849,8 @@ protected:
      *  ValueIterator pointer
      *  @var ValueIterator*
      */
-    iterator *_iterator = nullptr;
+    //iterator *_iterator = nullptr;
+     HashItem *_hashitem = nullptr;
     
     /**
      *  Detach the zval
