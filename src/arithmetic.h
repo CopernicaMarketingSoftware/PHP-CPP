@@ -55,7 +55,7 @@ public:
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
         
         // apply to natural numbers
-        return Value(F<long>()(_value->numericValue(), value));
+        return Value(F<int64_t>()(_value->numericValue(), value));
     }
     
     /**
@@ -69,7 +69,7 @@ public:
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
         
         // apply to natural numbers
-        return Value(F<long>()(_value->numericValue(), value));
+        return Value(F<int64_t>()(_value->numericValue(), value));
     }
 
     /**
@@ -83,7 +83,7 @@ public:
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
         
         // apply to natural numbers
-        return Value(F<long>()(_value->numericValue(), value));
+        return Value(F<int64_t>()(_value->numericValue(), value));
     }
         
     /**
@@ -97,7 +97,7 @@ public:
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value?1:0));
         
         // apply to natural numbers
-        return Value(F<long>()(_value->numericValue(), value?1:0));
+        return Value(F<int64_t>()(_value->numericValue(), value?1:0));
     }
     
     /**
@@ -114,7 +114,7 @@ public:
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), v));
         
         // apply to natural numbers
-        return Value(F<long>()(_value->numericValue(), v));
+        return Value(F<int64_t>()(_value->numericValue(), v));
     }
     
     /**
@@ -174,7 +174,7 @@ public:
         if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
         
         // do a numeric operation
-        return _value->operator=(F<long>()(_value->numericValue(), value));
+        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
     }
     
     /**
@@ -188,7 +188,7 @@ public:
         if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
         
         // do a numeric operation
-        return _value->operator=(F<long>()(_value->numericValue(), value));
+        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
     }
 
     /**

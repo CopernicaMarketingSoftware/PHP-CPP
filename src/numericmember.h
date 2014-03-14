@@ -1,7 +1,7 @@
 /**
- *  LongMember.h
+ *  NumericMember.h
  *
- *  Implementation for a property that is initially set to a long value
+ *  Implementation for a property that is initially set to a numeric value
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
@@ -15,7 +15,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class LongMember : public Member
+class NumericMember : public Member
 {
 private:
     /**
@@ -31,12 +31,12 @@ public:
      *  @param  value
      *  @param  flags
      */
-    LongMember(const char *name, long value, int flags) : Member(name, flags), _value(value) {}
+    NumericMember(const char *name, long value, int flags) : Member(name, flags), _value(value) {}
 
     /**
      *  Destructor
      */
-    virtual ~LongMember() {}
+    virtual ~NumericMember() {}
 
     /**
      *  Declare class constant

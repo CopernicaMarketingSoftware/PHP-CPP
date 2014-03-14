@@ -381,9 +381,15 @@ public:
     
     /**
      *  Retrieve the value as number
-     *  @return long
+     *
+     *  We force this to be a int64_t because we assume that most
+     *  servers run 64 bits nowadays, and because we use int32_t, int64_t
+     *  almost everywhere, instead of 'long' and on OSX neither of
+     *  these intxx_t types is defined as 'long'...
+     *
+     *  @return int64_t
      */
-    long numericValue() const;
+    int64_t numericValue() const;
     
     /**
      *  Retrieve the value as boolean

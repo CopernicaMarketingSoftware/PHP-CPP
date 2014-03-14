@@ -74,7 +74,7 @@ Value::Value(int32_t value)
 }
 
 /**
- *  Constructor based on long value
+ *  Constructor based on int64_t value
  *  @param  value
  */
 Value::Value(int64_t value)
@@ -1415,7 +1415,7 @@ Value Value::clone(Type type) const
  *  Retrieve the value as integer
  *  @return long
  */
-long Value::numericValue() const
+int64_t Value::numericValue() const
 {
     // already a long?
     if (isNumeric()) return Z_LVAL_P(_val);

@@ -83,7 +83,7 @@
 #include "method.h"
 #include "member.h"
 #include "nullmember.h"
-#include "longmember.h"
+#include "numericmember.h"
 #include "boolmember.h"
 #include "stringmember.h"
 #include "floatmember.h"

@@ -1595,7 +1595,7 @@ void ClassBase::property(const char *name, std::nullptr_t value, int flags)
 void ClassBase::property(const char *name, int16_t value, int flags)
 {
     // add property
-    _members.push_back(std::make_shared<LongMember>(name, value, flags));
+    _members.push_back(std::make_shared<NumericMember>(name, value, flags));
 }
 
 /**
@@ -1607,7 +1607,7 @@ void ClassBase::property(const char *name, int16_t value, int flags)
 void ClassBase::property(const char *name, int32_t value, int flags)
 {
     // add property
-    _members.push_back(std::make_shared<LongMember>(name, value, flags));
+    _members.push_back(std::make_shared<NumericMember>(name, value, flags));
 }
 
 /**
@@ -1619,7 +1619,7 @@ void ClassBase::property(const char *name, int32_t value, int flags)
 void ClassBase::property(const char *name, int64_t value, int flags)
 {
     // add property
-    _members.push_back(std::make_shared<LongMember>(name, value, flags));
+    _members.push_back(std::make_shared<NumericMember>(name, value, flags));
 }
 
 /**
