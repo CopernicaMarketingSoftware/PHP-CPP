@@ -12,11 +12,11 @@
     It is difficult to imagine that someone in the world would like to create
     a native class, with regular non-typed public PHP properties on it. However,
     if you insist, you can use the PHP-CPP library for this. Let's take an example
-    class in PHP, and see what it will look like in C++.
+    class in PHP, and see what it would look like in C++.
 </p>
 <p>
 <pre class="language-php"><code>
-&lt?php
+&lt;?php
 /**
  *  PHP example class
  */
@@ -57,7 +57,7 @@ $example->property1 = "new value";
 </p>
 <p>
     The above example creates a class with one public property. This property
-    can be accessed by the Example class, but because it is public, also by
+    can be accessed by the Example class, and because it is public also by
     everyone else, as is shown in the example. If you like such classes, you can 
     write something similar with PHP-CPP.
 </p>
@@ -140,7 +140,7 @@ extern "C" {
 </code></pre>
 </p>
 <p>
-    The example code shows how you need to initialize the properties inside
+    The example code shows how you initialize the properties inside
     the get_module() function.
 </p>
 <p>
@@ -151,14 +151,14 @@ extern "C" {
 <h2>Smart properties</h2>
 <p>
     With the <a href="magic-methods">magic methods __get() and __set()</a> you
-    can make more advanced properties that are directly mapped to your C++
-    code, and that allows you to perform additional checks when a property
+    can make more advanced properties that are directly mapped to C++
+    variables, and that allow you to perform additional checks when a property
     is overwritten, so that an object always remains in a valid state.
 </p>
 <p>
     On top of that, with the PHP-CPP library you can also assign getter and
     setter methods to properties. Every time a property is accessed, your getter
-    or setter method will automatically be accessed.
+    or setter method will automatically be called.
 </p>
 <p>
 <pre class="language-cpp"><code>
@@ -171,7 +171,7 @@ class Example : public Php::Base
 {
 private:
     /**
-     *  Example property 1
+     *  Example property
      *  @var    int
      */
     int _value = 0;
@@ -258,7 +258,7 @@ extern "C" {
 </p>
 <p>
 <pre class="language-php"><code>
-&lt?php
+&lt;?php
 // create object
 $object = new Example();
 
