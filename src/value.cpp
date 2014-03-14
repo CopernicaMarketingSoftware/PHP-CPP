@@ -1583,7 +1583,6 @@ Value::iterator Value::begin()
     
     // if already exist
     if(_hashitem) {
-       //_hashitem->reset();
        return _hashitem;
     }
 
@@ -1615,8 +1614,7 @@ Value::iterator Value::end() const
 {
     return nullptr;
 }
-
-
+    
 /**
  *  Does the array contain a certain index?
  *  @param  index

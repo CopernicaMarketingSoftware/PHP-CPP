@@ -89,15 +89,6 @@ public:
         return phItem;
     }
 
-    /**
-     *  reset internal hash table
-     */
-    /*
-    void reset() {
-        phItem->reset();
-    }
-    */
-
 private:
 
     /**

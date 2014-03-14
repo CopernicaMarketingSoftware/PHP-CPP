@@ -54,7 +54,7 @@ public:
     /**
      *  return string key
      */
-    //const char* key() const;
+    //const char * key() const;
     std::string key() const;
 
     /**

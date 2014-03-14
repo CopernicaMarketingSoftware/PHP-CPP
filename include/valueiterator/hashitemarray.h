@@ -22,11 +22,6 @@ class HashItemArray : public HashItem
 public:
 
     /**
-     *  Constructor empty HashItemArray
-     */
-    //HashItemArray() : HashPos() {}
-
-    /**
      *  Constructor HashItemArray
      *  @param  arr HashTable
      */
@@ -89,14 +84,6 @@ public:
     }
 
     /**
-     *  previous iteration
-     */
-    virtual void prev() override
-    {
-        HashPos.prev();
-    }
-
-    /**
      *  reset iterator to beginning of the hash table
      */
     virtual void reset() override
@@ -107,17 +94,14 @@ public:
     /**
      *  compare operator
      */
-    //virtual bool compare(const HashItem& rhs) const override
     virtual bool compare(const HashItem *rhs) const override
     {
-        //return (HashPos == ((HashItemArray *)&rhs)->HashPos);
         return (HashPos == ((HashItemArray *)rhs)->HashPos);
-        //return (HashPos == rhs->HashPos);
     }
 
     virtual ~HashItemArray() {};
 
-private:
+protected:
     
     // Position in the internal hash table
     HashPositionWrapper HashPos;

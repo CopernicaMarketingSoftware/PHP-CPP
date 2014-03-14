@@ -827,16 +827,13 @@ public:
      *  Iterator to beginning
      *  @return ValueIterator&
      */
-    //iterator& begin();
-     iterator begin();
+    iterator begin();
 
     /**
      *  Iterator to end
      *  @return ValueIterator&
      */
-    //iterator& end() const;
     iterator end() const;
-
 
 protected:
     /**

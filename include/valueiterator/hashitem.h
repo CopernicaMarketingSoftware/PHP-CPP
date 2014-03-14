@@ -59,12 +59,6 @@ public:
     virtual void next() = 0;
 
     /**
-     *  previous iteration
-     */
-    virtual void prev() = 0;
-
-
-    /**
      *  reset iterator to beginning of the hash table
      */
     virtual void reset() = 0;
