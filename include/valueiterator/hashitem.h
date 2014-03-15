@@ -1,24 +1,19 @@
 /**
  *  hashitem.h
  *
- *  HashItem
+ *  HashItem is interface allows you to iterate through the various data types that support iteration.
  *
  *  @copyright 2013 Copernica BV
  */
-#ifndef HASHITEM_H
-#define HASHITEM_H
 
-//class Value;
+
 
 /**
  *  Set up namespace
  */
 namespace Php {
 
-/**
- *  Class definition
- *  HashItem
- */
+
 class HashItem
 {
 public:
@@ -39,7 +34,7 @@ public:
     virtual unsigned long intKey() const = 0;
 
     /**
-     *  return integer key (index)
+     *  return string key
      */
     virtual std::string strKey() const = 0;
 
@@ -49,7 +44,7 @@ public:
     virtual bool isstr() const = 0;
 
     /**
-     *  is hashtable item is empty?
+     *  item on current position of hashtable is empty?
      */
     virtual bool isEmpty() const = 0;
 
@@ -66,7 +61,6 @@ public:
     /**
      *  compare operator
      */
-    //virtual bool compare(const HashItem& rhs) const;
     virtual bool compare(const HashItem *rhs) const = 0;
 
     virtual ~HashItem() {};
@@ -77,4 +71,4 @@ public:
  *  End of namespace
  */
 }
-#endif /* hashitem.h */
+

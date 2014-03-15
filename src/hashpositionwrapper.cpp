@@ -1,8 +1,9 @@
 /**
  *  hashpositionwrapper.cpp
  *
- *  HashPositionWrapper - designed for natural iteration objects and arrays of type Value. 
- *  it does not use STL containers and carries minimal overhead.
+ *
+ *  HashPositionWrapper - is wrapper over Zend for easy management of position in the internal hash table
+ *
  *
  *  @copyright 2013 Copernica BV
  */
@@ -18,7 +19,8 @@ namespace Php {
  *  Constructor HashPositionWrapper
  *  @param  arr HashTable
  */
- HashPositionWrapper::HashPositionWrapper(_hashtable *arr) {
+ HashPositionWrapper::HashPositionWrapper(_hashtable *arr)
+ {
     ht = arr;
     pos = arr->pInternalPointer;
  }
@@ -42,33 +44,33 @@ void HashPositionWrapper::toEnd()
 /**
  *  retrieve data value
  */
-Value HashPositionWrapper::value() const {
-    //zval **value;
-    //zend_hash_get_current_data_ex(ht, (void **) &value, &pos);
-    //return Value(*value);
-
-    //zval_add_ref((zval **)pos->pData);
+Value HashPositionWrapper::value() const
+{
+    //zval_add_ref((zval **)pos->pData); ??? it need?
     return Value(*((zval **)pos->pData));
 }
 
 /**
  *  return string key
  */
-std::string HashPositionWrapper::key() const {
+std::string HashPositionWrapper::key() const
+{
     return (0 == pos->nKeyLength) ? std::to_string(pos->h) : std::string(pos->arKey, pos->nKeyLength);
 }
 
 /**
  *  return integer key (index)
  */
-unsigned long HashPositionWrapper::ind() const {
+unsigned long HashPositionWrapper::ind() const
+{
     return (0 == pos->nKeyLength) ? pos->h : 0;
 }
 
 /**
  *  key type is string?
  */
-bool HashPositionWrapper::isstr() const {
+bool HashPositionWrapper::isstr() const
+{
     return (0 != pos->nKeyLength);
 }
 
@@ -83,7 +85,6 @@ bool HashPositionWrapper::keyAccessible() const
     // This hack and it might break in future versions of PHP.
     // @todo It would be good to redo it using regular Zend functions.
     
-    //return ( pos && pos->arKey &&'\0' != *(pos->arKey) );
     return ( pos && 
                     ( 
                         !pos->nKeyLength || 

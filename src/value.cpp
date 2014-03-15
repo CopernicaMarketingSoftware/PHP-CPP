@@ -278,6 +278,7 @@ Value::~Value()
 {
     // ignore if moved
     if (!_val) return;
+    //std::cout << "\x1b[1;35m\n Value::~Value() \n\x1b[0;0m";
     
     // if there were two references or less, we're going to remove a reference
     // and only one reference will remain, the object will then impossible be
@@ -1581,9 +1582,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
 Value::iterator Value::begin()
 {
     // if already exist
-    if(_hashitem) {
-       return _hashitem;
-    }
+    if(_hashitem) return _hashitem;
 
     // check type
     if (isArray())
@@ -1595,10 +1594,32 @@ Value::iterator Value::begin()
     }
     else if (isObject())
     {
-        // get access to the hast table
-        HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
+        zend_class_entry *ce = zend_get_class_entry(_val);
 
-        return (_hashitem = new HashItemObject(arr));
+        // If the object class implements iterator or traversable
+        if(ce->get_iterator)
+        {
+            
+            // if this object is an instance of a class that implements the Iterator (PHP-interface)
+            if(ce->iterator_funcs.funcs)
+            {
+                return (_hashitem = new HashItemIterator(ce, _val));
+            }
+            //if this object is an instance of a class that implements the Traversable (PHP-interface)
+            else 
+            {
+                return (_hashitem = new HashItemTraversable(ce, _val));
+            }
+
+        }
+        else 
+        {
+            // get access to the hast table
+            HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
+
+            return (_hashitem = new HashItemObject(arr));
+        }
+        
     }
 
     // for no-iterable types
@@ -1621,9 +1642,7 @@ Value::iterator Value::end() const
 Value::iterator Value::rbegin()
 {
     // if already exist
-    if(_hashitem) {
-       return _hashitem;
-    }
+    if(_hashitem) return _hashitem;
 
     // check type
     if (isArray())

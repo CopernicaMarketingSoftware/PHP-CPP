@@ -1,22 +1,20 @@
 /**
  *  hashitemobject.h
  *
- *  HashItemObject
+ *
+ *  HashItemObject - Allows iteration of regular PHP-object
+ *
  *
  *  @copyright 2013 Copernica BV
  */
-#ifndef HASHITEMOBJECT_H
-#define HASHITEMOBJECT_H
+
 
 /**
  *  Set up namespace
  */
 namespace Php {
 
-/**
- *  Class definition
- *  HashItemObject
- */
+
 class HashItemObject : public HashItemArray
 {
 public:
@@ -48,7 +46,7 @@ public:
     }
 
     /**
-     *  compare operator
+     *  compare
      */
     virtual bool compare(const HashItem *rhs) const override
     {
@@ -73,4 +71,3 @@ private:
  *  End of namespace
  */
 }
-#endif /* hashitemobject.h */

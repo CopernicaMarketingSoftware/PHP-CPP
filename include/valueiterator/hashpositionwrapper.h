@@ -1,19 +1,11 @@
 /**
  *  hashpositionwrapper.h
  *
- *  HashPositionWrapper
-
-
-  is a simple type that is used only in conjunction with ValueIterator.
- *  Intended for obtaining access to the keys, values, and types of key variable of type Value during iteration
- *
- *  You are not supposed to instantiate this class.
- *  An instance of this class is created automatically when you create an object of class Value::iterator
+ *  HashPositionWrapper - is wrapper over Zend for easy management of position in the internal hash table
  *
  *  @copyright 2013 Copernica BV
  */
-#ifndef HTPWRAPPER_H
-#define HTPWRAPPER_H
+
 
 /**
  *  Forward declaration
@@ -27,10 +19,7 @@ typedef bucket* _HashPosition;
  */
 namespace Php {
 
-/**
- *  Class definition
- *  HashPositionWrapper
- */
+
 class HashPositionWrapper
 {
 public:
@@ -54,7 +43,6 @@ public:
     /**
      *  return string key
      */
-    //const char * key() const;
     std::string key() const;
 
     /**
@@ -76,7 +64,8 @@ public:
     /**
      *  is hashtable item is empty?
      */
-    bool isEmpty() const {
+    bool isEmpty() const
+    {
         return !pos;
     }
 
@@ -120,4 +109,4 @@ private:
  *  End of namespace
  */
 }
-#endif /* hashpositionwrapper.h */
+

@@ -1,22 +1,20 @@
 /**
  *  hashitemobjectreverse.h
  *
- *  HashItemObjectReverse
+ *
+ *  HashItemObjectReverse - Allows reverse iteration of regular PHP-object
+ *
  *
  *  @copyright 2013 Copernica BV
  */
-#ifndef HASHITEMOBJECTREVERSE_H
-#define HASHITEMOBJECTREVERSE_H
+
 
 /**
  *  Set up namespace
  */
 namespace Php {
 
-/**
- *  Class definition
- *  HashItemObjectReverse
- */
+
 class HashItemObjectReverse : public HashItemArray
 {
 public:
@@ -48,7 +46,7 @@ public:
     }
 
     /**
-     *  compare operator
+     *  compare
      */
     virtual bool compare(const HashItem *rhs) const override
     {
@@ -73,4 +71,3 @@ private:
  *  End of namespace
  */
 }
-#endif /* HashItemObjectReverse.h */

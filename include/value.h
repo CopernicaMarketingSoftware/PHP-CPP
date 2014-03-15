@@ -19,9 +19,10 @@
  */
 
 /**
- *  Forward definitions
+ *  Forward declarations
  */
 struct _zval_struct;
+struct _zend_class_entry;
 
 /**
  *  Set up namespace
@@ -796,31 +797,9 @@ public:
         return dynamic_cast<T*>(base);
     }
 
-private:
     /**
-     *  Call function with a number of parameters
-     *  @param  argc        Number of parameters
-     *  @param  argv        The parameters
-     *  @return Value
+     *  Embed type `iterator` in class Value.
      */
-    Value exec(int argc, struct _zval_struct ***params) const;
-
-    /**
-     *  Call method with a number of parameters
-     *  @param  name        Name of method to call
-     *  @param  argc        Number of parameters
-     *  @param  argv        The parameters
-     *  @return Value
-     */
-    Value exec(const char *name, int argc, struct _zval_struct ***params);
-
-    /**
-     *  Refcount - the number of references to the value
-     *  @return int
-     */
-    int refcount();
-
-public:    
     typedef ValueIterator iterator;
     
     /**
@@ -847,12 +826,30 @@ public:
      */
     iterator rend() const;
 
-protected:
+private:
     /**
-     *  The wrapped zval
-     *  @var struct zval
+     *  Call function with a number of parameters
+     *  @param  argc        Number of parameters
+     *  @param  argv        The parameters
+     *  @return Value
      */
-    struct _zval_struct *_val;
+    Value exec(int argc, struct _zval_struct ***params) const;
+
+    /**
+     *  Call method with a number of parameters
+     *  @param  name        Name of method to call
+     *  @param  argc        Number of parameters
+     *  @param  argv        The parameters
+     *  @return Value
+     */
+    Value exec(const char *name, int argc, struct _zval_struct ***params);
+
+    /**
+     *  Refcount - the number of references to the value
+     *  @return int
+     */
+    int refcount();
+
 
     /**
      *  HashItem pointer
@@ -860,7 +857,14 @@ protected:
      *  @var HashItem*
      */
      HashItem *_hashitem = nullptr;
-    
+
+protected:
+    /**
+     *  The wrapped zval
+     *  @var struct zval
+     */
+    struct _zval_struct *_val;
+
     /**
      *  Detach the zval
      * 

@@ -1,22 +1,19 @@
 /**
  *  valueiterator.h
  *
- *  ValueIterator - designed for natural iteration objects and arrays of type Value. 
- *  it does not use STL containers and carries minimal overhead.
+ *  ValueIterator - allows the iteration variable of type Value.
+ *  It designed for natural iteration objects, arrays and other iterable types. And have minimal overhead.
  *
  *  @copyright 2013 Copernica BV
  */
-#ifndef VALUEITERATOR_H
-#define VALUEITERATOR_H
+
 
 /**
  *  Set up namespace
  */
 namespace Php {
 
-/**
- *  Class definition
- */
+
 class ValueIterator
 {
 public:
@@ -35,16 +32,6 @@ public:
     {
         phi->reset();
     }
-
-    /**
-     *  Copy Constructor
-     */
-    //ValueIterator(const ValueIterator& that) : phItem(that.phItem) {}
-
-    /**
-     *  Move Constructor
-     */
-    //ValueIterator(ValueIterator&& that) : phItem(std::move(that.phItem)) {}
 
     /**
      *  Increment prefix operator
@@ -108,4 +95,3 @@ private:
  *  End of namespace
  */
 }
-#endif /* valueiterator.h */
