@@ -44,8 +44,14 @@ Value call(const char *name, Params&&... params)
  *  make the code run on the highway), it is not expected that these functions
  *  are going to be used very often anyway.
  */
-inline Value array_keys(const Value &value)    { return call("array_keys", value); }
-inline Value array_values(const Value &value)  { return call("array_values", value); }
+inline Value array_keys(const Value &value)                 { return call("array_keys", value); }
+inline Value array_values(const Value &value)               { return call("array_values", value); }
+inline Value empty(const Value &value)                      { return call("empty", value); }
+inline Value empty(const HashMember<std::string> &member)   { return !member.exists() || empty(member.value()); }
+inline Value empty(const HashMember<int> &member)           { return !member.exists() || empty(member.value()); }
+//inline Value isset(const Value &value)                      { return call("isset", value); }
+//inline Value isset(const HashMember<std::string> &member)   { return member.exists() && isset(member.value()); }
+//inline Value isset(const HashMember<int> &member)           { return member.exists() && isset(member.value()); }
 
 /**
  *  End of namespace

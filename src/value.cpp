@@ -130,6 +130,17 @@ Value::Value(const char *value, int size)
 }
 
 /**
+ *  Contructor based on hardcoded string that does not have to be copied
+ *  @param  value
+ */
+Value::Value(const HardCoded &value)
+{
+    // create a string zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_STRINGL(_val, value.buffer(), value.size(), 0);
+}
+
+/**
  *  Constructor based on decimal value
  *  @param  value
  */
@@ -663,6 +674,26 @@ Value &Value::operator=(const char *value)
     return *this;
 }
 
+/** 
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(const HardCoded &value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+
+    // set new non-duplicated value
+    ZVAL_STRINGL(_val, value.buffer(), value.size(), 0);
+    
+    // update the object
+    return *this;
+}
+
 /**
  *  Assignment operator
  *  @param  value
@@ -696,6 +727,7 @@ Value &Value::operator+=(bool value)                { return Arithmetic<std::plu
 Value &Value::operator+=(char value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const std::string &value)  { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const char *value)         { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(const HardCoded &value)    { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(double value)              { return Arithmetic<std::plus>(this).assign(value); }
 
 /**
@@ -711,6 +743,7 @@ Value &Value::operator-=(bool value)                { return Arithmetic<std::min
 Value &Value::operator-=(char value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const std::string &value)  { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const char *value)         { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(const HardCoded &value)    { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(double value)              { return Arithmetic<std::minus>(this).assign(value); }
 
 /**
@@ -726,6 +759,7 @@ Value &Value::operator*=(bool value)                { return Arithmetic<std::mul
 Value &Value::operator*=(char value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const std::string &value)  { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const char *value)         { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(const HardCoded &value)    { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(double value)              { return Arithmetic<std::multiplies>(this).assign(value); }
 
 /**
@@ -741,6 +775,7 @@ Value &Value::operator/=(bool value)                { return Arithmetic<std::div
 Value &Value::operator/=(char value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const std::string &value)  { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const char *value)         { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(const HardCoded &value)    { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(double value)              { return Arithmetic<std::divides>(this).assign(value); }
 
 /**
@@ -757,6 +792,7 @@ Value &Value::operator%=(bool value)                { return operator=(numericVa
 Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
 Value &Value::operator%=(const char *value)         { return operator=(numericValue() % atoi(value)); }
+Value &Value::operator%=(const HardCoded &value)    { return operator=(numericValue() % atoi(value.buffer())); }
 Value &Value::operator%=(double value)              { return operator=(numericValue() % (int)value); }
 
 /**
@@ -772,6 +808,7 @@ Value Value::operator+(bool value)                  { return Arithmetic<std::plu
 Value Value::operator+(char value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const std::string &value)    { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const char *value)           { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(const HardCoded &value)      { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(double value)                { return Arithmetic<std::plus>(this).apply(value); }
 
 /**
@@ -787,6 +824,7 @@ Value Value::operator-(bool value)                  { return Arithmetic<std::min
 Value Value::operator-(char value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const std::string &value)    { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const char *value)           { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(const HardCoded &value)      { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(double value)                { return Arithmetic<std::minus>(this).apply(value); }
 
 /**
@@ -802,6 +840,7 @@ Value Value::operator*(bool value)                  { return Arithmetic<std::mul
 Value Value::operator*(char value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const std::string &value)    { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const char *value)           { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(const HardCoded &value)      { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(double value)                { return Arithmetic<std::multiplies>(this).apply(value); }
 
 /**
@@ -817,6 +856,7 @@ Value Value::operator/(bool value)                  { return Arithmetic<std::div
 Value Value::operator/(char value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const std::string &value)    { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const char *value)           { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(const HardCoded &value)      { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(double value)                { return Arithmetic<std::divides>(this).apply(value); }
 
 /**
@@ -832,6 +872,7 @@ Value Value::operator%(bool value)                  { return Value(numericValue(
 Value Value::operator%(char value)                  { return Value(numericValue() % value); }
 Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }
 Value Value::operator%(const char *value)           { return Value(numericValue() % atoi(value)); }
+Value Value::operator%(const HardCoded &value)      { return Value(numericValue() % atoi(value.buffer())); }
 Value Value::operator%(double value)                { return Value(numericValue() % (int)value); }
 
 /**
@@ -1355,27 +1396,6 @@ bool Value::isCallable() const
 }
 
 /**
- *  Is the variable empty?
- *  @return bool
- */
-bool Value::isEmpty() const
-{
-    switch (type()) {
-    case    Type::Null:     return  true;
-    case    Type::Numeric:  return  numericValue() == 0;
-    case    Type::Float:    return  floatValue() == 0.0;
-    case    Type::Bool:     return  boolValue() == false;
-    case    Type::Array:    return  size() == 0;
-    case    Type::Object:   return  false;
-    case    Type::String:   return  size() == 0;
-    case    Type::Callable: return  false;
-    default:                return  false;
-    }
-    
-    // for the time being we consider resources and consts to be not-empty
-}
-
-/**
  *  Make a clone of the type
  *  @return Value
  */
@@ -1451,15 +1471,28 @@ std::string Value::stringValue() const
 }
 
 /**
- *  Retrieve raw string value
+ *  Access to the raw buffer
+ *  @return char *
+ */
+char *Value::buffer() const
+{
+    // must be a string
+    if (!isString()) return nullptr;
+    
+    // already a string?
+    return Z_STRVAL_P(_val);
+}
+
+/**
+ *  Access to the raw buffer
  *  @return const char *
  */
 const char *Value::rawValue() const
 {
-    // already a string?
+    // must be a string
     if (isString()) return Z_STRVAL_P(_val);
     
-    // make a clone
+    // make a clone and return that buffer
     return clone(Type::String).rawValue();
 }
 

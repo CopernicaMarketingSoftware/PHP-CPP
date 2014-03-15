@@ -127,7 +127,7 @@ public:
         // convert string to integer
         return apply(atoi(value.c_str()));
     }
-        
+
     /**
      *  Apply a string (representing a number), and return a new value object after running the arithmetic function
      *  @param  value
@@ -137,6 +137,17 @@ public:
     {
         // convert string to integer
         return apply(atoi(value));
+    }
+
+    /**
+     *  Apply a string (representing a number), and return a new value object after running the arithmetic function
+     *  @param  value
+     *  @return Value
+     */
+    Value apply(const HardCoded &value)
+    {
+        // convert string to integer
+        return apply(atoi(value.buffer()));
     }
     
     /**

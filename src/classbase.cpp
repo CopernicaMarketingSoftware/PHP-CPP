@@ -739,9 +739,9 @@ int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
             // we know for certain that the offset exists, but should we check
             // more, like whether the value is empty or not?
             if (!check_empty) return true;
-            
-            // it should not be empty
-            return !arrayaccess->offsetGet(member).isEmpty();
+
+            // the user wants to know if the property is empty
+            return empty(arrayaccess->offsetGet(member));
         }
         catch (Exception &exception)
         {

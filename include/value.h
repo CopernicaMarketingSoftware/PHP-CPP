@@ -57,6 +57,7 @@ public:
     Value(char value);
     Value(const std::string &value);
     Value(const char *value, int size = -1);
+    Value(const HardCoded &value);
     Value(double value);
 
     /**
@@ -161,6 +162,7 @@ public:
     Value &operator=(char value);
     Value &operator=(const std::string &value);
     Value &operator=(const char *value);
+    Value &operator=(const HardCoded &value);
     Value &operator=(double value);
 
     /**
@@ -176,6 +178,7 @@ public:
     Value &operator+=(char value);
     Value &operator+=(const std::string &value);
     Value &operator+=(const char *value);
+    Value &operator+=(const HardCoded &value);
     Value &operator+=(double value);
 
     /**
@@ -191,6 +194,7 @@ public:
     Value &operator-=(char value);
     Value &operator-=(const std::string &value);
     Value &operator-=(const char *value);
+    Value &operator-=(const HardCoded &value);
     Value &operator-=(double value);
     
     /**
@@ -206,6 +210,7 @@ public:
     Value &operator*=(char value);
     Value &operator*=(const std::string &value);
     Value &operator*=(const char *value);
+    Value &operator*=(const HardCoded &value);
     Value &operator*=(double value);
 
     /**
@@ -221,6 +226,7 @@ public:
     Value &operator/=(char value);
     Value &operator/=(const std::string &value);
     Value &operator/=(const char *value);
+    Value &operator/=(const HardCoded &value);
     Value &operator/=(double value);
 
     /**
@@ -236,6 +242,7 @@ public:
     Value &operator%=(char value);
     Value &operator%=(const std::string &value);
     Value &operator%=(const char *value);
+    Value &operator%=(const HardCoded &value);
     Value &operator%=(double value);
     
     /**
@@ -251,6 +258,7 @@ public:
     Value operator+(char value);
     Value operator+(const std::string &value);
     Value operator+(const char *value);
+    Value operator+(const HardCoded &value);
     Value operator+(double value);
 
     /**
@@ -266,6 +274,7 @@ public:
     Value operator-(char value);
     Value operator-(const std::string &value);
     Value operator-(const char *value);
+    Value operator-(const HardCoded &value);
     Value operator-(double value);
 
     /**
@@ -281,6 +290,7 @@ public:
     Value operator*(char value);
     Value operator*(const std::string &value);
     Value operator*(const char *value);
+    Value operator*(const HardCoded &value);
     Value operator*(double value);
 
     /**
@@ -296,6 +306,7 @@ public:
     Value operator/(char value);
     Value operator/(const std::string &value);
     Value operator/(const char *value);
+    Value operator/(const HardCoded &value);
     Value operator/(double value);
 
     /**
@@ -311,18 +322,19 @@ public:
     Value operator%(char value);
     Value operator%(const std::string &value);
     Value operator%(const char *value);
+    Value operator%(const HardCoded &value);
     Value operator%(double value);
     
     /**
      *  Comparison operators for hardcoded strings
      *  @param  value
      */
-    bool operator==(const char *value) const { return stringValue() == value; }
-    bool operator!=(const char *value) const { return stringValue() != value; }
-    bool operator<=(const char *value) const { return stringValue() <= value; }
-    bool operator>=(const char *value) const { return stringValue() >= value; }
-    bool operator< (const char *value) const { return stringValue() <  value; }
-    bool operator> (const char *value) const { return stringValue() >  value; }
+    bool operator==(const char *value) const { return ::strcmp(rawValue(), value) == 0; }
+    bool operator!=(const char *value) const { return ::strcmp(rawValue(), value) != 0; }
+    bool operator<=(const char *value) const { return ::strcmp(rawValue(), value) <= 0; }
+    bool operator>=(const char *value) const { return ::strcmp(rawValue(), value) >= 0; }
+    bool operator< (const char *value) const { return ::strcmp(rawValue(), value) <  0; }
+    bool operator> (const char *value) const { return ::strcmp(rawValue(), value) >  0; }
 
     /**
      *  Comparison operators
@@ -372,12 +384,20 @@ public:
     bool isObject()     const { return type() == Type::Object; }
     bool isArray()      const { return type() == Type::Array; }
     bool isCallable()   const;
+
+    /**
+     *  Get access to the raw buffer - you can use this for direct reading and
+     *  writing to and from the buffer. Note that this only works for string
+     *  variables - other variables return nullptr
+     *  @return char *
+     */
+    char *buffer() const;
     
     /**
-     *  Is the variable empty?
-     *  @return bool
+     *  Get access to the raw buffer for read operationrs.
+     *  @return const char *
      */
-    bool isEmpty() const;
+    const char *rawValue() const;
     
     /**
      *  Retrieve the value as number
@@ -396,14 +416,6 @@ public:
      *  @return bool
      */
     bool boolValue() const;
-    
-    /**
-     *  Retrieve the raw string value
-     *  Warning: Only use this for NULL terminated strings, or use it in combination 
-     *  with the string size to prevent that you access data outside the buffer
-     *  @return const char *
-     */
-    const char *rawValue() const;
     
     /**
      *  Retrieve the value as a string
@@ -529,6 +541,17 @@ public:
      *  @return bool
      */
     bool contains(const char *key, int size) const;
+
+    /**
+     *  Is a certain key set in the array
+     *  @param  key
+     *  @param  size
+     *  @return bool
+     */
+    bool contains(const char *key) const
+    {
+        return contains(key, strlen(key));
+    }
     
     /**
      *  Cast to a number

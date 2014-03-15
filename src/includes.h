@@ -46,6 +46,7 @@
  */
 #include "../include/exception.h"
 #include "../include/type.h"
+#include "../include/hardcoded.h"
 #include "../include/value.h"
 #include "../include/array.h"
 #include "../include/object.h"
