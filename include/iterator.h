@@ -128,7 +128,7 @@ private:
      *  @param  int_key
      *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
      */
-    static int key(struct _zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key);
+    static int key(struct _zend_object_iterator *iter, char **str_key, unsigned int *str_key_len, unsigned long *int_key);
 
     /**
      *  Step forwards to the next element
