@@ -13,29 +13,6 @@
 namespace Php {
 
 /**
- *  Function that is called to clean up space that is occupied by the object
- *  @param  object      The object to be deallocated
- */
-static void deallocate_object(void *object TSRMLS_DC)
-{
-    // allocate memory for the object
-    MixedObject *obj = (MixedObject *)object;
-    
-    // deallocate the cpp object
-    if (obj->cpp) delete obj->cpp;
-    
-    // get rid of the object properties
-    // @todo if we enable the following two lines, segmentation
-    //      faults and memory corruption occurs. however, the online
-    //      documentation does it like this
-    //zend_hash_destroy(obj->php.properties);
-    //FREE_HASHTABLE(obj->php.properties);
-
-    // deallocate the entire object
-    efree(obj);
-}
-
-/**
  *  Store the object in the PHP object cache
  *  @param  entry               Class entry
  *  @return MixedObject
@@ -71,10 +48,20 @@ MixedObject *Base::store(zend_class_entry *entry)
 
     // the destructor and clone handlers are set to NULL. I dont know why, but they do not
     // seem to be necessary...
-    _handle = zend_objects_store_put(result, NULL, deallocate_object, NULL TSRMLS_CC);
+    _handle = zend_objects_store_put(result, (zend_objects_store_dtor_t)ClassBase::destructObject, (zend_objects_free_object_storage_t)ClassBase::freeObject, NULL TSRMLS_CC);
     
     // done
     return result;
+}
+
+/**
+ *  Overridable method that is called right before an object is destructed
+ */
+void Base::__destruct() const
+{
+    // throw exception, so that the PHP-CPP library will check if the user
+    // somehow registered an explicit __destruct method
+    throw NotImplemented();
 }
 
 /**

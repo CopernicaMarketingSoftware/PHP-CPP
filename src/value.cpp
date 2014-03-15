@@ -74,7 +74,7 @@ Value::Value(int32_t value)
 }
 
 /**
- *  Constructor based on long value
+ *  Constructor based on int64_t value
  *  @param  value
  */
 Value::Value(int64_t value)
@@ -167,6 +167,21 @@ Value::Value(struct _zval_struct *val, bool ref)
     
     // make this a reference
     Z_SET_ISREF_P(_val);
+}
+
+/**
+ *  Wrap around a hash table
+ *  @param  ht          Hashtable to wrap
+ */
+Value::Value(HashTable *ht)
+{
+    // construct a zval
+    MAKE_STD_ZVAL(_val);
+    Z_ARRVAL_P(_val) = ht;
+    Z_TYPE_P(_val) = IS_ARRAY;
+
+    // add a reference
+    Z_ADDREF_P(_val);
 }
 
 /**
@@ -302,6 +317,9 @@ Value::~Value()
  */
 zval *Value::detach()
 {
+    // leap out if already detached
+    if (!_val) return nullptr;
+    
     // copy return value
     zval *result = _val;
     
@@ -313,6 +331,50 @@ zval *Value::detach()
     
     // done
     return result;
+}
+
+/**
+ *  Attach a different zval
+ * 
+ *  This will first detach the current zval, and link the Value object to 
+ *  a different zval.
+ * 
+ *  @param  val
+ */
+void Value::attach(struct _zval_struct *val)
+{
+    // detach first
+    if (_val) detach();
+    
+    // store the zval
+    _val = val;
+    
+    // add one more reference
+    Z_ADDREF_P(_val);
+}
+
+/**
+ *  Attach a different zval
+ * 
+ *  This will first detach the current zval, and link the Value object to 
+ *  a new zval
+ * 
+ *  @param  hashtable
+ */
+void Value::attach(struct _hashtable *hashtable)
+{
+    // detach first
+    if (_val) detach();
+
+    // construct a new zval
+    MAKE_STD_ZVAL(_val);
+    
+    // store pointer to the hashtable, and mark the zval as an array
+    Z_ARRVAL_P(_val) = hashtable;
+    Z_TYPE_P(_val) = IS_ARRAY;
+
+    // add a reference
+    Z_ADDREF_P(_val);
 }
 
 /**
@@ -1353,7 +1415,7 @@ Value Value::clone(Type type) const
  *  Retrieve the value as integer
  *  @return long
  */
-long Value::numericValue() const
+int64_t Value::numericValue() const
 {
     // already a long?
     if (isNumeric()) return Z_LVAL_P(_val);

@@ -36,6 +36,7 @@
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>
 #include <phpcpp/global.h>
+#include <phpcpp/super.h>
 #include <phpcpp/hashmember.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/modifiers.h>

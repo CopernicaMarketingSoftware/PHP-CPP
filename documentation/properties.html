@@ -2,22 +2,274 @@
 <p>
     When you define a class completely in PHP, you can add properties (member 
     variables) to it. When you add member variables to a native C++ class however, 
-    you better use regular C++ member variables for that, instead of PHP variables.
+    you better use regular native member variables for that, instead of PHP variables.
     Native variables have an immensely better performance than PHP variables,
     and it would be insane to store integers or strings in Php::Value objects
     if you can store them in int's and std::string objects as well.
 </p>
+<h2 id="normal-members">Normal member variables</h2>
 <p>
-    To access these member variables you could create getX() and setX()
-    methods, or alternatively implement __get() and __set() methods if you 
-    want to make your native member variables look like public or protected 
-    properties.
+    It is difficult to imagine that someone in the world would like to create
+    a native class, with regular non-typed public PHP properties on it. However,
+    if you insist, you can use the PHP-CPP library for this. Let's take an example
+    class in PHP, and see what it would look like in C++.
 </p>
 <p>
-    I can not imagine that there is anyone in the world who would like to create
-    a native class, with regular public PHP properties on it. But still, in this 
-    article we explain how you can do that.
+<pre class="language-php"><code>
+&lt;?php
+/**
+ *  PHP example class
+ */
+class Example
+{
+    /**
+     *  Define a public property
+     */
+    public $property1;
+
+    /**
+     *  Constructor
+     */
+    public function __construct()
+    {
+        // initialize the property
+        $this->property1 = "xyz";
+    }
+    
+    /**
+     *  Example method
+     */
+    public function method()
+    {
+        // do something with the public property (like changing it)
+        $this->property = "abc";
+    }
+}
+
+// create an instance
+$example = new Example();
+
+// overwrite the public property
+$example->property1 = "new value";
+
+?&gt;
+</code></pre>
 </p>
 <p>
-    ... this article is not finished yet
+    The above example creates a class with one public property. This property
+    can be accessed by the Example class, and because it is public also by
+    everyone else, as is shown in the example. If you like such classes, you can 
+    write something similar with PHP-CPP.
 </p>
+<p>
+<pre class="language-cpp"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  C++ Example class
+ */
+class Example : public Php::Base
+{
+public:
+    /**
+     *  c++ constructor
+     */
+    Example() {}
+    
+    /**
+     *  c++ destructor
+     */
+    virtual ~Example() {}
+    
+    /**
+     *  php "constructor"
+     *  @param  params
+     */
+    void __construct()
+    {
+        // get self reference as Php::Value object
+        Php::Value self(this);
+        
+        // initialize a public property
+        self["property1"] = "xyz";
+    }
+    
+    /**
+     *  Example method
+     */
+    void method()
+    {
+        // get self reference as Php::Value object
+        Php::Value self(this);
+
+        // overwrite the property
+        self["property1"] = "abc";
+    }
+};
+
+/**
+ *  Switch to C context so that the get_module() function can be
+ *  called by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function for the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Example&gt; example("Example");
+        
+        // register the methods
+        example.method("__construct", &amp;Example::__construct);
+        example.method("method", &amp;Example::method);
+        
+        // the Example class has one public property
+        example.property("property1", "xyz", Php::Public);
+        
+        // add the class to the extension
+        myExtension.add(std::move(example));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The example code shows how you initialize the properties inside
+    the get_module() function.
+</p>
+<p>
+    Instead of public properties, you can also define private or protected
+    properties, but even that is probably not what you want, as storing 
+    data in native C++ variables is much faster.
+</p>
+<h2>Smart properties</h2>
+<p>
+    With the <a href="magic-methods">magic methods __get() and __set()</a> you
+    can make more advanced properties that are directly mapped to C++
+    variables, and that allow you to perform additional checks when a property
+    is overwritten, so that an object always remains in a valid state.
+</p>
+<p>
+    On top of that, with the PHP-CPP library you can also assign getter and
+    setter methods to properties. Every time a property is accessed, your getter
+    or setter method is automatically called.
+</p>
+<p>
+<pre class="language-cpp"><code>
+#include &lt;phpcpp.h&gt;
+
+/**
+ *  C++ Example class
+ */
+class Example : public Php::Base
+{
+private:
+    /**
+     *  Example property
+     *  @var    int
+     */
+    int _value = 0;
+    
+    
+public:
+    /**
+     *  c++ constructor
+     */
+    Example() {}
+    
+    /**
+     *  c++ destructor
+     */
+    virtual ~Example() {}
+    
+    /**
+     *  Method to get access to the property
+     *  @return Php::Value
+     */
+    Php::Value getValue() const
+    {
+        return _value;
+    }
+    
+    /**
+     *  Method to overwrite the property
+     *  @param  value
+     */
+    void setValue(const Php::Value &amp;value)
+    {
+        // overwrite property
+        _value = value;
+        
+        // sanity check: the value should never exceed 100
+        if (_value > 100) _value = 100;
+    }
+        
+    /**
+     *  Method to retrieve the double property value
+     *  @return Php::Value
+     */
+    Php::Value getDouble() const
+    {
+        return _value * 2;
+    }
+};
+
+/**
+ *  Switch to C context so that the get_module() function can be
+ *  called by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function for the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Example&gt; example("Example");
+        
+        // register the "value" property, with the methods to get and set it
+        example.property("value", &amp;Example::getValue, &amp;Example::setValue);
+        
+        // register a read-only "double" property, with a method to get it
+        example.property("double", &amp;Example::getDouble);
+        
+        // add the class to the extension
+        myExtension.add(std::move(example));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The following PHP script uses this. It created an example object, sets the
+    value property to 500 (which is not allowed, values higher than 100 are 
+    rounded to 100), and then it reads out the double value.
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// create object
+$object = new Example();
+
+// set the value
+$object->value = 500;
+
+// show the double value
+echo($object->double."\n");
+
+// update the double value
+// (this will trigger an error, this is a read-only property)
+$object->double = 300;
+?&gt;
+</code></pre>

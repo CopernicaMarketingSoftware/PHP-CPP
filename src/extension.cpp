@@ -117,7 +117,7 @@ int Extension::onStartup(int type, int module_number)
     
     // is the callback registered?
     if (extension->_onStartup) extension->_onStartup();
-    
+
     // done
     return BOOL2SUCCESS(true);
 }

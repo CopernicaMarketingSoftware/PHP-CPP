@@ -55,6 +55,7 @@
 #include "../include/byval.h"
 #include "../include/byref.h"
 #include "../include/global.h"
+#include "../include/super.h"
 #include "../include/hashmember.h"
 #include "../include/parameters.h"
 #include "../include/modifiers.h"
@@ -82,13 +83,14 @@
 #include "method.h"
 #include "member.h"
 #include "nullmember.h"
-#include "longmember.h"
+#include "numericmember.h"
 #include "boolmember.h"
 #include "stringmember.h"
 #include "floatmember.h"
 #include "arithmetic.h"
 #include "origexception.h"
 #include "notimplemented.h"
+#include "property.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

@@ -43,7 +43,7 @@ public:
     HashMember &operator=(const Value &value)
     {
         // set property in parent array
-        _base.set(_index, value);
+        _base->set(_index, value);
 
         // if there is a parent, it should sets its value too
         if (_parent) _parent->operator=(_base);
@@ -58,7 +58,7 @@ public:
      */
     Value value() const
     {
-        return _base.get(_index);
+        return _base->get(_index);
     }
 
     /**
@@ -67,7 +67,7 @@ public:
      */
     operator Value () const
     {
-        return _base.get(_index);
+        return _base->get(_index);
     }
 
     /**
@@ -76,7 +76,7 @@ public:
      */
     operator int16_t () const
     {
-        return _base.get(_index).numericValue();
+        return _base->get(_index).numericValue();
     }
 
     /**
@@ -85,7 +85,7 @@ public:
      */
     operator int32_t () const
     {
-        return _base.get(_index).numericValue();
+        return _base->get(_index).numericValue();
     }
 
     /**
@@ -94,7 +94,7 @@ public:
      */
     operator int64_t () const
     {
-        return _base.get(_index).numericValue();
+        return _base->get(_index).numericValue();
     }
     
     /**
@@ -103,7 +103,7 @@ public:
      */
     operator bool () const
     {
-        return _base.get(_index).boolValue();
+        return _base->get(_index).boolValue();
     }
     
     /**
@@ -112,7 +112,7 @@ public:
      */
     operator std::string () const
     {
-        return _base.get(_index).stringValue();
+        return _base->get(_index).stringValue();
     }
     
     /**
@@ -121,7 +121,7 @@ public:
      */
     operator const char * () const
     {
-        return _base.get(_index).rawValue();
+        return _base->get(_index).rawValue();
     }
     
     /**
@@ -130,7 +130,7 @@ public:
      */
     operator double () const
     {
-        return _base.get(_index).decimalValue();
+        return _base->get(_index).decimalValue();
     }
     
     /**
@@ -141,7 +141,7 @@ public:
      */
     HashMember operator[](int index)
     {
-        return _base.get(_index)[index].add(this);
+        return _base->get(_index)[index].add(this);
     }
 
     /**
@@ -152,7 +152,7 @@ public:
      */
     HashMember operator[](const std::string &key)
     {
-        return _base.get(_index)[key].add(this);
+        return _base->get(_index)[key].add(this);
     }
 
     /**
@@ -163,7 +163,7 @@ public:
      */
     HashMember operator[](const char *key)
     {
-        return _base.get(_index)[key].add(this);
+        return _base->get(_index)[key].add(this);
     }
 
     /**
@@ -359,7 +359,7 @@ private:
      *  @param  base    Base value
      *  @param  index   Index in the array
      */
-    HashMember(const Value *base, Type index) : _base(*base), _index(index) {}
+    HashMember(Value *base, Type index) : _base(base), _index(index) {}
     
     // @todo add move constructor
     
@@ -390,7 +390,7 @@ private:
      *  Base value
      *  @var Value
      */
-    Value _base;
+    Value *_base;
     
     /**
      *  Parent member (in case of nested members)

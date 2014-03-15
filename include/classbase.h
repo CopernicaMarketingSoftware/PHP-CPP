@@ -52,10 +52,19 @@ typedef Value   (Base::*method_callback_6)() const;
 typedef Value   (Base::*method_callback_7)(Parameters &) const;
 
 /**
+ *  Signatures for getters and setters
+ */
+typedef Value   (Base::*getter_callback_0)();
+typedef Value   (Base::*getter_callback_1)() const;
+typedef void    (Base::*setter_callback_0)(const Php::Value &value);
+typedef void    (Base::*setter_callback_1)(const Php::Value &value) const;
+
+/**
  *  Forward declarations
  */
 class Method;
 class Member;
+class Property;
 
 /**
  *  Class definition
@@ -87,6 +96,7 @@ public:
         _type(that._type), 
         _methods(that._methods), 
         _members(that._members), 
+        _properties(that._properties),
         _entry(nullptr) {}
 
     /**
@@ -98,6 +108,7 @@ public:
         _type(that._type), 
         _methods(std::move(that._methods)), 
         _members(std::move(that._members)), 
+        _properties(std::move(that._properties)),
         _entry(that._entry) 
     {
         // other entry are invalid now (not that it is used..., class objects are
@@ -271,6 +282,19 @@ protected:
     void property(const char *name, const char *value, int flags = Php::Public);
     void property(const char *name, double value, int flags = Php::Public);
 
+    /**
+     *  Set property with callbacks
+     *  @param  name        Name of the property
+     *  @param  getter      Getter method
+     *  @param  setter      Setter method
+     */
+    void property(const char *name, const getter_callback_0 &getter);
+    void property(const char *name, const getter_callback_1 &getter);
+    void property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter);
+    void property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter);
+    void property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter);
+    void property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter);
+
 private:
     /**
      *  Retrieve an array of zend_function_entry objects that hold the 
@@ -283,6 +307,14 @@ private:
     const struct _zend_function_entry *entries();
 
     /**
+     *  Helper method to turn a property into a zval
+     *  @param  value
+     *  @param  type
+     *  @return Value
+     */
+    static struct _zval_struct *toZval(Value &&value, int type);
+
+    /**
      *  Static member functions to create or clone objects based on this class
      *  @param  entry                   Pointer to class information
      *  @param  val                     The object to be cloned
@@ -290,6 +322,8 @@ private:
      */
     static struct _zend_object_value createObject(struct _zend_class_entry *entry);
     static struct _zend_object_value cloneObject(struct _zval_struct *val);
+    static void destructObject(struct _zend_object *object, unsigned int handle);
+    static void freeObject(struct _zend_object *object);
 
     /**
      *  Static member function that get called when a method or object is called
@@ -502,6 +536,18 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
+    
+    /**
+     *  Map of dynamically accessible properties
+     *  @var    std::map
+     */
+    std::map<std::string,std::shared_ptr<Property>> _properties;
+    
+    /**
+     *  Base object has access to the members
+     *  This is needed by the Base::store() method
+     */
+    friend class Base;
 };
     
 /**
