@@ -63,6 +63,40 @@ public:
         }
     }
     
+    void loopValue(Php::Parameters &params)
+    {
+        std::cout << "\nArray/Object contains " << params[0].size() << " items" << std::endl;
+    
+        // Preferred variant
+        // Value::iterator& Value::end() is called only once
+        Php::Value v;
+        for(auto &i: params[0]) {
+            std::cout << std::endl << "["<< i.ind() << "]:["<< i.key() << "]="<< i.value() << "\t\t\t\t| \t"<< i.typestr();
+            //v = i.value();
+        }
+        
+        std::cout << std::endl << "____________________________________________";
+
+        // Possible variant
+        // Value::iterator& Value::end() is called with each iteration
+        for (auto it=params[0].begin(); it!=params[0].end(); it++) {
+            //std::cout << it->key() << ' ' << it->value() << "\t | \t"<< it->typestr() << '\n';
+            std::cout << std::endl << "["<< it->ind() << "]:["<< it->key() << "]="<< it->value() << "\t | \t"<< it->typestr();
+        }
+
+        std::cout << std::endl << "____________________________________________";
+        std::cout << std::endl << "____________Recursive iterations____________";
+
+        for(auto &i: params[0]) {
+            v = i.value();
+            std::cout << std::endl << "["<< i.ind() << "]:["<< i.key() << "]="<< v << "\t\t\t\t| \t"<< i.typestr();
+            for(auto &j: v) {
+                std::cout << std::endl << "\t["<< j.ind() << "]:["<< j.key() << "]="<< j.value() << "\t\t\t\t| \t"<< j.typestr();
+            }
+        }
+        std::cout << std::endl;
+    }
+    
     Php::Value myMethod(Php::Parameters &params)
     {
         // check number of parameters
@@ -140,6 +174,9 @@ extern "C"
             Php::ByVal("arr", Php::Type::Array)
         });
         customClass.method("loopObject", &MyCustomClass::loop, {
+            Php::ByVal("obj", Php::Type::Object)
+        });
+        customClass.method("loopValueObject", &MyCustomClass::loopValue, {
             Php::ByVal("obj", Php::Type::Object)
         });
         

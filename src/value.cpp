@@ -293,6 +293,7 @@ Value::~Value()
 {
     // ignore if moved
     if (!_val) return;
+    //std::cout << "\x1b[1;35m\n Value::~Value() \n\x1b[0;0m";
     
     // if there were two references or less, we're going to remove a reference
     // and only one reference will remain, the object will then impossible be
@@ -302,6 +303,9 @@ Value::~Value()
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
     zval_ptr_dtor(&_val);
+
+    // delete ValueIterator pointer
+    if(_hashitem) delete _hashitem;
 }
 
 /**
@@ -1653,6 +1657,104 @@ std::map<std::string,Php::Value> Value::mapValue() const
 }
 
 /**
+ *  Iterator to beginning
+ *  @return ValueIterator
+ */
+Value::iterator Value::begin()
+{
+    // if already exist
+    if(_hashitem) return _hashitem;
+
+    // check type
+    if (isArray())
+    {
+        // get access to the hast table
+        HashTable *arr = Z_ARRVAL_P(_val);
+        
+        return (_hashitem = new HashItemArray(arr));
+    }
+    else if (isObject())
+    {
+        zend_class_entry *ce = zend_get_class_entry(_val);
+
+        // If the object class implements iterator or traversable
+        if(ce->get_iterator)
+        {
+            
+            // if this object is an instance of a class that implements the Iterator (PHP-interface)
+            if(ce->iterator_funcs.funcs)
+            {
+                return (_hashitem = new HashItemIterator(ce, _val));
+            }
+            //if this object is an instance of a class that implements the Traversable (PHP-interface)
+            else 
+            {
+                return (_hashitem = new HashItemTraversable(ce, _val));
+            }
+
+        }
+        else 
+        {
+            // get access to the hast table
+            HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
+
+            return (_hashitem = new HashItemObject(arr));
+        }
+        
+    }
+
+    // for no-iterable types
+    return nullptr;
+}
+
+/**
+ *  Iterator to end
+ *  @return ValueIterator
+ */
+Value::iterator Value::end() const 
+{
+    return nullptr;
+}
+
+/**
+ *  Reverse Iterator to beginning
+ *  @return ValueIterator
+ */
+Value::iterator Value::rbegin()
+{
+    // if already exist
+    if(_hashitem) return _hashitem;
+
+    // check type
+    if (isArray())
+    {
+        // get access to the hast table
+        HashTable *arr = Z_ARRVAL_P(_val);
+        
+        return (_hashitem = new HashItemArrayReverse(arr));
+    }
+    else if (isObject())
+    {
+        // get access to the hast table
+        HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
+
+        return (_hashitem = new HashItemObjectReverse(arr));
+    }
+
+    // for no-iterable types
+    return nullptr;
+}
+
+/**
+ *  Reverse Iterator to end
+ *  @return ValueIterator
+ */
+Value::iterator Value::rend() const 
+{
+    return nullptr;
+}
+    
+/**
  *  Does the array contain a certain index?
  *  @param  index
  *  @return bool
@@ -1801,6 +1903,10 @@ const Value &Value::set(int index, const Value &value)
     zval **current;
     
     // check if this index is already in the array, otherwise we return NULL
+    /*
+    * may be zend_hash_index_exists(Z_ARRVAL_P(_val), index); ?
+    * What is the purpose of the following construction?
+    */
     if (isArray() && zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&current) != FAILURE)
     {
         // skip if nothing is going to change
@@ -1864,6 +1970,10 @@ const Value &Value::set(const char *key, int size, const Value &value)
     zval **current;
     
     // check if this index is already in the array, otherwise we return NULL
+    /*
+    * may be zend_hash_exists(Z_ARRVAL_P(_val), key, size + 1); ?
+    * What is the purpose of the following construction?
+    */
     if (isArray() && zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&current) != FAILURE)
     {
         // skip if nothing is going to change

@@ -19,14 +19,21 @@
  */
 
 /**
- *  Forward definitions
+ *  Forward declarations
  */
 struct _zval_struct;
+struct _zend_class_entry;
 
 /**
  *  Set up namespace
  */
 namespace Php {
+
+/**
+ *  Forward declaration
+ */
+class ValueIterator;
+class HashItem;
 
 /**
  *  Forward definitions
@@ -840,6 +847,35 @@ public:
         return dynamic_cast<T*>(base);
     }
 
+    /**
+     *  Embed type `iterator` in class Value.
+     */
+    typedef ValueIterator iterator;
+    
+    /**
+     *  Iterator to beginning
+     *  @return ValueIterator
+     */
+    iterator begin();
+
+    /**
+     *  Iterator to end
+     *  @return ValueIterator
+     */
+    iterator end() const;
+    
+    /**
+     *  Reverse Iterator to beginning
+     *  @return ValueIterator
+     */
+    iterator rbegin();
+
+    /**
+     *  Reverse Iterator to end
+     *  @return ValueIterator
+     */
+    iterator rend() const;
+
 private:
     /**
      *  Call function with a number of parameters
@@ -864,13 +900,21 @@ private:
      */
     int refcount();
 
+
+    /**
+     *  HashItem pointer
+     *  Pointer to a position in the embedded array (if the internal array does not exist, then nullptr).
+     *  @var HashItem*
+     */
+     HashItem *_hashitem = nullptr;
+
 protected:
     /**
      *  The wrapped zval
      *  @var struct zval
      */
     struct _zval_struct *_val;
-    
+
     /**
      *  Detach the zval
      * 
