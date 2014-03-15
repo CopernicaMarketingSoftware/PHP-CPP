@@ -141,6 +141,119 @@ Php::Value myFunction(const Php::Value &amp;value)
     can become complicated, but for you, the extension programmer, there is
     nothing to worry about.
 </p>
+<h2 id="strings">Strings</h2>
+<p>
+    Strings can be easily stored in Php::Value objects. It is so easy to
+    assign a string to a Php::Value, or to cast a Php::Value into a string,
+    that any explanation hardly is necessary. Normally, the assignment operators 
+    and casting operators are sufficient. When performance is an issue however, 
+    you may consider to get direct access to the internal buffer inside the 
+    Php::Value object.
+</p>
+<p>
+    When a Php::Value is casted to a std::string, the entire string contents
+    are copied from the Php::Value object to the std::string object. 
+    If you do not want to make such a full copy, you can cast the value to a 
+    const char * instead. This gives you direct access to the buffer inside
+    the Php::Value object. The size of the string can be retrieved with the size() 
+    method. But you must realize that once the Php::Value gets out of scope,
+    the pointer to the buffer is no longer guaranteed to be valid.
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Example function
+ *  @param  params
+ */
+void myFunction(Parameters &amp;params)
+{
+    // store the first parameter in a std::string (the entire string 
+    // buffer is copied from the Php::Value object to the std::string)
+    std::string var1 = params[0];
+    
+    // it also is possible to cast the object into a const char *. This works
+    // too, but the buffer is only valid for as long as the Php::Value object
+    // stays in scope
+    const char *var2 = params[0];
+    size_t var2size = params[0].size();
+}
+</code></pre>
+</p>
+<p>
+    It also is possible to directly write to the internal Php::Value buffer.
+    When you assign a string to a Php::Value object, the entire string buffer
+    is copied too. It does not matter if the string that you assign is a 
+    std::string or a char*: a copy is always made. For small things, this hardly 
+    is an issue and it would make your code much less readable if you did it 
+    differently. But if you have to copy many bytes, you can better get direct 
+    access to the buffer.
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Example function to read bytes from a filedescriptor, and
+ *  return it as a Php::Value object
+ *
+ *  @param  fd          Filedescriptor
+ *  @return Php::Value
+ */
+Php::Value readExample1(int fd)
+{
+    // buffer to read the bytes in
+    char buffer[4096];
+    
+    // read the buffer
+    ssize_t bytes = read(fd, buffer, 4096);
+    if (bytes &lt; 0) bytes = 0;
+    
+    // convert the buffer to a Php::Value object and return it
+    return Php::Value(buffer, bytes);
+}
+
+/**
+ *  Another example function, that does the same as the previous
+ *  function, but now it reads the bytes directly into a Php::Value
+ *  buffer, and does not use an intermediate buffer.
+ *
+ *  @param  fd          Filedescriptor
+ *  @param  Php::Value
+ */
+Php::Value readExample2(int fd)
+{
+    // result variable
+    Php::Value result;
+    
+    // resize the buffer to 4096 bytes, the resize() method resizes
+    // the internal buffer to the appropriate size, and returns a pointer
+    // to the buffer
+    char *buffer = result.resize(4096);
+    
+    // read in the bytes directly into the just allocated buffer
+    ssize_t bytes = read(fd, buffer, 4096);
+    if (bytes &lt; 0) bytes = 0;
+    
+    // resize the buffer to the actual number of bytes in it (this
+    // is necessary, otherwise the PHP strlen() returns 4096 even
+    // when less bytes were available
+    result.resize(bytes);
+    
+    // return the result
+    return result;
+}
+</code></pre>
+</p>
+<p>
+    The first example function is easier to read. The read() system call is 
+    used to fill a local buffer with bytes. This local buffer is then converted
+    to a Php::Value object and returned.
+</p>
+<p>
+    The second example function is more efficient, because the read() system
+    call now immediately reads the bytes into the buffer of the Php::Value
+    object, and not into a temporary buffer. As a programmer, you must choose
+    between one of these algorithms depending on your needs: easy code or more
+    efficient code.
+</p>
 <h2 id="arrays">Arrays</h2>
 <p>
     PHP supports two array types: regular arrays (indexed by numbers) and
