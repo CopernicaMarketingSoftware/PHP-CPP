@@ -22,7 +22,7 @@
  * 
  * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013, 2014 Copernica BV
  */
 #include "includes.h"
 
@@ -130,17 +130,6 @@ Value::Value(const char *value, int size)
 }
 
 /**
- *  Contructor based on hardcoded string that does not have to be copied
- *  @param  value
- */
-Value::Value(const HardCoded &value)
-{
-    // create a string zval
-    MAKE_STD_ZVAL(_val);
-    ZVAL_STRINGL(_val, value.buffer(), value.size(), 0);
-}
-
-/**
  *  Constructor based on decimal value
  *  @param  value
  */
@@ -192,6 +181,7 @@ Value::Value(HashTable *ht)
     Z_TYPE_P(_val) = IS_ARRAY;
 
     // add a reference
+    // @todo this may be wrong
     Z_ADDREF_P(_val);
 }
 
@@ -240,6 +230,8 @@ Value::Value(const Value &that)
         // to the variable but have to allocate a new variable
         ALLOC_ZVAL(_val);
         INIT_PZVAL_COPY(_val, that._val);
+        
+        // we have to call the copy constructor to copy the entire other zval
         zval_copy_ctor(_val);
     }
     else
@@ -288,11 +280,8 @@ Value::Value(const Value &that)
  *  Move constructor
  *  @param  value
  */
-Value::Value(Value &&that)
+Value::Value(Value &&that) : _val(that._val)
 {
-    // just copy the zval
-    _val = that._val;
-
     // clear the other object
     that._val = nullptr;
 }
@@ -309,7 +298,7 @@ Value::~Value()
     // and only one reference will remain, the object will then impossible be
     // a reference
     if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
-    
+
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
     zval_ptr_dtor(&_val);
@@ -416,9 +405,6 @@ Value &Value::operator=(Value &&value)
         // keep the zval object, and copy the other value into it, get
         // the current refcount
         int refcount = Z_REFCOUNT_P(_val);
-        
-        // clean up the current zval (but keep the zval structure)
-        zval_dtor(_val);
         
         // make the copy
         *_val = *value._val;
@@ -674,26 +660,6 @@ Value &Value::operator=(const char *value)
     return *this;
 }
 
-/** 
- *  Assignment operator
- *  @param  value
- *  @return Value
- */
-Value &Value::operator=(const HardCoded &value)
-{
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
-
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new non-duplicated value
-    ZVAL_STRINGL(_val, value.buffer(), value.size(), 0);
-    
-    // update the object
-    return *this;
-}
-
 /**
  *  Assignment operator
  *  @param  value
@@ -727,7 +693,6 @@ Value &Value::operator+=(bool value)                { return Arithmetic<std::plu
 Value &Value::operator+=(char value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const std::string &value)  { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const char *value)         { return Arithmetic<std::plus>(this).assign(value); }
-Value &Value::operator+=(const HardCoded &value)    { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(double value)              { return Arithmetic<std::plus>(this).assign(value); }
 
 /**
@@ -743,7 +708,6 @@ Value &Value::operator-=(bool value)                { return Arithmetic<std::min
 Value &Value::operator-=(char value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const std::string &value)  { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const char *value)         { return Arithmetic<std::minus>(this).assign(value); }
-Value &Value::operator-=(const HardCoded &value)    { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(double value)              { return Arithmetic<std::minus>(this).assign(value); }
 
 /**
@@ -759,7 +723,6 @@ Value &Value::operator*=(bool value)                { return Arithmetic<std::mul
 Value &Value::operator*=(char value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const std::string &value)  { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const char *value)         { return Arithmetic<std::multiplies>(this).assign(value); }
-Value &Value::operator*=(const HardCoded &value)    { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(double value)              { return Arithmetic<std::multiplies>(this).assign(value); }
 
 /**
@@ -775,7 +738,6 @@ Value &Value::operator/=(bool value)                { return Arithmetic<std::div
 Value &Value::operator/=(char value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const std::string &value)  { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const char *value)         { return Arithmetic<std::divides>(this).assign(value); }
-Value &Value::operator/=(const HardCoded &value)    { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(double value)              { return Arithmetic<std::divides>(this).assign(value); }
 
 /**
@@ -792,7 +754,6 @@ Value &Value::operator%=(bool value)                { return operator=(numericVa
 Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
 Value &Value::operator%=(const char *value)         { return operator=(numericValue() % atoi(value)); }
-Value &Value::operator%=(const HardCoded &value)    { return operator=(numericValue() % atoi(value.buffer())); }
 Value &Value::operator%=(double value)              { return operator=(numericValue() % (int)value); }
 
 /**
@@ -808,7 +769,6 @@ Value Value::operator+(bool value)                  { return Arithmetic<std::plu
 Value Value::operator+(char value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const std::string &value)    { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const char *value)           { return Arithmetic<std::plus>(this).apply(value); }
-Value Value::operator+(const HardCoded &value)      { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(double value)                { return Arithmetic<std::plus>(this).apply(value); }
 
 /**
@@ -824,7 +784,6 @@ Value Value::operator-(bool value)                  { return Arithmetic<std::min
 Value Value::operator-(char value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const std::string &value)    { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const char *value)           { return Arithmetic<std::minus>(this).apply(value); }
-Value Value::operator-(const HardCoded &value)      { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(double value)                { return Arithmetic<std::minus>(this).apply(value); }
 
 /**
@@ -840,7 +799,6 @@ Value Value::operator*(bool value)                  { return Arithmetic<std::mul
 Value Value::operator*(char value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const std::string &value)    { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const char *value)           { return Arithmetic<std::multiplies>(this).apply(value); }
-Value Value::operator*(const HardCoded &value)      { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(double value)                { return Arithmetic<std::multiplies>(this).apply(value); }
 
 /**
@@ -856,7 +814,6 @@ Value Value::operator/(bool value)                  { return Arithmetic<std::div
 Value Value::operator/(char value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const std::string &value)    { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const char *value)           { return Arithmetic<std::divides>(this).apply(value); }
-Value Value::operator/(const HardCoded &value)      { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(double value)                { return Arithmetic<std::divides>(this).apply(value); }
 
 /**
@@ -872,7 +829,6 @@ Value Value::operator%(bool value)                  { return Value(numericValue(
 Value Value::operator%(char value)                  { return Value(numericValue() % value); }
 Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }
 Value Value::operator%(const char *value)           { return Value(numericValue() % atoi(value)); }
-Value Value::operator%(const HardCoded &value)      { return Value(numericValue() % atoi(value.buffer())); }
 Value Value::operator%(double value)                { return Value(numericValue() % (int)value); }
 
 /**
@@ -1481,6 +1437,26 @@ char *Value::buffer() const
     
     // already a string?
     return Z_STRVAL_P(_val);
+}
+
+/**
+ *  Reserve enough space
+ *  @param  size
+ *  @return char*
+ */
+char *Value::reserve(size_t size)
+{
+    // must be a string
+    setType(Type::String);
+ 
+    // leap ouf it the size if already big enough
+    if (Z_STRLEN_P(_val) >= (int)size) return Z_STRVAL_P(_val);
+    
+    // is there already a buffer?
+    if (!Z_STRVAL_P(_val)) return Z_STRVAL_P(_val) = (char *)emalloc(size);
+    
+    // reallocate an existing buffer
+    return Z_STRVAL_P(_val) = (char *)erealloc(Z_STRVAL_P(_val), size);
 }
 
 /**

@@ -189,7 +189,6 @@ public:
     HashMember &operator+=(char value)                  { return operator=(this->value() + value); }
     HashMember &operator+=(const std::string &value)    { return operator=(this->value() + value); }
     HashMember &operator+=(const char *value)           { return operator=(this->value() + value); }
-    HashMember &operator+=(const HardCoded &value)      { return operator=(this->value() + value); }
     HashMember &operator+=(double value)                { return operator=(this->value() + value); }
 
     /**
@@ -205,7 +204,6 @@ public:
     HashMember &operator-=(char value)                  { return operator=(this->value() - value); }
     HashMember &operator-=(const std::string &value)    { return operator=(this->value() - value); }
     HashMember &operator-=(const char *value)           { return operator=(this->value() - value); }
-    HashMember &operator-=(const HardCoded &value)      { return operator=(this->value() - value); }
     HashMember &operator-=(double value)                { return operator=(this->value() - value); }
     
     /**
@@ -221,7 +219,6 @@ public:
     HashMember &operator*=(char value)                  { return operator=(this->value() * value); }
     HashMember &operator*=(const std::string &value)    { return operator=(this->value() * value); }
     HashMember &operator*=(const char *value)           { return operator=(this->value() * value); }
-    HashMember &operator*=(const HardCoded &value)      { return operator=(this->value() * value); }
     HashMember &operator*=(double value)                { return operator=(this->value() * value); }
 
     /**
@@ -237,7 +234,6 @@ public:
     HashMember &operator/=(char value)                  { return operator=(this->value() / value); }
     HashMember &operator/=(const std::string &value)    { return operator=(this->value() / value); }
     HashMember &operator/=(const char *value)           { return operator=(this->value() / value); }
-    HashMember &operator/=(const HardCoded &value)      { return operator=(this->value() / value); }
     HashMember &operator/=(double value)                { return operator=(this->value() / value); }
 
     /**
@@ -253,7 +249,6 @@ public:
     HashMember &operator%=(char value)                  { return operator=(this->value() % value); }
     HashMember &operator%=(const std::string &value)    { return operator=(this->value() % value); }
     HashMember &operator%=(const char *value)           { return operator=(this->value() % value); }
-    HashMember &operator%=(const HardCoded &value)      { return operator=(this->value() % value); }
     HashMember &operator%=(double value)                { return operator=(this->value() % value); }
     
     /**
@@ -269,7 +264,6 @@ public:
     Value operator+(char value)                 { return this->value() + value; }
     Value operator+(const std::string &value)   { return this->value() + value; }
     Value operator+(const char *value)          { return this->value() + value; }
-    Value operator+(const HardCoded &value)     { return this->value() + value; }
     Value operator+(double value)               { return this->value() + value; }
 
     /**
@@ -285,7 +279,6 @@ public:
     Value operator-(char value)                 { return this->value() - value; }
     Value operator-(const std::string &value)   { return this->value() - value; }
     Value operator-(const char *value)          { return this->value() - value; }
-    Value operator-(const HardCoded &value)     { return this->value() - value; }
     Value operator-(double value)               { return this->value() - value; }
 
     /**
@@ -301,7 +294,6 @@ public:
     Value operator*(char value)                 { return this->value() * value; }
     Value operator*(const std::string &value)   { return this->value() * value; }
     Value operator*(const char *value)          { return this->value() * value; }
-    Value operator*(const HardCoded &value)     { return this->value() * value; }
     Value operator*(double value)               { return this->value() * value; }
 
     /**
@@ -317,7 +309,6 @@ public:
     Value operator/(char value)                 { return this->value() / value; }
     Value operator/(const std::string &value)   { return this->value() / value; }
     Value operator/(const char *value)          { return this->value() / value; }
-    Value operator/(const HardCoded &value)     { return this->value() / value; }
     Value operator/(double value)               { return this->value() / value; }
 
     /**
@@ -333,7 +324,6 @@ public:
     Value operator%(char value)                 { return this->value() % value; }
     Value operator%(const std::string &value)   { return this->value() % value; }
     Value operator%(const char *value)          { return this->value() % value; }
-    Value operator%(const HardCoded &value)     { return this->value() % value; }
     Value operator%(double value)               { return this->value() % value; }
     
     /**

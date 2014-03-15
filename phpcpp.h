@@ -27,7 +27,6 @@
  */
 #include <phpcpp/exception.h>
 #include <phpcpp/type.h>
-#include <phpcpp/hardcoded.h>
 #include <phpcpp/value.h>
 #include <phpcpp/array.h>
 #include <phpcpp/object.h>

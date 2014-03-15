@@ -144,17 +144,6 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value apply(const HardCoded &value)
-    {
-        // convert string to integer
-        return apply(atoi(value.buffer()));
-    }
-    
-    /**
-     *  Apply a string (representing a number), and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
     Value apply(double value)
     {
         return Value(F<double>()(_value->floatValue(), value));
