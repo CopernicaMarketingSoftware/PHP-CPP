@@ -78,11 +78,20 @@ bool HashPositionWrapper::isstr() const {
  */
 bool HashPositionWrapper::keyAccessible() const
 {
-    // Objects contain only string keys
+    // Regular objects contain only string keys. Object instance of stdClass can contain numeric keys.
     // But the fields with private/protected access key name missing
     // This hack and it might break in future versions of PHP.
     // @todo It would be good to redo it using regular Zend functions.
-    return ( '\0' != *(pos->arKey) );
+    
+    //return ( pos && pos->arKey &&'\0' != *(pos->arKey) );
+    return ( pos && 
+                    ( 
+                        !pos->nKeyLength || 
+                            (
+                                pos->arKey &&'\0' != *(pos->arKey)
+                            ) 
+                    ) 
+           );
 }
 
 /**
