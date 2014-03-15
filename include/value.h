@@ -379,18 +379,18 @@ public:
      *  variables - other variables return nullptr.
      * 
      *  If you are going to write to the buffer, make sure that you first call
-     *  the reserve() method to ensure that the buffer is big enough.
+     *  the resize() method to ensure that the buffer is big enough.
      *  
      *  @return char *
      */
     char *buffer() const;
     
     /**
-     *  Reserve enough space in the buffer. If you want to write directly to
-     *  the buffer (which is returned by the buffer() method), you should first
-     *  reserve enough space in it. This can be done with this reserve() method.
-     *  This will also turn the Value object into a string (if it was not 
-     *  already a string). The writable buffer is returned.
+     *  Resize buffer space. If you want to write directly to the buffer (which 
+     *  is returned by the buffer() method), you should first reserve enough 
+     *  space in it. This can be done with this resize() method. This will also 
+     *  turn the Value object into a string (if it was not already a string). 
+     *  The writable buffer is returned.
      * 
      *  @param  size
      *  @return char* 

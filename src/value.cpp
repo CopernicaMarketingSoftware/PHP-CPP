@@ -1449,14 +1449,24 @@ char *Value::reserve(size_t size)
     // must be a string
     setType(Type::String);
  
-    // leap ouf it the size if already big enough
-    if (Z_STRLEN_P(_val) >= (int)size) return Z_STRVAL_P(_val);
+    // is the current buffer too small?
+    if (Z_STRLEN_P(_val) < (int)size)
+    {
+        // is there already a buffer?
+        if (!Z_STRVAL_P(_val)) Z_STRVAL_P(_val) = (char *)emalloc(size+1);
+        
+        // reallocate an existing buffer
+        else Z_STRVAL_P(_val) = (char *)erealloc(Z_STRVAL_P(_val), size+1);
+
+        // last byte should be zero
+        Z_STRVAL_P(_val)[size] = 0;
+    }
     
-    // is there already a buffer?
-    if (!Z_STRVAL_P(_val)) return Z_STRVAL_P(_val) = (char *)emalloc(size);
+    // store size
+    Z_STRLEN_P(_val) = size;
     
-    // reallocate an existing buffer
-    return Z_STRVAL_P(_val) = (char *)erealloc(Z_STRVAL_P(_val), size);
+    // done
+    return Z_STRVAL_P(_val);
 }
 
 /**
