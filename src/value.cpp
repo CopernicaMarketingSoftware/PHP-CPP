@@ -749,15 +749,15 @@ Value &Value::operator/=(double value)              { return Arithmetic<std::div
  *  @param  value
  *  @return Value
  */
-Value &Value::operator%=(const Value &value)        { return operator=(numericValue() % value.numericValue()); }
-Value &Value::operator%=(int16_t value)             { return operator=(numericValue() % value); }
-Value &Value::operator%=(int32_t value)             { return operator=(numericValue() % value); }
-Value &Value::operator%=(int64_t value)             { return operator=(numericValue() % value); }
-Value &Value::operator%=(bool value)                { return operator=(numericValue() % value); }
-Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
-Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
-Value &Value::operator%=(const char *value)         { return operator=(numericValue() % atoi(value)); }
-Value &Value::operator%=(double value)              { return operator=(numericValue() % (int)value); }
+Value &Value::operator%=(const Value &value)        { Value *val = (Value *)(numericValue() % value.numericValue()); return operator=(val); }
+Value &Value::operator%=(int16_t value)             { return operator=((int16_t)(numericValue() % value)); }
+Value &Value::operator%=(int32_t value)             { return operator=((int32_t)(numericValue() % value)); }
+Value &Value::operator%=(int64_t value)             { return operator=((int64_t)(numericValue() % value)); }
+Value &Value::operator%=(bool value)                { return operator=((bool)(numericValue() % value)); }
+Value &Value::operator%=(char value)                { return operator=((char)(numericValue() % value)); }
+Value &Value::operator%=(const std::string &value)  { std::string *str = (std::string *)(numericValue() % atoi(value.c_str())); return operator=(str); }
+Value &Value::operator%=(const char *value)         { char *val = (char *)(numericValue() % atoi(value)); return operator=(val); }
+Value &Value::operator%=(double value)              { return operator=((double)(numericValue() % (int)value)); }
 
 /**
  *  Assignment operator
@@ -824,15 +824,15 @@ Value Value::operator/(double value)                { return Arithmetic<std::div
  *  @param  value
  *  @return Value
  */
-Value Value::operator%(const Value &value)          { return Value(numericValue() % value.numericValue()); }
-Value Value::operator%(int16_t value)               { return Value(numericValue() % value); }
-Value Value::operator%(int32_t value)               { return Value(numericValue() % value); }
-Value Value::operator%(int64_t value)               { return Value(numericValue() % value); }
-Value Value::operator%(bool value)                  { return Value(numericValue() % value); }
-Value Value::operator%(char value)                  { return Value(numericValue() % value); }
-Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }
-Value Value::operator%(const char *value)           { return Value(numericValue() % atoi(value)); }
-Value Value::operator%(double value)                { return Value(numericValue() % (int)value); }
+Value Value::operator%(const Value &value)          { Value *val = (Value *)(numericValue() % value.numericValue()); return val; }
+Value Value::operator%(int16_t value)               { return Value((int16_t)(numericValue() % value)); }
+Value Value::operator%(int32_t value)               { return Value((int32_t)(numericValue() % value)); }
+Value Value::operator%(int64_t value)               { return Value((int64_t)(numericValue() % value)); }
+Value Value::operator%(bool value)                  { return Value((bool)(numericValue() % value)); }
+Value Value::operator%(char value)                  { return Value((char)(numericValue() % value)); }
+Value Value::operator%(const std::string &value)    { std::string *str = (std::string *)(numericValue() % atoi(value.c_str())); return Value(str); }
+Value Value::operator%(const char *value)           { char *val = (char *)(numericValue() % atoi(value)); return Value(val); }
+Value Value::operator%(double value)                { return Value((double)(numericValue() % (int)value)); }
 
 /**
  *  Call the function in PHP
