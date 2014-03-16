@@ -46,7 +46,7 @@ Value call(const char *name, Params&&... params)
  */
 inline Value array_keys(const Value &value)                 { return call("array_keys", value); }
 inline Value array_values(const Value &value)               { return call("array_values", value); }
-inline Value empty(const Value &value)                      { return call("empty", value); }
+inline Value empty(const Value &value)                      { return value.isNull() || !value.boolValue(); }
 inline Value empty(const HashMember<std::string> &member)   { return !member.exists() || empty(member.value()); }
 inline Value empty(const HashMember<int> &member)           { return !member.exists() || empty(member.value()); }
 //inline Value isset(const Value &value)                      { return call("isset", value); }
