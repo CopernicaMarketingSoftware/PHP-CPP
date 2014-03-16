@@ -1,7 +1,7 @@
 /**
  *  valueiterator.h
  *
- *  ValueIterator - allows the iteration variable of type Value.
+ *  ValueIterator - allows the iteration variable of class Value.
  *  It designed for natural iteration objects, arrays and other iterable types. And have minimal overhead.
  *
  *  @copyright 2013 Copernica BV
@@ -17,43 +17,75 @@ namespace Php {
 class ValueIterator
 {
 public:
-    
-    /**
-     *  Constructor for empty ValueIterator.
-     *  Used to finish the iterations
-     */
-    ValueIterator(std::nullptr_t n) : phItem(nullptr) {}
 
     /**
      *  Constructor ValueIterator
      *  @param  arr HashTable
      */
-    ValueIterator(HashItem *phi): phItem(phi)
+    ValueIterator(HashItem *phi): ItemPos(phi)
     {
         phi->reset();
+    }
+    
+    /**
+     *  Constructor for empty ValueIterator.
+     *  Used to finish the iterations
+     */
+    ValueIterator(std::nullptr_t n) : ItemPos(nullptr) {}
+
+    /**
+     *  Copy Constructor
+     */
+    ValueIterator(const ValueIterator& that) = delete;
+
+    /**
+     *  Move constructor
+     */
+    ValueIterator(ValueIterator&& that)
+    {
+        ItemPos = that.ItemPos;
+        // clear the other object
+        that.ItemPos = nullptr;
+    }
+
+    /**
+     *  Move assignment
+     */
+    Value &operator=(ValueIterator&& that)
+    {
+        ItemPos = that.ItemPos;
+        // clear the other object
+        that.ItemPos = nullptr;
     }
 
     /**
      *  Increment prefix operator
      */
-    ValueIterator& operator++() {
-        phItem->next();
+    ValueIterator& operator++()
+    {
+        next();
         return *this;
     }
 
     /**
      *  Increment postfix operator
      */
-    ValueIterator operator++(int) {
-        ValueIterator tmp(*this);
-        operator++();
-        return tmp;
+    ValueIterator& operator++(int)
+    {
+        return operator++();
     }
 
     /**
-     *  compare operator
+     *  Add a int-value to the ValueIterator-object
      */
-    bool operator==(const ValueIterator& rhs) const {
+    ValueIterator& operator+=(unsigned int n)
+    {
+        for(unsigned int i=0; i < n; ++i) next();
+        return *this;
+    }
+
+    bool operator==(const ValueIterator& rhs) const
+    {
         // If one of items is empty
         // The order of the following tests is optimized. Do not change it.
         if(!isEmpty() &&  rhs.isEmpty() ) return false;
@@ -61,20 +93,33 @@ public:
         if( isEmpty() && !rhs.isEmpty() ) return false;
 
         // If both are not empty
-        return phItem->compare(rhs.phItem);
+        return ItemPos->compare(rhs.ItemPos);
     }
 
-    bool operator!=(const ValueIterator& rhs) const {
+    bool operator!=(const ValueIterator& rhs) const
+    {
         return !operator==(rhs);
     }
 
-    HashItem& operator*() {
-        return *phItem;
+    HashItem& operator*()
+    {
+        return *ItemPos;
     }
     
-    HashItem* operator->() {
-        return phItem;
+    HashItem* operator->()
+    {
+        return ItemPos;
     }
+
+    /**
+     *  Destructor
+     */
+    ~ValueIterator()
+    {
+        // delete HashItem pointer
+        if(ItemPos) delete ItemPos;
+    }
+
 
 private:
 
@@ -83,12 +128,26 @@ private:
      */
     bool isEmpty() const
     {
-        // True, if phItem == nullptr or  phItem is empty.
-        return (!phItem || phItem->isEmpty());
+        // True, if ItemPos == nullptr or  ItemPos is empty.
+        return (!ItemPos || ItemPos->isEmpty());
     }
 
-    // Position in the internal hash table. Pointer to HashItem
-    HashItem *phItem;
+    /**
+     *  next iteration
+     */
+    bool next()
+    {
+        // Only if ItemPos != nullptr
+        if(ItemPos) ItemPos->next();
+    }
+
+    /**
+     *  HashItem pointer
+     *  Pointer to a position in the internal array/oblect/traversable.
+     *  (if the internal array does not exist, then nullptr).
+     *  @var HashItem*
+     */
+    HashItem *ItemPos;
 };
 
 /**
