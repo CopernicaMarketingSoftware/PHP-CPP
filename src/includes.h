@@ -47,6 +47,7 @@
 #include "../include/exception.h"
 #include "../include/type.h"
 #include "../include/value.h"
+#include "../include/valueiterator.h"
 #include "../include/array.h"
 #include "../include/object.h"
 #include "../include/hiddenpointer.h"

@@ -28,6 +28,7 @@
 #include <phpcpp/exception.h>
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
+#include <phpcpp/valueiterator.h>
 #include <phpcpp/array.h>
 #include <phpcpp/object.h>
 #include <phpcpp/hiddenpointer.h>

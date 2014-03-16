@@ -1550,106 +1550,48 @@ std::map<std::string,Php::Value> Value::mapValue() const
 {
     // result variable
     std::map<std::string,Php::Value> result;
-
-    // check type
-    if (isArray())
-    {
-        // get access to the hast table
-        HashTable *arr = Z_ARRVAL_P(_val);
-        
-        // reset iterator to beginning of the hash table
-        zend_hash_internal_pointer_reset(arr);
-        
-        // loop through the records
-        while (true)
-        {
-            // pointer that will be set to hash key and index
-            char *key;
-            unsigned long ind;
-
-            // get current key
-            int hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0);
-
-            // required variable
-            zval **value;
-            
-            // check the type
-            switch (hash_key_type) {
-            
-            // was it a string?
-            case HASH_KEY_IS_STRING:
-
-                // retrieve data, and add to result
-                zend_hash_get_current_data(arr, (void **) &value);
-                result[key] = Value(*value);
-                break;
-                
-            // was it numeric?
-            case HASH_KEY_IS_LONG:
-
-                // retrieve data, and add to result
-                zend_hash_get_current_data(arr, (void **) &value);
-                result[std::to_string(ind)] = Value(*value);
-                break;
-                
-            default:
-            
-                // we're ready
-                return result;
-            }
-
-            // next iteration
-            zend_hash_move_forward(arr);
-        }
-    }
-    else if (isObject())
-    {
-        // get access to the hast table
-        HashTable *arr = Z_OBJ_HT_P(_val)->get_properties(_val);
-        
-        // reset iterator to beginning of the hash table
-        zend_hash_internal_pointer_reset(arr);
-        
-        // loop through the records
-        while (true)
-        {
-            // pointer that will be set to hash key and index
-            char *key;
-            unsigned long ind;
-
-            // get current key
-            int hash_key_type = zend_hash_get_current_key(arr, &key, &ind, 0);
-
-            // check the type
-            switch (hash_key_type) {
-            
-            // was it a string?
-            case HASH_KEY_IS_STRING:
-
-                // inaccessible properties (privates) start with a null character
-                if (*key == '\0') break;
-
-                // required variable
-                zval **value;
-
-                // retrieve data, and add to result
-                zend_hash_get_current_data(arr, (void **) &value);
-                result[key] = Value(*value);
-                break;
-                
-            default:
-            
-                // we're ready
-                return result;
-            }
-
-            // next iteration
-            zend_hash_move_forward(arr);
-        }
-    }
+    
+    // iterate over the object
+    for (auto &iter : *this) result[iter.first.rawValue()] = iter.second;
     
     // done
     return result;
+}
+
+/**
+ *  Return an iterator for iterating over the values
+ *  This is only meaningful for Value objects that hold an array or an object
+ *  @return iterator
+ */
+ValueIterator Value::begin() const
+{
+    // check type
+    if (isArray()) return ValueIterator(Z_ARRVAL_P(_val), true);
+    
+    // get access to the hast table
+    if (isObject()) return ValueIterator(Z_OBJ_HT_P(_val)->get_properties(_val), true);
+    
+    // invalid
+    // @todo fix iterators without a hashtable
+    // @todo test Php::empty() function
+    return ValueIterator(nullptr,true);
+}
+
+/**
+ *  Return an iterator for iterating over the values
+ *  This is only meaningful for Value objects that hold an array or an object
+ *  @return iterator
+ */
+ValueIterator Value::end() const
+{
+    // check type
+    if (isArray()) return ValueIterator(Z_ARRVAL_P(_val), false);
+    
+    // get access to the hast table
+    if (isObject()) return ValueIterator(Z_OBJ_HT_P(_val)->get_properties(_val), false);
+    
+    // invalid
+    return ValueIterator(nullptr, false);
 }
 
 /**

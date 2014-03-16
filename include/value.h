@@ -32,6 +32,7 @@ namespace Php {
  *  Forward definitions
  */
 class Base;
+class ValueIterator;
 template <class Type> class HashMember;
 
 /**
@@ -498,6 +499,25 @@ public:
     }
     
     /**
+     *  Define the iterator type
+     */
+    typedef ValueIterator iterator;
+    
+    /**
+     *  Return an iterator for iterating over the values
+     *  This is only meaningful for Value objects that hold an array or an object
+     *  @return iterator
+     */
+    iterator begin() const;
+    
+    /**
+     *  Return an iterator for iterating over the values
+     *  This is only meaningful for Value objects that hold an array or an object
+     *  @return iterator
+     */
+    iterator end() const;
+    
+    /**
      *  The number of members in case of an array or object
      *  @return int
      */
@@ -926,6 +946,7 @@ protected:
     friend class ClassBase;
     friend class Iterator;
     friend class Extension;
+    friend class ValueIterator;
 };
 
 /**
