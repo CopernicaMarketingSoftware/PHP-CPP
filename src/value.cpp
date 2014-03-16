@@ -170,22 +170,6 @@ Value::Value(struct _zval_struct *val, bool ref)
 }
 
 /**
- *  Wrap around a hash table
- *  @param  ht          Hashtable to wrap
- */
-Value::Value(HashTable *ht)
-{
-    // construct a zval
-    MAKE_STD_ZVAL(_val);
-    Z_ARRVAL_P(_val) = ht;
-    Z_TYPE_P(_val) = IS_ARRAY;
-
-    // add a reference
-    // @todo this may be wrong
-    Z_ADDREF_P(_val);
-}
-
-/**
  *  Wrap around an object
  *  @param  object
  */
@@ -1572,8 +1556,6 @@ ValueIterator Value::begin() const
     if (isObject()) return ValueIterator(Z_OBJ_HT_P(_val)->get_properties(_val), true);
     
     // invalid
-    // @todo fix iterators without a hashtable
-    // @todo test Php::empty() function
     return ValueIterator(nullptr,true);
 }
 

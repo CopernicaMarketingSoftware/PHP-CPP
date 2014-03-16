@@ -113,12 +113,6 @@ public:
     Value(struct _zval_struct *zval, bool ref = false);
     
     /**
-     *  Wrap around a hash table
-     *  @param  ht          Hashtable to wrap
-     */
-    Value(struct _hashtable *ht);
-    
-    /**
      *  Wrap around an object implemented by us
      *  @param  object      Object to be wrapped
      */
@@ -445,6 +439,8 @@ public:
     template <typename T>
     std::vector<T> vectorValue() const
     {
+        
+        
         // only works for arrays, other types return an empty vector
         if (!isArray()) return std::vector<T>();
 
