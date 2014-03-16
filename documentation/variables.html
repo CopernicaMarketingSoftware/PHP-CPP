@@ -333,7 +333,32 @@ array1 = 100;
 </code></pre>
 </p>
 <p>
-    @todo explain how to iterate over arrays
+    The Php::Value class also implements the begin() and end() methods that
+    you many STL containers has too. As a consequence, you can iterate
+    over an array just like you would iterate over a std::map class.
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Function that accepts an array as parameter
+ *  @param  array
+ */
+void myFunction(const Php::Value &amp;value)
+{
+    // assum the value variable holds an array or object, it then
+    // is possible to iterator over the values or properties
+    for (auto &amp;iter : value)
+    {
+        // output key and value
+        std::cout &lt;&lt; iter.first &lt;&lt; ": " &lt;&lt; iter.second &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The iterator treats the values in the Value class as variables of type
+    std::pair&lt;Php::Value,Php::Value&gt;. You can thus access the 'first'
+    and 'second' properties to retrieve either the key or the value.
 </p>
 <h2 id="objects">Objects</h2>
 <p>
