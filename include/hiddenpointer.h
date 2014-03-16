@@ -104,7 +104,7 @@ public:
      *  @param  that
      *  @return HiddenPointer
      */
-    HiddenPointer<Type> operator=(const HiddenPointer &that)
+    HiddenPointer<Type> &operator=(const HiddenPointer &that)
     {
         // skip self assignmend
         if (this == &that) return *this;
