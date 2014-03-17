@@ -55,7 +55,7 @@ Value HashPositionWrapper::value() const
  */
 std::string HashPositionWrapper::key() const
 {
-    return (0 == pos->nKeyLength) ? std::to_string(pos->h) : std::string(pos->arKey, pos->nKeyLength);
+    return (0 == pos->nKeyLength) ? std::to_string(pos->h) : std::string(pos->arKey, pos->nKeyLength-1);
 }
 
 /**
