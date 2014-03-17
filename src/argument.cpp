@@ -30,11 +30,15 @@ Argument::Argument(const char *name, Type type, bool required, bool byref)
     _info->name_len = strlen(name);
 #if PHP_VERSION_ID >= 50400    
     _info->type_hint = (unsigned char)(type == Type::Array || type == Type::Callable ? type : Type::Null);
+#else
+    _info->array_type_hint = type == Type::Array;
 #endif
     _info->class_name = NULL;
     _info->class_name_len = 0;
     _info->allow_null = false;
     _info->pass_by_reference = byref;
+    _info->return_reference = false;
+    _info->required_num_args = 0;   // @todo is this correct?
     
     // store if required
     _required = required;
