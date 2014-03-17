@@ -12,7 +12,7 @@
  *  Forward definitions
  */
 struct _zend_function_entry;
-struct _zend_internal_function_info;
+struct _zend_arg_info;
  
 /**
  *  Set up namespace
@@ -36,18 +36,19 @@ public:
         _argc = arguments.size();
         _argv = new zend_arg_info[_argc+1];
         
-        // counter
+        // the first record is initialized with information about the function,
+        // so we skip that here
         int i=1;
         
         // loop through the arguments
         for (auto it = arguments.begin(); it != arguments.end(); it++)
         {
+            // increment required
+            if (it->required()) _required++;
+            
             // fill the arg info
             it->fill(&_argv[i++]);
         }
-        
-        // @todo find out number of required arguments
-        _required = _argc;
     }
     
     /**
@@ -106,7 +107,7 @@ public:
      *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      */
-    void initialize(struct _zend_internal_function_info *info, const char *classname = nullptr) const;
+    void initialize(struct _zend_arg_info *info, const char *classname = nullptr) const;
 
 
 protected:

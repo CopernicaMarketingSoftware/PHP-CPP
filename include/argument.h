@@ -71,6 +71,16 @@ public:
      *  @internal
      */
     void fill(struct _zend_arg_info *info) const;
+    
+    /**
+     *  Is this a required argument?
+     *  @return bool
+     *  @internal
+     */
+    bool required() const
+    {
+        return _required;
+    }
 
 private:
     /**

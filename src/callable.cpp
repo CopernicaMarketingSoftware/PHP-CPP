@@ -70,9 +70,7 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
     entry->flags = flags;
 
     // we should fill the first argument as well
-#if PHP_VERSION_ID >= 50400
-    initialize((zend_internal_function_info *)entry->arg_info, classname);
-#endif
+    initialize((zend_arg_info *)entry->arg_info, classname);
 }
 
 /**
@@ -80,27 +78,42 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
  *  @param  info        Info to be filled
  *  @param  classname   Optional classname
  */
-#if PHP_VERSION_ID >= 50400
-void Callable::initialize(zend_internal_function_info *info, const char *classname) const
+void Callable::initialize(zend_arg_info *info, const char *classname) const
 {
+#if PHP_VERSION_ID >= 50400
+    // up until php 5.3, the first info object is filled with alternative information,
+    // later it is casted to a zend_internal_function object
+    auto *finfo = (zend_internal_function_info *)info;
+    
     // fill in all the members, note that return reference is false by default,
     // because we do not support returning references in PHP-CPP, although Zend
     // engine allows it. Inside the name we hide a pointer to the current object
-    info->_name = _ptr;
-    info->_name_len = strlen(_ptr);
-    info->_class_name = classname;
+    finfo->_name = _ptr;
+    finfo->_name_len = strlen(_ptr);
+    finfo->_class_name = classname;
 
     // number of required arguments, and the expected return type
-    info->required_num_args = _required;
-    info->_type_hint = (unsigned char)_return;
+    finfo->required_num_args = _required;
+    finfo->_type_hint = (unsigned char)_return;
 
     // we do not support return-by-reference
-    info->return_reference = false;
+    finfo->return_reference = false;
  
     // passing by reference is not used
-    info->pass_rest_by_reference = false;
-}
+    finfo->pass_rest_by_reference = false;
+#else
+    // php 5.3 code
+    info->name = nullptr;
+    info->name_len = 0;
+    info->class_name = nullptr;
+    info->class_name_len = 0;
+    info->array_type_hint = false;
+    info->allow_null = false;
+    info->pass_by_reference = false;
+    info->return_reference = false;
+    info->required_num_args = _required;
 #endif
+}
 
 /**
  *  End of namespace
