@@ -40,7 +40,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~NotImplemented() {}
+    virtual ~NotImplemented() throw() {}
 
 };
 
