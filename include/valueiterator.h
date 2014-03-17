@@ -36,21 +36,59 @@ public:
     ValueIterator(struct _hashtable *hashtable, bool first);
     
     /**
+     *  Copy constructor
+     *  @param  that
+     */
+    ValueIterator(const ValueIterator &that);
+    
+    /**
      *  Destructor
      */
     virtual ~ValueIterator() {}
 
     /**
-     *  Increment position
+     *  Increment position (pre-increment)
      *  @return ValueIterator
      */
     ValueIterator &operator++();
     
     /**
-     *  Decrement position
+     *  Increment position (post-increment)
+     *  @return ValueIterator
+     */
+    ValueIterator operator++(int)
+    {
+        // make a copy
+        ValueIterator copy(*this);
+        
+        // increment current object
+        ++(*this);
+        
+        // and return the unchanged original
+        return copy;
+    }
+    
+    /**
+     *  Decrement position (pre-decrement)
      *  @return ValueIterator
      */
     ValueIterator &operator--();
+
+    /**
+     *  Increment position (post-decrement)
+     *  @return ValueIterator
+     */
+    ValueIterator operator--(int)
+    {
+        // make a copy
+        ValueIterator copy(*this);
+        
+        // decrement current object
+        --(*this);
+        
+        // and return the unchanged original
+        return copy;
+    }
     
     /**
      *  Compare with other iterator
