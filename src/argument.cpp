@@ -99,6 +99,9 @@ Argument::Argument(Argument &&argument)
     
     // forget in other object
     argument._info = nullptr;
+    
+    // store if required
+    _required = argument._required;
 }
 
 /**
