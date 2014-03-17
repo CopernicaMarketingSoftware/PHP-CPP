@@ -33,12 +33,12 @@ Argument::Argument(const char *name, Type type, bool required, bool byref)
 #else
     _info->array_type_hint = type == Type::Array;
     _info->return_reference = false;
+    _info->required_num_args = 0;   // @todo is this correct?
 #endif
     _info->class_name = NULL;
     _info->class_name_len = 0;
     _info->allow_null = false;
     _info->pass_by_reference = byref;
-    _info->required_num_args = 0;   // @todo is this correct?
     
     // store if required
     _required = required;
