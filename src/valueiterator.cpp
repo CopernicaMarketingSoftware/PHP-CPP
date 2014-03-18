@@ -116,7 +116,7 @@ ValueIterator &ValueIterator::read()
     if (type == HASH_KEY_NON_EXISTANT) return invalidate();
 
     // numeric keys are the easiest ones
-    if (type == HASH_KEY_NON_EXISTANT) key = (int64_t)num_key;
+    if (type == HASH_KEY_IS_LONG) key = (int64_t)num_key;
     else key = string_key;
 
 #endif
