@@ -91,6 +91,9 @@ COMPILER_FLAGS  =   -Wall -c -I. -I${PHP_DIR} -I${PHP_DIR}/main -I${PHP_DIR}/ext
 #   Just like the compiler, the linker can have flags too. The default flag
 #   is probably the only one you need.
 #
+#   Are you compiling on OSX? You may have to append the option "-undefined dynamic_lookup"
+#   to the linker flags
+#
 
 LINKER_FLAGS    =   -shared `php-config --ldflags`
 
