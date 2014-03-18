@@ -20,6 +20,17 @@ PHP_DIR         =   /usr/include/php5
 
 
 #
+#   PHP binary file
+#
+#   The path to the executable PHP binary file.
+#   Need to run tests.
+#   You can see the command "whereis php"
+#
+
+PHP_BIN         =   /usr/bin/php
+
+
+#
 #   Installation directory
 #
 #   When you install the PHP-CPP library, it will place a number of C++ *.h 
@@ -126,6 +137,10 @@ OBJECTS         =   $(SOURCES:%.cpp=%.o)
 #
 
 all: ${OBJECTS} ${RESULT}
+	@echo
+	@echo "Build complete."
+	@echo "Don't forget to run 'make test'."
+	@echo
 
 ${RESULT}: ${OBJECTS}
 	${LINKER} ${LINKER_FLAGS} -o $@ ${OBJECTS}
@@ -141,4 +156,6 @@ install:
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
 	${CP} ${RESULT} ${INSTALL_LIB}
+test:
+	cd tests && ./test.sh -p ${PHP_BIN}
 

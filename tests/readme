@@ -1,0 +1,3 @@
+In this directory cpp extension is designed to conduct tests.
+When creating a test, do not use extension requiring the installation.
+In the catalog php are the tests themselves.
