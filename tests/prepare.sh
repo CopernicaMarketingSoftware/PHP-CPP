@@ -8,6 +8,11 @@
 EXTDLOC=ext_dir
 SO=extfortest.so
 
+if [ $1 ]
+then
+    SO=$1
+fi
+
 EXTDIR=$(php-config --extension-dir)
 
 #echo $EXTDIR
