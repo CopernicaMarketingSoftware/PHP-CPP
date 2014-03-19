@@ -137,10 +137,11 @@ OBJECTS         =   $(SOURCES:%.cpp=%.o)
 #
 
 all: ${OBJECTS} ${RESULT}
-	@echo
-	@echo "Build complete."
-	@echo "Don't forget to run 'make test'."
-	@echo
+#	Before offering to run the tests, we need to write more tests
+#	@echo
+#	@echo "Build complete."
+#	@echo "Don't forget to run 'make test'."
+#	@echo
 
 ${RESULT}: ${OBJECTS}
 	${LINKER} ${LINKER_FLAGS} -o $@ ${OBJECTS}

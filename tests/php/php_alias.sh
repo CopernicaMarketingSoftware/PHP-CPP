@@ -13,4 +13,7 @@ then
 	exit;
 fi
 
+LD_LIBRARY_PATH="$(cd $PWD/../.. && echo $PWD):${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
+
 /usr/bin/php -d enable_dl=On -d extension_dir=../ext_dir -d extension=extfortest.so $1

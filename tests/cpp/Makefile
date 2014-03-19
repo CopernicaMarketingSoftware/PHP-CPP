@@ -87,11 +87,11 @@ LINKER				=	g++
 #	one: the PHP-CPP library), you should update the LINKER_DEPENDENCIES variable
 #	with a list of all flags that should be passed to the linker.
 #
-
+LIB_DIR=$(shell cd ../.. && pwd)
 #COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -o
 #COMPILER_FLAGS		=	-Wall -c -g -std=c++11 -fpic -o
-COMPILER_FLAGS		=	-Wall -c -g -std=c++11 -fpic  -I. -I"../../include" -o
-LINKER_FLAGS		=	-shared
+COMPILER_FLAGS		=	-Wall -c -g -std=c++11 -fpic  -I. -I"${LIB_DIR}/include" -o
+LINKER_FLAGS		=	-shared -L"${LIB_DIR}"
 LINKER_DEPENDENCIES	=	-lphpcpp
 
 

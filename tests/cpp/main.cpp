@@ -20,7 +20,7 @@ extern "C"
     PHPCPP_EXPORT void *get_module()
     {
         // create extension
-        static Php::Extension extension("extention_for_tests","0.1");
+        static Php::Extension extension("extension_for_tests","0.1");
         
         // build an interface
         //Php::Interface interface("MyInterface");

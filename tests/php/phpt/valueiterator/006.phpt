@@ -3,7 +3,7 @@ Iterate itarable oblect
 --DESCRIPTION--
 class impIterAggr1 implements IteratorAggregate
 --SKIPIF--
-<?php if (!extension_loaded("extention_for_tests")) print "skip"; ?>
+<?php if (!extension_loaded("extension_for_tests")) print "skip"; ?>
 --FILEEOF--
 <?php
 require dirname(__FILE__) . '/../../include/valueiterator/1.php';
