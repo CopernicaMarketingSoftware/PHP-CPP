@@ -148,9 +148,9 @@ public:
      *  @param  flags       Optional flags
      */
     void property(const char *name, std::nullptr_t value,     int flags = Public) { ClassBase::property(name, value, flags); }
-    void property(const char *name, uint64_t value,           int flags = Public) { ClassBase::property(name, value, flags); }
-    void property(const char *name, uint32_t value,           int flags = Public) { ClassBase::property(name, value, flags); }
-    void property(const char *name, uint16_t value,           int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, int64_t value,            int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, int32_t value,            int flags = Public) { ClassBase::property(name, value, flags); }
+    void property(const char *name, int16_t value,            int flags = Public) { ClassBase::property(name, value, flags); }
     void property(const char *name, char value,               int flags = Public) { ClassBase::property(name, value, flags); }
     void property(const char *name, const char *value,        int flags = Public) { ClassBase::property(name, value, flags); }
     void property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); }
