@@ -1,7 +1,7 @@
 --TEST--
 Test constructor & destructor
 --SKIPIF--
-<?php if (!extension_loaded("extention_for_tests")) print "skip"; ?>
+<?php if (!extension_loaded("extension_for_tests")) print "skip"; ?>
 --FILEEOF--
 <?php
 

@@ -92,7 +92,7 @@ fi
 TEST_FILES=`find ./php/phpt -type f -name "*.phpt"`
 
 #RUN_SCR="$PHP_BIN -z ./cpp/$EXT_NAME"
-RUN_SCR="$PHP_BIN -d enable_dl=On -d extension_dir=./ext_dir -d extension=$EXT_NAME"
+RUN_SCR="$PHP_BIN -d enable_dl=On -d extension_dir=$PWD/ext_dir -d extension=$EXT_NAME"
 
 
 # Create a local copy of the directory with the extension for run without installation
@@ -107,6 +107,12 @@ if [ 1 = $COMPILE_EXT ]; then
 fi
 
 
+
+LD_LIBRARY_PATH="$(cd $PWD/.. && echo $PWD):${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH
+echo $LD_LIBRARY_PATH
+
+RUN_SCR="LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\" && export LD_LIBRARY_PATH && $RUN_SCR"
 # run tests
 $PHP_BIN run-tests.php $SCR_OPT -p "$RUN_SCR" $TEST_FILES
 
