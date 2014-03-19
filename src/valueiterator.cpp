@@ -27,7 +27,10 @@ ValueIterator::ValueIterator(HashTable *hashtable, bool first) : _table(hashtabl
         zend_hash_internal_pointer_reset_ex(_table, &_position);
         
         // read current data
-        read();
+        if (read()) return;
+        
+        // data was private, move on
+        operator++();
     }
     else
     {
@@ -49,12 +52,18 @@ ValueIterator &ValueIterator::operator++()
     if (zend_hash_move_forward_ex(_table, &_position) == SUCCESS)
     {
         // read current key and value
-        return read();
+        if (read()) return *this;
+        
+        // data was private or invalid, move further
+        return operator++();
     }
     else
     {
         // invalidate current position
-        return invalidate();
+        invalidate();
+        
+        // done
+        return *this;
     }
 }
 
@@ -76,18 +85,24 @@ ValueIterator &ValueIterator::operator--()
     else if (zend_hash_move_backwards_ex(_table, &_position) == FAILURE)
     {
         // invalidate current position
-        return invalidate();
+        invalidate();
+        
+        // done
+        return *this;
     }
 
     // read current key and value
-    return read();
+    if (read()) return *this;
+    
+    // data was private, move on
+    return operator--();
 }
 
 /**
  *  Read current key and value
- *  @return ValueIterator
+ *  @return bool        true if the object is in a valid position, false otherwise
  */
-ValueIterator &ValueIterator::read()
+bool ValueIterator::read()
 {
     // zval to read the current key in
     Value key;
@@ -130,16 +145,17 @@ ValueIterator &ValueIterator::read()
     
     // we can now update the current data
     _current = std::make_pair<Value,Value>(std::move(key), *value);
-    
-    // done
-    return *this;
+
+    // if the key is private (it starts with a null character) we should return
+    // false to report that the object is not in a completely valid state
+    return !_current.first.isString() || _current.first.rawValue()[0];
 }
 
 /**
  *  Invalidate the iterator
- *  @return ValueIterator
+ *  @return bool        always false
  */
-ValueIterator &ValueIterator::invalidate()
+bool ValueIterator::invalidate()
 {
     // forget current position
     _position = nullptr;
@@ -148,7 +164,7 @@ ValueIterator &ValueIterator::invalidate()
     _current = std::make_pair<Value,Value>(nullptr,nullptr);
     
     // done
-    return *this;
+    return false;
 }
 
 /**

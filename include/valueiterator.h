@@ -149,15 +149,15 @@ private:
 
     /**
      *  Read current key and value
-     *  @return ValueIterator
+     *  @return bool
      */
-    ValueIterator &read();
+    bool read();
 
     /**
      *  Invalidate the iterator
-     *  @return ValueIterator
+     *  @return bool
      */
-    ValueIterator &invalidate();
+    bool invalidate();
 };
 
 /**
