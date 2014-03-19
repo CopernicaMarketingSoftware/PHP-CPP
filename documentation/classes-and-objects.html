@@ -577,9 +577,11 @@ extern "C" {
 <p>
     In case you want your extension to <i>define</i> an interface, so that the
     interface can be implemented from PHP user space scripts, you can do that
-    almost similar to how you would define an abstract class. The only difference
-    is that you will not use a Php::Class instance to define the methods, but
-    a Php::Interface instance.
+    almost in a similar way to how you would define an abstract class. The only 
+    difference is that you will not use a Php::Class instance to define the 
+    methods, but a Php::Interface instance. The interface does not have to be
+    linked to a real C++ class (it is an interface after all), so the 
+    Php::Interface does not have to be passed the name of a C++ class.
 </p>
 <p>
 <pre class="language-c++"><code>
