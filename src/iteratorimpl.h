@@ -19,6 +19,13 @@ namespace Php {
  */
 class IteratorImpl
 {
+public:
+    /**
+     *  Clone the object
+     *  @return IteratorImpl*
+     */
+    virtual IteratorImpl *clone() = 0;
+
     /**
      *  Increment position (pre-increment)
      *  @return bool

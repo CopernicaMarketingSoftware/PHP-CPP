@@ -1550,13 +1550,13 @@ std::map<std::string,Php::Value> Value::mapValue() const
 ValueIterator Value::begin() const
 {
     // check type
-    if (isArray()) return ValueIterator(Z_ARRVAL_P(_val), true);
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), true));
     
     // get access to the hast table
-    if (isObject()) return ValueIterator(Z_OBJ_HT_P(_val)->get_properties(_val), true);
+    if (isObject()) return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val), true));
     
     // invalid
-    return ValueIterator(nullptr,true);
+    return ValueIterator(new InvalidIterator());
 }
 
 /**
@@ -1567,13 +1567,13 @@ ValueIterator Value::begin() const
 ValueIterator Value::end() const
 {
     // check type
-    if (isArray()) return ValueIterator(Z_ARRVAL_P(_val), false);
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), false));
     
     // get access to the hast table
-    if (isObject()) return ValueIterator(Z_OBJ_HT_P(_val)->get_properties(_val), false);
+    if (isObject()) return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val), false));
     
     // invalid
-    return ValueIterator(nullptr, false);
+    return ValueIterator(new InvalidIterator());
 }
 
 /**

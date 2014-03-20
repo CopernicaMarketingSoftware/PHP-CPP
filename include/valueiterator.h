@@ -23,6 +23,11 @@ struct bucket;
 namespace Php {
 
 /**
+ *  Forward declarations
+ */
+class IteratorImpl;
+
+/**
  *  Class definition
  */
 class ValueIterator
@@ -30,10 +35,9 @@ class ValueIterator
 public:
     /**
      *  Constructor
-     *  @param  hashtable       The hashtable to iterate over
-     *  @param  first           Should it start on the first position?
+     *  @param  impl        Implementation iterator
      */
-    ValueIterator(struct _hashtable *hashtable, bool first);
+    ValueIterator(IteratorImpl *impl) : _impl(impl) {}
     
     /**
      *  Copy constructor
@@ -95,69 +99,34 @@ public:
      *  @param  that
      *  @return bool
      */
-    bool operator==(const ValueIterator &that) const
-    {
-        return _position == that._position;
-    }
+    bool operator==(const ValueIterator &that) const;
 
     /**
      *  Compare with other iterator
      *  @param  that
      *  @return bool
      */
-    bool operator!=(const ValueIterator &that) const
-    {
-        return _position != that._position;
-    }
+    bool operator!=(const ValueIterator &that) const;
 
     /**
      *  Derefecence, this returns a std::pair with the current key and value
      *  @return std::pair
      */
-    const std::pair<Value,Value> &operator*() const
-    {
-        return _current;
-    }
+    const std::pair<Value,Value> &operator*() const;
     
     /**
      *  Dereference, this returns a std::pair with the current key and value
      *  @return std::pair
      */
-    const std::pair<Value,Value> *operator->() const
-    {
-        return &_current;
-    }
+    const std::pair<Value,Value> *operator->() const;
 
 private:
     /**
-     *  The hash table over which is being iterated
-     *  @var    HashTable
+     *  Pointer to the actual implementation
+     *  @var    std::unique_ptr
      */
-    struct _hashtable *_table = nullptr;
+    std::unique_ptr<IteratorImpl> _impl;
 
-    /**
-     *  The position in the hash table
-     *  @var    HashPosition
-     */
-    struct bucket *_position = nullptr;
-    
-    /**
-     *  The current key and value
-     *  @var    std::pair
-     */
-    std::pair<Value,Value> _current;
-
-    /**
-     *  Read current key and value
-     *  @return bool
-     */
-    bool read();
-
-    /**
-     *  Invalidate the iterator
-     *  @return bool
-     */
-    bool invalidate();
 };
 
 /**
