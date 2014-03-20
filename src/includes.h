@@ -92,6 +92,8 @@
 #include "origexception.h"
 #include "notimplemented.h"
 #include "property.h"
+#include "iteratorimpl.h"
+#include "hashiterator.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \
