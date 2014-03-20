@@ -20,6 +20,15 @@ namespace Php {
 ValueIterator::ValueIterator(const ValueIterator &that) : _impl(that._impl->clone()) {}
 
 /**
+ *  Destructor
+ */
+ValueIterator::~ValueIterator()
+{
+    // get rid of implementation
+    delete _impl;
+}
+
+/**
  *  Increment position
  *  @return ValueIterator
  */
@@ -52,7 +61,7 @@ ValueIterator &ValueIterator::operator--()
  */
 bool ValueIterator::operator==(const ValueIterator &that) const
 {
-    return _impl->equals(that._impl.get());
+    return _impl->equals(that._impl);
 }
 
 /**
@@ -62,7 +71,7 @@ bool ValueIterator::operator==(const ValueIterator &that) const
  */
 bool ValueIterator::operator!=(const ValueIterator &that) const
 {
-    return !_impl->equals(that._impl.get());
+    return !_impl->equals(that._impl);
 }
 
 /**

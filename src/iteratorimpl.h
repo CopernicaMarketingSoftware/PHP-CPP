@@ -21,6 +21,16 @@ class IteratorImpl
 {
 public:
     /**
+     *  Constructor
+     */
+    IteratorImpl() {}
+    
+    /**
+     *  Destructor
+     */
+    virtual ~IteratorImpl() {}
+
+    /**
      *  Clone the object
      *  @return IteratorImpl*
      */

@@ -48,7 +48,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ValueIterator() {}
+    virtual ~ValueIterator();
 
     /**
      *  Increment position (pre-increment)
@@ -125,7 +125,7 @@ private:
      *  Pointer to the actual implementation
      *  @var    std::unique_ptr
      */
-    std::unique_ptr<IteratorImpl> _impl;
+    IteratorImpl *_impl;
 
 };
 
