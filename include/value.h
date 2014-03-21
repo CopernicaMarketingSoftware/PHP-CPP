@@ -949,7 +949,8 @@ protected:
     friend class ClassBase;
     friend class Iterator;
     friend class Extension;
-    friend class ValueIterator;
+    friend class HashIterator;
+    friend class TraverseIterator;
 };
 
 /**

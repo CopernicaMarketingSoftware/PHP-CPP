@@ -165,7 +165,7 @@ private:
         Value val;
         
         // call the function to get the key
-        _iter->funcs->get_current_key(_iter, _val.
+        _iter->funcs->get_current_key(_iter, val._val);
 
 #else
 
