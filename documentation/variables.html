@@ -391,13 +391,13 @@ void myFunction(const Php::Value &amp;value)
 </code></pre>
 </p>
 <p>
-    The iterated value is a std::pair&lt;Php::Value::Php::Value&gt. You can 
+    The iterated value is a std::pair&lt;Php::Value::Php::Value&gt;. You can 
     access its property 'first' to get the current key, and the property 'second' 
     to get the current value. This is identical to how you would iterate over
     a std::map.
 </p>
 <p>
-    You can iterate over Php::Value objects that hold either an object
+    You can iterate over all Php::Value objects that hold either an object
     or an array. When you iterate over an array, the iterator simply iterates
     over all records in the array.
 </p>
@@ -426,7 +426,7 @@ void myFunction(const Php::Value &amp;value)
     new iterator that is back at the front position of the object. But remember that 
     in C++ and PHP (and in many other programming languages) it is much wiser to 
     use the ++ <i>prefix</i> operator, as this does not require making a copy of 
-    the original object.
+    the original object, so you should not use the ++ postfix operator anyway!
 </p>
 <h2 id="functions">Functions</h2>
 <p>
