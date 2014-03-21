@@ -166,6 +166,9 @@ private:
         
         // call the function to get the key
         _iter->funcs->get_current_key(_iter, val._val);
+        
+        // store the key
+        _data.first = val;
 
 #else
 
