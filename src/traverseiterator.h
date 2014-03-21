@@ -39,14 +39,8 @@ public:
         // rewind the iterator
         _iter->funcs->rewind(_iter);
         
-        // is the iterator at a valid position?
-        if (_iter->funcs->valid(_iter) != FAILURE) return;
-        
-        // reset the iterator
-        _iter->funcs->dtor(_iter);
-        
-        // set back to null
-        _iter = nullptr;
+        // read the first key/value pair
+        read();
     }
     
     /**
@@ -163,74 +157,77 @@ private:
         if (!_iter) return false;
 
         // is the iterator at a valid position?
-        if (_iter->funcs->valid(_iter) != FAILURE)
-        {
-            // we need to read the current key and value
-            // @todo implementation for php 5.3 and php 5.4 and higher
+        if (_iter->funcs->valid(_iter) == FAILURE) return invalidate();
 
 #if PHP_VERSION_ID >= 50400
 
-            // create a value object
-            Value val;
-            
-            // call the function to get the key
-            _iter->funcs->get_current_key(_iter, _val.
+        // create a value object
+        Value val;
+        
+        // call the function to get the key
+        _iter->funcs->get_current_key(_iter, _val.
 
 #else
 
-            // variable we need for fetching the key, and that will be assigned by
-            // the PHP engine
-            char *str_key; unsigned int str_key_len; unsigned long int_key;
+        // variable we need for fetching the key, and that will be assigned by
+        // the PHP engine (this is php 5.3 code)
+        char *str_key; unsigned int str_key_len; unsigned long int_key;
 
-            // php 5.3 code, fetch the current key
-            int type = _iter->funcs->get_current_key(_iter, &str_key, &str_key_len, &int_key);
-            
-            // what sort of key do we have?
-            if (type == HASH_KEY_IS_LONG) 
-            {
-                // we have an int key
-                _data.first = (int64_t)int_key;
-            }
-            else
-            {
-                // we have a string key that is already allocated
-                _data.first = str_key;
-                
-                // deallocate the data
-                efree(str_key);
-            }
-
-#endif
-
-            // now we're going to fetch the value, for this we need a strange zval
-            // it is strange that this is a pointer-to-pointer, but that is how
-            // the Zend engine implements this. It is going to be filled with
-            // a pointer to a memory address that is guaranteed to hold a valid
-            // zval.
-            zval **zval;
-            
-            // get the current value
-            _iter->funcs->get_current_data(_iter, &zval);
-            
-            // wrap the zval in a value object
-            _data.second = Value(*zval);
-         
-            // done
-            return true;
+        // php 5.3 code, fetch the current key
+        int type = _iter->funcs->get_current_key(_iter, &str_key, &str_key_len, &int_key);
+        
+        // what sort of key do we have?
+        if (type == HASH_KEY_IS_LONG) 
+        {
+            // we have an int key
+            _data.first = (int64_t)int_key;
         }
         else
         {
-            // reset the iterator
-            _iter->funcs->dtor(_iter);
+            // we have a string key that is already allocated
+            _data.first = str_key;
             
-            // set back to null
-            _iter = nullptr;
-            
-            // done
-            return false;
+            // deallocate the data
+            efree(str_key);
         }
-    }
 
+#endif
+
+        // now we're going to fetch the value, for this we need a strange zval
+        // it is strange that this is a pointer-to-pointer, but that is how
+        // the Zend engine implements this. It is going to be filled with
+        // a pointer to a memory address that is guaranteed to hold a valid
+        // zval.
+        zval **zval;
+        
+        // get the current value
+        _iter->funcs->get_current_data(_iter, &zval);
+        
+        // wrap the zval in a value object
+        _data.second = Value(*zval);
+     
+        // done
+        return true;
+    }
+    
+    /**
+     *  Invalidate the object
+     *  @return bool
+     */
+    bool invalidate()
+    {
+        // skip if already invalid
+        if (!_iter) return false;
+        
+        // reset the iterator
+        _iter->funcs->dtor(_iter);
+        
+        // set back to null
+        _iter = nullptr;
+        
+        // done
+        return false;
+    }
 };
 
 /**
