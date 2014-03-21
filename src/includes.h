@@ -95,6 +95,7 @@
 #include "iteratorimpl.h"
 #include "hashiterator.h"
 #include "invaliditerator.h"
+#include "traverseiterator.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

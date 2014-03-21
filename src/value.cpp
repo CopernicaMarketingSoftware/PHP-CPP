@@ -1543,17 +1543,34 @@ std::map<std::string,Php::Value> Value::mapValue() const
 }
 
 /**
- *  Return an iterator for iterating over the values
- *  This is only meaningful for Value objects that hold an array or an object
+ *  Internal helper method to retrieve an iterator
+ *  @param  begin       Should the iterator start at the begin
  *  @return iterator
  */
-ValueIterator Value::begin() const
+ValueIterator Value::createIterator(bool begin) const
 {
     // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), true));
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin));
     
     // get access to the hast table
-    if (isObject()) return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val), true));
+    if (isObject()) 
+    {
+        // is a special iterator method defined in the class entry?
+        auto *entry = zend_get_class_entry(_val);
+        
+        // check if there is an iterator
+        if (entry->get_iterator)
+        {
+            // the object implements Traversable interface, we have to use a
+            // special iterator to user that interface too
+            return ValueIterator(new TraverseIterator(_val, begin));
+        }
+        else
+        {
+            // construct a regular iterator
+            return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val), begin));
+        }
+    }
     
     // invalid
     return ValueIterator(new InvalidIterator());
@@ -1564,16 +1581,19 @@ ValueIterator Value::begin() const
  *  This is only meaningful for Value objects that hold an array or an object
  *  @return iterator
  */
+ValueIterator Value::begin() const
+{
+    return createIterator(true);
+}
+
+/**
+ *  Return an iterator for iterating over the values
+ *  This is only meaningful for Value objects that hold an array or an object
+ *  @return iterator
+ */
 ValueIterator Value::end() const
 {
-    // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), false));
-    
-    // get access to the hast table
-    if (isObject()) return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val), false));
-    
-    // invalid
-    return ValueIterator(new InvalidIterator());
+    return createIterator(false);
 }
 
 /**

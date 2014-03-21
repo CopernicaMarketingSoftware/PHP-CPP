@@ -933,6 +933,13 @@ protected:
      *  @return Value       The value that was set
      */
     const Value &setRaw(const char *key, int size, const Value &value);
+
+    /**
+     *  Internal helper method to create an iterator
+     *  @param  begin       Should the iterator start at the begin?
+     *  @return iterator
+     */
+    iterator createIterator(bool begin) const;
     
     /**
      *  The Globals and Member classes can access the zval directly
