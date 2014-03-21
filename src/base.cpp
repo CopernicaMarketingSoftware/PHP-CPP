@@ -28,22 +28,22 @@ MixedObject *Base::store(zend_class_entry *entry)
     // store the class entry in the newly created object
     result->php.ce = entry;
     
-    // @todo is this really necessary - and when do we destruct this data?
-    // (if we remove this code, everything breaks down in a for ($object as $k => $v) loop)
-
-    // the original create_object fills the initial object with the default properties,
-    // we're going to do exactly the same. start with setting up a hashtable for the props
-    ALLOC_HASHTABLE(result->php.properties);
-
-    // initialize the hash table
-    zend_hash_init(result->php.properties, 0, NULL, ZVAL_PTR_DTOR, 0);
+    // initialize the object
+    zend_object_std_init(&result->php, entry);
 
 #if PHP_VERSION_ID < 50399
-    // initialize the properties
-    zend_hash_copy(result->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_add_ref, NULL, sizeof(zval*));
+
+    // tmp variable
+    zval *tmp;
+    
+    // initialize the properties, php 5.3 way
+    zend_hash_copy(result->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_property_ctor, &tmp, sizeof(zval*));
+
 #else
+
     // version higher than 5.3 have an easier way to initialize
     object_properties_init(&result->php, entry);
+
 #endif    
 
     // the destructor and clone handlers are set to NULL. I dont know why, but they do not
