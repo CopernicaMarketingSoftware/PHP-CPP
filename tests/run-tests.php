@@ -1065,6 +1065,14 @@ function error_report($testname, $logname, $tested)
 
 function system_with_timeout($commandline, $env = null, $stdin = null)
 {
+	/*
+	 * Fixed for tests extension without installation
+	 * extension_for_tests
+	 */
+	if(isset($_SERVER["LD_LIBRARY_PATH"])) {
+		$env['LD_LIBRARY_PATH'] = $_SERVER["LD_LIBRARY_PATH"];
+	}
+	
 	global $leak_check, $cwd;
 
 	$data = '';
@@ -1792,27 +1800,6 @@ SCRIPT_FILENAME = " . $env['SCRIPT_FILENAME'] . "
 HTTP_COOKIE     = " . $env['HTTP_COOKIE'] . "
 COMMAND $cmd
 ";
-	//
-	/*
-	 * Fixed for tests extension without installation
-	 * extension_for_tests
-	 */
-	/*
-	$_LD_LIBRARY_PATH = isset($_SERVER["LD_LIBRARY_PATH"]) ?
-				('LD_LIBRARY_PATH="' . $_SERVER["LD_LIBRARY_PATH"] . "\"\nexport LD_LIBRARY_PATH")
-				
-					:
-				"###";
-	$_LD_LIBRARY_PATH_ex = isset($_SERVER["LD_LIBRARY_PATH"]) ?
-				('LD_LIBRARY_PATH="' . $_SERVER["LD_LIBRARY_PATH"] . "\" && export LD_LIBRARY_PATH && ")
-				
-					:
-				"";
-	*/
-
-	//$cmd = "LD_LIBRARY_PATH=\"/home/valmat/work/PHP-CPP\" && export LD_LIBRARY_PATH && $cmd";
-	//$cmd = "${_LD_LIBRARY_PATH_ex}$cmd";
-	
 
 	junit_start_timer($shortname);
 

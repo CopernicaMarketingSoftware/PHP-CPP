@@ -42,8 +42,7 @@ NAME				=	extfortest
 #	this with a different fixed directory
 #
 
-#EXTENSION_DIR		=	$(shell php-config --extension-dir)
-EXTENSION_DIR		=	../..
+EXTENSION_DIR		=	$(shell php-config --extension-dir)
 
 
 #
@@ -87,10 +86,9 @@ LINKER				=	g++
 #	one: the PHP-CPP library), you should update the LINKER_DEPENDENCIES variable
 #	with a list of all flags that should be passed to the linker.
 #
+
 LIB_DIR=$(shell cd ../.. && pwd)
-#COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic -o
-#COMPILER_FLAGS		=	-Wall -c -g -std=c++11 -fpic -o
-COMPILER_FLAGS		=	-Wall -c -g -std=c++11 -fpic  -I. -I"${LIB_DIR}/include" -o
+COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic  -I"${LIB_DIR}/include" -o
 LINKER_FLAGS		=	-shared -L"${LIB_DIR}"
 LINKER_DEPENDENCIES	=	-lphpcpp
 
@@ -131,7 +129,7 @@ ${EXTENSION}:			${OBJECTS}
 ${OBJECTS}:
 						${COMPILER} ${COMPILER_FLAGS} $@ ${@:%.o=%.cpp}
 
-#	Do not install this extention
+#	Do not install this extension
 #install:		
 #						${CP} ${EXTENSION} ${EXTENSION_DIR}
 #						${CP} ${INI} ${INI_DIR}
