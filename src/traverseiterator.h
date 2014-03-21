@@ -40,7 +40,7 @@ public:
         _iter->funcs->rewind(_iter);
         
         // is the iterator at a valid position?
-        if (_iter->funcs->valid(_iter)) return;
+        if (_iter->funcs->valid(_iter) != FAILURE) return;
         
         // reset the iterator
         _iter->funcs->dtor(_iter);
@@ -84,7 +84,7 @@ public:
     virtual bool increment() override
     {
         // do we still have an iterator?
-        if (_iter) return false;
+        if (!_iter) return false;
         
         // movw it forward
         _iter->funcs->move_forward(_iter);
@@ -100,6 +100,7 @@ public:
     virtual bool decrement() override
     {
         // not possible with PHP iterators
+        throw Exception("Impossible to iterate backwards");
     }
 
     /**
@@ -162,7 +163,7 @@ private:
         if (!_iter) return false;
 
         // is the iterator at a valid position?
-        if (_iter->funcs->valid(_iter))
+        if (_iter->funcs->valid(_iter) != FAILURE)
         {
             // we need to read the current key and value
             // @todo implementation for php 5.3 and php 5.4 and higher
