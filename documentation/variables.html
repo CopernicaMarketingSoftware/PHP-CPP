@@ -332,34 +332,6 @@ Php::Value array2 = array1;
 array1 = 100;
 </code></pre>
 </p>
-<p>
-    The Php::Value class also implements the begin() and end() methods that
-    you many STL containers has too. As a consequence, you can iterate
-    over an array just like you would iterate over a std::map class.
-</p>
-<p>
-<pre class="language-c++"><code>
-/**
- *  Function that accepts an array as parameter
- *  @param  array
- */
-void myFunction(const Php::Value &amp;value)
-{
-    // assum the value variable holds an array or object, it then
-    // is possible to iterator over the values or properties
-    for (auto &amp;iter : value)
-    {
-        // output key and value
-        std::cout &lt;&lt; iter.first &lt;&lt; ": " &lt;&lt; iter.second &lt;&lt; std::endl;
-    }
-}
-</code></pre>
-</p>
-<p>
-    The iterator treats the values in the Value class as variables of type
-    std::pair&lt;Php::Value,Php::Value&gt;. You can thus access the 'first'
-    and 'second' properties to retrieve either the key or the value.
-</p>
 <h2 id="objects">Objects</h2>
 <p>
     Just like the Php::Array class that is an extended Php::Value that initializes
@@ -393,6 +365,69 @@ std::cout &lt;&lt; object.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 Php::Value value = Php::Object("DateTime", "now");
 std::cout &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 </code></pre>
+</p>
+<h2 id="iterating">Iterating</h2>
+<p>
+    The Php::Value class implements the begin() and end() methods just like 
+    many C++ STL containers. As a consequence, you can iterate over a Php::Value 
+    just like you would iterate over a std::map class.
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Function that accepts an array as parameter
+ *  @param  array
+ */
+void myFunction(const Php::Value &amp;value)
+{
+    // assum the value variable holds an array or object, it then
+    // is possible to iterator over the values or properties
+    for (auto &amp;iter : value)
+    {
+        // output key and value
+        std::cout &lt;&lt; iter.first &lt;&lt; ": " &lt;&lt; iter.second &lt;&lt; std::endl;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The iterated value is a std::pair&lt;Php::Value::Php::Value&gt. You can 
+    access its property 'first' to get the current key, and the property 'second' 
+    to get the current value. This is identical to how you would iterate over
+    a std::map.
+</p>
+<p>
+    You can iterate over Php::Value objects that hold either an object
+    or an array. When you iterate over an array, the iterator simply iterates
+    over all records in the array.
+</p>
+<p>
+    For objects there are some things to consider. If the object that you iterate
+    over implements the Iterator or IteratorAggregate interface, the C++ iterator
+    uses these built-in interfaces and calls its methods to traverse the object. 
+    For regular objects (the ones that do not implement Iterator or IteratorAggregate) 
+    the iterator simply iterates over all the <i>public</i> properties of the object.
+</p>
+<p>
+    An iterator can be used in two directions: both the operator ++ as well as
+    the operator -- are available. But be careful with using the -- operator: If 
+    the Php::Value object holds an object that implements Iterator or 
+    IteratorAggregate, reverse iterating does not work, because the internal
+    iterator only has a next() method, and there is no way for the PHP-CPP
+    library to instruct the internal iterator to move backwards.
+</p>
+<p>
+    Also be careful with the return value of the ++ postfix operator. Normally,
+    a postfix increment operation returns the original value <i>before</i>
+    the operation. This is different when you iterate over objects that implement 
+    Iterator or IteratorAggregate, because it is impossible for the PHP-CPP
+    library to make a copy of a PHP iterator. As a result, the ++ postfix operator
+    (only when using it on a Iterator or IteratorAggregate object) returns a brand
+    new iterator that is back at the front position of the object. But remember that 
+    in C++ and PHP (and in many other programming languages) it is much wiser to 
+    use the ++ <i>prefix</i> operator, as this does not require making a copy of 
+    the original object.
+</p>
 <h2 id="functions">Functions</h2>
 <p>
     When a Php::Value object holds a <i>callable</i>, you can use the () operator
