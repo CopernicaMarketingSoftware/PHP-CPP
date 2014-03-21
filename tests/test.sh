@@ -22,6 +22,7 @@ function print_help() {
     echo "  -s <file>    Write output to <file>."
     echo "  -x           Sets 'SKIP_SLOW_TESTS' environmental variable."
     echo "  -o           Cancels sets 'SKIP_ONLINE_TESTS' (default set)."
+    echo "  -q           Quiet, no user interaction (same as environment NO_INTERACTION)."
     echo "  -v           Verbose mode."
     echo "  -h           This Help."
     echo
@@ -34,7 +35,7 @@ COMPILE_EXT=1
 OFFLINE=1
 EXT_NAME="extfortest.so"
 
-while getopts ":p:e:nw:a:d:g:ms:xovh" opt ;
+while getopts ":p:e:nw:a:d:g:ms:xoqvh" opt ;
 do
     case $opt in
         p)
@@ -70,6 +71,9 @@ do
         o)
             OFFLINE=0
             ;;
+        q)
+            SCR_OPT="$SCR_OPT -q"
+            ;;
         v)
             SCR_OPT="$SCR_OPT -v"
             ;;
@@ -88,11 +92,8 @@ done
 if [ 1 = $OFFLINE ]; then
     SCR_OPT="$SCR_OPT --offline"
 fi
-
+SCR_OPT="$SCR_OPT -d extension_dir=$PWD/ext_dir -d extension=$EXT_NAME"
 TEST_FILES=`find ./php/phpt -type f -name "*.phpt"`
-
-#RUN_SCR="$PHP_BIN -z ./cpp/$EXT_NAME"
-RUN_SCR="$PHP_BIN -d enable_dl=On -d extension_dir=$PWD/ext_dir -d extension=$EXT_NAME"
 
 
 # Create a local copy of the directory with the extension for run without installation
@@ -107,14 +108,13 @@ if [ 1 = $COMPILE_EXT ]; then
 fi
 
 
-
 LD_LIBRARY_PATH="$(cd $PWD/.. && echo $PWD):${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 echo $LD_LIBRARY_PATH
 
-RUN_SCR="LD_LIBRARY_PATH=\"$LD_LIBRARY_PATH\" && export LD_LIBRARY_PATH && $RUN_SCR"
+
 # run tests
-$PHP_BIN run-tests.php $SCR_OPT -p "$RUN_SCR" $TEST_FILES
+$PHP_BIN run-tests.php $SCR_OPT -p "$PHP_BIN" $TEST_FILES
 
 
 
