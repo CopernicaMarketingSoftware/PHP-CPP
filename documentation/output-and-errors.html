@@ -1,28 +1,29 @@
 <h1>Output and errors</h1>
 <p>
-    You can use regular C++ streams for IO. It is however not 
-    a good idea to use the std::cout and std::cerr streams for output.
+    You can use regular C++ streams for IO, with the regular &lt;&lt; operator
+    and special functions like std::endl. It is however not a good idea to use 
+    the 'std::cout' and 'std::cerr' streams.
 </p>
 <p>
     When PHP runs as a webserver module, stdout is redirected to the 
-    terminal <i>from where the webserver process was originally started</i>,
-    while you probably want to generate output that ends up in the generated
-    (HTML) output. But even when PHP runs as a CLI script - and std::cout works - 
-    you still should not write to stdout directly, because it will bypass all 
-    output handlers that may have been set up by the PHP user space script.
+    terminal <i>from which the webserver process was originally started</i>.
+    On production servers such a terminal is not active, so any output that
+    you send to stdout will be lost. Using std::cout in extensions that run in
+    a webserver module is thus a no-go. But even when PHP runs as a CLI script 
+    (and std::cout <i>does</i> work) you still should not write to stdout 
+    directly. Writing to stdout will bypass all output handlers that may have 
+    been set up by the PHP user space script.
 </p>
 <p>
     The PHP-CPP library offers a Php::out stream that can be used instead. This
     Php::out variable is an instance of the well known std::ostream class, and 
-    utilizes all the output buffering set up in PHP. All output that you send to
-    it always ends up where you expect: on stdout for CLI scripts, and in the 
-    generated code for webserver processes. It does essentially the same
+    respects all the output buffering set up in PHP. It does essentially the same
     as the echo() function in PHP scripts.
 </p>
 <p>
-    Php::out is a regular std::ostring object. This also has as consequence that 
-    it uses a buffer that needs to be sync'ed to flush the output. This flush 
-    happens automatically when you add 'std::endl' to the output, or when you 
+    Php::out is a regular std::ostream object. This has as consequence that 
+    it uses an internal buffer that needs to be flushed. This flushing
+    occurs automatically when you add 'std::endl' to the output, or when you 
     add 'std::sync' explicitly.
 </p>
 <p>
@@ -42,7 +43,8 @@ void example()
     Php::out &lt;&lt; "example output";
     Php::out.flush();
     
-    // just like all PHP functions, the Php::echo() function can also be used
+    // just like all PHP functions, you can call the echo() function 
+    // from C++ code as well
     Php::echo("Example output\n");
 }   
 </code></pre>
