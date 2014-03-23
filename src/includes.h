@@ -45,6 +45,7 @@
  *  Include other files from this library
  */
 #include "../include/exception.h"
+#include "../include/streams.h"
 #include "../include/type.h"
 #include "../include/value.h"
 #include "../include/valueiterator.h"
@@ -73,7 +74,6 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
-#include "../include/streams.h"
 #include "../include/init.h"
 
 /**

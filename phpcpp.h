@@ -26,6 +26,7 @@
  *  Include all headers files that are related to this library
  */
 #include <phpcpp/exception.h>
+#include <phpcpp/streams.h>
 #include <phpcpp/type.h>
 #include <phpcpp/value.h>
 #include <phpcpp/valueiterator.h>
@@ -54,7 +55,6 @@
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/call.h>
-#include <phpcpp/streams.h>
 
 /**
  *  Macro to export a function
