@@ -36,7 +36,7 @@ void example_function(Php::Parameters &amp;params)
     for (auto &key : keys) 
     {
         // output key
-        std::cout &lt;&lt; "key: " &lt;&lt; key &lt;&lt; std::endl;
+        Php::out &lt;&lt; "key: " &lt;&lt; key &lt;&lt; std::endl;
     }
     
     // call a function from user space
@@ -46,7 +46,7 @@ void example_function(Php::Parameters &amp;params)
     Php::Object time("DateTime", "now");
     
     // call a method on the datetime object
-    std::cout &lt;&lt; time.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
+    Php::out &lt;&lt; time.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
     
     // second parameter is a callback function
     Php::Value callback = params[1];
@@ -60,7 +60,7 @@ void example_function(Php::Parameters &amp;params)
     Php::Array time_format({time, "format"});
     
     // call the method that is stored in the array
-    std::cout &lt;&lt; time_format("Y-m-d H:i:s") &lt;&lt; std::endl;
+    Php::out &lt;&lt; time_format("Y-m-d H:i:s") &lt;&lt; std::endl;
 }
 
 /**

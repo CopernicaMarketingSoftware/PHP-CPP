@@ -1,0 +1,103 @@
+<h1>Output and errors</h1>
+<p>
+    You can use regular C++ streams for IO. It is however not 
+    a good idea to use the std::cout and std::cerr streams for output.
+</p>
+<p>
+    When PHP runs as a webserver module, stdout is redirected to the 
+    terminal <i>from where the webserver process was originally started</i>,
+    while you probably want to generate output that ends up in the generated
+    (HTML) output. But even when PHP runs as a CLI script - and std::cout works - 
+    you still should not write to stdout directly, because it will bypass all 
+    output handlers that may have been set up by the PHP user space script.
+</p>
+<p>
+    The PHP-CPP library offers a Php::out stream that can be used instead. This
+    Php::out variable is an instance of the well known std::ostream class, and 
+    utilizes all the output buffering set up in PHP. All output that you send to
+    it always ends up where you expect: on stdout for CLI scripts, and in the 
+    generated code for webserver processes. It does essentially the same
+    as the echo() function in PHP scripts.
+</p>
+<p>
+    Php::out is a regular std::ostring object. This also has as consequence that 
+    it uses a buffer that needs to be sync'ed to flush the output. This flush 
+    happens automatically when you add 'std::endl' to the output, or when you 
+    add 'std::sync' explicitly.
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Example function that shows how to generate output
+ */
+void example()
+{
+    // the C++ equivalent of the echo() function
+    Php::out &lt;&lt; "example output" &lt;&lt; std::endl;
+    
+    // generate output without a newline, and ensure that it is flushed
+    Php::out &lt;&lt; "example output" &lt;&lt; std::flush;
+
+    // or call the flush() method
+    Php::out &lt;&lt; "example output";
+    Php::out.flush();
+    
+    // just like all PHP functions, the Php::echo() function can also be used
+    Php::echo("Example output\n");
+}   
+</code></pre>
+</p>
+<h2 id="warnings-and-notices">Errors, warnings and notices</h2>
+<p>
+    When you want to trigger a PHP error (the C++ equivalent of the PHP 
+    trigger_error()) function, you can use one of the Php::error, Php::notice,
+    Php::warning and Php::deprecated streams. These are also instances of the
+    std::ostream class.
+</p>
+<p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Example function that shows how to generate output
+ */
+void example()
+{
+    // generate a PHP notice
+    Php::notice &lt;&lt; "this is a notice" &lt;&lt; std::flush;
+    
+    // generate a PHP warning
+    Php::warning &lt;&lt; "this is a warning" &lt;&lt; std::flush;
+
+    // inform the user that a call to a deprecated function was made
+    Php::deprecated &lt;&lt; "this method is deprecated" &lt;&lt; std::flush;
+    
+    // generate a fatal error
+    Php::error &lt;&lt; "fatal error" &lt;&lt; std::flush;
+    
+    // this code will no longer be called
+    Php::out &lt;&lt; "regular output" &lt;&lt; std::endl;
+}   
+</code></pre>
+</p>
+<p>
+    In the above example you can see that we used std::flush and not std::endl.
+    The reason for this is that std::endl internally does two things: it 
+    appends a newline, and it flushes the buffer. For errors, notices and
+    warnings we don't need the newline, but we still have to flush the 
+    buffer to actually generate the output.
+</p>
+<p>
+    There is something very peculiar with the Php::error stream: when you flush
+    it, the PHP script ends with a fatal error <i>and your C++ algorithm
+    immediately exits!!</i> Under the hood, the PHP engine does a longjump to
+    a place deep inside the Zend engine. In the example function the 
+    'Php::out &lt;&lt; "regular output"; statement is therefore never executed.
+</p>
+<p>
+    This all is very unusual, and (according to us) in conflict with the general
+    rules of decent software engineering. An output-generating function should 
+    not behave like throwing an exception. Code that looks like normal code,
+    should also behave like normal code, and not do unexpected things like 
+    leaping out of the current call stack. We therefore advise not to use 
+    Php::error - or use it with extreme care.
+</p>

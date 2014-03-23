@@ -101,7 +101,7 @@ void myFunction(const Php::Value &amp;value)
 void myFunction(Php::Value &amp;value)
 {
     value += 10;
-    std::cout &lt;&lt; value &lt;&lt; std::endl;
+    Php::out &lt;&lt; value &lt;&lt; std::endl;
     if (value == "some string")
     {
         
@@ -311,8 +311,8 @@ Php::Value array;
 array["x"] = 10;
 array["y"] = 20;
 
-std::cout &lt;&lt; array["x"] &lt;&lt; std::endl;
-std::cout &lt;&lt; array["y"] &lt;&lt; std::endl;
+Php::out &lt;&lt; array["x"] &lt;&lt; std::endl;
+Php::out &lt;&lt; array["y"] &lt;&lt; std::endl;
 </code></pre>
 </p>
 <p>
@@ -359,11 +359,11 @@ object["property2"] = "value2";
 object = Php::Object("DateTime", "now");
 
 // methods can be called with the call() method
-std::cout &lt;&lt; object.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
+Php::out &lt;&lt; object.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 
 // all these methods can be called on a Php::Value object too
 Php::Value value = Php::Object("DateTime", "now");
-std::cout &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
+Php::out &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 </code></pre>
 </p>
 <h2 id="iterating">Iterating</h2>
@@ -385,7 +385,7 @@ void myFunction(const Php::Value &amp;value)
     for (auto &amp;iter : value)
     {
         // output key and value
-        std::cout &lt;&lt; iter.first &lt;&lt; ": " &lt;&lt; iter.second &lt;&lt; std::endl;
+        Php::out &lt;&lt; iter.first &lt;&lt; ": " &lt;&lt; iter.second &lt;&lt; std::endl;
     }
 }
 </code></pre>
@@ -439,7 +439,7 @@ void myFunction(const Php::Value &amp;value)
 Php::Value date = "date";
 
 // "date" is a built-in PHP function and thus can it be called
-std::cout &lt;&lt; date("Y-m-d H:i:s") &lt;&lt; std::endl;
+Php::out &lt;&lt; date("Y-m-d H:i:s") &lt;&lt; std::endl;
 
 // create a date-time object
 Php::Object now = Php::Object("DateTime","now");
@@ -453,7 +453,7 @@ array[1] = "format";
 // an array with two members can be called too, the first
 // member is seen as the object, and the second as the
 // name of the method
-std::cout &lt;&lt; array("Y-m-d H:i:s") &lt;&lt; std::endl;
+Php::out &lt;&lt; array("Y-m-d H:i:s") &lt;&lt; std::endl;
 </code></pre>
 </p>
 <h2 id="global-variables">Global variables</h2>
@@ -474,7 +474,7 @@ Php::GLOBALS["b"] = Php::Array({1,2,3,4});
 Php::GLOBALS["b"][4] = 5;
 
 // and global variables can also be read
-std::cout &lt;&lt; Php::GLOBALS["b"] &lt;&lt; std::endl;
+Php::out &lt;&lt; Php::GLOBALS["b"] &lt;&lt; std::endl;
 </code></pre>
 </p>
 <p>

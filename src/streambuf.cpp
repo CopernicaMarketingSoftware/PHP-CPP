@@ -34,6 +34,9 @@ StreamBuf::StreamBuf(int error) : _error(error)
  */
 int StreamBuf::overflow(int c)
 {
+    // for error buffers, overflow is simply discarded
+    if (_error) return c;
+    
     // end-of-file has not output, we call EOF directly, and by using the
     // comma operator we ensure that EOF is returned
     if (c == EOF) return sync(), EOF;
