@@ -73,6 +73,7 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
+#include "../include/streams.h"
 #include "../include/init.h"
 
 /**
@@ -96,6 +97,7 @@
 #include "hashiterator.h"
 #include "invaliditerator.h"
 #include "traverseiterator.h"
+#include "streambuf.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \
