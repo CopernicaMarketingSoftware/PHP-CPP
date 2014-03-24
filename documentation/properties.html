@@ -148,6 +148,49 @@ extern "C" {
     properties, but even that is probably not what you want, as storing 
     data in native C++ variables is much faster.
 </p>
+<h2 id="constants">Class constants</h2>
+<p>
+    Class constants can be defined in a similar way as properties. The only
+    difference is that you have to pass in the flag 'Php::Const' instead of 
+    one of the public, private or protected access modifiers.
+</p>
+<p>
+<pre class="language-cpp"><code>
+#include &lt;phpcpp.h&gt;
+
+// @todo you class definition
+
+/**
+ *  Switch to C context so that the get_module() function can be
+ *  called by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function for the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static extension object
+        static Php::Extension myExtension("my_extension", "1.0");
+        
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class&lt;Example&gt; example("Example");
+        
+        // the Example class has a class constant
+        example.property("MY_CONSTANT", "some value", Php::Const);
+        
+        // add the class to the extension
+        myExtension.add(std::move(example));
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    The class constant can be accessed from PHP scripts using Example::MY_CONSTANT.
+</p>
 <h2>Smart properties</h2>
 <p>
     With the <a href="magic-methods">magic methods __get() and __set()</a> you
