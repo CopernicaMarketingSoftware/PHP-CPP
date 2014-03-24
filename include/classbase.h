@@ -132,8 +132,10 @@ public:
      *  class.
      * 
      *  @param  ns          Namespace name
+     *  @param  tsrm_ls
      */
-    void initialize(const std::string &ns);
+//    void initialize(const std::string &ns);
+    void initialize(const std::string &ns, void ***tsrm_ls);
 
 protected:
     /**
@@ -318,12 +320,17 @@ private:
      *  Static member functions to create or clone objects based on this class
      *  @param  entry                   Pointer to class information
      *  @param  val                     The object to be cloned
+     *  @param  tsrm_ls
      *  @return zend_object_value       Object info
      */
-    static struct _zend_object_value createObject(struct _zend_class_entry *entry);
-    static struct _zend_object_value cloneObject(struct _zval_struct *val);
-    static void destructObject(struct _zend_object *object, unsigned int handle);
-    static void freeObject(struct _zend_object *object);
+//    static struct _zend_object_value createObject(struct _zend_class_entry *entry);
+    static struct _zend_object_value createObject(struct _zend_class_entry *entry, void ***tsrm_ls);
+//    static struct _zend_object_value cloneObject(struct _zval_struct *val);
+    static struct _zend_object_value cloneObject(struct _zval_struct *val, void ***tsrm_ls);
+//    static void destructObject(struct _zend_object *object, unsigned int handle);
+    static void destructObject(struct _zend_object *object, unsigned int handle, void ***tsrm_ls);
+//    static void freeObject(struct _zend_object *object);
+    static void freeObject(struct _zend_object *object, void ***tsrm_ls);
 
     /**
      *  Static member function that get called when a method or object is called
@@ -332,9 +339,12 @@ private:
      *  @param  return_value_ptr        Pointer to the same zval
      *  @param  this_ptr                Object being called
      *  @param  return_value_used       Is the return value used or not?
+     *  @param  tsrm_ls
      */
-    static void callMethod(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
-    static void callInvoke(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
+//    static void callMethod(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
+    static void callMethod(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used, void ***tsrm_ls);
+//    static void callInvoke(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used);
+    static void callInvoke(int ht, struct _zval_struct *return_value, struct _zval_struct **return_value_ptr, struct _zval_struct *this_ptr, int return_value_used, void ***tsrm_ls);
 
     /**
      *  Function that is used to count the number of elements in the object
@@ -342,43 +352,29 @@ private:
      *  call the count() method
      *  @param  val
      *  @param  count
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int countElements(struct _zval_struct *object, long *count);
-
-    /**
-     *  Function that is called when the object is used as an array in PHP
-     *  @param  object          The object on which it is called
-     *  @param  offset          The name of the property
-     *  @param  type            The type of the variable???
-     *  @return zval
-     */
-    static struct _zval_struct *readDimension(struct _zval_struct *object, struct _zval_struct *offset, int type);
+//    static int countElements(struct _zval_struct *object, long *count);
+    static int countElements(struct _zval_struct *object, long *count, void ***tsrm_ls);
 
     /**
      *  Function that is called when the object is used as an array in PHP
      *  @param  object          The object on which it is called
      *  @param  offset          The name of the property
      *  @param  value           The new value
+     *  @param  type            The type of the variable???
+     *  @param  check_empty     ????
      *  @return zval
      */
-    static void writeDimension(struct _zval_struct *object, struct _zval_struct *offset, struct _zval_struct *value);
-
-    /**
-     *  Function that is called when the object is used as an array in PHP
-     *  @param  object          The object on which it is called
-     *  @param  member          The member to check
-     *  @param  check_empty     ????
-     *  @return bool
-     */
-    static int hasDimension(struct _zval_struct *object, struct _zval_struct *member, int check_empty);
-
-    /**
-     *  Function that is called when the object is used as an array in PHP
-     *  @param  object          The object on which it is called
-     *  @param  member          The member to remove
-     */
-    static void unsetDimension(struct _zval_struct *object, struct _zval_struct *member);
+//    static struct _zval_struct *readDimension(struct _zval_struct *object, struct _zval_struct *offset, int type);
+    static struct _zval_struct *readDimension(struct _zval_struct *object, struct _zval_struct *offset, int type, void ***tsrm_ls);
+//    static void writeDimension(struct _zval_struct *object, struct _zval_struct *offset, struct _zval_struct *value);
+    static void writeDimension(struct _zval_struct *object, struct _zval_struct *offset, struct _zval_struct *value, void ***tsrm_ls);
+//    static int  hasDimension(struct _zval_struct *object, struct _zval_struct *offset, int check_empty);
+    static int  hasDimension(struct _zval_struct *object, struct _zval_struct *offset, int check_empty, void ***tsrm_ls);
+//    static void unsetDimension(struct _zval_struct *object, struct _zval_struct *offset);
+    static void unsetDimension(struct _zval_struct *object, struct _zval_struct *offset, void ***tsrm_ls);
 
     /**
      *  Retrieve pointer to our own object handlers
@@ -391,9 +387,11 @@ private:
      *  @param  entry                   The class entry
      *  @param  object                  The object to iterate over
      *  @param  by_ref                  ?????
+     *  @param  tsrm_ls
      *  @return zend_object_iterator*   Pointer to the iterator
      */
-    static struct _zend_object_iterator *getIterator(struct _zend_class_entry *entry, struct _zval_struct *object, int by_ref);
+//    static struct _zend_object_iterator *getIterator(struct _zend_class_entry *entry, struct _zval_struct *object, int by_ref);
+    static struct _zend_object_iterator *getIterator(struct _zend_class_entry *entry, struct _zval_struct *object, int by_ref, void ***tsrm_ls);
 
     /**
      *  Function that is called when a property is being read
@@ -401,10 +399,13 @@ private:
      *  @param  offset          The name of the property
      *  @param  type            The type of the variable???
      *  @param  key             ???
+     *  @param  tsrm_ls
      *  @return zval
      */
-    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type, const struct _zend_literal *key);
-    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type);
+//    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type, const struct _zend_literal *key);
+    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type, const struct _zend_literal *key, void ***tsrm_ls);
+//    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type);
+    static struct _zval_struct *readProperty(struct _zval_struct *object, struct _zval_struct *name, int type, void ***tsrm_ls);
 
     /**
      *  Function that is called when a property is set / updated
@@ -412,28 +413,37 @@ private:
      *  @param  name            The name of the property
      *  @param  value           The new value
      *  @param  key             ???
+     *  @param  tsrm_ls
      *  @return zval
      */
-    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value, const struct _zend_literal *key);
-    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value);
+//    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value, const struct _zend_literal *key);
+    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value, const struct _zend_literal *key, void ***tsrm_ls);
+//    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value);
+    static void writeProperty(struct _zval_struct *object, struct _zval_struct *name, struct _zval_struct *value, void ***tsrm_ls);
 
     /**
      *  Function that is called to check whether a certain property is set
      *  @param  object          The object on which it is called
      *  @param  name            The name of the property to check
      *  @param  has_set_exists  See above
+     *  @param  tsrm_ls
      *  @return bool
      */
-    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists, const struct _zend_literal *key);
-    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists);
+//    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists, const struct _zend_literal *key);
+    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists, const struct _zend_literal *key, void ***tsrm_ls);
+//    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists);
+    static int hasProperty(struct _zval_struct *object, struct _zval_struct *name, int has_set_exists, void ***tsrm_ls);
 
     /**
      *  Function that is called when a property is removed from the project
      *  @param  object          The object on which it is called
      *  @param  member          The member to remove
+     *  @param  tsrm_ls
      */
-    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member, const struct _zend_literal *key);
-    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member);
+//    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member, const struct _zend_literal *key);
+    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member, const struct _zend_literal *key, void ***tsrm_ls);
+//    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member);
+    static void unsetProperty(struct _zval_struct *object, struct _zval_struct *member, void ***tsrm_ls);
 
     /**
      *  Method that returns information about the function signature of a undefined method
@@ -441,10 +451,13 @@ private:
      *  @param  method
      *  @param  method_len
      *  @param  key
+     *  @param  tsrm_ls
      *  @return zend_function
      */
-    static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, const struct _zend_literal *key);
+//    static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, const struct _zend_literal *key);
     static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len);
+//    static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, const struct _zend_literal *key, void ***tsrm_ls);
+    static union _zend_function *getMethod(struct _zval_struct **object_ptr, char *method, int method_len, void ***tsrm_ls);
 
     /**
      *  Method that returns information about the function signature of an undefined static method
@@ -452,9 +465,11 @@ private:
      *  @param  method
      *  @param  method_len
      *  @param  key
+     *  @param  tsrm_ls
      *  @return zend_function
      */
-    static union _zend_function *getStaticMethod(struct _zend_class_entry *entry, char* method, int method_len);
+//    static union _zend_function *getStaticMethod(struct _zend_class_entry *entry, char* method, int method_len);
+    static union _zend_function *getStaticMethod(struct _zend_class_entry *entry, char* method, int method_len, void ***tsrm_ls);
 
     /**
      *  Method that returns information about the __invoke() method
@@ -462,26 +477,32 @@ private:
      *  @param  entry
      *  @param  func
      *  @param  object_ptr
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int getClosure(struct _zval_struct *object, struct _zend_class_entry **entry, union _zend_function **func, struct _zval_struct **object_ptr);
+//    static int getClosure(struct _zval_struct *object, struct _zend_class_entry **entry, union _zend_function **func, struct _zval_struct **object_ptr);
+    static int getClosure(struct _zval_struct *object, struct _zend_class_entry **entry, union _zend_function **func, struct _zval_struct **object_ptr, void ***tsrm_ls);
 
     /**
      *  Function to cast the object to a different type
      *  @param  object
      *  @param  retval
      *  @param  type
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int cast(struct _zval_struct *object, struct _zval_struct *retval, int type);
+//    static int cast(struct _zval_struct *object, struct _zval_struct *retval, int type);
+    static int cast(struct _zval_struct *object, struct _zval_struct *retval, int type, void ***tsrm_ls);
 
     /**
      *  Function to compare two objects
      *  @param  object1
      *  @param  object2
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int compare(struct _zval_struct *object1, struct _zval_struct *object2);
+//    static int compare(struct _zval_struct *object1, struct _zval_struct *object2);
+    static int compare(struct _zval_struct *object1, struct _zval_struct *object2, void ***tsrm_ls);
 
     /**
      *  Methods that are called to serialize/unserialize an object
@@ -490,10 +511,13 @@ private:
      *  @param  buffer      Buffer in which to store the data
      *  @param  buf_len     Size of the bufffer
      *  @param  data        Structure describing the serialize/unserialize data
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int serialize(struct _zval_struct *object, unsigned char **buffer, unsigned int *buf_len, struct _zend_serialize_data *data);
-    static int unserialize(struct _zval_struct **object, struct _zend_class_entry *entry, const unsigned char *buffer, unsigned int buf_len, struct _zend_unserialize_data *data);
+//    static int serialize(struct _zval_struct *object, unsigned char **buffer, unsigned int *buf_len, struct _zend_serialize_data *data);
+    static int serialize(struct _zval_struct *object, unsigned char **buffer, unsigned int *buf_len, struct _zend_serialize_data *data, void ***tsrm_ls);
+//    static int unserialize(struct _zval_struct **object, struct _zend_class_entry *entry, const unsigned char *buffer, unsigned int buf_len, struct _zend_unserialize_data *data);
+    static int unserialize(struct _zval_struct **object, struct _zend_class_entry *entry, const unsigned char *buffer, unsigned int buf_len, struct _zend_unserialize_data *data, void ***tsrm_ls);
 
     /**
      *  Name of the class

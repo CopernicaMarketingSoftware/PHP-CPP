@@ -21,6 +21,7 @@ class InvalidIterator : public IteratorImpl
 public:
     /**
      *  Clone the object
+     *  @param  tsrm_ls
      *  @return IteratorImpl
      */
     virtual IteratorImpl *clone()
@@ -31,6 +32,7 @@ public:
 
     /**
      *  Increment position (pre-increment)
+     *  @param  tsrm_ls
      *  @return bool
      */
     virtual bool increment() override

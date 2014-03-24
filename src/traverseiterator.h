@@ -24,30 +24,32 @@ public:
      *  Constructor
      *  @param  object
      *  @param  begin
+     *  @param  tsrm_ls
      */
-    TraverseIterator(zval *object, bool begin) : _object(object)
+    TraverseIterator(zval *object, bool begin TSRMLS_DC) : _object(object)
     {
         // leap out if this iterator starts at the end
         if (!begin) return;
         
         // we need the class entry
-        auto *entry = zend_get_class_entry(object);
+        auto *entry = zend_get_class_entry(object TSRMLS_CC);
         
         // create the iterator
-        _iter = entry->get_iterator(entry, object, false);
+        _iter = entry->get_iterator(entry, object, false TSRMLS_CC);
         
         // rewind the iterator
-        _iter->funcs->rewind(_iter);
+        _iter->funcs->rewind(_iter TSRMLS_CC);
         
         // read the first key/value pair
-        read();
+        read(TSRMLS_C);
     }
     
     /**
      *  Copy constructor
      *  @param  that
+     *  @param  tsrm_ls
      */
-    TraverseIterator(const TraverseIterator &that) : TraverseIterator(that._object, that._iter != nullptr)
+    TraverseIterator(const TraverseIterator &that TSRMLS_DC) : TraverseIterator(that._object, that._iter != nullptr TSRMLS_CC)
     {
         // @todo    this is a broken implementation, the copy is at the start
         //          position, while we'd like to be at the same position
@@ -58,33 +60,48 @@ public:
      */
     virtual ~TraverseIterator()
     {
+        // do nothing if iterator is already invalid
+        if (!_iter) return;
+        
+        // we need the tsrm pointer
+        TSRMLS_FETCH();
+        
         // call the iterator destructor
-        if (_iter) _iter->funcs->dtor(_iter);
+        if (_iter) _iter->funcs->dtor(_iter TSRMLS_CC);
     }
 
     /**
      *  Clone the object
+     *  @param  tsrm_ls
      *  @return IteratorImpl*
      */
     virtual IteratorImpl *clone() override
     {
-        return new TraverseIterator(*this);
+        // we need the tsrm_ls variable
+        TSRMLS_FETCH();
+        
+        // construct iterator
+        return new TraverseIterator(*this TSRMLS_CC);
     }
 
     /**
      *  Increment position (pre-increment)
+     *  @param  tsrm_ls
      *  @return bool
      */
     virtual bool increment() override
     {
         // do we still have an iterator?
         if (!_iter) return false;
+
+        // we need the tsrm_ls variable
+        TSRMLS_FETCH();
         
         // movw it forward
-        _iter->funcs->move_forward(_iter);
+        _iter->funcs->move_forward(_iter TSRMLS_CC);
         
         // and read current data
-        read();
+        read(TSRMLS_C);
     }
     
     /**
@@ -149,15 +166,16 @@ private:
 
     /**
      *  Read current data
+     *  @param  tsrm_ls
      *  @return bool
      */
-    bool read()
+    bool read(TSRMLS_D)
     {
         // not possible when no iterator exists
         if (!_iter) return false;
 
         // is the iterator at a valid position?
-        if (_iter->funcs->valid(_iter) == FAILURE) return invalidate();
+        if (_iter->funcs->valid(_iter TSRMLS_CC) == FAILURE) return invalidate(TSRMLS_C);
 
 #if PHP_VERSION_ID >= 50400
 
@@ -165,7 +183,7 @@ private:
         Value val;
         
         // call the function to get the key
-        _iter->funcs->get_current_key(_iter, val._val);
+        _iter->funcs->get_current_key(_iter, val._val TSRMLS_CC);
         
         // store the key
         _data.first = val;
@@ -177,7 +195,7 @@ private:
         char *str_key; unsigned int str_key_len; unsigned long int_key;
 
         // php 5.3 code, fetch the current key
-        int type = _iter->funcs->get_current_key(_iter, &str_key, &str_key_len, &int_key);
+        int type = _iter->funcs->get_current_key(_iter, &str_key, &str_key_len, &int_key TSRMLS_CC);
         
         // what sort of key do we have?
         if (type == HASH_KEY_IS_LONG) 
@@ -204,7 +222,7 @@ private:
         zval **zval;
         
         // get the current value
-        _iter->funcs->get_current_data(_iter, &zval);
+        _iter->funcs->get_current_data(_iter, &zval TSRMLS_CC);
         
         // wrap the zval in a value object
         _data.second = Value(*zval);
@@ -215,15 +233,16 @@ private:
     
     /**
      *  Invalidate the object
+     *  @param  tsrm_ls
      *  @return bool
      */
-    bool invalidate()
+    bool invalidate(TSRMLS_D)
     {
         // skip if already invalid
         if (!_iter) return false;
         
         // reset the iterator
-        _iter->funcs->dtor(_iter);
+        _iter->funcs->dtor(_iter TSRMLS_CC);
         
         // set back to null
         _iter = nullptr;

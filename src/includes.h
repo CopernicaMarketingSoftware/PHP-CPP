@@ -25,16 +25,18 @@
 
 /**
  *  @todo: if ZTS defined many errors appear. need debug.
+ *  @todo this should come from some external source
  */
-//#define ZTS 1
+// #define ZTS 1
+// #define PTHREADS 1
 
 /**
  *  PHP includes
  */
 #pragma GCC system_header
 #include <php.h>
-#include "zend_exceptions.h"
-#include "zend_interfaces.h"
+#include <zend_exceptions.h>
+#include <zend_interfaces.h>
 
 /**
  *  Macro to convert results to success status

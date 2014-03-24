@@ -92,23 +92,29 @@ private:
     /**
      *  Iterator destructor method
      *  @param  iter
+     *  @param  tsrm_ls
      */
-    static void destructor(struct _zend_object_iterator *iter);
+//    static void destructor(struct _zend_object_iterator *iter);
+    static void destructor(struct _zend_object_iterator *iter, void ***tsrm_ls);
 
     /**
      *  Iterator valid function
      *  Returns FAILURE or SUCCESS
      *  @param  iter
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int valid(struct _zend_object_iterator *iter);
+//    static int valid(struct _zend_object_iterator *iter);
+    static int valid(struct _zend_object_iterator *iter, void ***tsrm_ls);
 
     /**
      *  Fetch the current item
      *  @param  iter
      *  @param  data
+     *  @param  tsrm_ls
      */
-    static void current(struct _zend_object_iterator *iter, struct _zval_struct ***data);
+//    static void current(struct _zend_object_iterator *iter, struct _zval_struct ***data);
+    static void current(struct _zend_object_iterator *iter, struct _zval_struct ***data, void ***tsrm_ls);
 
     /**
      *  Fetch the key for the current element (optional, may be NULL). The key
@@ -117,8 +123,10 @@ private:
      *  used.
      *  @param  iter
      *  @param  data
+     *  @param  tsrm_ls
      */
-    static void key(struct _zend_object_iterator *iter, struct _zval_struct *data);
+//    static void key(struct _zend_object_iterator *iter, struct _zval_struct *data);
+    static void key(struct _zend_object_iterator *iter, struct _zval_struct *data, void ***tsrm_ls);
 
     /**
      *  Function to retrieve the current key, php 5.3 style
@@ -126,21 +134,27 @@ private:
      *  @param  str_key
      *  @param  str_key_len
      *  @param  int_key
+     *  @param  tsrm_ls
      *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
      */
-    static int key(struct _zend_object_iterator *iter, char **str_key, unsigned int *str_key_len, unsigned long *int_key);
+//    static int key(struct _zend_object_iterator *iter, char **str_key, unsigned int *str_key_len, unsigned long *int_key);
+    static int key(struct _zend_object_iterator *iter, char **str_key, unsigned int *str_key_len, unsigned long *int_key, void ***tsrm_ls);
 
     /**
      *  Step forwards to the next element
      *  @param  iter
+     *  @param  tsrm_ls
      */
-    static void next(struct _zend_object_iterator *iter);
+//    static void next(struct _zend_object_iterator *iter);
+    static void next(struct _zend_object_iterator *iter, void ***tsrm_ls);
 
     /**
      *  Rewind the iterator back to the start
      *  @param  iter
+     *  @param  tsrm_ls
      */
-    static void rewind(struct _zend_object_iterator *iter);
+//    static void rewind(struct _zend_object_iterator *iter);
+    static void rewind(struct _zend_object_iterator *iter, void ***tsrm_ls);
 
     /**
      *  Get access to all iterator functions

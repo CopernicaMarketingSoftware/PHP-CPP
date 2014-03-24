@@ -79,16 +79,17 @@ static int match_module(_zend_module_entry *entry)
 /**
  *  Find an extension based on the module number
  *  @param  number
+ *  @param  tsrm_ls
  *  @return Extension*
  */
-static Extension *find(int number)
+static Extension *find(int number TSRMLS_DC)
 {
     // do we already have an extension with this number?
     auto iter = number2extension.find(number);
     if (iter != number2extension.end()) return iter->second;
     
     // no, not yet, loop through all modules
-    zend_hash_apply(&module_registry, (apply_func_t)match_module);
+    zend_hash_apply(&module_registry, (apply_func_t)match_module TSRMLS_CC);
     
     // find again
     iter = number2extension.find(number);
@@ -102,18 +103,19 @@ static Extension *find(int number)
  *  Function that is called when the extension initializes
  *  @param  type        Module type
  *  @param  number      Module number
+ *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int Extension::onStartup(int type, int module_number)
+int Extension::onStartup(int type, int module_number TSRMLS_DC)
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
     
     // get the extension
-    Extension *extension = find(module_number);
+    Extension *extension = find(module_number TSRMLS_CC);
     
     // initialize namespace
-    extension->initialize("");
+    extension->initialize("" TSRMLS_CC);
     
     // is the callback registered?
     if (extension->_onStartup) extension->_onStartup();
@@ -126,12 +128,13 @@ int Extension::onStartup(int type, int module_number)
  *  Function that is called when the extension is about to be stopped
  *  @param  type        Module type
  *  @param  number      Module number
+ *  @param  tsrm_ls
  *  @return int
  */
-int Extension::onShutdown(int type, int module_number)
+int Extension::onShutdown(int type, int module_number TSRMLS_DC)
 {
     // get the extension
-    Extension *extension = find(module_number);
+    Extension *extension = find(module_number TSRMLS_CC);
     
     // is the callback registered?
     if (extension->_onShutdown) extension->_onShutdown();
@@ -144,12 +147,13 @@ int Extension::onShutdown(int type, int module_number)
  *  Function that is called when a request starts
  *  @param  type        Module type
  *  @param  number      Module number
+ *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int Extension::onRequest(int type, int module_number)
+int Extension::onRequest(int type, int module_number TSRMLS_DC)
 {
     // get the extension
-    Extension *extension = find(module_number);
+    Extension *extension = find(module_number TSRMLS_CC);
     
     // is the callback registered?
     if (extension->_onRequest) extension->_onRequest();
@@ -162,12 +166,13 @@ int Extension::onRequest(int type, int module_number)
  *  Function that is called when a request is ended
  *  @param  type        Module type
  *  @param  number      Module number
+ *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int Extension::onIdle(int type, int module_number)
+int Extension::onIdle(int type, int module_number TSRMLS_DC)
 {
     // get the extension
-    Extension *extension = find(module_number);
+    Extension *extension = find(module_number TSRMLS_CC);
     
     // is the callback registered?
     if (extension->_onIdle) extension->_onIdle();
@@ -210,7 +215,6 @@ Extension::Extension(const char *name, const char *version) : Namespace("")
     _entry->info_func = NULL;                               // information for retrieving info
     _entry->version = version;                              // version string
     _entry->globals_size = 0;                               // size of the global variables
-    _entry->globals_ptr = NULL;                             // pointer to the globals
     _entry->globals_ctor = NULL;                            // constructor for global variables
     _entry->globals_dtor = NULL;                            // destructor for global variables
     _entry->post_deactivate_func = NULL;                    // unknown function

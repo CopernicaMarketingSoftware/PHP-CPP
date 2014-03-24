@@ -62,9 +62,11 @@ public:
      * 
      *  This will restore the exception so that it can be further processed 
      *  in PHP code
+     * 
+     *  @param  tsrm_ls
      *  @internal
      */
-    virtual void process() override
+    virtual void process(TSRMLS_D) override
     {
         // mark exception as restored
         _restored = true;

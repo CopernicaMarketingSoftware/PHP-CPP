@@ -30,6 +30,9 @@ Super REQUEST   (TRACK_VARS_REQUEST);
  */
 Value Super::operator[](const std::string &key) const
 {
+    // we need the tsrm_ls pointer
+    TSRMLS_FETCH();
+    
     // create a value object that wraps around the actual zval
     Value value(PG(http_globals)[_index]);
     
@@ -45,6 +48,9 @@ Value Super::operator[](const std::string &key) const
  */
 Value Super::operator[](const char *key) const
 {
+    // we need the tsrm_ls pointer
+    TSRMLS_FETCH();
+
     // create a value object that wraps around the actual zval
     Value value(PG(http_globals)[_index]);
     

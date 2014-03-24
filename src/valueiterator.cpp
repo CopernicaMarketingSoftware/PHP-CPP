@@ -16,6 +16,7 @@ namespace Php {
 /**
  *  Copy constructor
  *  @param  that
+ *  @param  tsrm_ls
  */
 ValueIterator::ValueIterator(const ValueIterator &that) : _impl(that._impl->clone()) {}
 

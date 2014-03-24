@@ -181,33 +181,41 @@ private:
      *  Function that is called when the extension initializes
      *  @param  type        Module type
      *  @param  number      Module number
+     *  @param  tsrm_ls
      *  @return int         0 on success
      */
-    static int onStartup(int type, int module_number);
-
+//    static int onStartup(int type, int module_number);
+    static int onStartup(int type, int module_number, void ***tsrm_ls);
+    
     /**
      *  Function that is called when the extension is about to be stopped
      *  @param  type        Module type
      *  @param  number      Module number
+     *  @param  tsrm_ls
      *  @return int
      */
-    static int onShutdown(int type, int module_number);
+//    static int onShutdown(int type, int module_number);
+    static int onShutdown(int type, int module_number, void ***tsrm_ls);
     
-        /**
-    *  Function that is called when a request starts
-    *  @param  type        Module type
-    *  @param  number      Module number
-    *  @return int         0 on success
-    */
-    static int onRequest(int type, int module_number);
+    /**
+     *  Function that is called when a request starts
+     *  @param  type        Module type
+     *  @param  number      Module number
+     *  @param  tsrm_ls
+     *  @return int         0 on success
+     */
+//    static int onRequest(int type, int module_number);
+    static int onRequest(int type, int module_number, void ***tsrm_ls);
 
     /**
-    *  Function that is called when a request is ended
-    *  @param  type        Module type
-    *  @param  number      Module number
-    *  @return int         0 on success
-    */
-    static int onIdle(int type, int module_number);
+     *  Function that is called when a request is ended
+     *  @param  type        Module type
+     *  @param  number      Module number
+     *  @param  tsrm_ls
+     *  @return int         0 on success
+     */
+//    static int onIdle(int type, int module_number);
+    static int onIdle(int type, int module_number, void ***tsrm_ls);
 };
 
 /**

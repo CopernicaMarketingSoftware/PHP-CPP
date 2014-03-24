@@ -39,6 +39,9 @@ Global Globals::operator[](const char *name)
     // pointer to a zval
     zval **varvalue;
     
+    // we need the TSRMLS variable
+    TSRMLS_FETCH();
+    
     // check if the variable already exists
     if (zend_hash_find(&EG(symbol_table), name, strlen(name)+1, (void**)&varvalue) == FAILURE) 
     {
@@ -63,6 +66,9 @@ Global Globals::operator[](const std::string &name)
 {
     // pointer to a zval
     zval **varvalue;
+
+    // we need the TSRMLS variable
+    TSRMLS_FETCH();
     
     // check if the variable already exists
     if (zend_hash_find(&EG(symbol_table), name.c_str(), name.size()+1, (void**)&varvalue) == FAILURE) 

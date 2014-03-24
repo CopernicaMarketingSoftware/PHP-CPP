@@ -17,7 +17,7 @@ namespace Php {
  *  @param  argc        Number of arguments
  *  @param  tsrm_ls
  */
-Parameters::Parameters(zval *this_ptr, int argc TSRMLS_DC) : _this(this_ptr)
+Parameters::Parameters(zval *this_ptr, int argc TSRMLS_DC)
 {
     // reserve plenty of space
     reserve(argc);
@@ -31,24 +31,15 @@ Parameters::Parameters(zval *this_ptr, int argc TSRMLS_DC) : _this(this_ptr)
         // append value
         push_back(Value(*arg));
     }
-}
+    
+    // skip if there is no this_ptr
+    if (!this_ptr) return;
 
-/**
- *  The the object that is called
- *  @return Base
- */
-Base *Parameters::object()
-{
-    // do we have a this pointer in the first place? The member is not set
-    // when static methods are being called, or when a regular function is
-    // called in a static context
-    if (!_this) return nullptr;
-    
     // get the mixed object
-    MixedObject *obj = (MixedObject *)zend_object_store_get_object(_this TSRMLS_CC);
+    MixedObject *obj = (MixedObject *)zend_object_store_get_object(this_ptr TSRMLS_CC);
     
-    // return the CPP object
-    return obj->cpp;
+    // store the CPP object
+    _object = obj->cpp;
 }
 
 /**

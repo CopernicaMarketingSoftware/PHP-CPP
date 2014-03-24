@@ -27,6 +27,7 @@ public:
      *  Constructor
      *  @param  hashtable       The hashtable to iterate over
      *  @param  first           Should it start on the first position?
+     *  @param  tsrm_ls
      */
     HashIterator(HashTable *hashtable, bool first) : _table(hashtable)
     {
@@ -52,8 +53,9 @@ public:
     /**
      *  Copy constructor
      *  @param  that
+     *  @param  tsrm_ls
      */
-    HashIterator(const HashIterator &that) :
+    HashIterator(const HashIterator &that TSRMLS_DC) :
         _table(that._table), _position(that._position)
     {
         // read current position
@@ -67,6 +69,7 @@ public:
     
     /**
      *  Clone the object
+     *  @param  tsrm_ls
      *  @return IteratorImpl
      */
     virtual IteratorImpl *clone()

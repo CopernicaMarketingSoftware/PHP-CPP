@@ -246,9 +246,11 @@ private:
     /**
      *  Store the object in the zend object cache
      *  @param  entry
+     *  @param  tsrm_ls
      *  @return MixedObject
      */
     MixedObject *store(struct _zend_class_entry *entry);
+    MixedObject *store(struct _zend_class_entry *entry, void ***tsrm_ls);
 
     /**
      *  Retrieve the handle

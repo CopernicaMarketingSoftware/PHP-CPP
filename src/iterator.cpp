@@ -16,8 +16,9 @@ namespace Php {
 /**
  *  Iterator destructor method
  *  @param  iter
+ *  @param  tsrm_ls
  */
-void Iterator::destructor(zend_object_iterator *iter)
+void Iterator::destructor(zend_object_iterator *iter TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
@@ -33,9 +34,10 @@ void Iterator::destructor(zend_object_iterator *iter)
  *  Iterator valid function
  *  Returns FAILURE or SUCCESS
  *  @param  iter
+ *  @param  tsrm_ls
  *  @return int
  */
-int Iterator::valid(zend_object_iterator *iter)
+int Iterator::valid(zend_object_iterator *iter TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
@@ -48,8 +50,9 @@ int Iterator::valid(zend_object_iterator *iter)
  *  Fetch the current item
  *  @param  iter
  *  @param  data
+ *  @param  tsrm_ls
  */
-void Iterator::current(zend_object_iterator *iter, zval ***data)
+void Iterator::current(zend_object_iterator *iter, zval ***data TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
@@ -69,8 +72,9 @@ void Iterator::current(zend_object_iterator *iter, zval ***data)
  *  used.
  *  @param  iter
  *  @param  key
+ *  @param  tsrm_ls
  */
-void Iterator::key(zend_object_iterator *iter, zval *key)
+void Iterator::key(zend_object_iterator *iter, zval *key TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
@@ -91,9 +95,10 @@ void Iterator::key(zend_object_iterator *iter, zval *key)
  *  @param  str_key
  *  @param  str_key_len
  *  @param  int_key
+ *  @param  tsrm_ls
  *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
  */
-int Iterator::key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key)
+int Iterator::key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
@@ -124,8 +129,9 @@ int Iterator::key(zend_object_iterator *iter, char **str_key, uint *str_key_len,
 /**
  *  Step forwards to the next element
  *  @param  iter
+ *  @param  tsrm_ls
  */
-void Iterator::next(zend_object_iterator *iter)
+void Iterator::next(zend_object_iterator *iter TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;
@@ -137,8 +143,9 @@ void Iterator::next(zend_object_iterator *iter)
 /**
  *  Rewind the iterator back to the start
  *  @param  iter
+ *  @param  tsrm_ls
  */
-void Iterator::rewind(zend_object_iterator *iter)
+void Iterator::rewind(zend_object_iterator *iter TSRMLS_DC)
 {
     // get the actual iterator
     Iterator *iterator = (Iterator *)iter->data;

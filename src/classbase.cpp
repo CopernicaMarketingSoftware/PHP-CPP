@@ -42,10 +42,10 @@ static ClassBase *cpp_class(zend_class_entry *entry)
  *  @param  val
  *  @return Base
  */
-static Base *cpp_object(const zval *val)
+static Base *cpp_object(const zval *val TSRMLS_DC)
 {
     // retrieve the old object, which we are going to copy
-    MixedObject *object = (MixedObject *)zend_object_store_get_object(val);
+    MixedObject *object = (MixedObject *)zend_object_store_get_object(val TSRMLS_CC);
 
     // return the cpp object
     return object->cpp;
@@ -119,7 +119,7 @@ void ClassBase::callMethod(INTERNAL_FUNCTION_PARAMETERS)
         Value result(return_value, true);
 
         // construct parameters
-        Parameters params(this_ptr, ZEND_NUM_ARGS());
+        Parameters params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
 
         // retrieve the base object
         Base *base = params.object();
@@ -136,7 +136,7 @@ void ClassBase::callMethod(INTERNAL_FUNCTION_PARAMETERS)
     catch (Exception &exception)
     {
         // process the exception
-        exception.process();
+        exception.process(TSRMLS_C);
     }
 }
 
@@ -165,7 +165,7 @@ void ClassBase::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
         Value result(return_value, true);
 
         // construct parameters
-        Parameters params(this_ptr, ZEND_NUM_ARGS());
+        Parameters params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
 
         // retrieve the base object
         Base *base = params.object();
@@ -182,7 +182,7 @@ void ClassBase::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
     catch (Exception &exception)
     {
         // process the exception
-        exception.process();
+        exception.process(TSRMLS_C);
     }
 }
 
@@ -191,12 +191,13 @@ void ClassBase::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
  *  @param  object_ptr
  *  @param  method_name
  *  @param  method_len
+ *  @param  tsrm_ls
  *  @return zend_function
  */
 #if PHP_VERSION_ID < 50399
-zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len)
+zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len TSRMLS_DC)
 #else
-zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len, const struct _zend_literal *key)
+zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int method_len, const struct _zend_literal *key TSRMLS_DC)
 #endif
 {
     // something strange about the Zend engine (once more). The structure with
@@ -209,16 +210,16 @@ zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int me
     // first we'll check if the default handler does not have an implementation,
     // in that case the method is probably already implemented as a regular method
 #if PHP_VERSION_ID < 50399
-    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len);
+    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len TSRMLS_CC);
 #else
-    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len, key);
+    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len, key TSRMLS_CC);
 #endif
 
     // did the default implementation do anything?
     if (defaultFunction) return defaultFunction;
     
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(*object_ptr);
+    auto *entry = zend_get_class_entry(*object_ptr TSRMLS_CC);
 
     // this is peculiar behavior of the zend engine, we first are going to dynamically 
     // allocate memory holding all the properties of the __call method (we initially
@@ -253,16 +254,17 @@ zend_function *ClassBase::getMethod(zval **object_ptr, char *method_name, int me
  *  @param  entry
  *  @param  method
  *  @param  method_len
+ *  @param  tsrm_ls
  *  @return zend_function
  */
-zend_function *ClassBase::getStaticMethod(zend_class_entry *entry, char* method, int method_len)
+zend_function *ClassBase::getStaticMethod(zend_class_entry *entry, char* method, int method_len TSRMLS_DC)
 {
     // first we'll check if the default handler does not have an implementation,
     // in that case the method is probably already implemented as a regular method
 #if PHP_VERSION_ID < 50399
-    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len);
+    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len TSRMLS_CC);
 #else
-    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len, nullptr);
+    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len, nullptr TSRMLS_CC);
 #endif
 
     // did the default implementation do anything?
@@ -298,9 +300,10 @@ zend_function *ClassBase::getStaticMethod(zend_class_entry *entry, char* method,
  *  @param  entry_ptr
  *  @param  func
  *  @param  object_ptr
+ *  @param  tsrm_ls
  *  @return int
  */
-int ClassBase::getClosure(zval *object, zend_class_entry **entry_ptr, zend_function **func, zval **object_ptr)
+int ClassBase::getClosure(zval *object, zend_class_entry **entry_ptr, zend_function **func, zval **object_ptr TSRMLS_DC)
 {
     // it is really unbelievable how the Zend engine manages to implement every feature
     // in a complete different manner. You would expect the __invoke() and the
@@ -310,7 +313,7 @@ int ClassBase::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     // method that is going to get called
     
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(object);
+    auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // just like we did for getMethod(), we're going to dynamically allocate memory
     // with all information about the function
@@ -363,7 +366,8 @@ zend_object_handlers *ClassBase::objectHandlers()
     memcpy(&handlers, &std_object_handlers, sizeof(zend_object_handlers));
     
     // install custom clone function
-    handlers.clone_obj = clonable() ? &ClassBase::cloneObject : nullptr;
+    if (!clonable()) handlers.clone_obj = nullptr;
+    else handlers.clone_obj = &ClassBase::cloneObject;
     
     // functions for the Countable interface
     handlers.count_elements = &ClassBase::countElements;
@@ -401,25 +405,26 @@ zend_object_handlers *ClassBase::objectHandlers()
  *  Function to compare two objects
  *  @param  object1
  *  @param  object2
+ *  @param  tsrm_ls
  *  @return int
  */
-int ClassBase::compare(zval *object1, zval *object2)
+int ClassBase::compare(zval *object1, zval *object2 TSRMLS_DC)
 {
     // prevent exceptions
     try
     {
         // retrieve the class entry linked to this object
-        auto *entry = zend_get_class_entry(object1);
+        auto *entry = zend_get_class_entry(object1 TSRMLS_CC);
 
         // other object must be of the same type
-        if (entry != zend_get_class_entry(object2)) throw NotImplemented();
+        if (entry != zend_get_class_entry(object2 TSRMLS_CC)) throw NotImplemented();
 
         // we need the C++ class meta-information object
         ClassBase *meta = cpp_class(entry);
         
         // get the base objects
-        Base *base1 = cpp_object(object1);
-        Base *base2 = cpp_object(object2);
+        Base *base1 = cpp_object(object1 TSRMLS_CC);
+        Base *base2 = cpp_object(object2 TSRMLS_CC);
         
         // run the compare method
         return meta->callCompare(base1, base2);
@@ -430,13 +435,13 @@ int ClassBase::compare(zval *object1, zval *object2)
         if (!std_object_handlers.compare_objects) return 1;
         
         // call default
-        return std_object_handlers.compare_objects(object1, object2);
+        return std_object_handlers.compare_objects(object1, object2 TSRMLS_CC);
     }
     catch (Exception &exception)
     {
         // a Php::Exception was thrown by the extension __compare function, 
         // pass this on to user space
-        exception.process();
+        exception.process(TSRMLS_C);
         
         // what shall we return here...
         return 1;
@@ -448,15 +453,16 @@ int ClassBase::compare(zval *object1, zval *object2)
  *  @param  object
  *  @param  retval
  *  @param  type
+ *  @param  tsrm_ls
  *  @return int
  */
-int ClassBase::cast(zval *object, zval *retval, int type)
+int ClassBase::cast(zval *object, zval *retval, int type TSRMLS_DC)
 {
     // get the base object
-    Base *base = cpp_object(object);
+    Base *base = cpp_object(object TSRMLS_CC);
     
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(object);
+    auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // we need the C++ class meta-information object
     ClassBase *meta = cpp_class(entry);
@@ -503,12 +509,12 @@ int ClassBase::cast(zval *object, zval *retval, int type)
         if (!std_object_handlers.cast_object) return FAILURE;
         
         // call default
-        return std_object_handlers.cast_object(object, retval, type);
+        return std_object_handlers.cast_object(object, retval, type TSRMLS_CC);
     }
     catch (Exception &exception)
     {
         // pass on the exception to php userspace
-        exception.process();
+        exception.process(TSRMLS_C);
         
         // done
         return FAILURE;
@@ -523,13 +529,13 @@ int ClassBase::cast(zval *object, zval *retval, int type)
 zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
 {
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(val);
+    auto *entry = zend_get_class_entry(val TSRMLS_CC);
 
     // we need the C++ class meta-information object
     ClassBase *meta = cpp_class(entry);
 
     // retrieve the old object, which we are going to copy
-    MixedObject *old_object = (MixedObject *)zend_object_store_get_object(val);
+    MixedObject *old_object = (MixedObject *)zend_object_store_get_object(val TSRMLS_CC);
 
     // create a new base c++ object
     auto *cpp = meta->clone(old_object->cpp);
@@ -553,7 +559,7 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     
     // clone the members (this will also call the __clone() function if the user
     // had registered that as a visible method)
-    zend_objects_clone_members(&new_object->php, result, &old_object->php, Z_OBJ_HANDLE_P(val));
+    zend_objects_clone_members(&new_object->php, result, &old_object->php, Z_OBJ_HANDLE_P(val) TSRMLS_CC);
     
     // was a custom clone method installed? If not we call the magic c++ __clone method
     if (!entry->clone) meta->callClone(cpp);
@@ -575,7 +581,7 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
 int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
 {
     // does it implement the countable interface?
-    Countable *countable = dynamic_cast<Countable*>(cpp_object(object));
+    Countable *countable = dynamic_cast<Countable*>(cpp_object(object TSRMLS_CC));
 
     // if it does not implement the Countable interface, we rely on the default implementation
     if (countable) 
@@ -592,7 +598,7 @@ int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
         catch (Exception &exception)
         {
             // process the exception
-            exception.process();
+            exception.process(TSRMLS_C);
             
             // unreachable
             return FAILURE;
@@ -604,7 +610,7 @@ int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
         if (!std_object_handlers.count_elements) return FAILURE;
         
         // call default
-        return std_object_handlers.count_elements(object, count);
+        return std_object_handlers.count_elements(object, count TSRMLS_CC);
     }
 }
 
@@ -617,9 +623,10 @@ int ClassBase::countElements(zval *object, long *count TSRMLS_DC)
  *  @param  object          The object on which it is called
  *  @param  offset          The name of the property
  *  @param  type            The type of the variable???
+ *  @param  tsrm_ls
  *  @return zval
  */
-zval *ClassBase::readDimension(zval *object, zval *offset, int type)
+zval *ClassBase::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
 {
     // what to do with the type?
     //
@@ -640,7 +647,7 @@ zval *ClassBase::readDimension(zval *object, zval *offset, int type)
     
      
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -654,7 +661,7 @@ zval *ClassBase::readDimension(zval *object, zval *offset, int type)
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            exception.process();
+            exception.process(TSRMLS_C);
             
             // unreachable
             return Value(nullptr).detach();
@@ -666,7 +673,7 @@ zval *ClassBase::readDimension(zval *object, zval *offset, int type)
         if (!std_object_handlers.read_dimension) return nullptr;
         
         // call default
-        return std_object_handlers.read_dimension(object, offset, type);
+        return std_object_handlers.read_dimension(object, offset, type TSRMLS_CC);
     }
 }
 
@@ -679,12 +686,13 @@ zval *ClassBase::readDimension(zval *object, zval *offset, int type)
  *  @param  object          The object on which it is called
  *  @param  offset          The name of the property
  *  @param  value           The new value
+ *  @param  tsrm_ls
  *  @return zval
  */
-void ClassBase::writeDimension(zval *object, zval *offset, zval *value)
+void ClassBase::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -698,7 +706,7 @@ void ClassBase::writeDimension(zval *object, zval *offset, zval *value)
         catch (Exception &exception)
         {
             // process the exception (send it to user space
-            exception.process();
+            exception.process(TSRMLS_C);
         }
     }
     else
@@ -707,7 +715,7 @@ void ClassBase::writeDimension(zval *object, zval *offset, zval *value)
         if (!std_object_handlers.write_dimension) return;
         
         // call the default
-        std_object_handlers.write_dimension(object, offset, value);
+        std_object_handlers.write_dimension(object, offset, value TSRMLS_CC);
     }
 }
 
@@ -720,12 +728,13 @@ void ClassBase::writeDimension(zval *object, zval *offset, zval *value)
  *  @param  object          The object on which it is called
  *  @param  member          The member to check
  *  @param  check_empty     Was this an isset() call, or an empty() call?
+ *  @param  tsrm_ls
  *  @return bool
  */
-int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
+int ClassBase::hasDimension(zval *object, zval *member, int check_empty TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -746,7 +755,7 @@ int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            exception.process();
+            exception.process(TSRMLS_C);
             
             // unreachable
             return false;
@@ -758,7 +767,7 @@ int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
         if (!std_object_handlers.has_dimension) return 0;
 
         // call default
-        return std_object_handlers.has_dimension(object, member, check_empty);
+        return std_object_handlers.has_dimension(object, member, check_empty TSRMLS_CC);
     }
 }
 
@@ -770,11 +779,12 @@ int ClassBase::hasDimension(zval *object, zval *member, int check_empty)
  * 
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
+ *  @param  tsrm_ls
  */
-void ClassBase::unsetDimension(zval *object, zval *member)
+void ClassBase::unsetDimension(zval *object, zval *member TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -788,7 +798,7 @@ void ClassBase::unsetDimension(zval *object, zval *member)
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            exception.process();
+            exception.process(TSRMLS_C);
         }
     }
     else
@@ -797,7 +807,7 @@ void ClassBase::unsetDimension(zval *object, zval *member)
         if (!std_object_handlers.unset_dimension) return;
         
         // call the default
-        std_object_handlers.unset_dimension(object, member);
+        std_object_handlers.unset_dimension(object, member TSRMLS_CC);
     }
 }
 
@@ -831,12 +841,13 @@ zval *ClassBase::toZval(Value &&value, int type)
  *  @param  name
  *  @param  type
  *  @param  key
+ *  @param  tsrm_ls
  *  @return val
  */
 #if PHP_VERSION_ID < 50399
-zval *ClassBase::readProperty(zval *object, zval *name, int type)
+zval *ClassBase::readProperty(zval *object, zval *name, int type TSRMLS_DC)
 #else
-zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _zend_literal *key)
+zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _zend_literal *key TSRMLS_DC)
 #endif
 {
     // what to do with the type?
@@ -857,10 +868,10 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _
     // that is in most cases simply impossible.
 
     // retrieve the object and class
-    Base *base = cpp_object(object);
+    Base *base = cpp_object(object TSRMLS_CC);
     
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(object);
+    auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // we need the C++ class meta-information object
     ClassBase *meta = cpp_class(entry);
@@ -894,16 +905,16 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _
         
         // call default
 #if PHP_VERSION_ID < 50399
-        return std_object_handlers.read_property(object, name, type);
+        return std_object_handlers.read_property(object, name, type TSRMLS_CC);
 #else
-        return std_object_handlers.read_property(object, name, type, key);
+        return std_object_handlers.read_property(object, name, type, key TSRMLS_CC);
 #endif
     }
     catch (Exception &exception)
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process();
+        exception.process(TSRMLS_C);
         
         // unreachable
         return Value(nullptr).detach();
@@ -920,19 +931,20 @@ zval *ClassBase::readProperty(zval *object, zval *name, int type, const struct _
  *  @param  name            The name of the property
  *  @param  value           The new value
  *  @param  key             ???
+ *  @param  tsrm_ls
  *  @return zval
  */
 #if PHP_VERSION_ID < 50399
-void ClassBase::writeProperty(zval *object, zval *name, zval *value)
+void ClassBase::writeProperty(zval *object, zval *name, zval *value TSRMLS_DC)
 #else
-void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struct _zend_literal *key)
+void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struct _zend_literal *key TSRMLS_DC)
 #endif
 {
     // retrieve the object and class
-    Base *base = cpp_object(object);
+    Base *base = cpp_object(object TSRMLS_CC);
     
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(object);
+    auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // we need the C++ class meta-information object
     ClassBase *meta = cpp_class(entry);
@@ -969,16 +981,16 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struc
         
         // call the default
 #if PHP_VERSION_ID < 50399
-        std_object_handlers.write_property(object, name, value);
+        std_object_handlers.write_property(object, name, value TSRMLS_CC);
 #else
-        std_object_handlers.write_property(object, name, value, key);
+        std_object_handlers.write_property(object, name, value, key TSRMLS_CC);
 #endif
     }
     catch (Exception &exception)
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process();
+        exception.process(TSRMLS_C);
     }
 }
 
@@ -999,12 +1011,13 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struc
  *  @param  name            The name of the property to check
  *  @param  has_set_exists  See above
  *  @param  key             ???
+ *  @param  tsrm_ls
  *  @return bool
  */
 #if PHP_VERSION_ID < 50399
-int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists)
+int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, void ***tsrm_ls)
 #else
-int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const struct _zend_literal *key)
+int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const struct _zend_literal *key, void ***tsrm_ls)
 #endif
 {
     // the default implementation throws an exception, if we catch that
@@ -1012,10 +1025,10 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const s
     try
     {
         // get the cpp object
-        Base *base = cpp_object(object);
+        Base *base = cpp_object(object TSRMLS_CC);
         
         // retrieve the class entry linked to this object
-        auto *entry = zend_get_class_entry(object);
+        auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
         // we need the C++ class meta-information object
         ClassBase *meta = cpp_class(entry);
@@ -1048,16 +1061,16 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const s
 
         // call default
 #if PHP_VERSION_ID < 50399
-        return std_object_handlers.has_property(object, name, has_set_exists);
+        return std_object_handlers.has_property(object, name, has_set_exists TSRMLS_CC);
 #else
-        return std_object_handlers.has_property(object, name, has_set_exists, key);
+        return std_object_handlers.has_property(object, name, has_set_exists, key TSRMLS_CC);
 #endif
     }
     catch (Exception &exception)
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process();
+        exception.process(TSRMLS_C);
         
         // unreachable
         return false;
@@ -1072,11 +1085,12 @@ int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const s
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
  *  @param  key
+ *  @param  tsrm_ls
  */
 #if PHP_VERSION_ID < 50399
-void ClassBase::unsetProperty(zval *object, zval *member)
+void ClassBase::unsetProperty(zval *object, zval *member TSRMLS_DC)
 #else
-void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_literal *key)
+void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_literal *key TSRMLS_DC)
 #endif
 {
     // the default implementation throws an exception, if we catch that
@@ -1084,7 +1098,7 @@ void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_lit
     try
     {
         // retrieve the class entry linked to this object
-        auto *entry = zend_get_class_entry(object);
+        auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
         // we need the C++ class meta-information object
         ClassBase *meta = cpp_class(entry);
@@ -1096,7 +1110,7 @@ void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_lit
         auto iter = meta->_properties.find(name);
         
         // if the property does not exist, we forward to the __unset
-        if (iter == meta->_properties.end()) meta->callUnset(cpp_object(object), member);
+        if (iter == meta->_properties.end()) meta->callUnset(cpp_object(object TSRMLS_CC), member);
         
         // callback properties cannot be unset
         zend_error(E_ERROR, "Property %s can not be unset", (const char *)name);
@@ -1108,24 +1122,27 @@ void ClassBase::unsetProperty(zval *object, zval *member, const struct _zend_lit
         
         // call the default
 #if PHP_VERSION_ID < 50399
-        std_object_handlers.unset_property(object, member);
+        std_object_handlers.unset_property(object, member TSRMLS_CC);
 #else
-        std_object_handlers.unset_property(object, member, key);
+        std_object_handlers.unset_property(object, member, key TSRMLS_CC);
 #endif
     }
     catch (Exception &exception)
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process();
+        exception.process(TSRMLS_C);
     }
 }
 
 /**
  *  Function that is called when an object is about to be destructed
  *  This will call the magic __destruct method
+ *  @param  object
+ *  @param  handle
+ *  @param  tsrm_ls
  */
-void ClassBase::destructObject(zend_object *object, zend_object_handle handle)
+void ClassBase::destructObject(zend_object *object, zend_object_handle handle TSRMLS_DC)
 {
     // allocate memory for the object
     MixedObject *obj = (MixedObject *)object;
@@ -1142,21 +1159,22 @@ void ClassBase::destructObject(zend_object *object, zend_object_handle handle)
     catch (const NotImplemented &exception)
     {
         // fallback on the default destructor call
-        zend_objects_destroy_object(object, handle);
+        zend_objects_destroy_object(object, handle TSRMLS_CC);
     }
     catch (Exception &exception)
     {
         // a regular Php::Exception was thrown by the extension, pass it on
         // to PHP user space
-        exception.process();
+        exception.process(TSRMLS_C);
     }
 }
 
 /**
  *  Function that is called to clean up space that is occupied by the object
  *  @param  object      The object to be deallocated
+ *  @param  tsrm_ls
  */
-void ClassBase::freeObject(zend_object *object)
+void ClassBase::freeObject(zend_object *object TSRMLS_DC)
 {
     // allocate memory for the object
     MixedObject *obj = (MixedObject *)object;
@@ -1165,13 +1183,14 @@ void ClassBase::freeObject(zend_object *object)
     if (obj->cpp) delete obj->cpp;
     
     // pass on to the default destructor
-    zend_objects_free_object_storage(object);
+    zend_objects_free_object_storage(object TSRMLS_CC);
 }
 
 /**
  *  Function that is called when an instance of the class needs to be created.
  *  This function will create the C++ class, and the PHP object
  *  @param  entry                   Pointer to the class information
+ *  @param  tsrm_ls
  *  @return zend_object_value       The newly created object
  */
 zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
@@ -1206,15 +1225,16 @@ zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
  *  @param  entry                   The class entry
  *  @param  object                  The object to iterate over
  *  @param  by_ref                  ?????
+ *  @param  tsrm_ls
  *  @return zend_object_iterator*   Pointer to the iterator
  */
-zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *object, int by_ref)
+zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *object, int by_ref TSRMLS_DC)
 {
     // by-ref is not possible (copied from SPL)
     if (by_ref) throw Php::Exception("Foreach by ref is not possible");
     
     // retrieve the traversable object
-    Traversable *traversable = dynamic_cast<Traversable*>(cpp_object(object));
+    Traversable *traversable = dynamic_cast<Traversable*>(cpp_object(object TSRMLS_CC));
     
     // user may throw an exception in the getIterator() function
     try
@@ -1229,7 +1249,7 @@ zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *obje
     {
         // user threw an exception in its method 
         // implementation, send it to user space
-        exception.process();
+        exception.process(TSRMLS_C);
         
         // unreachable
         return nullptr;
@@ -1242,12 +1262,13 @@ zend_object_iterator *ClassBase::getIterator(zend_class_entry *entry, zval *obje
  *  @param  buffer      Buffer in which to store the data
  *  @param  buf_len     Size of the bufffer
  *  @param  data        ??
+ *  @param  tsrm_ls
  *  @return int
  */
-int ClassBase::serialize(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data)
+int ClassBase::serialize(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data TSRMLS_DC)
 {
     // get the serializable object
-    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(object));
+    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(object TSRMLS_CC));
     
     // call the serialize method on the object
     auto value = serializable->serialize();
@@ -1268,15 +1289,16 @@ int ClassBase::serialize(zval *object, unsigned char **buffer, zend_uint *buf_le
  *  @param  entry       The class entry to which is belongs
  *  @param  buffer      Buffer holding the unserialized data
  *  @param  data        All the unserialize data
+ *  @param  tsrm_ls
  *  @return int
  */
-int ClassBase::unserialize(zval **object, zend_class_entry *entry, const unsigned char *buffer, zend_uint buf_len, zend_unserialize_data *data)
+int ClassBase::unserialize(zval **object, zend_class_entry *entry, const unsigned char *buffer, zend_uint buf_len, zend_unserialize_data *data TSRMLS_DC)
 {
     // create the PHP object
     object_init_ex(*object, entry);
     
     // turn this into a serializale
-    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(*object));
+    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(*object TSRMLS_CC));
     
     // call the unserialize method on it
     serializable->unserialize((const char *)buffer, buf_len);
@@ -1334,8 +1356,9 @@ const struct _zend_function_entry *ClassBase::entries()
  *  class.
  * 
  *  @param  prefix      namespace prefix
+ *  @param  tsrm_ls
  */
-void ClassBase::initialize(const std::string &prefix)
+void ClassBase::initialize(const std::string &prefix TSRMLS_DC)
 {
     // the class entry
     zend_class_entry entry;
@@ -1394,7 +1417,7 @@ void ClassBase::initialize(const std::string &prefix)
     _entry->ce_flags = (int)_type;
     
     // declare all member variables
-    for (auto &member : _members) member->initialize(_entry);
+    for (auto &member : _members) member->initialize(_entry TSRMLS_CC);
 }
 
 /**

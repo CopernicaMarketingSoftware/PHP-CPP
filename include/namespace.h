@@ -199,18 +199,10 @@ protected:
     /**
      *  Initialize the namespace after it was registered
      *  @param  parent      Parent namespace
+     *  @param  tsrm_ls
      */
-    void initialize(const std::string &parent)
-    {
-        // the namespace to use
-        std::string prefix = parent.size() ? parent + "\\" + _name : _name;
-        
-        // loop through the classes in this namespace
-        for (auto &c : _classes) c->initialize(prefix);
-        
-        // and loop through the other namespaces
-        for (auto &n : _namespaces) n->initialize(prefix);
-    }
+//    void initialize(const std::string &parent);
+    void initialize(const std::string &parent, void ***tsrm_ls);
 };
     
 /**

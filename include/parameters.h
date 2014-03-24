@@ -29,25 +29,29 @@ public:
      *  @param  argc        Number of arguments
      *  @param  tsrm_ls
      */
-    Parameters(struct _zval_struct *this_ptr, int argc);// TSRMLS_DC);
+//    Parameters(struct _zval_struct *this_ptr, int argc);
+    Parameters(struct _zval_struct *this_ptr, int argc, void ***tsrm_ls);
 
     /**
      *  Destructor
      */
     virtual ~Parameters() {}
-    
+
     /**
      *  The object that is being called
      *  @return Base
      */
-    Base *object();
+    Base *object() const
+    {
+        return _object;
+    }
     
 private:
     /**
-     *  The this pointer
-     *  @var zval
+     *  The base object
+     *  @var Base
      */
-    struct _zval_struct *_this;
+    Base *_object = nullptr;
 };
 
 /**

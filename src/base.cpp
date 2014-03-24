@@ -15,9 +15,10 @@ namespace Php {
 /**
  *  Store the object in the PHP object cache
  *  @param  entry               Class entry
+ *  @param  tsrm_ls
  *  @return MixedObject
  */
-MixedObject *Base::store(zend_class_entry *entry)
+MixedObject *Base::store(zend_class_entry *entry TSRMLS_DC)
 {
     // allocate memory for the object
     MixedObject *result = (MixedObject *)emalloc(sizeof(MixedObject));
@@ -29,7 +30,7 @@ MixedObject *Base::store(zend_class_entry *entry)
     result->php.ce = entry;
     
     // initialize the object
-    zend_object_std_init(&result->php, entry);
+    zend_object_std_init(&result->php, entry TSRMLS_CC);
 
 #if PHP_VERSION_ID < 50399
 

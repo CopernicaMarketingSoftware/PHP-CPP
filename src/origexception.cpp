@@ -21,8 +21,11 @@ OrigException::~OrigException() noexcept
     // skip if the exception was restored
     if (_restored) return;
     
+    // we need the tsrm_ls var
+    TSRMLS_FETCH();
+    
     // clean up the exception, because it was handled in C++ code
-    zend_clear_exception();
+    zend_clear_exception(TSRMLS_C);
 }
 
 /**

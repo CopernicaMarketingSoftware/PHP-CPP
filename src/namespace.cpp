@@ -97,6 +97,24 @@ size_t Namespace::initialize(const std::string &parent, struct _zend_function_en
 }
 
 /**
+ *  Initialize the namespace after it was registered
+ *  @param  parent      Parent namespace
+ *  @param  tsrm_ls
+ */
+void Namespace::initialize(const std::string &parent TSRMLS_DC)
+{
+    // the namespace to use
+    std::string prefix = parent.size() ? parent + "\\" + _name : _name;
+    
+    // loop through the classes in this namespace
+    for (auto &c : _classes) c->initialize(prefix TSRMLS_CC);
+    
+    // and loop through the other namespaces
+    for (auto &n : _namespaces) n->initialize(prefix TSRMLS_CC);
+}
+
+
+/**
  *  End namespace
  */
 }
