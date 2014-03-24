@@ -27,8 +27,8 @@
  *  @todo: if ZTS defined many errors appear. need debug.
  *  @todo this should come from some external source
  */
-// #define ZTS 1
-// #define PTHREADS 1
+//#define ZTS 1
+//#define PTHREADS 1
 
 /**
  *  PHP includes

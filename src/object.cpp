@@ -37,7 +37,7 @@ Object::Object(const char *name, Base *base)
         if (!entry) throw Php::Exception(std::string("Unknown class name ") + name);
         
         // store the object in the php object cache (this will give the object a handle)
-        base->store(entry);
+        base->store(entry TSRMLS_CC);
         
         // now we can store it
         operator=(Value(base));

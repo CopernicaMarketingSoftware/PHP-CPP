@@ -552,7 +552,7 @@ zend_object_value ClassBase::cloneObject(zval *val TSRMLS_DC)
     result.handlers = meta->objectHandlers();
     
     // store the object
-    MixedObject *new_object = cpp->store(entry);
+    MixedObject *new_object = cpp->store(entry TSRMLS_CC);
 
     // store the object in the object cache
     result.handle = cpp->handle();
@@ -1211,7 +1211,7 @@ zend_object_value ClassBase::createObject(zend_class_entry *entry TSRMLS_DC)
     result.handlers = meta->objectHandlers();
     
     // store the object
-    cpp->store(entry);
+    cpp->store(entry TSRMLS_CC);
 
     // store the object in the object cache
     result.handle = cpp->handle();
