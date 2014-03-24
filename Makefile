@@ -16,7 +16,7 @@
 #   will find sub-directories named TSRM, Zend, ext and main.
 #
 
-PHP_DIR         =   /usr/include/php5
+PHP_DIR         =   `php-config --include-dir`
 
 
 #
@@ -27,7 +27,7 @@ PHP_DIR         =   /usr/include/php5
 #   You can see the command "whereis php"
 #
 
-PHP_BIN         =   /usr/bin/php
+PHP_BIN         =   `php-config --php-binary`
 
 
 #
