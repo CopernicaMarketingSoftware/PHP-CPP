@@ -47,9 +47,28 @@ MixedObject *Base::store(zend_class_entry *entry TSRMLS_DC)
 
 #endif    
 
+#if ZTS
+
+    // when in thread safety mode, the destruct method and free method have
+    // an extra parameter holding thread information
+    using DestructType = void(zend_object*,unsigned int,void***);
+    using FreeType = void(zend_object*,void***);
+    
+#else
+
+    // not in thread mode: no special parameter for the tsrm_ls variable
+    using DestructType = void(zend_object*,unsigned int);
+    using FreeType = void(zend_object*);
+    
+#endif
+    
+    // store the two destruct methods in temporary vars
+    DestructType *destructMethod = &ClassBase::destructObject;
+    FreeType *freeMethod = &ClassBase::freeObject;
+
     // the destructor and clone handlers are set to NULL. I dont know why, but they do not
     // seem to be necessary...
-    _handle = zend_objects_store_put(result, (zend_objects_store_dtor_t)ClassBase::destructObject, (zend_objects_free_object_storage_t)ClassBase::freeObject, NULL TSRMLS_CC);
+    _handle = zend_objects_store_put(result, (zend_objects_store_dtor_t)destructMethod, (zend_objects_free_object_storage_t)freeMethod, NULL TSRMLS_CC);
     
     // done
     return result;

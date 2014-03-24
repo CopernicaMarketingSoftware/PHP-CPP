@@ -201,8 +201,7 @@ protected:
      *  @param  parent      Parent namespace
      *  @param  tsrm_ls
      */
-//    void initialize(const std::string &parent);
-    void initialize(const std::string &parent, void ***tsrm_ls);
+    void initialize(const std::string &parent TSRMLS_DC);
 };
     
 /**

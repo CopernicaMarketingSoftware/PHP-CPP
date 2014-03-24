@@ -1015,9 +1015,9 @@ void ClassBase::writeProperty(zval *object, zval *name, zval *value, const struc
  *  @return bool
  */
 #if PHP_VERSION_ID < 50399
-int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, void ***tsrm_ls)
+int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists TSRMLS_DC)
 #else
-int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const struct _zend_literal *key, void ***tsrm_ls)
+int ClassBase::hasProperty(zval *object, zval *name, int has_set_exists, const struct _zend_literal *key TSRMLS_DC)
 #endif
 {
     // the default implementation throws an exception, if we catch that

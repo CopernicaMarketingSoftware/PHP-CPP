@@ -184,8 +184,7 @@ private:
      *  @param  tsrm_ls
      *  @return int         0 on success
      */
-//    static int onStartup(int type, int module_number);
-    static int onStartup(int type, int module_number, void ***tsrm_ls);
+    static int onStartup(int type, int module_number TSRMLS_DC);
     
     /**
      *  Function that is called when the extension is about to be stopped
@@ -194,8 +193,7 @@ private:
      *  @param  tsrm_ls
      *  @return int
      */
-//    static int onShutdown(int type, int module_number);
-    static int onShutdown(int type, int module_number, void ***tsrm_ls);
+    static int onShutdown(int type, int module_number TSRMLS_DC);
     
     /**
      *  Function that is called when a request starts
@@ -204,8 +202,7 @@ private:
      *  @param  tsrm_ls
      *  @return int         0 on success
      */
-//    static int onRequest(int type, int module_number);
-    static int onRequest(int type, int module_number, void ***tsrm_ls);
+    static int onRequest(int type, int module_number TSRMLS_DC);
 
     /**
      *  Function that is called when a request is ended
@@ -214,8 +211,7 @@ private:
      *  @param  tsrm_ls
      *  @return int         0 on success
      */
-//    static int onIdle(int type, int module_number);
-    static int onIdle(int type, int module_number, void ***tsrm_ls);
+    static int onIdle(int type, int module_number TSRMLS_DC);
 };
 
 /**

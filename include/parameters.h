@@ -29,8 +29,7 @@ public:
      *  @param  argc        Number of arguments
      *  @param  tsrm_ls
      */
-//    Parameters(struct _zval_struct *this_ptr, int argc);
-    Parameters(struct _zval_struct *this_ptr, int argc, void ***tsrm_ls);
+    Parameters(struct _zval_struct *this_ptr, int argc TSRMLS_DC);
 
     /**
      *  Destructor

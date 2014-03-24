@@ -249,8 +249,7 @@ private:
      *  @param  tsrm_ls
      *  @return MixedObject
      */
-    MixedObject *store(struct _zend_class_entry *entry);
-    MixedObject *store(struct _zend_class_entry *entry, void ***tsrm_ls);
+    MixedObject *store(struct _zend_class_entry *entry TSRMLS_DC);
 
     /**
      *  Retrieve the handle

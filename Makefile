@@ -16,7 +16,7 @@
 #   will find sub-directories named TSRM, Zend, ext and main.
 #
 
-PHP_DIR         =   /home/emiel/Downloads/php-5.3.24
+PHP_DIR         =   /usr/include/php5
 
 
 #
@@ -27,7 +27,7 @@ PHP_DIR         =   /home/emiel/Downloads/php-5.3.24
 #   You can see the command "whereis php"
 #
 
-PHP_BIN         =   /home/emiel/Downloads/php-5.3.24/sapi/cli
+PHP_BIN         =   /usr/bin/php
 
 
 #

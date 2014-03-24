@@ -65,8 +65,7 @@ public:
      * 
      *  @internal
      */
-//    virtual void process();
-    virtual void process(void ***tsrm_ls);
+    virtual void process(TSRMLS_D);
 };
 
 /**

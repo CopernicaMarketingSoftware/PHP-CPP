@@ -23,6 +23,14 @@
 #include <map>
 
 /**
+ *  Disable TSRM for now
+ */
+#define TSRMLS_C    
+#define TSRMLS_CC    
+#define TSRMLS_D
+#define TSRMLS_DC    
+
+/**
  *  Include all headers files that are related to this library
  */
 #include <phpcpp/exception.h>

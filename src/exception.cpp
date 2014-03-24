@@ -16,7 +16,7 @@ namespace Php {
 /**
  *  Process the exception
  * 
- *  This method is called only from withing the PHP-CPP library,
+ *  This method is called only from within the PHP-CPP library,
  *  and will turn the exception into a PHP exception
  * 
  *  @param  tsrm_ls
