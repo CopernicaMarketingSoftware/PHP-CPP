@@ -951,6 +951,8 @@ protected:
     friend class Extension;
     friend class HashIterator;
     friend class TraverseIterator;
+    friend class HashMember<int>;
+    friend class HashMember<std::string>;
 };
 
 /**

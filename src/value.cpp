@@ -1829,7 +1829,7 @@ const Value &Value::set(const char *key, int size, const Value &value)
  */
 HashMember<int> Value::operator[](int index) 
 {
-    return HashMember<int>(this, index);
+    return HashMember<int>(_val, index);
 }
 
 /**
@@ -1840,7 +1840,7 @@ HashMember<int> Value::operator[](int index)
  */
 HashMember<std::string> Value::operator[](const std::string &key) 
 {
-    return HashMember<std::string>(this, key);
+    return HashMember<std::string>(_val, key);
 }
 
 /**
@@ -1851,7 +1851,7 @@ HashMember<std::string> Value::operator[](const std::string &key)
  */
 HashMember<std::string> Value::operator[](const char *key) 
 {
-    return HashMember<std::string>(this, key);
+    return HashMember<std::string>(_val, key);
 }
 
 /**
