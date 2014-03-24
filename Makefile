@@ -8,15 +8,16 @@
 #   
 
 #
-#   Zend header files
+#   Php-config utility
 #
-#   The variable PHP_DIR contains the location on your system where the regular
-#   header files of the Zend engine can be found. Usually this is either
-#   /usr/include/php5 or /usr/local/include/php5. Inside this directory you
-#   will find sub-directories named TSRM, Zend, ext and main.
-#
+#   PHP comes with a standard utility program called 'php-config'. This program
+#   can be used to find out in which directories PHP is installed. Inside this
+#   makefile this utility program is used to find include directories, shared
+#   libraries and the path to the binary file. If your php-config is not 
+#   installed in the default directory, you can change that here.
+#   
 
-PHP_DIR         =   `php-config --include-dir`
+PHP_CONFIG      =   php-config
 
 
 #
@@ -27,7 +28,7 @@ PHP_DIR         =   `php-config --include-dir`
 #   You can see the command "whereis php"
 #
 
-PHP_BIN         =   `php-config --php-binary`
+PHP_BIN         =   $(shell ${PHP_CONFIG} --php-binary)
 
 
 #
@@ -82,7 +83,7 @@ LINKER          =   g++
 #   you want to leave that flag out on production servers).
 #
 
-COMPILER_FLAGS  =   -Wall -c -I. -I${PHP_DIR} -I${PHP_DIR}/main -I${PHP_DIR}/ext -I${PHP_DIR}/Zend -I${PHP_DIR}/TSRM -g -std=c++11 -fpic -o
+COMPILER_FLAGS  =   -Wall -c `php-config --includes` -g -std=c++11 -fpic -o
 
 
 #
