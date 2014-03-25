@@ -15,39 +15,6 @@
     installation instructions and include other platforms as well.
 </p>
 
-<h2 id="limitations">Limitations</h2>
-<p>
-    At this moment, PHP-CPP only supports single-threaded PHP installations.
-    Web servers come in a number forms: there are the ones that handle each
-    page request in different process, and the ones that handle each page request
-    in the same process, but in a different thread. If you're using such a
-    multi-threaded PHP installation, you can not use the PHP-CPP library. Most
-    installations are single-threaded however, so this should not be a show stopper.
-</p>
-<p>
-    Are you not sure whether you have a single-threaded or multi-threaded PHP
-    environment? Just try to compile the PHP-CPP library, if you see a zillion
-    errors, you can be pretty sure that this is because of your installation
-    is multi-threaded.
-</p>
-<p>
-    The reason why we've chosen not to support multi-threaded PHP installations
-    lies in the fact that internally the Zend engine uses a very odd system
-    to ensure thread safety. Essentially, they pass an additional parameter to 
-    each and every function call that holds a pointer-to-a-pointer with thread
-    information that you can access with specific C macro's, and that you have
-    to pass on to every other function call that you make. This makes life for 
-    extension writers much harder than is necessary - and is in total conflict
-    with the core principle of the PHP-CPP library: to make life easy.
-</p>
-<p>
-    However, if there is demand for, we will add support for multi-threaded PHP
-    installations, and hopefully we can even keep the same simple C++ API as we 
-    have now.
-</p>
-
-
-
 <h2 id="download">Download</h2>
 <p>
     Installation begins with downloading the source code. You can either

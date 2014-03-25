@@ -20,15 +20,8 @@
 #include <exception>
 #include <type_traits>
 
- // for debug
+// for debug
 #include <iostream>
-
-/**
- *  @todo: if ZTS defined many errors appear. need debug.
- *  @todo this should come from some external source
- */
-//#define ZTS 1
-//#define PTHREADS 1
 
 /**
  *  PHP includes

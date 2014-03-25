@@ -130,4 +130,83 @@ extern "C" {
     right before PHP shuts down. If there is anything to clean up, you can install
     such a callback and run the cleanup code from it.
 </p>
+<h2 id="multi-threading">Watch out for multi-threading</h2>
+<p>
+    If your extension runs on a multi-threaded PHP installation, you need to take 
+    extra care. Most PHP installations (Apache, CLI scripts, etc) serve one
+    request at a time, sequentially. There are however PHP installations that use 
+    multi-threading and that can serve multiple requests in parallel. If your 
+    extension runs on such an environment, you should be aware that your global 
+    (and static!) variables can also be accessed by multiple threads at the same 
+    time. It is your own responsibility to use technologies like std::mutex or 
+    std::atomic to prevent race conditions and conflicts.
+</p>
+<p>
+    If your extension is compiled for a multi-threaded environment, the PHP-CPP
+    header files defines the macro ZTS. You can use this macro to check if you
+    do have to create special code to deal with threads.
+</p>
+<p>
+<pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
+
+/**
+ *  Global variable that store the number of times 
+ *  the function updateCounters() has been called in total
+ *  @var    int
+ */
+int invokeTotalCount = 0;
+
+#ifdef ZTS
+
+/**
+ *  Mutex so that the 'invokeTotalCount' variable is only accessed
+ *  by one process at a time
+ *  @var    std::mutex
+ */
+std::mutex invokeTotalMutex;
+ 
+#endif
+
+/**
+ *  Native function that is callable from PHP
+ *
+ *  This function updates a number of global variables that count
+ *  the number of times a function was called
+ */
+void updateCounters()
+{
+#ifdef ZTS
     
+    // lock the mutex
+    std::unique_lock&lt;std::mutex&gt; lock(invokeTotalMutex);
+
+#endif
+
+    // increment counters
+    invokeTotalCount++;
+}
+</code></pre>
+</p>
+<p>
+    Another important thing to realize is that PHP also does this locking 
+    internally. If you call a PHP function from you C++ code (like Php::Value("myFunction")()), 
+    or when you access a PHP variable in the Php::GLOBALS array (or one of the 
+    other super-globals), PHP has to lock something to ensure that no 
+    other thread is accessing the same information at the same time. These operations
+    can be expensive.
+</p>
+<p>
+    Good rules of thumb for writing native extensions with PHP-CPP therefore
+    are:
+    <ol type="1">
+        <li>Do not use global variables</li>
+        <li>Only call other <i>native</i> functions, and don't call back to PHP</li>
+    </ol>
+</p>
+<p>
+    In our opinion, these rules should not not be limiting for you. The use of global 
+    variables is not considered a very good software design, so you were probably
+    not even using them, and the reason why you are writing a native extension is
+    because you want to get away from PHP. Calling back to (slow) PHP is the last
+    thing you want to do when your application has finally reached native code.
+</p>
