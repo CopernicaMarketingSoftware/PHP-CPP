@@ -198,15 +198,15 @@ void updateCounters()
 <p>
     Good rules of thumb for writing native extensions with PHP-CPP therefore
     are:
-    <ol type="1">
+    <ul>
         <li>Do not use global variables</li>
-        <li>Only call other <i>native</i> functions, and don't call back to PHP</li>
-    </ol>
+        <li>Only call other <i>native</i> functions, and don't call back into PHP</li>
+    </ul>
 </p>
 <p>
-    In our opinion, these rules should not not be limiting for you. The use of global 
-    variables is not considered a very good software design, so you were probably
-    not even using them, and the reason why you are writing a native extension is
-    because you want to get away from PHP. Calling back to (slow) PHP is the last
-    thing you want to do when your application has finally reached native code.
+    These rules are not as limiting as they appear. The use of global 
+    variables is not considered excellent software design, so you were probably
+    not even using them, and the reason why you are writing a native extension 
+    in the first place is because you wanted to get away from PHP. Calling (slow) 
+    PHP functions from your extension should be prevented anyway.
 </p>
