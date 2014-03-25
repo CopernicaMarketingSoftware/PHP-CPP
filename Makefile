@@ -47,14 +47,14 @@ INSTALL_LIB     =   ${INSTALL_PREFIX}/lib
 
 
 #
-#   Name of the target library name
+#   Name of the target library name and config-generator
 #
 #   The PHP-CPP library will be installed on your system as libphpcpp.so.
 #   This is a brilliant name. If you want to use a different name for it,
-#   you can change that here
+#   you can change that here.
 #
 
-RESULT          =   libphpcpp.so
+LIBRARY         =   libphpcpp.so
 
 
 #
@@ -84,7 +84,6 @@ LINKER          =   g++
 #
 
 COMPILER_FLAGS  =   -Wall -c `php-config --includes` -g -std=c++11 -fpic -o
-
 
 #
 #   Linker flags
@@ -118,7 +117,7 @@ MKDIR           =   mkdir -p
 #   src/ directory for all *.cpp files. No changes are probably necessary here
 #
 
-SOURCES         =   $(wildcard src/*.cpp)
+LIBRARY_SOURCES =   $(wildcard src/*.cpp)
 
 
 #
@@ -129,7 +128,19 @@ SOURCES         =   $(wildcard src/*.cpp)
 #   We also use a Makefile function here that takes all source files.
 #
 
-OBJECTS         =   $(SOURCES:%.cpp=%.o)
+LIBRARY_OBJECTS =   $(LIBRARY_SOURCES:%.cpp=%.o)
+
+
+#
+#   Configuration program
+#
+#   During installation, a configuration utility will be installed. It is
+#   compiled with the following instructions
+#
+
+CONFIG_UTILITY  =   ./create_config
+CONFIG_SOURCES  =   $(wildcard config/*.cpp)
+CONFIG_FLAGS    =   `php-config --includes` -o
 
 
 #
@@ -137,27 +148,27 @@ OBJECTS         =   $(SOURCES:%.cpp=%.o)
 #   dependencies that are used by the compiler.
 #
 
-all: ${OBJECTS} ${RESULT}
-#	Before offering to run the tests, we need to write more tests
-#	@echo
-#	@echo "Build complete."
-#	@echo "Don't forget to run 'make test'."
-#	@echo
+all: ${LIBRARY_OBJECTS} ${LIBRARY} ${CONFIG_UTILITY}
 
-${RESULT}: ${OBJECTS}
-	${LINKER} ${LINKER_FLAGS} -o $@ ${OBJECTS}
+${LIBRARY}: ${LIBRARY_OBJECTS}
+	${LINKER} ${LINKER_FLAGS} -o $@ ${LIBRARY_OBJECTS}
+
+${CONFIG_UTILITY}:
+	${COMPILER} ${CONFIG_FLAGS} $@ ${CONFIG_SOURCES}
 
 clean:
-	${RM} ${OBJECTS} ${RESULT}
+	${RM} ${LIBRARY_OBJECTS} ${LIBRARY} ${CONFIG_UTILITY}
 
-${OBJECTS}: 
+${LIBRARY_OBJECTS}: 
 	${COMPILER} ${COMPILER_FLAGS} $@ ${@:%.o=%.cpp}
 
 install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	${CP} ${RESULT} ${INSTALL_LIB}
+	${CP} ${LIBRARY} ${INSTALL_LIB}
+	${CONFIG_UTILITY} > ${INSTALL_HEADERS}/phpcpp/config.h
+
 test:
 	cd tests && ./test.sh -p ${PHP_BIN}
 

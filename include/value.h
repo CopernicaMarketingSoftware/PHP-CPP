@@ -109,8 +109,9 @@ public:
      *  Wrap object around zval
      *  @param  zval        Zval to wrap
      *  @param  ref         Force this to be a reference
+     *  @param  tsrm_ls     Optional pointer to thread safe data
      */
-    Value(struct _zval_struct *zval, bool ref = false);
+    Value(struct _zval_struct *zval, bool ref=false);
     
     /**
      *  Wrap around an object implemented by us
