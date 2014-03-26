@@ -78,12 +78,22 @@ do
             
             # if quiet, only delete
             if [ $(echo $SCR_OPT | grep -o "\-q") ]; then
-                find ./php/phpt -type f \( -name '*.diff' -or -name '*.exp' -or -name '*.log' -or -name '*.out' -or -name '*.php' -or -name '*.sh' -or -name '*.mem' \) -delete
+                find ./php/phpt -type f \( \
+                                           -name '*.diff' -or -name '*.exp' -or -name '*.log' -or -name '*.out' \
+                                           -or -name '*.php' -or -name '*.sh' -or -name '*.mem' -or \
+                                           -name '*.phpt-diff' -or -name '*.phpt-exp' -or -name '*.phpt-log' -or -name '*.phpt-out' \
+                                           -or -name '*.phpt-php' -or -name '*.phpt-sh' -or -name '*.phpt-mem' \
+                                        \) -delete
             
             # else delete and print
             else
                 echo -e "\x1b[1;31;47mRemove auxiliary files...\x1b[0;0m"
-                for AUXF in `find ./php/phpt -type f \( -name '*.diff' -or -name '*.exp' -or -name '*.log' -or -name '*.out' -or -name '*.php' -or -name '*.sh' -or -name '*.mem' \)`;
+                for AUXF in `find ./php/phpt -type f \( \
+                                           -name '*.diff' -or -name '*.exp' -or -name '*.log' -or -name '*.out' \
+                                           -or -name '*.php' -or -name '*.sh' -or -name '*.mem' -or \
+                                           -name '*.phpt-diff' -or -name '*.phpt-exp' -or -name '*.phpt-log' -or -name '*.phpt-out' \
+                                           -or -name '*.phpt-php' -or -name '*.phpt-sh' -or -name '*.phpt-mem' \
+                                        \)`;
                     do
                     echo -e "\x1b[1;31;47mdel \x1b[0;30;47m$(dirname $AUXF)/\x1b[1;31;47m$(basename $AUXF)\x1b[0;30;47m ...\x1b[0;0m"
                     rm $AUXF
