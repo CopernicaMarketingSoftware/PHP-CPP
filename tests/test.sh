@@ -22,6 +22,7 @@ function print_help() {
     echo "               (possible values: PASS, FAIL, XFAIL, SKIP, BORK, WARN, LEAK, REDIRECT)."
     echo "  -m           Test for memory leaks with Valgrind."
     echo "  -r           Removes all auxiliary files. (*.log, *.diff etc)."
+    echo "  -t <files>   Test file(s). Specify individual file(s) to test"
     echo "  -s <file>    Write output to <file>."
     echo "  -x           Sets 'SKIP_SLOW_TESTS' environmental variable."
     echo "  -o           Cancels sets 'SKIP_ONLINE_TESTS' (default set)."
@@ -39,8 +40,10 @@ COMPILE_EXT=1
 # SKIP_ONLINE_TESTS == true
 OFFLINE=1
 EXT_NAME="extfortest.so"
+# The file list of the tests that will be launched
+TEST_FILES=""
 
-while getopts ":p:e:nw:a:d:g:mrs:xoqvh" opt ;
+while getopts ":p:e:nw:a:d:g:mrt:s:xoqvh" opt ;
 do
     case $opt in
         p)
@@ -88,6 +91,9 @@ do
             fi
             exit;
             ;;
+        t)
+            TEST_FILES="$OPTARG"
+            ;;
         x)
             SCR_OPT="$SCR_OPT -x"
             ;;
@@ -112,6 +118,11 @@ do
     esac
 done
 
+# The file list of the tests that will be launched
+if [ ! "$TEST_FILES" ]; then
+    TEST_FILES=`find ./php/phpt -type f -name "*.phpt"`
+fi
+
 # default offline mode
 if [ 1 = $OFFLINE ]; then
     SCR_OPT="$SCR_OPT --offline"
@@ -119,8 +130,6 @@ fi
 
 # A list of all additional options
 SCR_OPT="$SCR_OPT -d extension_dir=$PWD/ext_dir -d extension=$EXT_NAME"
-# The file list of the tests that will be launched
-TEST_FILES=`find ./php/phpt -type f -name "*.phpt"`
 
 
 # Create a local copy of the directory with the extension for run without installation
