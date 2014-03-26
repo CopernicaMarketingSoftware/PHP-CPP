@@ -2,6 +2,8 @@
 #
 # It is intended to run the command "make test" from the root directory of the library
 #
+#  @author valmat <ufabiz@gmail.com>
+#
 
 
 THIS=`basename $0`
@@ -19,6 +21,7 @@ function print_help() {
     echo "  -g <opt>     Comma separated list of groups to show during test run"
     echo "               (possible values: PASS, FAIL, XFAIL, SKIP, BORK, WARN, LEAK, REDIRECT)."
     echo "  -m           Test for memory leaks with Valgrind."
+    echo "  -r           Removes all auxiliary files. (*.log, *.diff etc)."
     echo "  -s <file>    Write output to <file>."
     echo "  -x           Sets 'SKIP_SLOW_TESTS' environmental variable."
     echo "  -o           Cancels sets 'SKIP_ONLINE_TESTS' (default set)."
@@ -30,12 +33,14 @@ function print_help() {
 }
 
 PHP_BIN="/usr/bin/php"
+# options list
 SCR_OPT=""
 COMPILE_EXT=1
+# SKIP_ONLINE_TESTS == true
 OFFLINE=1
 EXT_NAME="extfortest.so"
 
-while getopts ":p:e:nw:a:d:g:ms:xoqvh" opt ;
+while getopts ":p:e:nw:a:d:g:mrs:xoqvh" opt ;
 do
     case $opt in
         p)
@@ -65,10 +70,29 @@ do
         m)
             SCR_OPT="$SCR_OPT -m"
             ;;
+        r)
+            # Removes all auxiliary files. (*.log, *.diff etc).
+            
+            # if quiet, only delete
+            if [ $(echo $SCR_OPT | grep -o "\-q") ]; then
+                find ./php/phpt -type f \( -name '*.diff' -or -name '*.exp' -or -name '*.log' -or -name '*.out' -or -name '*.php' -or -name '*.sh' -or -name '*.mem' \) -delete
+            
+            # else delete and print
+            else
+                echo -e "\x1b[1;31;47mRemove auxiliary files...\x1b[0;0m"
+                for AUXF in `find ./php/phpt -type f \( -name '*.diff' -or -name '*.exp' -or -name '*.log' -or -name '*.out' -or -name '*.php' -or -name '*.sh' -or -name '*.mem' \)`;
+                    do
+                    echo -e "\x1b[1;31;47mdel \x1b[0;30;47m$(dirname $AUXF)/\x1b[1;31;47m$(basename $AUXF)\x1b[0;30;47m ...\x1b[0;0m"
+                    rm $AUXF
+                done
+            fi
+            exit;
+            ;;
         x)
             SCR_OPT="$SCR_OPT -x"
             ;;
         o)
+            # SKIP_ONLINE_TESTS == false
             OFFLINE=0
             ;;
         q)
@@ -92,7 +116,10 @@ done
 if [ 1 = $OFFLINE ]; then
     SCR_OPT="$SCR_OPT --offline"
 fi
+
+# A list of all additional options
 SCR_OPT="$SCR_OPT -d extension_dir=$PWD/ext_dir -d extension=$EXT_NAME"
+# The file list of the tests that will be launched
 TEST_FILES=`find ./php/phpt -type f -name "*.phpt"`
 
 
