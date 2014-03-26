@@ -57,9 +57,9 @@ More complicated structured can be handled by PHP-CPP as well. If you would like
 a nested associative array from your function, you can do so too:
 
 ```c
-PhpCpp::Value get_complex_array()
+Php::Value get_complex_array()
 {
-    PhpCpp::Value r;
+    Php::Value r;
     r["a"] = 123;
     r["b"] = 456;
     r["c"][0] = "nested value";
@@ -70,7 +70,7 @@ PhpCpp::Value get_complex_array()
 
 The C++ function above is equivalent to the following function in PHP:
 
-```c
+```php
 function get_complex_array()
 {
     return array(

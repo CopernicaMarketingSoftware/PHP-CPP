@@ -1,27 +1,31 @@
 #!/bin/bash
 #
-# do not run this script.
-# Create a local copy of the directory with the extension for run without installation
+#  do not run this script manualy.
+#  This script is intended to be run from a script test.sh
+#  Create a local copy of the directory with the extension for run tests without installation
+#
+#  @author valmat <ufabiz@gmail.com>
 #
 
-
+# Local directory in which to copy the links to all installed extensions
 EXTDLOC=ext_dir
+mkdir -p "./$EXTDLOC"
+
 SO=extfortest.so
 
+# to check whether specified the extension name as parameter
 if [ $1 ]
 then
     SO=$1
 fi
 
+# a directory of extensions already installed in the operating system
 EXTDIR=$(php-config --extension-dir)
 
-#echo $EXTDIR
-
-mkdir -p "./$EXTDLOC"
+# To copy references for all extensions to the local directory
 for LIBFILE in `find $EXTDIR -type f -or -type l -name "*.so"`; do
 
     BN=$(basename $LIBFILE)
-    PWD=$(pwd)
     NF="$PWD/$EXTDLOC/$BN"
     
     # if still no exist
@@ -29,7 +33,6 @@ for LIBFILE in `find $EXTDIR -type f -or -type l -name "*.so"`; do
     then
         if [ -L $LIBFILE ];
         then
-            #echo "cp $LIBFILE $NF"
             cp --no-dereference $LIBFILE $NF
         else
             ln -s $LIBFILE $NF
@@ -40,10 +43,9 @@ for LIBFILE in `find $EXTDIR -type f -or -type l -name "*.so"`; do
 done
 
 # current extention
-if [ ! -L "$PWD/$EXTDLOC/$SO" ];
+if [ ! -L "$PWD/$EXTDLOC/$SO" ]
 then
     ln -s "$PWD/cpp/$SO" "$PWD/$EXTDLOC/$SO"
 fi
     
-
 

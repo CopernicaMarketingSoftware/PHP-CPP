@@ -88,7 +88,7 @@ LINKER				=	g++
 #
 
 LIB_DIR=$(shell cd ../.. && pwd)
-COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic  -I"${LIB_DIR}/include" -o
+COMPILER_FLAGS		=	-Wall -c -O2 -std=c++11 -fpic  -I"${LIB_DIR}/include" -I"./zts" -o
 LINKER_FLAGS		=	-shared -L"${LIB_DIR}"
 LINKER_DEPENDENCIES	=	-lphpcpp
 

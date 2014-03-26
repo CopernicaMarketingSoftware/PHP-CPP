@@ -25,7 +25,8 @@ PHP_CONFIG      =   php-config
 #
 #   The path to the executable PHP binary file.
 #   Need to run tests.
-#   You can see the command "whereis php"
+#   You can see the command "whereis -b php"
+#   Usually /usr/bin/php
 #
 
 PHP_BIN         =   $(shell ${PHP_CONFIG} --php-binary)
@@ -170,5 +171,7 @@ install:
 	${CONFIG_UTILITY} > ${INSTALL_HEADERS}/phpcpp/config.h
 
 test:
-	cd tests && ./test.sh -p ${PHP_BIN}
+	mkdir -p ./tests/cpp/zts/phpcpp
+	${CONFIG_UTILITY} > ./tests/cpp/zts/phpcpp/config.h
+	cd tests && ./test.sh -p "${PHP_BIN}"
 

@@ -23,29 +23,29 @@ using namespace std;
  */
 Php::Value process_globals()
 {
-    // all global variables can be accessed via the Php::globals variable,
+    // all global variables can be accessed via the Php::GLOBALS variable,
     // which is more or less the same as the PHP $_GLOBALS variable
     
     // set a global variable
-    Php::globals["a"] = 1;
+    Php::GLOBALS["a"] = 1;
     
     // increment a global variable
-    Php::globals["b"] += 1;
+    Php::GLOBALS["b"] += 1;
     
     // set a global variable to be an array
-    Php::globals["c"] = Php::Array();
+    Php::GLOBALS["c"] = Php::Array();
     
     // add a member to an array
-    Php::globals["c"]["member"] = 123;
+    Php::GLOBALS["c"]["member"] = 123;
     
     // and increment it
-    Php::globals["c"]["member"] += 77;
+    Php::GLOBALS["c"]["member"] += 77;
     
     // change value e
-    Php::globals["e"] = Php::globals["e"][0]("hello");
+    Php::GLOBALS["e"] = Php::GLOBALS["e"][0]("hello");
     
     // if a global variable holds a function, we can call it
-    return Php::globals["d"](1,2,3);
+    return Php::GLOBALS["d"](1,2,3);
 }
 
 // Symbols are exported according to the "C" language

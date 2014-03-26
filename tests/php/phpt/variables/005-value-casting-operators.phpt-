@@ -1,0 +1,174 @@
+--TEST--
+Test Php::Value casting operators
+--DESCRIPTION--
+The Php::Value class has casting operators to cast the object to almost every thinkable native type.
+
+
+It seems need to replace double on long double
+
+native_value_casting - repeats the behavior of c++ functions TestVariables\value_casting
+the output of each of these functions should be the same
+
+
+--SKIPIF--
+<?php if (!extension_loaded("extension_for_tests")) print "skip"; ?>
+--FILEEOF--
+<?php
+
+
+function bool2str($b) {
+    return $b ? "Yes" : "No";
+}
+function native_value_casting($value) {
+    echo  "   long:", (int)$value, "\n string:", (string)$value, "\n double:", (double)$value, "\n   bool:", bool2str((bool)$value), PHP_EOL;
+}
+
+
+function out($v) {
+    echo 'Test ';
+    var_export($v);
+    echo ':', PHP_EOL;
+    TestVariables\value_casting($v);
+    //native_value_casting($v);
+    echo PHP_EOL;
+}
+
+out(5555555555555555);
+out("9223372036854775807");
+out(9223372036854775807);
+out(5);
+out(-99999999);
+out("18");
+out("3.14159265359");
+out(3.14159265359);
+out(25/7);
+out(" this is a string ");
+out(" 2-nd string ");
+out("false");
+out(false);
+out("true");
+out(true);
+out(0);
+out("0");
+out(0123); // octal number (equivalent to 83 decimal)
+out(0x1A); // hexadecimal number (equivalent to 26 decimal)
+
+
+
+
+//echo PHP_EOL;
+--EXPECT--
+Test 5555555555555555:
+   long:5555555555555555
+ string:5555555555555555
+ double:5.5555555555556E+15
+   bool:Yes
+
+Test '9223372036854775807':
+   long:9223372036854775807
+ string:9223372036854775807
+ double:9.2233720368548E+18
+   bool:Yes
+
+Test 9223372036854775807:
+   long:9223372036854775807
+ string:9223372036854775807
+ double:9.2233720368548E+18
+   bool:Yes
+
+Test 5:
+   long:5
+ string:5
+ double:5
+   bool:Yes
+
+Test -99999999:
+   long:-99999999
+ string:-99999999
+ double:-99999999
+   bool:Yes
+
+Test '18':
+   long:18
+ string:18
+ double:18
+   bool:Yes
+
+Test '3.14159265359':
+   long:3
+ string:3.14159265359
+ double:3.14159265359
+   bool:Yes
+
+Test 3.14159265359:
+   long:3
+ string:3.14159265359
+ double:3.14159265359
+   bool:Yes
+
+Test 3.5714285714286:
+   long:3
+ string:3.5714285714286
+ double:3.5714285714286
+   bool:Yes
+
+Test ' this is a string ':
+   long:0
+ string: this is a string 
+ double:0
+   bool:Yes
+
+Test ' 2-nd string ':
+   long:2
+ string: 2-nd string 
+ double:2
+   bool:Yes
+
+Test 'false':
+   long:0
+ string:false
+ double:0
+   bool:Yes
+
+Test false:
+   long:0
+ string:
+ double:0
+   bool:No
+
+Test 'true':
+   long:0
+ string:true
+ double:0
+   bool:Yes
+
+Test true:
+   long:1
+ string:1
+ double:1
+   bool:Yes
+
+Test 0:
+   long:0
+ string:0
+ double:0
+   bool:No
+
+Test '0':
+   long:0
+ string:0
+ double:0
+   bool:No
+
+Test 83:
+   long:83
+ string:83
+ double:83
+   bool:Yes
+
+Test 26:
+   long:26
+ string:26
+ double:26
+   bool:Yes
+
