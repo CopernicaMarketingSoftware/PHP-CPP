@@ -765,7 +765,7 @@ HELP;
 
 			} else if (is_dir($testfile)) {
 				find_files($testfile);
-			} else if (preg_match("/\.phpt$/", $testfile)) {
+			} else if (preg_match("/\.phpt\-?$/", $testfile)) {
 				$test_files[] = $testfile;
 			} else {
 				die("bogus test name " . $argv[$i] . "\n");
