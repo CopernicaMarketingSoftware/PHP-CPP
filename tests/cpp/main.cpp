@@ -9,7 +9,7 @@
 
 // Test includes
 #include "include/ValueIterator.h"
-#include "include/MyCustomClass.h"
+#include "include/Classes_and_objects.h"
 #include "include/variables.h"
 
 
@@ -33,7 +33,14 @@ extern "C"
         
         // add the interface to the extension
         //extension.add(interface);
+
         
+
+
+        /**
+         *  Classes and objects
+         * 
+         */
         // we are going to define a class
         Php::Class<TestBaseClass::MyCustomClass> customClass("TestBaseClass\\MyClass");
         
@@ -44,6 +51,12 @@ extern "C"
 
         // add the class to the extension
         extension.add(customClass);
+
+        // Comparable
+        extension.add( Php::Class<TestBaseClass::Comparable>("TestBaseClass\\Comparable") );
+
+
+
 
         /**
          *  tests for Iterators
