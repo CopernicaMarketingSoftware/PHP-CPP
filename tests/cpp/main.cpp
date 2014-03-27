@@ -52,6 +52,7 @@ extern "C"
         // add function to extension
         //extension.add("TestValueIterator\\loopValue", TestValueIterator::loopValue/*, {
         extension.add("TestValueIterator\\loopValue", TestValueIterator::loopValue);
+        extension.add("TestValueIterator\\loopArray", TestValueIterator::loopArray);
 
 
         /**
