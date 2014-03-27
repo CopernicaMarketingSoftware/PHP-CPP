@@ -63,11 +63,12 @@ extern "C"
         extension.add("TestVariables\\value_types",       TestVariables::value_types);
         extension.add("TestVariables\\scalar_store",      TestVariables::scalar_store);
         extension.add("TestVariables\\value_casting",     TestVariables::value_casting);
+        extension.add("TestVariables\\value_cast2double", TestVariables::value_cast2double);
         extension.add("TestVariables\\value_cast2str",    TestVariables::value_cast2str);
         extension.add("TestVariables\\overloaded_op",     TestVariables::overloaded_op);
         extension.add("TestVariables\\value_arrays",      TestVariables::value_arrays);
-        extension.add("TestVariables\\value_object1",      TestVariables::value_object1);
-        extension.add("TestVariables\\value_object2",      TestVariables::value_object2);
+        extension.add("TestVariables\\value_object1",     TestVariables::value_object1);
+        extension.add("TestVariables\\value_object2",     TestVariables::value_object2);
 
 
 
