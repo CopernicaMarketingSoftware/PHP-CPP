@@ -49,7 +49,7 @@ namespace TestBaseClass {
             // check number of parameters
             //if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
             
-            std::cout << "myMethod is called for object " << _x << std::endl;
+            Php::out << "myMethod is called for object " << _x << std::endl;
 
             return 5;
 
@@ -58,7 +58,7 @@ namespace TestBaseClass {
 
 
     /**
-     *  custom comparison operator
+     *  Test custom comparison operator
      */
     class Comparable : public Php::Base
     {
@@ -108,6 +108,83 @@ namespace TestBaseClass {
         }
     };
     int Comparable::count = 0;
+
+
+    /**
+     *  Begin test static functions
+     */
+
+
+        /**
+         *  Regular function
+         *
+         *  Because a regular function does not have a 'this' pointer,
+         *  it has the same signature as static methods
+         *
+         *  @param  params      Parameters passed to the function
+         */
+        void testStaticRegFunc(Php::Parameters &params)
+        {
+            Php::out << "testStatic regular function"<< std::endl;
+        }
+
+        /**
+         *  A very simple class that will not be exported to PHP
+         */
+        class testStaticPrivClass
+        {
+        public:
+            /**
+             *  C++ constructor and destructor
+             */
+            testStaticPrivClass() {}
+            virtual ~testStaticPrivClass() {}
+
+            /** 
+             *  Static method
+             *
+             *  A static method also has no 'this' pointer and has
+             *  therefore a signature identical to regular functions
+             *
+             *  @param  params      Parameters passed to the method
+             */
+            static void staticMethod(Php::Parameters &params)
+            {
+                Php::out << "testStaticPrivClass::staticMethod()"<< std::endl;
+            }
+        };
+
+        /**
+         *  A very simple class that will be exported to PHP
+         */
+        class  testStaticPubClass : public Php::Base
+        {
+        public:
+            /**
+             *  C++ constructor and destructor
+             */
+            testStaticPubClass() {}
+            virtual ~testStaticPubClass() {}
+
+            /** 
+             *  Another static method
+             *
+             *  This static has exactly the same signature as the
+             *  regular function and static method that were mentioned
+             *  before
+             *
+             *  @param  params      Parameters passed to the method
+             */
+            static void staticMethod(Php::Parameters &params)
+            {
+                Php::out << "testStaticPubClass::staticMethod()"<< std::endl;
+            }
+        };
+
+
+    /**
+     *  End test static functions
+     */
 
 
 

@@ -56,6 +56,24 @@ extern "C"
         extension.add( Php::Class<TestBaseClass::Comparable>("TestBaseClass\\Comparable") );
 
 
+        // test static functions
+        //
+        // description of the class so that PHP knows which methods are accessible
+        Php::Class<TestBaseClass::testStaticPubClass> ClassWithStatic("TestBaseClass\\ClassWithStatic");
+        // register the testStaticPubClass::staticMethod to be a static method callable from PHP
+        ClassWithStatic.method("static1", &TestBaseClass::testStaticPubClass::staticMethod);
+        // regular functions have the same signatures as static methods. So nothing forbids you to register a normal function as static method too
+        ClassWithStatic.method("static2", TestBaseClass::testStaticRegFunc);
+        // and even static methods from completely different classes have the same function signature and can thus be registered
+        ClassWithStatic.method("static3", &TestBaseClass::testStaticPrivClass::staticMethod);
+        // add the class to the extension
+        extension.add(std::move(ClassWithStatic));
+        // In fact, because a static method has the same signature
+        // as a regular function, you can also register static
+        // C++ methods as regular global PHP functions
+        extension.add("TestBaseClass\\staticFun1", &TestBaseClass::testStaticPrivClass::staticMethod);
+
+
 
 
         /**

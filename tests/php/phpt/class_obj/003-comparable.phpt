@@ -1,5 +1,5 @@
 --TEST--
-Test constructor & destructor
+Test comparable objects
 --SKIPIF--
 <?php if (!extension_loaded("extension_for_tests")) print "skip"; ?>
 --FILEEOF--
