@@ -1,1 +1,5 @@
 tests variables
+
+TODO: more tests for globals variables
+including separate test for $_GET, $_POST, $_COOKIE, $_FILES, $_SERVER, $_REQUEST and $_ENV (Php::GET, Php::POST, Php::COOKIE, Php::FILES, Php::SERVER, Php::REQUEST and Php::ENV) variables.
+

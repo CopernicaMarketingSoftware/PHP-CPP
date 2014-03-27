@@ -71,6 +71,10 @@ extern "C"
         extension.add("TestVariables\\value_object1",     TestVariables::value_object1);
         extension.add("TestVariables\\value_object2",     TestVariables::value_object2);
 
+        // A sample class, with methods to cast objects to scalars
+        Php::Class<TestVariables::Obj2Scalar> cObj2Scalar("Obj2Scalar");
+        extension.add(std::move(cObj2Scalar));
+
 
 
 
