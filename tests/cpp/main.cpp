@@ -49,6 +49,11 @@ extern "C"
         customClass.property("property1", "prop1");
         customClass.property("property2", "prop2", Php::Protected);
 
+        customClass.property("CONSTANT1", "some string", Php::Const);
+        customClass.property("EXP",       2.718281828459, Php::Const);
+        customClass.property("CONSTANT2", -2582341, Php::Const);
+        customClass.property("CONSTANT1", true, Php::Const);
+
         // add the class to the extension
         extension.add(customClass);
 

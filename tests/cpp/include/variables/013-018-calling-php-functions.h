@@ -108,16 +108,6 @@ namespace TestVariables {
 	    // call callable object of class from user space
 	    Php::Object clbl("CallableClass", "Arctics around mount Meru");
 	    Php::out << clbl("is the birthplace of the Hyperboreans") << std::endl;
-	    
-
-
-	    //::someMethod
-	    //(new usrspClass("Mount Meru"))->someMethod("is in the Arctics");
-
-
-
-
-
 	}
 
 /**
