@@ -102,6 +102,10 @@ extern "C"
         extension.add("TestVariables\\value_arrays",      TestVariables::value_arrays);
         extension.add("TestVariables\\value_object1",     TestVariables::value_object1);
         extension.add("TestVariables\\value_object2",     TestVariables::value_object2);
+        extension.add("TestVariables\\fnFromUserSpace",   TestVariables::fnFromUserSpace);
+        extension.add("TestVariables\\fnCallback",        TestVariables::fnCallback);
+        
+
 
         // A sample class, with methods to cast objects to scalars
         Php::Class<TestVariables::Obj2Scalar> cObj2Scalar("TestVariables\\Obj2Scalar");
