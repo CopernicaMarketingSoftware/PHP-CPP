@@ -8,9 +8,9 @@
 #include <phpcpp.h>
 
 // Test includes
-#include "include/ValueIterator.h"
-#include "include/Classes_and_objects.h"
-#include "include/variables.h"
+#include "h/ValueIterator.h"
+#include "h/Classes_and_objects.h"
+#include "h/variables.h"
 
 
 
@@ -90,6 +90,7 @@ extern "C"
          *  tests for variables
          * 
          */
+        // create a nested namespace
         extension.add("TestVariables\\process_globals",   TestVariables::process_globals);
         extension.add("TestVariables\\get_complex_array", TestVariables::get_complex_array);
         extension.add("TestVariables\\value_types",       TestVariables::value_types);
@@ -103,7 +104,7 @@ extern "C"
         extension.add("TestVariables\\value_object2",     TestVariables::value_object2);
 
         // A sample class, with methods to cast objects to scalars
-        Php::Class<TestVariables::Obj2Scalar> cObj2Scalar("Obj2Scalar");
+        Php::Class<TestVariables::Obj2Scalar> cObj2Scalar("TestVariables\\Obj2Scalar");
         extension.add(std::move(cObj2Scalar));
 
 

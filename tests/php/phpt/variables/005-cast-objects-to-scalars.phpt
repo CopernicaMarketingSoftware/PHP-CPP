@@ -11,7 +11,7 @@ http://www.phpcpp.com/documentation/special-features#casting-functions
 function bool2str($b) {
     return $b ? "Yes" : "No";
 }
-$obj = new Obj2Scalar();
+$obj = new TestVariables\Obj2Scalar();
 echo  "   long: ", (int)$obj, "\n string: ", (string)$obj, "\n double: ", (double)$obj, "\n   bool: ", bool2str((bool)$obj);
 
 
