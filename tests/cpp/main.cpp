@@ -103,6 +103,7 @@ extern "C"
         extension.add("TestVariables\\value_object1",     TestVariables::value_object1);
         extension.add("TestVariables\\value_object2",     TestVariables::value_object2);
         extension.add("TestVariables\\fnFromUserSpace",   TestVariables::fnFromUserSpace);
+        extension.add("TestVariables\\fnFromUserSpace2",   TestVariables::fnFromUserSpace2);
         extension.add("TestVariables\\fnCallback",        TestVariables::fnCallback);
         
 
