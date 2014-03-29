@@ -1436,11 +1436,15 @@ void ClassBase::notImplemented()
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+    
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1449,11 +1453,15 @@ void ClassBase::method(const char *name, const method_callback_0 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1462,11 +1470,15 @@ void ClassBase::method(const char *name, const method_callback_1 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1475,11 +1487,15 @@ void ClassBase::method(const char *name, const method_callback_2 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1488,11 +1504,15 @@ void ClassBase::method(const char *name, const method_callback_3 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1501,11 +1521,15 @@ void ClassBase::method(const char *name, const method_callback_4 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1514,11 +1538,15 @@ void ClassBase::method(const char *name, const method_callback_5 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1527,11 +1555,15 @@ void ClassBase::method(const char *name, const method_callback_6 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, callback, flags, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1540,11 +1572,15 @@ void ClassBase::method(const char *name, const method_callback_7 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const native_callback_0 &method, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const native_callback_0 &method, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1553,11 +1589,15 @@ void ClassBase::method(const char *name, const native_callback_0 &method, int fl
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const native_callback_1 &method, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const native_callback_1 &method, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1566,11 +1606,15 @@ void ClassBase::method(const char *name, const native_callback_1 &method, int fl
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const native_callback_2 &method, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const native_callback_2 &method, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1579,11 +1623,15 @@ void ClassBase::method(const char *name, const native_callback_2 &method, int fl
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, const native_callback_3 &method, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, const native_callback_3 &method, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1591,25 +1639,31 @@ void ClassBase::method(const char *name, const native_callback_3 &method, int fl
  *  @param  name        Name of the method
  *  @param  flags       Optional flags (like public or protected)
  *  @param  args        Description of the supported arguments
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::method(const char *name, int flags, const Arguments &args)
+ClassBase &ClassBase::method(const char *name, int flags, const Arguments &args)
 {
     // add the method
     _methods.push_back(std::make_shared<Method>(name, Abstract | flags, args));
+
+    // allow chaining
+    return *this;
 }
-
-
 
 /**
  *  Add a property to the class
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, std::nullptr_t value, int flags)
+ClassBase &ClassBase::property(const char *name, std::nullptr_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<NullMember>(name, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1617,11 +1671,15 @@ void ClassBase::property(const char *name, std::nullptr_t value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, int16_t value, int flags)
+ClassBase &ClassBase::property(const char *name, int16_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<NumericMember>(name, value, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1629,11 +1687,15 @@ void ClassBase::property(const char *name, int16_t value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, int32_t value, int flags)
+ClassBase &ClassBase::property(const char *name, int32_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<NumericMember>(name, value, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1641,11 +1703,15 @@ void ClassBase::property(const char *name, int32_t value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, int64_t value, int flags)
+ClassBase &ClassBase::property(const char *name, int64_t value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<NumericMember>(name, value, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1653,11 +1719,15 @@ void ClassBase::property(const char *name, int64_t value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, bool value, int flags)
+ClassBase &ClassBase::property(const char *name, bool value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<BoolMember>(name, value, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1665,11 +1735,15 @@ void ClassBase::property(const char *name, bool value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, char value, int flags)
+ClassBase &ClassBase::property(const char *name, char value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<StringMember>(name, &value, 1, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1677,11 +1751,15 @@ void ClassBase::property(const char *name, char value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const std::string &value, int flags)
+ClassBase &ClassBase::property(const char *name, const std::string &value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<StringMember>(name, value, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1689,11 +1767,15 @@ void ClassBase::property(const char *name, const std::string &value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const char *value, int flags)
+ClassBase &ClassBase::property(const char *name, const char *value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<StringMember>(name, value, strlen(value), flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1701,33 +1783,45 @@ void ClassBase::property(const char *name, const char *value, int flags)
  *  @param  name        Name of the property
  *  @param  value       Actual property value
  *  @param  flags       Optional flags
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, double value, int flags)
+ClassBase &ClassBase::property(const char *name, double value, int flags)
 {
     // add property
     _members.push_back(std::make_shared<FloatMember>(name, value, flags));
+
+    // allow chaining
+    return *this;
 }
 
 /**
  *  Set property with callbacks
  *  @param  name        Name of the property
  *  @param  getter      Getter method
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const getter_callback_0 &getter)
+ClassBase &ClassBase::property(const char *name, const getter_callback_0 &getter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter);
+
+    // allow chaining
+    return *this;
 }
 
 /**
  *  Set property with callbacks
  *  @param  name        Name of the property
  *  @param  getter      Getter method
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const getter_callback_1 &getter)
+ClassBase &ClassBase::property(const char *name, const getter_callback_1 &getter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter);
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1735,11 +1829,15 @@ void ClassBase::property(const char *name, const getter_callback_1 &getter)
  *  @param  name        Name of the property
  *  @param  getter      Getter method
  *  @param  setter      Setter method
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter)
+ClassBase &ClassBase::property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter,setter);
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1747,11 +1845,15 @@ void ClassBase::property(const char *name, const getter_callback_0 &getter, cons
  *  @param  name        Name of the property
  *  @param  getter      Getter method
  *  @param  setter      Setter method
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter)
+ClassBase &ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter,setter);
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1759,11 +1861,15 @@ void ClassBase::property(const char *name, const getter_callback_1 &getter, cons
  *  @param  name        Name of the property
  *  @param  getter      Getter method
  *  @param  setter      Setter method
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter)
+ClassBase &ClassBase::property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter,setter);
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -1771,11 +1877,15 @@ void ClassBase::property(const char *name, const getter_callback_0 &getter, cons
  *  @param  name        Name of the property
  *  @param  getter      Getter method
  *  @param  setter      Setter method
+ *  @return ClassBase   Same object to allow chaining
  */
-void ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter)
+ClassBase &ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter)
 {
     // add property
     _properties[name] = std::make_shared<Property>(getter,setter);
+
+    // allow chaining
+    return *this;
 }
 
 

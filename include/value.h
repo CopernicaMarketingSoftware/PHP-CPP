@@ -580,7 +580,7 @@ public:
      */
     operator int16_t () const
     {
-        return numericValue();
+        return (int16_t)numericValue();
     }
 
     /**
@@ -589,7 +589,7 @@ public:
      */
     operator int32_t () const
     {
-        return numericValue();
+        return (int32_t)numericValue();
     }
 
     /**

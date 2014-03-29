@@ -224,15 +224,16 @@ protected:
      *  @param  method      The actual method
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
+     *  @return ClassBase   Same object to allow chaining
      */
-    void method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {});
 
     /**
      *  Add a static method to the class
@@ -245,11 +246,12 @@ protected:
      *  @param  method      The actual method
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
+     *  @return ClassBase   Same object to allow chaining
      */
-    void method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {});
 
     /**
      *  Add an abstract method to the class
@@ -257,8 +259,9 @@ protected:
      *  @param  name        Name of the method
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
+     *  @return ClassBase   Same object to allow chaining
      */
-    void method(const char *name, int flags=0, const Arguments &args = {});
+    ClassBase &method(const char *name, int flags=0, const Arguments &args = {});
 
     /**
      *  Add a property to the class
@@ -272,29 +275,31 @@ protected:
      *  @param  name        Name of the property
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
+     *  @return ClassBase   Same object to allow chaining
      */
-    void property(const char *name, std::nullptr_t value, int flags = Php::Public);
-    void property(const char *name, int16_t value, int flags = Php::Public);
-    void property(const char *name, int32_t value, int flags = Php::Public);
-    void property(const char *name, int64_t value, int flags = Php::Public);
-    void property(const char *name, bool value, int flags = Php::Public);
-    void property(const char *name, char value, int flags = Php::Public);
-    void property(const char *name, const std::string &value, int flags = Php::Public);
-    void property(const char *name, const char *value, int flags = Php::Public);
-    void property(const char *name, double value, int flags = Php::Public);
+    ClassBase &property(const char *name, std::nullptr_t value, int flags = Php::Public);
+    ClassBase &property(const char *name, int16_t value, int flags = Php::Public);
+    ClassBase &property(const char *name, int32_t value, int flags = Php::Public);
+    ClassBase &property(const char *name, int64_t value, int flags = Php::Public);
+    ClassBase &property(const char *name, bool value, int flags = Php::Public);
+    ClassBase &property(const char *name, char value, int flags = Php::Public);
+    ClassBase &property(const char *name, const std::string &value, int flags = Php::Public);
+    ClassBase &property(const char *name, const char *value, int flags = Php::Public);
+    ClassBase &property(const char *name, double value, int flags = Php::Public);
 
     /**
      *  Set property with callbacks
      *  @param  name        Name of the property
      *  @param  getter      Getter method
      *  @param  setter      Setter method
+     *  @return ClassBase   Same object to allow chaining
      */
-    void property(const char *name, const getter_callback_0 &getter);
-    void property(const char *name, const getter_callback_1 &getter);
-    void property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter);
-    void property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter);
-    void property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter);
-    void property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter);
+    ClassBase &property(const char *name, const getter_callback_0 &getter);
+    ClassBase &property(const char *name, const getter_callback_1 &getter);
+    ClassBase &property(const char *name, const getter_callback_0 &getter, const setter_callback_0 &setter);
+    ClassBase &property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter);
+    ClassBase &property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter);
+    ClassBase &property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter);
 
 private:
     /**

@@ -60,90 +60,111 @@ public:
      *  @param  name        Name of the function
      *  @param  function    The function to add
      *  @param  arguments   Optional argument specification
+     *  @return Namespace   Same object to allow chaining
      */
-    void add(const char *name, const native_callback_0 &function, const Arguments &arguments = {});
-    void add(const char *name, const native_callback_1 &function, const Arguments &arguments = {});
-    void add(const char *name, const native_callback_2 &function, const Arguments &arguments = {});
-    void add(const char *name, const native_callback_3 &function, const Arguments &arguments = {});
+    Namespace &add(const char *name, const native_callback_0 &function, const Arguments &arguments = {});
+    Namespace &add(const char *name, const native_callback_1 &function, const Arguments &arguments = {});
+    Namespace &add(const char *name, const native_callback_2 &function, const Arguments &arguments = {});
+    Namespace &add(const char *name, const native_callback_3 &function, const Arguments &arguments = {});
     
     /**
      *  Add a native class to the extension by moving it
      *  @param  type        The class implementation
+     *  @return Namespace   Same object to allow chaining
      */
     template<typename T>
-    void add(Class<T> &&type)
+    Namespace &add(Class<T> &&type)
     {
         // make a copy of the object
         auto *copy = new Class<T>(std::move(type));
         
         // and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(copy));
+        
+        // allow chaining
+        return *this;
     }
 
     /**
      *  Add a native class to the extension by copying it
      *  @param  type        The class implementation
+     *  @param  Namespace   Same object to allow chaining
      */
     template<typename T>
-    void add(const Class<T> &type)
+    Namespace &add(const Class<T> &type)
     {
         // make a copy of the object
         auto *copy = new Class<T>(std::move(type));
         
         // and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(copy));
+        
+        // allow chaining
+        return *this;
     }
 
     /**
      *  Add an interface to the extension by moving it
      *  @param  interface   The interface properties
      */
-    void add(Interface &&interface)
+    Namespace &add(Interface &&interface)
     {
         // make a copy of the object
         auto *copy = new Interface(std::move(interface));
         
         // and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(copy));
+        
+        // allow chaining
+        return *this;
     }
 
     /**
      *  Add an interface to the extension by copying it
      *  @param  interface   The interface properties
      */
-    void add(const Interface &interface)
+    Namespace &add(const Interface &interface)
     {
         // make a copy of the object
         auto *copy = new Interface(interface);
         
         // and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(copy));
+        
+        // allow chaining
+        return *this;
     }
     
     /**
      *  Add a namespace to the extension by moving it
      *  @param  ns          The namespace
      */
-    void add(Namespace &&ns)
+    Namespace &add(Namespace &&ns)
     {
         // make a copy of the object
         auto *copy = new Namespace(std::move(ns));
         
         // add it to the list of namespaces
         _namespaces.push_back(std::unique_ptr<Namespace>(copy));
+        
+        // allow chaining
+        return *this;
     }
 
     /**
      *  Add a namespace to the extension by copying it
      *  @param  ns          The namespace
      */
-    void add(const Namespace &ns)
+    Namespace &add(const Namespace &ns)
     {
         // make a copy of the object
         auto *copy = new Namespace(std::move(ns));
         
         // add it to the list of namespaces
         _namespaces.push_back(std::unique_ptr<Namespace>(copy));
+        
+        // allow chaining
+        return *this;
     }
 
 

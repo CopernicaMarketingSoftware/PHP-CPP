@@ -18,11 +18,15 @@ namespace Php {
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @return Namespace   Same object to allow chaining
  */
-void Namespace::add(const char *name, const native_callback_0 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_0 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
+    
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -30,11 +34,15 @@ void Namespace::add(const char *name, const native_callback_0 &function, const A
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @return Namespace   Same object to allow chaining
  */
-void Namespace::add(const char *name, const native_callback_1 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_1 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -42,11 +50,15 @@ void Namespace::add(const char *name, const native_callback_1 &function, const A
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @return Namespace   Same object to allow chaining
  */
-void Namespace::add(const char *name, const native_callback_2 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_2 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
+
+    // allow chaining
+    return *this;
 }
 
 /**
@@ -54,11 +66,15 @@ void Namespace::add(const char *name, const native_callback_2 &function, const A
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @return Namespace   Same object to allow chaining
  */
-void Namespace::add(const char *name, const native_callback_3 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_3 &function, const Arguments &arguments)
 {
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
+
+    // allow chaining
+    return *this;
 }
 
 /**
