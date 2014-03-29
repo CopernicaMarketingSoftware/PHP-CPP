@@ -1,9 +1,12 @@
 /**
- *  
  *
- *  
+ *  Test Classes and objects
+ *	001.phpt
+ *	002.phpt
  *
  */
+
+
 
 
 /**
@@ -11,11 +14,6 @@
  */
 namespace TestBaseClass {
 
-    
-/**
-     *  Namespace to use
-     */
-    using namespace std;
 
     class MyCustomClass : public Php::Base, public Php::Countable
     {
@@ -53,7 +51,7 @@ namespace TestBaseClass {
             // check number of parameters
             //if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
             
-            std::cout << "myMethod is called for object " << _x << std::endl;
+            Php::out << "myMethod is called for object " << _x << std::endl;
 
             return 5;
 
@@ -61,10 +59,8 @@ namespace TestBaseClass {
     };
 
 
-
 /**
  *  End of namespace
  */
 }
 
-    

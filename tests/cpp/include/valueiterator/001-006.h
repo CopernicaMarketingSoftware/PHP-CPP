@@ -1,6 +1,7 @@
 /**
  *
  *  TestValueIterator
+ *	test valueiterator/001.phpt-valueiterator/006.phpt
  *
  */
 
@@ -19,7 +20,6 @@ namespace TestValueIterator {
         }
         return;
     }
-
 /**
  *  End of namespace
  */
