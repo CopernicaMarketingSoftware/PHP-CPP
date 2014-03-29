@@ -11,7 +11,7 @@ function get_complex_array()
     return array(
         "a" => 123,
         "b" => 456,
-        "c" => array("nested_value","example",7)
+        "c" => array("nested value","example",7)
     );
 }
 var_export(get_complex_array());
@@ -26,7 +26,7 @@ array (
   'b' => 456,
   'c' => 
   array (
-    0 => 'nested_value',
+    0 => 'nested value',
     1 => 'example',
     2 => 7,
   ),
