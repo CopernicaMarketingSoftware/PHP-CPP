@@ -80,22 +80,22 @@ public:
      *  @param  args        Argument descriptions
      *  @return Class       Same object to allow chaining
      */
-    Class<T> &method(const char *name, void  (T::*method)(),                         int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); }
-    Class<T> &method(const char *name, Value (T::*method)(),                         int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); }
-    Class<T> &method(const char *name, void  (T::*method)(),                                    const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params),                  const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); }
-    Class<T> &method(const char *name, Value (T::*method)(),                                    const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params),                  const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); }
-    Class<T> &method(const char *name, void  (T::*method)()                   const, int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_4>(method), flags,  args); }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_5>(method), flags,  args); }
-    Class<T> &method(const char *name, Value (T::*method)()                   const, int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_6>(method), flags,  args); }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_7>(method), flags,  args); }
-    Class<T> &method(const char *name, void  (T::*method)()                   const,            const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_4>(method), Public, args); }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const,            const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_5>(method), Public, args); }
-    Class<T> &method(const char *name, Value (T::*method)()                   const,            const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_6>(method), Public, args); }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const,            const Arguments &args = {}) { return ClassBase::method(name, static_cast<method_callback_7>(method), Public, args); }
+    Class<T> &method(const char *name, void  (T::*method)(),                         int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)(),                         int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)(),                                    const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)(Parameters &params),                  const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)(),                                    const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)(Parameters &params),                  const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)()                   const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_4>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)()                   const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), flags,  args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_4>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), Public, args); return *this; }
+    Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), Public, args); return *this; }
 
     /**
      *  Add a static method to a class
@@ -113,14 +113,14 @@ public:
      *  @param  args        Argument descriptions
      *  @return Class       Same object to allow chaining
      */
-    Class<T> &method(const char *name, const native_callback_0 &function, int flags, const Arguments &args = {}) { return ClassBase::method(name, function, flags,  args); }
-    Class<T> &method(const char *name, const native_callback_1 &function, int flags, const Arguments &args = {}) { return ClassBase::method(name, function, flags,  args); }
-    Class<T> &method(const char *name, const native_callback_2 &function, int flags, const Arguments &args = {}) { return ClassBase::method(name, function, flags,  args); }
-    Class<T> &method(const char *name, const native_callback_3 &function, int flags, const Arguments &args = {}) { return ClassBase::method(name, function, flags,  args); }
-    Class<T> &method(const char *name, const native_callback_0 &function,            const Arguments &args = {}) { return ClassBase::method(name, function, Public, args); }
-    Class<T> &method(const char *name, const native_callback_1 &function,            const Arguments &args = {}) { return ClassBase::method(name, function, Public, args); }
-    Class<T> &method(const char *name, const native_callback_2 &function,            const Arguments &args = {}) { return ClassBase::method(name, function, Public, args); }
-    Class<T> &method(const char *name, const native_callback_3 &function,            const Arguments &args = {}) { return ClassBase::method(name, function, Public, args); }
+    Class<T> &method(const char *name, const native_callback_0 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    Class<T> &method(const char *name, const native_callback_1 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    Class<T> &method(const char *name, const native_callback_2 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    Class<T> &method(const char *name, const native_callback_3 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    Class<T> &method(const char *name, const native_callback_0 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    Class<T> &method(const char *name, const native_callback_1 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    Class<T> &method(const char *name, const native_callback_2 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    Class<T> &method(const char *name, const native_callback_3 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
 
     /**
      *  Add an abstract method to the class
@@ -133,8 +133,8 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
      */
-    Class<T> &method(const char *name, int flags, const Arguments &args = {}) { return ClassBase::method(name, flags  | Abstract, args); }
-    Class<T> &method(const char *name,            const Arguments &args = {}) { return ClassBase::method(name, Public | Abstract, args); }
+    Class<T> &method(const char *name, int flags, const Arguments &args = {}) { ClassBase::method(name, flags  | Abstract, args); return *this; }
+    Class<T> &method(const char *name,            const Arguments &args = {}) { ClassBase::method(name, Public | Abstract, args); return *this; }
 
     /**
      *  Add a property to the class
@@ -149,15 +149,15 @@ public:
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
      */
-    Class<T> &property(const char *name, std::nullptr_t value,     int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, int64_t value,            int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, int32_t value,            int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, int16_t value,            int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, char value,               int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, const char *value,        int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, const std::string &value, int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, bool value,               int flags = Public) { return ClassBase::property(name, value, flags); }
-    Class<T> &property(const char *name, double value,             int flags = Public) { return ClassBase::property(name, value, flags); }
+    Class<T> &property(const char *name, std::nullptr_t value,     int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, int64_t value,            int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, int32_t value,            int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, int16_t value,            int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, char value,               int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, const char *value,        int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); return *this; }
 
     /**
      *  Properties as methods
@@ -172,12 +172,12 @@ public:
      *  @param  getter      The getter method
      *  @param  setter      The setter method
      */
-    Class<T> &property(const char *name, Value (T::*getter)()                                                   ) { return ClassBase::property(name, static_cast<getter_callback_0>(getter)); }
-    Class<T> &property(const char *name, Value (T::*getter)() const                                             ) { return ClassBase::property(name, static_cast<getter_callback_1>(getter)); }
-    Class<T> &property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value)      ) { return ClassBase::property(name, static_cast<getter_callback_0>(getter), static_cast<setter_callback_0>(setter)); }
-    Class<T> &property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value)      ) { return ClassBase::property(name, static_cast<getter_callback_1>(getter), static_cast<setter_callback_0>(setter)); }
-    Class<T> &property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value) const) { return ClassBase::property(name, static_cast<getter_callback_0>(getter), static_cast<setter_callback_1>(setter)); }
-    Class<T> &property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value) const) { return ClassBase::property(name, static_cast<getter_callback_1>(getter), static_cast<setter_callback_1>(setter)); }
+    Class<T> &property(const char *name, Value (T::*getter)()                                                   ) { ClassBase::property(name, static_cast<getter_callback_0>(getter)); return *this; }
+    Class<T> &property(const char *name, Value (T::*getter)() const                                             ) { ClassBase::property(name, static_cast<getter_callback_1>(getter)); return *this; }
+    Class<T> &property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value)      ) { ClassBase::property(name, static_cast<getter_callback_0>(getter), static_cast<setter_callback_0>(setter)); return *this; }
+    Class<T> &property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value)      ) { ClassBase::property(name, static_cast<getter_callback_1>(getter), static_cast<setter_callback_0>(setter)); return *this; }
+    Class<T> &property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value) const) { ClassBase::property(name, static_cast<getter_callback_0>(getter), static_cast<setter_callback_1>(setter)); return *this; }
+    Class<T> &property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value) const) { ClassBase::property(name, static_cast<getter_callback_1>(getter), static_cast<setter_callback_1>(setter)); return *this; }
     
 private:
     /**

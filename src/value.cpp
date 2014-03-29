@@ -173,7 +173,7 @@ Value::Value(struct _zval_struct *val, bool ref)
  *  Wrap around an object
  *  @param  object
  */
-Value::Value(Base *object)
+Value::Value(const Base *object)
 {
     // there are two options: the object was constructed from user space,
     // and is already linked to a handle, or it was constructed from C++ 

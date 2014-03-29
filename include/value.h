@@ -117,7 +117,7 @@ public:
      *  Wrap around an object implemented by us
      *  @param  object      Object to be wrapped
      */
-    Value(Base *base);
+    Value(const Base *base);
     
     /**
      *  Copy constructor
