@@ -102,7 +102,7 @@ do
             exit;
             ;;
         t)
-            TEST_FILES="$OPTARG"
+            TEST_FILES="${TEST_FILES}${OPTARG} "
             ;;
         x)
             SCR_OPT="$SCR_OPT -x"
@@ -160,7 +160,6 @@ if [ 1 = $COMPILE_EXT ]; then
         ln -s "$LIBRARY_PATH/phpcpp.h" $PHPCPP_H
     fi
     # local copy of /usr/include/phpcpp:
-    #if [ -L $PHPCPP_INC ] || [ -d $PHPCPP_INC ];
     if [ -a $PHPCPP_INC ];
     then
         rm -rf $PHPCPP_INC
