@@ -13,7 +13,7 @@ namespace Php {
 /**
  *  Forward declarations
  */
-class MixedObject;
+struct MixedObject;
 
 /**
  *  Class definition
