@@ -145,16 +145,35 @@ SCR_OPT="$SCR_OPT -d extension_dir=$PWD/ext_dir -d extension=$EXT_NAME"
 # Create a local copy of the directory with the extension for run without installation
 ./prepare.sh $EXT_NAME
 
+# Absolute path to library
+LIBRARY_PATH="$(cd $PWD/.. && echo $PWD)"
 
 if [ 1 = $COMPILE_EXT ]; then
+    
+    # Create a local copy of header files
+    PHPCPP_H="$LIBRARY_PATH/tests/include/lib/phpcpp.h"
+    PHPCPP_INC="$LIBRARY_PATH/tests/include/lib/phpcpp"
+    mkdir -p "$LIBRARY_PATH/tests/include/lib"
+    # local copy of /usr/include/phpcpp.h:
+    if [ ! -L $PHPCPP_H ];
+    then
+        ln -s "$LIBRARY_PATH/phpcpp.h" $PHPCPP_H
+    fi
+    # local copy of /usr/include/phpcpp:
+    #if [ -L $PHPCPP_INC ] || [ -d $PHPCPP_INC ];
+    if [ -a $PHPCPP_INC ];
+    then
+        rm -rf $PHPCPP_INC
+    fi
+    ln -s "$LIBRARY_PATH/include" $PHPCPP_INC
+    
     echo "Compile the test extension"
     cd cpp
     make clean && make
     cd ..
 fi
 
-
-LD_LIBRARY_PATH="$(cd $PWD/.. && echo $PWD):${LD_LIBRARY_PATH}"
+LD_LIBRARY_PATH="${LIBRARY_PATH}:${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 echo $LD_LIBRARY_PATH
 
