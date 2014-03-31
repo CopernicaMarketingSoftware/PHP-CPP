@@ -171,7 +171,7 @@ install:
 	${CONFIG_UTILITY} > ${INSTALL_HEADERS}/phpcpp/config.h
 
 test:
-	mkdir -p ./tests/cpp/zts/phpcpp
-	${CONFIG_UTILITY} > ./tests/cpp/zts/phpcpp/config.h
+	mkdir -p ./tests/include/zts/phpcpp
+	${CONFIG_UTILITY} > ./tests/include/zts/phpcpp/config.h
 	cd tests && ./test.sh -p "${PHP_BIN}"
 
