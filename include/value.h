@@ -38,7 +38,7 @@ template <class Type> class HashMember;
 /**
  *  Class definition
  */
-class Value
+class Value : private HashParent
 {
 public:
     /**
@@ -543,14 +543,14 @@ public:
      *  @param  index
      *  @return bool
      */
-    bool contains(int index) const;
+    virtual bool contains(int index) const override;
 
     /**
      *  Is a certain key set in the array
      *  @param  key
      *  @return bool
      */
-    bool contains(const std::string &key) const
+    virtual bool contains(const std::string &key) const override
     {
         return contains(key.c_str(), key.size());
     }
@@ -671,7 +671,7 @@ public:
      *  @param  index
      *  @return Value
      */
-    Value get(int index) const;
+    virtual Value get(int index) const override;
     
     /**
      *  Get access to a certain assoc member
@@ -686,7 +686,7 @@ public:
      *  @param  key
      *  @return Value
      */
-    Value get(const std::string &key) const
+    virtual Value get(const std::string &key) const override
     {
         return get(key.c_str(), key.size());
     }
@@ -698,7 +698,7 @@ public:
      *  @param  value       Value to set
      *  @return Value       The value that was set
      */
-    virtual const Value &set(int index, const Value &value);
+    virtual void set(int index, const Value &value) override;
     
     /**
      *  Set a certain property
@@ -706,20 +706,18 @@ public:
      *  @param  key         Key of the property to set
      *  @param  size        Size of the key
      *  @param  value       Value to set
-     *  @return Value       The value that was set
      */
-    virtual const Value &set(const char *key, int size, const Value &value);
+    virtual void set(const char *key, int size, const Value &value);
 
     /**
      *  Set a certain property
      *  Calling this method will turn the object into an array
      *  @param  key         Key to set
      *  @param  value       Value to set
-     *  @return Value       The value that was set
      */
-    const Value &set(const char *key, const Value &value)
+    void set(const char *key, const Value &value)
     {
-        return set(key, strlen(key), value);
+        set(key, strlen(key), value);
     }
     
     /**
@@ -727,9 +725,8 @@ public:
      *  Calling this method will turn the object into an array
      *  @param  key         Key to set
      *  @param  value       Value to set
-     *  @return Value       The value that was set
      */
-    const Value &set(const std::string &key, const Value &value)
+    virtual void set(const std::string &key, const Value &value) override
     {
         return set(key.c_str(), key.size(), value);
     }
@@ -919,9 +916,8 @@ protected:
      * 
      *  @param  index       Index of the property to set
      *  @param  value       Value to set
-     *  @return Value       The value that was set
      */
-    const Value &setRaw(int index, const Value &value);
+    void setRaw(int index, const Value &value);
     
     /**
      *  Set a certain property without any checks (you must already know for
@@ -931,9 +927,8 @@ protected:
      *  @param  key         Key of the property to set
      *  @param  size        Size of the key
      *  @param  value       Value to set
-     *  @return Value       The value that was set
      */
-    const Value &setRaw(const char *key, int size, const Value &value);
+    void setRaw(const char *key, int size, const Value &value);
 
     /**
      *  Internal helper method to create an iterator

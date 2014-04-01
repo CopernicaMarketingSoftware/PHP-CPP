@@ -42,6 +42,7 @@
 #include "../include/exception.h"
 #include "../include/streams.h"
 #include "../include/type.h"
+#include "../include/hashparent.h"
 #include "../include/value.h"
 #include "../include/valueiterator.h"
 #include "../include/array.h"

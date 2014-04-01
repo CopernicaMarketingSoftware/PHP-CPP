@@ -24,25 +24,19 @@ namespace Php {
 class Value;
 
 /**
- *  Base class for hash members
- */
-class HashMemberBase
-{
-public:
-    /**
-     *  Assignment operator
-     *  @param  param   value
-     */
-    virtual void assign(const Value &value) = 0;
-};
-
-/**
  *  Member class
  */
 template <typename Type>
-class HashMember : public HashMemberBase
+class HashMember : private HashParent
 {
 public:
+    /**
+     *  Constructor
+     *  @param  parent
+     *  @param  index
+     */
+    HashMember(HashParent *parent, Type index) : _parent(parent), _index(index) {}
+    
     /**
      *  Destructor
      */
@@ -55,9 +49,9 @@ public:
      */
     HashMember &operator=(const Value &value)
     {
-        // assign the property
-        assign(value);
-        
+        // set new value in the parent
+        _parent->set(_index, value);
+
         // done
         return *this;
     }
@@ -69,7 +63,8 @@ public:
      */
     bool exists() const
     {
-        return _base.contains(_index);
+        // ask the parent
+        return _parent->contains(_index);
     }
 
     /**
@@ -78,7 +73,7 @@ public:
      */
     Value value() const
     {
-        return _base.get(_index);
+        return _parent->get(_index);
     }
 
     /**
@@ -87,7 +82,7 @@ public:
      */
     operator Value () const
     {
-        return _base.get(_index);
+        return _parent->get(_index);
     }
 
     /**
@@ -96,7 +91,7 @@ public:
      */
     operator int16_t () const
     {
-        return _base.get(_index).numericValue();
+        return value().numericValue();
     }
 
     /**
@@ -105,7 +100,7 @@ public:
      */
     operator int32_t () const
     {
-        return _base.get(_index).numericValue();
+        return value().numericValue();
     }
 
     /**
@@ -114,7 +109,7 @@ public:
      */
     operator int64_t () const
     {
-        return _base.get(_index).numericValue();
+        return value().numericValue();
     }
     
     /**
@@ -123,7 +118,7 @@ public:
      */
     operator bool () const
     {
-        return _base.get(_index).boolValue();
+        return value().boolValue();
     }
     
     /**
@@ -132,7 +127,7 @@ public:
      */
     operator std::string () const
     {
-        return _base.get(_index).stringValue();
+        return value().stringValue();
     }
     
     /**
@@ -141,7 +136,7 @@ public:
      */
     operator const char * () const
     {
-        return _base.get(_index).rawValue();
+        return value().rawValue();
     }
     
     /**
@@ -150,7 +145,7 @@ public:
      */
     operator double () const
     {
-        return _base.get(_index).decimalValue();
+        return value().floatValue();
     }
     
     /**
@@ -161,7 +156,7 @@ public:
      */
     HashMember<int> operator[](int index)
     {
-        return _base.get(_index)[index].add(this);
+        return HashMember<int>(this, index);
     }
 
     /**
@@ -172,7 +167,7 @@ public:
      */
     HashMember<std::string> operator[](const std::string &key)
     {
-        return _base.get(_index)[key].add(this);
+        return HashMember<std::string>(this, key);
     }
 
     /**
@@ -183,11 +178,11 @@ public:
      */
     HashMember<std::string> operator[](const char *key)
     {
-        return _base.get(_index)[key].add(this);
+        return HashMember<std::string>(this, key);
     }
 
     /**
-     *  Add a value to the object
+     *  Add a value to the object (or other arithmetric operators)
      *  @param  value
      *  @return HashMember
      */
@@ -373,44 +368,110 @@ public:
     Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5, Value param6, Value param7, Value param8) { return value()(param0, param1, param2, param3, param4, param5, param6, param7, param8); }
     Value operator()(Value param0, Value param1, Value param2, Value param3, Value param4, Value param5, Value param6, Value param7, Value param8, Value param9) { return value()(param0, param1, param2, param3, param4, param5, param6, param7, param8, param9); }
 
-private:
     /**
-     *  Constructor
-     *  @param  base    Base value
-     *  @param  index   Index in the array
+     *  Check if a certain key exists in the array/object
+     *  @param  key
+     *  @return bool
      */
-    HashMember(struct _zval_struct *base, Type index) : _base(base, true), _index(index) {}
+    virtual bool contains(const std::string &key) const override
+    {
+        // object must exist, and the value must contain the key
+        return exists() && value().contains(key);
+    }
     
-    // @todo add move constructor
+    /**
+     *  Check if a certain index exists in the array/object
+     *  @param  key
+     *  @return bool
+     */
+    virtual bool contains(int index) const override
+    {
+        // object must exist, and the value must contain the key
+        return exists() && value().contains(index);
+    }
     
+    /**
+     *  Retrieve the value at a string index
+     *  @param  key
+     *  @return Value
+     */
+    virtual Value get(const std::string &key) const override
+    {
+        // return null if it does not exist
+        if (!exists()) return nullptr;
+        
+        // ask the value
+        return value().get(key);
+    }
+    
+    /**
+     *  Retrieve the value at a numeric index
+     *  @param  index
+     *  @return Value
+     */
+    virtual Value get(int index) const override
+    {
+        // return null if it does not exist
+        if (!exists()) return nullptr;
+        
+        // ask the value
+        return value().get(index);
+    }
+    
+    /**
+     *  Overwrite the value at a certain string index
+     *  @param  key
+     *  @param  value
+     */
+    virtual void set(const std::string &key, const Value &value) override
+    {
+        // get the current value
+        Value current(this->value());
+        
+        // add the value
+        current[key] = value;
+        
+        // pass this to the base
+        _parent->set(_index, current);
+    }
+    
+    /**
+     *  Overwrite the value at a certain numeric index
+     *  @param  index
+     *  @param  value
+     */
+    virtual void set(int index, const Value &value) override
+    {
+        // get the current value
+        Value current(value());
+        
+        // add the value
+        current[index] = value;
+        
+        // pass this to the base
+        _parent->set(_index, current);
+    }
+
+protected:
     /**
      *  Protected copy constructor
      *  @param  value   Other element
      */
-    HashMember(const HashMember<Type> &member) : _base(member._base._val, true), _index(member._index), _parent(member._parent) {}
-    
-    /**
-     *  Add parent
-     *  @param  parent
-     */
-    HashMember &add(HashMemberBase *parent)
-    {
-        _parent = parent;
-        return *this;
-    }
+    HashMember(const HashMember<Type> &member) : _parent(member._parent), _index(member._index) {}
 
     /**
-     *  Implementation of the assign method
-     *  @param  value
+     *  Move constructor
+     *  @param  value   Other element
      */
-    virtual void assign(const Value &value) override
-    {
-        // set property in parent array
-        _base.set(_index, value);
+//    HashMember(HashMember<Type> &&member) : 
+//        _parent(std::move(member._parent)), _index(std::move(member._index)) {}
 
-        // if there is a parent, it should sets its value too
-        if (_parent) _parent->assign(_base);
-    }
+private:
+    /**
+     *  Base value
+     *  @var 
+     */
+    HashParent *_parent;
     
     /**
      *  The original index
@@ -419,24 +480,12 @@ private:
     Type _index;
     
     /**
-     *  Base value
-     *  @var Value
+     *  Friend classes
      */
-    Value _base;
-    
-    /**
-     *  Parent member (in case of nested members)
-     *  @var HashMemberBase
-     */
-    HashMemberBase *_parent = nullptr;
-    
-    /**
-     *  Only value objects may construct members
-     */
-    friend class Value;
-    friend class Base;
-    friend class HashMember<int>;
     friend class HashMember<std::string>;
+    friend class HashMember<int>;
+    friend class Base;
+    friend class Value;
 };
 
 /**

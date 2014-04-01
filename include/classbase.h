@@ -94,10 +94,10 @@ public:
     ClassBase(const ClassBase &that) : 
         _name(that._name), 
         _type(that._type), 
+        _entry(that._entry),
         _methods(that._methods), 
         _members(that._members), 
-        _properties(that._properties),
-        _entry(nullptr) {}
+        _properties(that._properties) {}
 
     /**
      *  Move constructor
@@ -106,10 +106,10 @@ public:
     ClassBase(ClassBase &&that) :
         _name(std::move(that._name)), 
         _type(that._type), 
+        _entry(that._entry),
         _methods(std::move(that._methods)), 
         _members(std::move(that._members)), 
-        _properties(std::move(that._properties)),
-        _entry(that._entry) 
+        _properties(std::move(that._properties))
     {
         // other entry are invalid now (not that it is used..., class objects are
         // only moved during extension setup, when the entry pointer has not yet

@@ -1741,7 +1741,7 @@ Value Value::get(const char *key, int size) const
  *  @param  value
  *  @return Value
  */
-const Value &Value::setRaw(int index, const Value &value)
+void Value::setRaw(int index, const Value &value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -1751,11 +1751,7 @@ const Value &Value::setRaw(int index, const Value &value)
 
     // the variable has one more reference (the array entry)
     Z_ADDREF_P(value._val);
-    
-    // done
-    return value;
 }
-
 
 /**
  *  Set a certain property
@@ -1763,7 +1759,7 @@ const Value &Value::setRaw(int index, const Value &value)
  *  @param  value
  *  @return Value
  */
-const Value &Value::set(int index, const Value &value)
+void Value::set(int index, const Value &value)
 {
     // the current value
     zval **current;
@@ -1772,14 +1768,14 @@ const Value &Value::set(int index, const Value &value)
     if (isArray() && zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&current) != FAILURE)
     {
         // skip if nothing is going to change
-        if (value._val == *current) return value;
+        if (value._val == *current) return;
     }
 
     // must be an array
     setType(Type::Array);
 
     // set property
-    return setRaw(index, value);
+    setRaw(index, value);
 }
 
 /**
@@ -1787,9 +1783,8 @@ const Value &Value::set(int index, const Value &value)
  *  @param  key
  *  @param  size
  *  @param  value
- *  @return Value
  */
-const Value &Value::setRaw(const char *key, int size, const Value &value)
+void Value::setRaw(const char *key, int size, const Value &value)
 {
     // is this an object?
     if (isObject())
@@ -1817,9 +1812,6 @@ const Value &Value::setRaw(const char *key, int size, const Value &value)
         // the variable has one more reference (the array entry)
         Z_ADDREF_P(value._val);
     }
-
-    // done
-    return value;
 }
 
 /**
@@ -1829,7 +1821,7 @@ const Value &Value::setRaw(const char *key, int size, const Value &value)
  *  @param  value
  *  @return Value
  */
-const Value &Value::set(const char *key, int size, const Value &value)
+void Value::set(const char *key, int size, const Value &value)
 {
     // the current value
     zval **current;
@@ -1838,14 +1830,14 @@ const Value &Value::set(const char *key, int size, const Value &value)
     if (isArray() && zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&current) != FAILURE)
     {
         // skip if nothing is going to change
-        if (value._val == *current) return value;
+        if (value._val == *current) return;
     }
     
     // this should be an object or an array
     if (!isObject()) setType(Type::Array);
     
     // done
-    return setRaw(key, size, value);
+    setRaw(key, size, value);
 }
 
 /**
@@ -1856,7 +1848,7 @@ const Value &Value::set(const char *key, int size, const Value &value)
  */
 HashMember<int> Value::operator[](int index) 
 {
-    return HashMember<int>(_val, index);
+    return HashMember<int>(this, index);
 }
 
 /**
@@ -1867,7 +1859,7 @@ HashMember<int> Value::operator[](int index)
  */
 HashMember<std::string> Value::operator[](const std::string &key) 
 {
-    return HashMember<std::string>(_val, key);
+    return HashMember<std::string>(this, key);
 }
 
 /**
@@ -1878,7 +1870,7 @@ HashMember<std::string> Value::operator[](const std::string &key)
  */
 HashMember<std::string> Value::operator[](const char *key) 
 {
-    return HashMember<std::string>(_val, key);
+    return HashMember<std::string>(this, key);
 }
 
 /**

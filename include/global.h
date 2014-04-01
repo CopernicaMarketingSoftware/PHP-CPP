@@ -106,13 +106,13 @@ public:
      *  @param  value       Value to set
      *  @return Value       The value that was set
      */
-    virtual const Value &set(int index, const Value &value) override
+    virtual void set(int index, const Value &value) override
     {
         // update current object
         update();
         
         // call base
-        return Value::set(index, value);
+        Value::set(index, value);
     }
     
     /**
@@ -123,13 +123,13 @@ public:
      *  @param  value       Value to set
      *  @return Value       The value that was set
      */
-    virtual const Value &set(const char *key, int size, const Value &value) override
+    virtual void set(const char *key, int size, const Value &value) override
     {
         // update current object
         update();
         
         // call base
-        return Value::set(key, size, value);
+        Value::set(key, size, value);
     }
 
 

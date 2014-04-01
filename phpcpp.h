@@ -54,6 +54,7 @@
 #include <phpcpp/exception.h>
 #include <phpcpp/streams.h>
 #include <phpcpp/type.h>
+#include <phpcpp/hashparent.h>
 #include <phpcpp/value.h>
 #include <phpcpp/valueiterator.h>
 #include <phpcpp/array.h>
