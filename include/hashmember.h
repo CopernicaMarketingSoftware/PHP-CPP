@@ -443,7 +443,7 @@ public:
     virtual void set(int index, const Value &value) override
     {
         // get the current value
-        Value current(value());
+        Value current(this->value());
         
         // add the value
         current[index] = value;
