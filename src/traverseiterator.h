@@ -177,7 +177,7 @@ private:
         // is the iterator at a valid position?
         if (_iter->funcs->valid(_iter TSRMLS_CC) == FAILURE) return invalidate(TSRMLS_C);
 
-#if PHP_VERSION_ID >= 50400
+#if PHP_VERSION_ID >= 50500
 
         // create a value object
         Value val;
@@ -194,7 +194,7 @@ private:
         // the PHP engine (this is php 5.3 code)
         char *str_key; unsigned int str_key_len; unsigned long int_key;
 
-        // php 5.3 code, fetch the current key
+        // php 5.4 or php 5.3 code, fetch the current key
         int type = _iter->funcs->get_current_key(_iter, &str_key, &str_key_len, &int_key TSRMLS_CC);
         
         // what sort of key do we have?
