@@ -186,7 +186,7 @@ public:
      *  @param  interface   Interface object
      *  @return Class       Same object to allow chaining
      */
-//    Class<T> &implements(const Interface &interface) { ClassBase::implements(interface); return *this; }
+    Class<T> &implements(const Interface &interface) { ClassBase::implements(interface); return *this; }
     
     /**
      *  Add a base class

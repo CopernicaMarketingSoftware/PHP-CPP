@@ -259,7 +259,7 @@ protected:
      *  Add an interface
      *  @param  interface       Interface object
      */
-//    void implements(const ClassBase &interface) { _interfaces.push_back(&interface); }
+    void implements(const ClassBase &interface);
 
     /**
      *  Set the base class
@@ -268,7 +268,6 @@ protected:
 //    void extends(const std::string &name) { _base = name; }
 
 private:
-
     /**
      *  Pointer to the actual implementation
      *  @var    std::shared_ptr<ClassImpl>

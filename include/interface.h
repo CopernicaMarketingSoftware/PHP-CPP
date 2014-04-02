@@ -41,12 +41,18 @@ public:
         // return self
         return *this;
     }
-
-private:
+    
     /**
-     *  Namespaces have access to the private base class
+     *  The namespace needs to have access to the private ClassBase base
+     *  class, to actually register the interface.
      */
     friend class Namespace;
+    
+    /**
+     *  All Php::Class<AnyThing> also need access to the base class to
+     *  register an interface.
+     */
+    template<typename ANYTHING> friend class Class;
 };
 
 /**

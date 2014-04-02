@@ -77,8 +77,8 @@
 #include <phpcpp/serializable.h>
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
-#include <phpcpp/class.h>
 #include <phpcpp/interface.h>
+#include <phpcpp/class.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/call.h>

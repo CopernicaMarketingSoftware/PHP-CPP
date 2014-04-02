@@ -73,6 +73,12 @@ private:
      */
     std::map<std::string,std::shared_ptr<Property>> _properties;
 
+    /**
+     *  Interfaces that are implemented
+     *  @var    std::list
+     */
+    std::list<std::shared_ptr<ClassImpl>> _interfaces;
+
 
     /**
      *  Retrieve an array of zend_function_entry objects that hold the 
@@ -395,7 +401,11 @@ public:
     void property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter)   { _properties[name] = std::make_shared<Property>(getter,setter); }
     void property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter)   { _properties[name] = std::make_shared<Property>(getter,setter); }
     
-
+    /**
+     *  Add an interface that is implemented
+     *  @param  interface   The interface that is implemented
+     */
+    void implements(const std::shared_ptr<ClassImpl> &interface) { _interfaces.push_back(interface); }
 
 
 };

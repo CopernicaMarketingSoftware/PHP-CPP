@@ -1399,12 +1399,12 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);
     
-//    // register the classes
-//    for (auto &interface : _interfaces)
-//    {
-//        // register this interface
-//        zend_class_implements(_entry, 1, interface->_entry);
-//    }
+    // register the classes
+    for (auto &interface : _interfaces)
+    {
+        // register this interface
+        zend_class_implements(_entry, 1, interface->_entry);
+    }
     
     // allocate doc comment to contain an empty string + a hidden pointer
     if (!_comment)

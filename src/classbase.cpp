@@ -112,6 +112,12 @@ void ClassBase::property(const char *name, const getter_callback_0 &getter, cons
 void ClassBase::property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter) { _impl->property(name, getter, setter); }
 
 /**
+ *  Add an interface
+ *  @param  interface       Interface object
+ */
+void ClassBase::implements(const ClassBase &interface) { _impl->implements(interface._impl); }
+
+/**
  *  End namespace
  */
 }
