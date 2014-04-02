@@ -65,8 +65,8 @@
 #include "../include/traversable.h"
 #include "../include/classtype.h"
 #include "../include/classbase.h"
-#include "../include/class.h"
 #include "../include/interface.h"
+#include "../include/class.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
@@ -94,6 +94,7 @@
 #include "invaliditerator.h"
 #include "traverseiterator.h"
 #include "streambuf.h"
+#include "classimpl.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

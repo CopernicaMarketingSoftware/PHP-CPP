@@ -271,7 +271,7 @@ private:
      */
     friend class Value;
     friend class Object;
-    friend class ClassBase;
+    friend class ClassImpl;
 
 };
 

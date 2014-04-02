@@ -31,11 +31,15 @@ public:
      *  Add a - of course abstract - method to the interface
      *  @param  name        Name of the method
      *  @param  arguments   Optional description of the arguments
+     *  @return Interface   Same object to allow chaining
      */
-    void method(const char *name, const Arguments &arguments = {})
+    Interface &method(const char *name, const Arguments &arguments = {})
     {
         // call base
         ClassBase::method(name, Abstract | Public, arguments);
+        
+        // return self
+        return *this;
     }
 
 private:

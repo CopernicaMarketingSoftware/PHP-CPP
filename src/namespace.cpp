@@ -123,7 +123,7 @@ void Namespace::initialize(const std::string &parent TSRMLS_DC)
     std::string prefix = parent.size() ? parent + "\\" + _name : _name;
     
     // loop through the classes in this namespace
-    for (auto &c : _classes) c->initialize(prefix TSRMLS_CC);
+    for (auto &c : _classes) c->implementation()->initialize(c.get(), prefix TSRMLS_CC);
     
     // and loop through the other namespaces
     for (auto &n : _namespaces) n->initialize(prefix TSRMLS_CC);

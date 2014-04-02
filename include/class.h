@@ -18,11 +18,7 @@
 /**
  *  Zend/SPL interfaces that we support
  */
-//extern struct _zend_class_entry *zend_ce_traversable;
-//extern struct _zend_class_entry *zend_ce_aggregate;
-//extern struct _zend_class_entry *zend_ce_iterator;
 extern struct _zend_class_entry *zend_ce_arrayaccess;
-//extern struct _zend_class_entry *zend_ce_serializable;
 
 /**
  *  Set up namespace
@@ -132,6 +128,7 @@ public:
      *  @param  name        Name of the method
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
+     *  @return Class       Same object to allow chaining
      */
     Class<T> &method(const char *name, int flags, const Arguments &args = {}) { ClassBase::method(name, flags  | Abstract, args); return *this; }
     Class<T> &method(const char *name,            const Arguments &args = {}) { ClassBase::method(name, Public | Abstract, args); return *this; }
@@ -148,6 +145,7 @@ public:
      *  @param  name        Name of the property
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
+     *  @return Class       Same object to allow chaining
      */
     Class<T> &property(const char *name, std::nullptr_t value,     int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, int64_t value,            int flags = Public) { ClassBase::property(name, value, flags); return *this; }
@@ -178,6 +176,34 @@ public:
     Class<T> &property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value)      ) { ClassBase::property(name, static_cast<getter_callback_1>(getter), static_cast<setter_callback_0>(setter)); return *this; }
     Class<T> &property(const char *name, Value (T::*getter)()      , void (T::*setter)(const Value &value) const) { ClassBase::property(name, static_cast<getter_callback_0>(getter), static_cast<setter_callback_1>(setter)); return *this; }
     Class<T> &property(const char *name, Value (T::*getter)() const, void (T::*setter)(const Value &value) const) { ClassBase::property(name, static_cast<getter_callback_1>(getter), static_cast<setter_callback_1>(setter)); return *this; }
+
+    /**
+     *  Add a PHP interface to the class
+     * 
+     *  Note that the interface that you supply must already exist! Therefore
+     *  you can only supply interfaces that you created in your own extension.
+     * 
+     *  @param  interface   Interface object
+     *  @return Class       Same object to allow chaining
+     */
+//    Class<T> &implements(const Interface &interface) { ClassBase::implements(interface); return *this; }
+    
+    /**
+     *  Add a base class
+     * 
+     *  Because PHP does not allow multiple inheritance, you can only add one
+     *  base class. If you call this method more than once, the earlier base
+     *  class is overridden.
+     * 
+     *  The base class that you supply must already be registered. And because
+     *  your extension is most likely registered before any user space PHP scripts
+     *  run, you can only specify built-in classes, or classes that you created
+     *  in your own extension.
+     * 
+     *  @param  name        Name of the base class
+     *  @return Class       Same object to allow chaining
+     */
+//    Class<T> &extends(const char *name) { ClassBase::extends(name); return *this; }
     
 private:
     /**

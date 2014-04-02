@@ -63,8 +63,8 @@ MixedObject *Base::store(zend_class_entry *entry TSRMLS_DC)
 #endif
     
     // store the two destruct methods in temporary vars
-    DestructType *destructMethod = &ClassBase::destructObject;
-    FreeType *freeMethod = &ClassBase::freeObject;
+    DestructType *destructMethod = &ClassImpl::destructObject;
+    FreeType *freeMethod = &ClassImpl::freeObject;
 
     // the destructor and clone handlers are set to NULL. I dont know why, but they do not
     // seem to be necessary...

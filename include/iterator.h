@@ -158,7 +158,7 @@ private:
     /**
      *  Classbase is a friend
      */
-    friend class ClassBase;
+    friend class ClassImpl;
 };
     
 /**
