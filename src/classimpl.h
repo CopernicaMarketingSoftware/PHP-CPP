@@ -78,6 +78,12 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<ClassImpl>> _interfaces;
+    
+    /**
+     *  The parent/base class
+     *  @var    std::shared_ptr
+     */
+    std::shared_ptr<ClassImpl> _parent;
 
 
     /**
@@ -407,6 +413,11 @@ public:
      */
     void implements(const std::shared_ptr<ClassImpl> &interface) { _interfaces.push_back(interface); }
 
+    /**
+     *  Set the base class
+     *  @param  base        The base class
+     */
+    void extends(const std::shared_ptr<ClassImpl> &base) { _parent = base; }
 
 };
 

@@ -118,6 +118,12 @@ void ClassBase::property(const char *name, const getter_callback_1 &getter, cons
 void ClassBase::implements(const ClassBase &interface) { _impl->implements(interface._impl); }
 
 /**
+ *  Set the base class
+ *  @param  base            Php::Class object that is the base
+ */
+void ClassBase::extends(const ClassBase &base) { _impl->extends(base._impl); }
+
+/**
  *  End namespace
  */
 }

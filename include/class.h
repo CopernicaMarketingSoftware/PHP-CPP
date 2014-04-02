@@ -197,13 +197,13 @@ public:
      * 
      *  The base class that you supply must already be registered. And because
      *  your extension is most likely registered before any user space PHP scripts
-     *  run, you can only specify built-in classes, or classes that you created
-     *  in your own extension.
+     *  run, you can only specify classes that you created in your own extension.
      * 
-     *  @param  name        Name of the base class
+     *  @param  base        Php::Class object
      *  @return Class       Same object to allow chaining
      */
-//    Class<T> &extends(const char *name) { ClassBase::extends(name); return *this; }
+    template<typename CLASS>
+    Class<T> &extends(const Class<CLASS> &base) { ClassBase::extends(base); return *this; }
     
 private:
     /**
@@ -534,9 +534,17 @@ private:
     }
 
     /**
-     *  Namespaces have access to the private base class
+     *  Namespaces have access to the private base class, so that the classes
+     *  can be registered.
      */
     friend class Namespace;
+    
+    /**
+     *  All Php::Class<AnyThing> also need access to the base class to
+     *  register this class as base class.
+     */
+    template<typename ANYTHING> friend class Class;
+    
 };
 
 /**

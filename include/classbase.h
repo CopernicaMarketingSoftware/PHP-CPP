@@ -245,7 +245,7 @@ protected:
     /**
      *  Set property with callbacks
      *  @param  name        Name of the property
-     *  @param  getter      Getter method
+     *  @param  getter      Getter methode
      *  @param  setter      Setter method
      */
     void property(const char *name, const getter_callback_0 &getter);
@@ -263,9 +263,9 @@ protected:
 
     /**
      *  Set the base class
-     *  @param  name        Name of the base class
+     *  @param  base            Php::Class object that is the base
      */
-//    void extends(const std::string &name) { _base = name; }
+    void extends(const ClassBase &base);
 
 private:
     /**
