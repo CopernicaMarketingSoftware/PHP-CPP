@@ -1396,6 +1396,9 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
         entry.unserialize = &ClassImpl::unserialize;
     }
     
+    // do we have a base class?
+    if (_parent && _parent->_entry) entry.parent = _parent->_entry;
+    
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);
     
