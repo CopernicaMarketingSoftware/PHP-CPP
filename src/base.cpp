@@ -47,7 +47,7 @@ MixedObject *Base::store(zend_class_entry *entry TSRMLS_DC)
 
 #endif    
 
-#if ZTS
+#ifdef ZTS
 
     // when in thread safety mode, the destruct method and free method have
     // an extra parameter holding thread information

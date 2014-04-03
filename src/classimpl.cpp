@@ -1406,7 +1406,7 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
     for (auto &interface : _interfaces)
     {
         // register this interface
-        zend_class_implements(_entry, 1, interface->_entry);
+        zend_class_implements(_entry TSRMLS_CC, 1, interface->_entry);
     }
     
     // allocate doc comment to contain an empty string + a hidden pointer
