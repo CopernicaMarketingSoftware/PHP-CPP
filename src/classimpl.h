@@ -220,8 +220,11 @@ public:
      *  @param  tsrm_ls
      *  @return zval
      */
+#if PHP_VERSION_ID >= 50400    
     static zval *readProperty(zval *object, zval *name, int type, const zend_literal *key TSRMLS_DC);
+#else
     static zval *readProperty(zval *object, zval *name, int type TSRMLS_DC);
+#endif
 
     /**
      *  Function that is called when a property is set / updated
@@ -232,8 +235,11 @@ public:
      *  @param  tsrm_ls
      *  @return zval
      */
+#if PHP_VERSION_ID >= 50400    
     static void writeProperty(zval *object, zval *name, zval *value, const zend_literal *key TSRMLS_DC);
+#else
     static void writeProperty(zval *object, zval *name, zval *value TSRMLS_DC);
+#endif
 
     /**
      *  Function that is called to check whether a certain property is set
@@ -243,8 +249,11 @@ public:
      *  @param  tsrm_ls
      *  @return bool
      */
+#if PHP_VERSION_ID >= 50400    
     static int hasProperty(zval *object, zval *name, int has_set_exists, const zend_literal *key TSRMLS_DC);
+#else
     static int hasProperty(zval *object, zval *name, int has_set_exists TSRMLS_DC);
+#endif
 
     /**
      *  Function that is called when a property is removed from the project
@@ -252,8 +261,11 @@ public:
      *  @param  member          The member to remove
      *  @param  tsrm_ls
      */
+#if PHP_VERSION_ID >= 50400    
     static void unsetProperty(zval *object, zval *member, const zend_literal *key TSRMLS_DC);
+#else
     static void unsetProperty(zval *object, zval *member TSRMLS_DC);
+#endif
 
     /**
      *  Method that returns information about the function signature of a undefined method
@@ -264,8 +276,11 @@ public:
      *  @param  tsrm_ls
      *  @return zend_function
      */
-    static zend_function *getMethod(zval **object_ptr, char *method, int method_len TSRMLS_DC);
+#if PHP_VERSION_ID >= 50400    
     static zend_function *getMethod(zval **object_ptr, char *method, int method_len, const zend_literal *key TSRMLS_DC);
+#else
+    static zend_function *getMethod(zval **object_ptr, char *method, int method_len TSRMLS_DC);
+#endif
 
     /**
      *  Method that returns information about the function signature of an undefined static method
