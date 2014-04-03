@@ -14,13 +14,13 @@ namespace Php {
 /**
  *  A number of super-globals are always accessible
  */
-Super POST      (TRACK_VARS_POST);
-Super GET       (TRACK_VARS_GET);
-Super COOKIE    (TRACK_VARS_COOKIE);
-Super SERVER    (TRACK_VARS_SERVER);
-Super ENV       (TRACK_VARS_ENV);
-Super FILES     (TRACK_VARS_FILES);
-Super REQUEST   (TRACK_VARS_REQUEST);
+Super POST      (TRACK_VARS_POST,    "_POST");
+Super GET       (TRACK_VARS_GET,     "_GET");
+Super COOKIE    (TRACK_VARS_COOKIE,  "_COOKIR");
+Super SERVER    (TRACK_VARS_SERVER,  "_SERVER");
+Super ENV       (TRACK_VARS_ENV,     "_ENV");
+Super FILES     (TRACK_VARS_FILES,   "_FILES");
+Super REQUEST   (TRACK_VARS_REQUEST, "_REQUEST");
 
 /**
  *  Array access operator
@@ -28,10 +28,13 @@ Super REQUEST   (TRACK_VARS_REQUEST);
  *  @param  key
  *  @return Value
  */
-Value Super::operator[](const std::string &key) const
+Value Super::operator[](const std::string &key)
 {
     // we need the tsrm_ls pointer
     TSRMLS_FETCH();
+    
+    // call zend_is_auto_global to ensure that the just-in-time globals are loaded
+    if (_name) { zend_is_auto_global(_name, strlen(_name) TSRMLS_CC); _name = nullptr; }
     
     // create a value object that wraps around the actual zval
     Value value(PG(http_globals)[_index]);
@@ -46,11 +49,14 @@ Value Super::operator[](const std::string &key) const
  *  @param  key
  *  @return Value
  */
-Value Super::operator[](const char *key) const
+Value Super::operator[](const char *key)
 {
     // we need the tsrm_ls pointer
     TSRMLS_FETCH();
 
+    // call zend_is_auto_global to ensure that the just-in-time globals are loaded
+    if (_name) { zend_is_auto_global(_name, strlen(_name) TSRMLS_CC); _name = nullptr; }
+    
     // create a value object that wraps around the actual zval
     Value value(PG(http_globals)[_index]);
     

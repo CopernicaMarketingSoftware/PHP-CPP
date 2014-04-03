@@ -25,9 +25,10 @@ public:
      *  Extension writers do not have to access the super-globals themselves.
      *  They are always accessible via Php::POST, Php::GET, et cetera.
      * 
-     *  @param  index number
+     *  @param  index   index number
+     *  @param  name    name of the variable in PHP
      */
-    Super(int index) : _index(index) {}
+    Super(int index, const char *name) : _index(index), _name(name) {}
     
     /**
      *  Destructor
@@ -40,7 +41,7 @@ public:
      *  @param  key
      *  @return Value
      */
-    Value operator[](const std::string &key) const;
+    Value operator[](const std::string &key);
 
     /**
      *  Array access operator
@@ -48,7 +49,7 @@ public:
      *  @param  key
      *  @return Value
      */
-    Value operator[](const char *key) const;
+    Value operator[](const char *key);
 
 private:
     /**
@@ -56,6 +57,12 @@ private:
      *  @var    int
      */
     int _index;
+    
+    /**
+     *  Name of the variable in PHP
+     *  @var    name
+     */
+    const char *_name;
 };
 
 /**
