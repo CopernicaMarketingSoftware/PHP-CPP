@@ -16,7 +16,7 @@ namespace Php {
  */
 Super POST      (TRACK_VARS_POST,    "_POST");
 Super GET       (TRACK_VARS_GET,     "_GET");
-Super COOKIE    (TRACK_VARS_COOKIE,  "_COOKIR");
+Super COOKIE    (TRACK_VARS_COOKIE,  "_COOKIE");
 Super SERVER    (TRACK_VARS_SERVER,  "_SERVER");
 Super ENV       (TRACK_VARS_ENV,     "_ENV");
 Super FILES     (TRACK_VARS_FILES,   "_FILES");
