@@ -28,13 +28,32 @@ Argument::Argument(const char *name, Type type, bool required, bool byref)
     // fill members
     _info->name = name;
     _info->name_len = strlen(name);
-#if PHP_VERSION_ID >= 50400    
+
+#if PHP_VERSION_ID >= 50400
+
+    // since php 5.4 there is a type-hint
     _info->type_hint = (unsigned char)(type == Type::Array || type == Type::Callable ? type : Type::Null);
+
+# if PHP_VERSION_ID >= 50600
+
+    // from PHP 5.6 and onwards, an is_variadic property can be set, this 
+    // specifies whether this argument is the first argument that specifies
+    // the type for a variable length list of arguments. For now we only
+    // support methods and functions with a fixed number of arguments.
+    _info->is_variadic = false;
+
+# endif
+
 #else
+
+    // php 5.3 code
     _info->array_type_hint = type == Type::Array;
     _info->return_reference = false;
     _info->required_num_args = 0;   // @todo is this correct?
+
 #endif
+
+    // this parameter is a regular type
     _info->class_name = NULL;
     _info->class_name_len = 0;
     _info->allow_null = false;
@@ -60,9 +79,32 @@ Argument::Argument(const char *name, const char *classname, bool nullable, bool 
     // fill members
     _info->name = name;
     _info->name_len = strlen(name);
-#if PHP_VERSION_ID >= 50400    
+
+#if PHP_VERSION_ID >= 50400
+
+    // since php 5.4 there is a type hint
     _info->type_hint = (unsigned char)Type::Object;
+
+# if PHP_VERSION_ID >= 50600
+
+    // from PHP 5.6 and onwards, an is_variadic property can be set, this 
+    // specifies whether this argument is the first argument that specifies
+    // the type for a variable length list of arguments. For now we only
+    // support methods and functions with a fixed number of arguments.
+    _info->is_variadic = false;
+
+# endif
+
+#else
+    
+    // php 5.3 code
+    _info->array_type_hint = false;
+    _info->return_reference = false;
+    _info->required_num_args = 0;   // @todo is this correct?
+
 #endif
+
+    // the parameter is a class
     _info->class_name = classname;
     _info->class_name_len = strlen(classname);
     _info->allow_null = nullable;

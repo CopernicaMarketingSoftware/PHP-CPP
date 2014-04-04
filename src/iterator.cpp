@@ -83,10 +83,10 @@ void Iterator::key(zend_object_iterator *iter, zval *key TSRMLS_DC)
     Value retval(iterator->key());
 
     // detach the underlying zval
-    zval *zval = retval.detach();
+    zval *val = retval.detach();
     
     // copy it to the key
-    ZVAL_ZVAL(key, zval, 1, 1);
+    ZVAL_ZVAL(key, val, 1, 1);
 }
 
 /**

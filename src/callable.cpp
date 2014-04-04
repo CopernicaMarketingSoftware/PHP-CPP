@@ -99,8 +99,18 @@ void Callable::initialize(zend_arg_info *info, const char *classname) const
     // we do not support return-by-reference
     finfo->return_reference = false;
  
-    // passing by reference is not used
+# if PHP_VERSION_ID >= 50600
+    // since php 5.6 there are _allow_null and _is_variadic properties. It's
+    // not exactly clear what they do (@todo find this out) so for now we set
+    // them to false
+    finfo->_allow_null = false;
+    finfo->_is_variadic = false;
+
+# else
+    // passing by reference is not used (only for php 5.4 and php 5.5)
     finfo->pass_rest_by_reference = false;
+# endif
+
 #else
     // php 5.3 code
     info->name = nullptr;
