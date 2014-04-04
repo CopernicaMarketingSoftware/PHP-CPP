@@ -274,7 +274,7 @@ Php::Value filled({ "a", "b", "c", "d"});
 
 // you can cast an array to a vector, template parameter can be
 // any type that a Value object is compatible with (string, int, etc)
-std::vector<std::string> fruit = array;
+std::vector&lt;std::string&gt; fruit = array;
 
 // create an associative array
 Php::Value assoc;
@@ -297,7 +297,7 @@ assoc2["z"][1] = "b";
 assoc2["z"][2] = "c";
 
 // assoc arrays can be cast to a map, indexed by string
-std::map<std::string,std::string> map = assoc2;
+std::map&lt;std::string,std::string&gt; map = assoc2;
 
 </code></pre>
 </p>
@@ -381,7 +381,7 @@ Php::out &lt;&lt; value.call("format", "Y-m-d H:i:s") &lt;&lt; std::endl;
 void myFunction(const Php::Value &amp;value)
 {
     // assum the value variable holds an array or object, it then
-    // is possible to iterator over the values or properties
+    // is possible to iterate over the values or properties
     for (auto &amp;iter : value)
     {
         // output key and value

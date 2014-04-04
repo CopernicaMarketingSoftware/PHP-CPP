@@ -51,6 +51,7 @@ inline Value echo(const std::string &input)                 { out << input; retu
 inline Value empty(const Value &value)                      { return value.isNull() || !value.boolValue(); }
 inline Value empty(const HashMember<std::string> &member)   { return !member.exists() || empty(member.value()); }
 inline Value empty(const HashMember<int> &member)           { return !member.exists() || empty(member.value()); }
+inline Value ini_get(const Value &value)                    { return call("ini_get", value); }
 //inline Value isset(const Value &value)                      { return call("isset", value); }
 //inline Value isset(const HashMember<std::string> &member)   { return member.exists() && isset(member.value()); }
 //inline Value isset(const HashMember<int> &member)           { return member.exists() && isset(member.value()); }
