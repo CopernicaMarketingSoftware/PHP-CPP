@@ -41,7 +41,18 @@ public:
         // return self
         return *this;
     }
-    
+
+    /**
+     *  Extends exisiting PHP interface
+     *
+     *  Note that the interface that you supply must already exist! Therefore
+     *  you can only supply interfaces that you created in your own extension.
+     *
+     *  @param  interface   Interface object
+     *  @return Interface   Same object to allow chaining
+     */
+    Interface &extends(const Interface &interface) { ClassBase::implements(interface); return *this; }
+
     /**
      *  The namespace needs to have access to the private ClassBase base
      *  class, to actually register the interface.
