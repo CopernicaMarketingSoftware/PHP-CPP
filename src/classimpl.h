@@ -351,14 +351,14 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
-    void method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags, args)); }
+    void method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
+    void method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags & MethodModifiers, args)); }
 
     /**
      *  Add a static method to the class
@@ -372,10 +372,10 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args)); }
-    void method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args)); }
-    void method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args)); }
-    void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, flags | ZEND_ACC_STATIC, args)); }
+    void method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, (flags & MethodModifiers) | Static, args)); }
+    void method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, (flags & MethodModifiers) | Static, args)); }
+    void method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, (flags & MethodModifiers) | Static, args)); }
+    void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, (flags & MethodModifiers) | Static, args)); }
 
     /**
      *  Add an abstract method to the class
@@ -384,7 +384,7 @@ public:
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, Abstract | flags, args)); }
+    void method(const char *name, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static)) | Abstract , args)); }
 
     /**
      *  Add a property to the class
@@ -399,15 +399,15 @@ public:
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
      */
-    void property(const char *name, std::nullptr_t value, int flags = Php::Public)      { _members.push_back(std::make_shared<NullMember>(name, flags)); }
-    void property(const char *name, int16_t value, int flags = Php::Public)             { _members.push_back(std::make_shared<NumericMember>(name, value, flags)); }
-    void property(const char *name, int32_t value, int flags = Php::Public)             { _members.push_back(std::make_shared<NumericMember>(name, value, flags)); }
-    void property(const char *name, int64_t value, int flags = Php::Public)             { _members.push_back(std::make_shared<NumericMember>(name, value, flags)); }
-    void property(const char *name, bool value, int flags = Php::Public)                { _members.push_back(std::make_shared<BoolMember>(name, value, flags)); }
-    void property(const char *name, char value, int flags = Php::Public)                { _members.push_back(std::make_shared<StringMember>(name, &value, 1, flags)); }
-    void property(const char *name, const std::string &value, int flags = Php::Public)  { _members.push_back(std::make_shared<StringMember>(name, value, flags)); }
-    void property(const char *name, const char *value, int flags = Php::Public)         { _members.push_back(std::make_shared<StringMember>(name, value, strlen(value), flags)); }
-    void property(const char *name, double value, int flags = Php::Public)              { _members.push_back(std::make_shared<FloatMember>(name, value, flags)); }
+    void property(const char *name, std::nullptr_t value, int flags = Php::Public)      { _members.push_back(std::make_shared<NullMember>   (name,                        flags & PropertyModifiers)); }
+    void property(const char *name, int16_t value, int flags = Php::Public)             { _members.push_back(std::make_shared<NumericMember>(name,  value,                flags & PropertyModifiers)); }
+    void property(const char *name, int32_t value, int flags = Php::Public)             { _members.push_back(std::make_shared<NumericMember>(name,  value,                flags & PropertyModifiers)); }
+    void property(const char *name, int64_t value, int flags = Php::Public)             { _members.push_back(std::make_shared<NumericMember>(name,  value,                flags & PropertyModifiers)); }
+    void property(const char *name, bool value, int flags = Php::Public)                { _members.push_back(std::make_shared<BoolMember>   (name,  value,                flags & PropertyModifiers)); }
+    void property(const char *name, char value, int flags = Php::Public)                { _members.push_back(std::make_shared<StringMember> (name, &value,             1, flags & PropertyModifiers)); }
+    void property(const char *name, const std::string &value, int flags = Php::Public)  { _members.push_back(std::make_shared<StringMember> (name,  value,                flags & PropertyModifiers)); }
+    void property(const char *name, const char *value, int flags = Php::Public)         { _members.push_back(std::make_shared<StringMember> (name,  value, strlen(value), flags & PropertyModifiers)); }
+    void property(const char *name, double value, int flags = Php::Public)              { _members.push_back(std::make_shared<FloatMember>  (name,  value,                flags & PropertyModifiers)); }
 
     /**
      *  Set property with callbacks

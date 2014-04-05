@@ -148,11 +148,12 @@ extern "C" {
     properties, but even that is probably not what you want, as storing 
     data in native C++ variables is much faster.
 </p>
-<h2 id="constants">Class constants</h2>
+<h2 id="static-constants">Static properties and class constants</h2>
 <p>
-    Class constants can be defined in a similar way as properties. The only
-    difference is that you have to pass in the flag 'Php::Const' instead of 
-    one of the public, private or protected access modifiers.
+    Static properties and class class constants can be defined in a similar way 
+    as properties. The only difference is that you have to pass in either the 
+    flag 'Php::Static' or 'Php::Const' instead of one of the Php::Public, 
+    Php::Private or Php::Protected access modifiers.
 </p>
 <p>
 <pre class="language-cpp"><code>
@@ -179,6 +180,9 @@ extern "C" {
         // the Example class has a class constant
         example.property("MY_CONSTANT", "some value", Php::Const);
         
+        // and a public static propertie
+        example.property("my_property", "initial value", Php::Public | Php::Static);
+        
         // add the class to the extension
         myExtension.add(std::move(example));
         
@@ -189,7 +193,8 @@ extern "C" {
 </code></pre>
 </p>
 <p>
-    The class constant can be accessed from PHP scripts using Example::MY_CONSTANT.
+    The class constant can be accessed from PHP scripts using Example::MY_CONSTANT,
+    and the static properties with Example::$my_property.
 </p>
 <h2>Smart properties</h2>
 <p>
