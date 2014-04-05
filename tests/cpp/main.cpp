@@ -52,7 +52,12 @@ extern "C"
         customClass.property("CONSTANT1", "some string", Php::Const);
         customClass.property("EXP",       2.718281828459, Php::Const);
         customClass.property("CONSTANT2", -2582341, Php::Const);
-        customClass.property("CONSTANT1", true, Php::Const);
+        customClass.property("CONSTANT3", true, Php::Const);
+
+        customClass.property("StatProp1", "some string", Php::Static);
+        customClass.property("Exp",       2.718281828459, Php::Static);
+        customClass.property("StatProp2", -2582341, Php::Static);
+        customClass.property("StatProp3", true, Php::Static);
 
         // add the class to the extension
         extension.add(customClass);
@@ -108,8 +113,13 @@ extern "C"
         extension.add("TestVariables\\value_object1",     TestVariables::value_object1);
         extension.add("TestVariables\\value_object2",     TestVariables::value_object2);
         extension.add("TestVariables\\fnFromUserSpace",   TestVariables::fnFromUserSpace);
-        extension.add("TestVariables\\fnFromUserSpace2",   TestVariables::fnFromUserSpace2);
+        extension.add("TestVariables\\fnFromUserSpace2",  TestVariables::fnFromUserSpace2);
         extension.add("TestVariables\\fnCallback",        TestVariables::fnCallback);
+        extension.add("TestVariables\\test_HashMember_1", TestVariables::test_HashMember_1);
+        extension.add("TestVariables\\test_HashMember_2", TestVariables::test_HashMember_2);
+        extension.add("TestVariables\\test_HashMember_3", TestVariables::test_HashMember_3);
+        extension.add("TestVariables\\test_HashMember_4", TestVariables::test_HashMember_4);
+
         
 
 
