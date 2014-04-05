@@ -93,7 +93,7 @@
 #include "origexception.h"
 #include "notimplemented.h"
 #include "property.h"
-#include "iteratorimpl.h"
+#include "valueiteratorimpl.h"
 #include "hashiterator.h"
 #include "invaliditerator.h"
 #include "traverseiterator.h"

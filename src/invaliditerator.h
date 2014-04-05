@@ -16,15 +16,15 @@ namespace Php {
 /**
  *  Class definition
  */
-class InvalidIterator : public IteratorImpl
+class InvalidIterator : public ValueIteratorImpl
 {
 public:
     /**
      *  Clone the object
      *  @param  tsrm_ls
-     *  @return IteratorImpl
+     *  @return ValueIteratorImpl
      */
-    virtual IteratorImpl *clone()
+    virtual ValueIteratorImpl *clone()
     {
         // create a new instance
         return new InvalidIterator(*this);
@@ -54,7 +54,7 @@ public:
      *  @param  that
      *  @return bool
      */
-    virtual bool equals(const IteratorImpl *that) const override
+    virtual bool equals(const ValueIteratorImpl *that) const override
     {
         // the other iterator is also an invalid-iterator, and all invalid
         // iterators are equal

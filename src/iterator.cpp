@@ -1,7 +1,7 @@
 /**
- *  IteratorImpl.cpp
+ *  Iterator.cpp
  *
- *  Implementation file of the IteratorImpl class
+ *  Implementation file of the Iterator class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV

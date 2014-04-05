@@ -2,17 +2,17 @@
  *  Iterator.h
  *
  *  Base class for iterators. Extension writers that want to create traversable
- *  classes, should override this class and implement all pure virtual methods
- *  in it.
+ *  classes, should override the Php::Traversable base class. This base class
+ *  forces you to implement a getIterator() method that returns an instance of 
+ *  a Php::Iterator class.
+ * 
+ *  In this file you find the signature of the Php::Iterator class. It mostly has
+ *  pure virtual methods, which means that you should create a derived class
+ *  that implements all these methods.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV
  */
-
-/**
- *  Forward declarations
- */
-struct _zend_object_iterator_funcs;
 
 /**
  *  Set up namespace

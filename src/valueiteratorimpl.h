@@ -1,7 +1,7 @@
 /**
- *  IteratorImpl.h
+ *  ValueIteratorImpl.h
  *
- *  Interface that describes what an implementation of an iterator should
+ *  Interface that describes what an implementation of a value iterator should
  *  look like. This is an internal class that extension developers do not
  *  need.
  *
@@ -17,25 +17,25 @@ namespace Php {
 /**
  *  Class definition
  */
-class IteratorImpl
+class ValueIteratorImpl
 {
 public:
     /**
      *  Constructor
      */
-    IteratorImpl() {}
+    ValueIteratorImpl() {}
     
     /**
      *  Destructor
      */
-    virtual ~IteratorImpl() {}
+    virtual ~ValueIteratorImpl() {}
 
     /**
      *  Clone the object
      *  @param  tsrm_ls
-     *  @return IteratorImpl*
+     *  @return ValueIteratorImpl*
      */
-    virtual IteratorImpl *clone() = 0;
+    virtual ValueIteratorImpl *clone() = 0;
 
     /**
      *  Increment position (pre-increment)
@@ -55,7 +55,7 @@ public:
      *  @param  that
      *  @return bool
      */
-    virtual bool equals(const IteratorImpl *that) const = 0;
+    virtual bool equals(const ValueIteratorImpl *that) const = 0;
 
     /**
      *  Derefecence, this returns a std::pair with the current key and value
