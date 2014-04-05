@@ -125,6 +125,15 @@ public:
     virtual ~ClassImpl();
 
     /**
+     *  Retrieve the class name
+     *  @return std::string
+     */
+    const std::string &name() const
+    {
+        return _name;
+    }
+
+    /**
      *  Retrieve the extension's class object
      *  @param  entry
      *  @return ClassBase

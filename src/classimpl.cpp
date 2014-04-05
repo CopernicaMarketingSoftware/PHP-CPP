@@ -1397,7 +1397,14 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
     }
     
     // do we have a base class?
-    if (_parent && _parent->_entry) entry.parent = _parent->_entry;
+    if (_parent) 
+    {
+        // check if the base class was already defined
+        if (_parent->_entry) entry.parent = _parent->_entry;
+        
+        // otherwise an error is reported
+        else std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
+    }
     
     // register the class
     _entry = zend_register_internal_class(&entry TSRMLS_CC);
@@ -1406,7 +1413,10 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
     for (auto &interface : _interfaces)
     {
         // register this interface
-        zend_class_implements(_entry TSRMLS_CC, 1, interface->_entry);
+        if (interface->_entry) zend_class_implements(_entry TSRMLS_CC, 1, interface->_entry);
+        
+        // otherwise report an error
+        else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
     
     // allocate doc comment to contain an empty string + a hidden pointer
