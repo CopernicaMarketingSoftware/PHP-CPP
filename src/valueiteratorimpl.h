@@ -3,7 +3,7 @@
  *
  *  Interface that describes what an implementation of a value iterator should
  *  look like. This is an internal class that extension developers do not
- *  need.
+ *  need. It is used internally inside the ValueIterator class.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV

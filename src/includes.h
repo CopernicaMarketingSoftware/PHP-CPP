@@ -97,6 +97,7 @@
 #include "hashiterator.h"
 #include "invaliditerator.h"
 #include "traverseiterator.h"
+#include "iteratorimpl.h"
 #include "streambuf.h"
 #include "classimpl.h"
 

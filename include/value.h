@@ -943,7 +943,7 @@ protected:
     friend class Globals;
     friend class Member;
     friend class ClassImpl;
-    friend class Iterator;
+    friend class IteratorImpl;
     friend class Extension;
     friend class HashIterator;
     friend class TraverseIterator;

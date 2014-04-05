@@ -1246,7 +1246,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
     try
     {
         // create an iterator
-        auto *iterator = traversable->getIterator();
+        auto *iterator = new IteratorImpl(traversable->getIterator());
         
         // return the implementation
         return iterator->implementation();
