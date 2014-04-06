@@ -76,7 +76,12 @@
 #include "../include/call.h"
 
 /**
- *  Interface files for internal use only
+ *  Common header files for internal use only
+ */
+#include "../common/extensionbase.h"
+
+/**
+ *  Specific zend implementation  files for internal use only
  */
 #include "init.h"
 #include "callable.h"

@@ -120,11 +120,11 @@ MKDIR           =   mkdir -p
 #   The source files
 #
 #   For this we use a special Makefile function that automatically scans the
-#   src/, zend/ and hhvm/ directories for all *.cpp files. No changes are 
+#   common/, zend/ and hhvm/ directories for all *.cpp files. No changes are 
 #   probably necessary here
 #
 
-SOURCES         =   $(wildcard src/*.cpp)
+COMMON_SOURCES  =   $(wildcard common/*.cpp)
 PHP_SOURCES     =   $(wildcard zend/*.cpp)
 HHVM_SOURCES    =   $(wildcard hhvm/*.cpp)
 
@@ -137,7 +137,7 @@ HHVM_SOURCES    =   $(wildcard hhvm/*.cpp)
 #   takes all source files.
 #
 
-OBJECTS         =   $(SOURCES:%.cpp=%.o)
+COMMON_OBJECTS  =   $(COMMON_SOURCES:%.cpp=%.o)
 PHP_OBJECTS     =   $(PHP_SOURCES:%.cpp=%.o)
 HHVM_OBJECTS    =   $(HHVM_SOURCES:%.cpp=%.o)
 
@@ -149,17 +149,21 @@ HHVM_OBJECTS    =   $(HHVM_SOURCES:%.cpp=%.o)
 
 all: ${PHP_LIBRARY}
 
-${PHP_LIBRARY}: ${OBJECTS} ${PHP_OBJECTS}
+phpcpp: ${PHP_LIBRARY}
+
+hhvmcpp: ${HHVM_LIBRARY}
+
+${PHP_LIBRARY}: ${COMMON_OBJECTS} ${PHP_OBJECTS}
 	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${OBJECTS} ${PHP_OBJECTS}
 
-${HHVM_LIBRARY}: ${OBJECTS} ${HHVM_OBJECTS}
+${HHVM_LIBRARY}: ${COMMON_OBJECTS} ${HHVM_OBJECTS}
 	${LINKER} ${HHVM_LINKER_FLAGS} -o $@ ${OBJECTS} ${HHVM_OBJECTS}
 
 clean:
-	${RM} ${OBJECTS} ${PHP_OBJECTS} ${HHVM_OBJECTS} ${PHP_LIBRARY} ${HHVM_LIBRARY}
+	${RM} ${COMMON_OBJECTS} ${PHP_OBJECTS} ${HHVM_OBJECTS} ${PHP_LIBRARY} ${HHVM_LIBRARY}
 
-${OBJECTS}: 
-	${COMPILER} ${PHP_COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
+${COMMON_OBJECTS}: 
+	${COMPILER} ${COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
 
 ${PHP_OBJECTS}: 
 	${COMPILER} ${PHP_COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
