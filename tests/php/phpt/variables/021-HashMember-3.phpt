@@ -22,6 +22,5 @@ array (
   'key1' => 
   array (
     'key2' => 'val1-2',
-    'key3' => 'val1-3',
   ),
 )
