@@ -35,11 +35,8 @@ Parameters::Parameters(zval *this_ptr, int argc TSRMLS_DC)
     // skip if there is no this_ptr
     if (!this_ptr) return;
 
-    // get the mixed object
-    MixedObject *obj = (MixedObject *)zend_object_store_get_object(this_ptr TSRMLS_CC);
-    
     // store the CPP object
-    _object = obj->cpp;
+    _object = ObjectImpl::find(this_ptr TSRMLS_CC)->object();
 }
 
 /**

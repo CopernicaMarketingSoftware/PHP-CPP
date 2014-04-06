@@ -177,22 +177,22 @@ Value::Value(const Base *object)
 {
     // there are two options: the object was constructed from user space,
     // and is already linked to a handle, or it was constructed from C++ 
-    // space, and no handle does yet exist
-    int handle = object->handle();
+    // space, and no handle does yet exist, find the implementation object
+    auto *impl = object->implementation();
     
     // do we have a handle?
-    if (!handle) throw Php::Exception("Assigning an unassigned object to a variable");
+    if (!impl) throw Php::Exception("Assigning an unassigned object to a variable");
 
     // make a regular zval, and set it to an object
     MAKE_STD_ZVAL(_val);
     Z_TYPE_P(_val) = IS_OBJECT;
-    Z_OBJ_HANDLE_P(_val) = handle;
+    Z_OBJ_HANDLE_P(_val) = impl->handle();
     
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
 
     // we have to lookup the object in the object-table
-    zend_object_store_bucket *obj_bucket = &EG(objects_store).object_buckets[handle];
+    zend_object_store_bucket *obj_bucket = &EG(objects_store).object_buckets[impl->handle()];
     
     // this is copy-pasted from zend_objects.c - and it is necessary too!
     if (!obj_bucket->bucket.obj.handlers) obj_bucket->bucket.obj.handlers = &std_object_handlers;
@@ -1890,11 +1890,7 @@ Base *Value::implementation() const
     TSRMLS_FETCH();
     
     // retrieve the mixed object that contains the base
-    MixedObject *object = (MixedObject *)zend_object_store_get_object(_val TSRMLS_CC);
-    if (!object) return nullptr;
-    
-    // retrieve the associated C++ class
-    return object->cpp;
+    return ObjectImpl::find(_val TSRMLS_CC)->object();
 }
 
 /**

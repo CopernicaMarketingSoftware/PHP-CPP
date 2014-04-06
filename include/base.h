@@ -13,13 +13,21 @@ namespace Php {
 /**
  *  Forward declarations
  */
-struct MixedObject;
+class ObjectImpl;
+
 
 /**
  *  Class definition
  */
 class Base
 {
+private:
+    /**
+     *  Object handle in the PHP engine
+     *  @var    ObjectImpl
+     */
+    ObjectImpl *_impl = nullptr;
+    
 protected:
     /**
      *  Constructor
@@ -241,40 +249,24 @@ public:
      */
     int __compare(const Base &base) const;
     
-    
+
 private:
     /**
-     *  Store the object in the zend object cache
-     *  @param  entry
-     *  @param  tsrm_ls
-     *  @return MixedObject
+     *  Get access to the implementation object
+     *  @return ObjectImpl
      */
-    MixedObject *store(struct _zend_class_entry *entry TSRMLS_DC);
-
-    /**
-     *  Retrieve the handle
-     *  @return int
-     */
-    int handle() const
+    const ObjectImpl *implementation() const
     {
-        return _handle;
+        return _impl;
     }
-    
-    /**
-     *  The handle in the zend object cache
-     *  @var    int
-     */
-    int _handle = 0;
 
     /**
-     *  Friends that have access to the private members
+     *  Classes that have direct access to private date
      */
-    friend class Value;
+    friend class ObjectImpl;
     friend class Object;
-    friend class ClassImpl;
-
+    friend class Value;
 };
-
 
 /**
  *  End of namespace

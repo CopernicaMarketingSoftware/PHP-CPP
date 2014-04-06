@@ -20,7 +20,7 @@ namespace Php {
 Object::Object(const char *name, Base *base)
 {
     // does the object already have a handle?
-    if (base->handle())
+    if (base->implementation())
     {
         // the object is already instantiated, we can assign it the this object
         operator=(Value(base));
@@ -36,8 +36,9 @@ Object::Object(const char *name, Base *base)
         auto *entry = zend_fetch_class(name, strlen(name), 0 TSRMLS_CC);
         if (!entry) throw Php::Exception(std::string("Unknown class name ") + name);
         
-        // store the object in the php object cache (this will give the object a handle)
-        base->store(entry TSRMLS_CC);
+        // construct an implementation (this will also set the implementation
+        // member in the base object)
+        new ObjectImpl(entry, base TSRMLS_CC);
         
         // now we can store it
         operator=(Value(base));

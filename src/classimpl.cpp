@@ -28,11 +28,15 @@ ClassImpl::~ClassImpl()
 }
 
 /**
+ *  @todo refactor so that methods become simpler
+ */
+
+/**
  *  Retrieve our C++ implementation object
  *  @param  entry
  *  @return ClassImpl
  */
-static ClassImpl *cpp_impl(zend_class_entry *entry)
+static ClassImpl *self(zend_class_entry *entry)
 {
     // we need the base class (in user space the class may have been overridden,
     // but we are not interested in these user space classes)
@@ -49,34 +53,6 @@ static ClassImpl *cpp_impl(zend_class_entry *entry)
     // the first byte of the comment is an empty string (null character), but
     // the next bytes contain a pointer to the ClassBase class
     return *((ClassImpl **)(comment + 1));
-}
-
-/**
- *  Retrieve the extension's class object
- *  @param  entry
- *  @return ClassBase
- */
-ClassBase *ClassImpl::base(zend_class_entry *entry)
-{
-    // first the implementation class
-    ClassImpl *impl = cpp_impl(entry);
-    
-    // and now the base
-    return impl->_base;
-}
-
-/**
- *  Retrieve the CPP object
- *  @param  val
- *  @return Base
- */
-static Base *cpp_object(const zval *val TSRMLS_DC)
-{
-    // retrieve the old object, which we are going to copy
-    MixedObject *object = (MixedObject *)zend_object_store_get_object(val TSRMLS_CC);
-
-    // return the cpp object
-    return object->cpp;
 }
 
 /**
@@ -244,7 +220,7 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
     function->function_name = method_name;
     
     // store pointer to ourselves
-    data->self = cpp_impl(entry);
+    data->self = self(entry);
     
     // done (cast to zend_function* is allowed, because a zend_function is a union
     // that has one member being a zend_internal_function)
@@ -289,7 +265,7 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, char* method,
     function->function_name = method;
     
     // store pointer to ourselves
-    data->self = cpp_impl(entry);
+    data->self = self(entry);
     
     // done (cast to zend_function* is allowed, because a zend_function is a union
     // that has one member being a zend_internal_function)
@@ -334,7 +310,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     function->function_name = nullptr;
     
     // store pointer to ourselves
-    data->self = cpp_impl(entry);
+    data->self = self(entry);
     
     // assign this dynamically allocated variable to the func parameter
     // the case is ok, because zend_internal_function is a member of the
@@ -405,31 +381,31 @@ zend_object_handlers *ClassImpl::objectHandlers()
 
 /**
  *  Function to compare two objects
- *  @param  object1
- *  @param  object2
+ *  @param  val1
+ *  @param  val2
  *  @param  tsrm_ls
  *  @return int
  */
-int ClassImpl::compare(zval *object1, zval *object2 TSRMLS_DC)
+int ClassImpl::compare(zval *val1, zval *val2 TSRMLS_DC)
 {
     // prevent exceptions
     try
     {
         // retrieve the class entry linked to this object
-        auto *entry = zend_get_class_entry(object1 TSRMLS_CC);
+        auto *entry = zend_get_class_entry(val1 TSRMLS_CC);
 
         // other object must be of the same type
-        if (entry != zend_get_class_entry(object2 TSRMLS_CC)) throw NotImplemented();
+        if (entry != zend_get_class_entry(val2 TSRMLS_CC)) throw NotImplemented();
 
         // we need the C++ class meta-information object
-        ClassBase *meta = base(entry);
+        ClassBase *meta = self(entry)->_base;
         
         // get the base objects
-        Base *base1 = cpp_object(object1 TSRMLS_CC);
-        Base *base2 = cpp_object(object2 TSRMLS_CC);
+        Base *object1 = ObjectImpl::find(val1 TSRMLS_CC)->object();
+        Base *object2 = ObjectImpl::find(val2 TSRMLS_CC)->object();
         
         // run the compare method
-        return meta->callCompare(base1, base2);
+        return meta->callCompare(object1, object2);
     }
     catch (const NotImplemented &exception)
     {
@@ -437,7 +413,7 @@ int ClassImpl::compare(zval *object1, zval *object2 TSRMLS_DC)
         if (!std_object_handlers.compare_objects) return 1;
         
         // call default
-        return std_object_handlers.compare_objects(object1, object2 TSRMLS_CC);
+        return std_object_handlers.compare_objects(val1, val2 TSRMLS_CC);
     }
     catch (Exception &exception)
     {
@@ -452,22 +428,22 @@ int ClassImpl::compare(zval *object1, zval *object2 TSRMLS_DC)
 
 /**
  *  Function to cast the object to a different type
- *  @param  object
+ *  @param  val
  *  @param  retval
  *  @param  type
  *  @param  tsrm_ls
  *  @return int
  */
-int ClassImpl::cast(zval *object, zval *retval, int type TSRMLS_DC)
+int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
 {
-    // get the base object
-    Base *base = cpp_object(object TSRMLS_CC);
+    // get the base c++ object
+    Base *object = ObjectImpl::find(val TSRMLS_CC)->object();
     
     // retrieve the class entry linked to this object
-    auto *entry = zend_get_class_entry(object TSRMLS_CC);
+    auto *entry = zend_get_class_entry(val TSRMLS_CC);
 
     // we need the C++ class meta-information object
-    ClassBase *meta = ClassImpl::base(entry);
+    ClassBase *meta = self(entry)->_base;
     
     // retval it not yet initialized --- and again feelings of disbelief,
     // frustration, wonder and anger come up when you see that there are not two
@@ -486,18 +462,18 @@ int ClassImpl::cast(zval *object, zval *retval, int type TSRMLS_DC)
         
         // check type
         switch ((Type)type) {
-        case Type::Numeric:     result = meta->callToInteger(base).detach();  break;
-        case Type::Float:       result = meta->callToFloat(base).detach();    break;
-        case Type::Bool:        result = meta->callToBool(base).detach();     break;
-        case Type::String:      result = meta->callToString(base).detach();   break;
+        case Type::Numeric:     result = meta->callToInteger(object).detach();  break;
+        case Type::Float:       result = meta->callToFloat(object).detach();    break;
+        case Type::Bool:        result = meta->callToBool(object).detach();     break;
+        case Type::String:      result = meta->callToString(object).detach();   break;
         default:                throw NotImplemented();             break;
         }
         
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
         // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
         
-        // is the object overwritten?
-        if (object == retval) zval_dtor(object);
+        // is the original parameter overwritten?
+        if (val == retval) zval_dtor(val);
         
         // overwrite the result
         ZVAL_ZVAL(retval, result, 1, 1);
@@ -511,7 +487,7 @@ int ClassImpl::cast(zval *object, zval *retval, int type TSRMLS_DC)
         if (!std_object_handlers.cast_object) return FAILURE;
         
         // call default
-        return std_object_handlers.cast_object(object, retval, type TSRMLS_CC);
+        return std_object_handlers.cast_object(val, retval, type TSRMLS_CC);
     }
     catch (Exception &exception)
     {
@@ -534,14 +510,14 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     auto *entry = zend_get_class_entry(val TSRMLS_CC);
 
     // we need the C++ class meta-information object
-    ClassImpl *impl = cpp_impl(entry);
+    ClassImpl *impl = self(entry);
     ClassBase *meta = impl->_base;
 
     // retrieve the old object, which we are going to copy
-    MixedObject *old_object = (MixedObject *)zend_object_store_get_object(val TSRMLS_CC);
+    ObjectImpl *old_object = ObjectImpl::find(val TSRMLS_CC);
 
     // create a new base c++ object
-    auto *cpp = meta->clone(old_object->cpp);
+    auto *cpp = meta->clone(old_object->object());
     
     // report error on failure (this does not occur because the cloneObject()
     // method is only installed as handler when we have seen that there is indeed
@@ -555,14 +531,14 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     result.handlers = impl->objectHandlers();
     
     // store the object
-    MixedObject *new_object = cpp->store(entry TSRMLS_CC);
+    ObjectImpl *new_object = new ObjectImpl(entry, cpp TSRMLS_CC);
 
     // store the object in the object cache
-    result.handle = cpp->handle();
+    result.handle = new_object->handle();
     
     // clone the members (this will also call the __clone() function if the user
     // had registered that as a visible method)
-    zend_objects_clone_members(&new_object->php, result, &old_object->php, Z_OBJ_HANDLE_P(val) TSRMLS_CC);
+    zend_objects_clone_members(new_object->php(), result, old_object->php(), Z_OBJ_HANDLE_P(val) TSRMLS_CC);
     
     // was a custom clone method installed? If not we call the magic c++ __clone method
     if (!entry->clone) meta->callClone(cpp);
@@ -584,7 +560,7 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
 int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
 {
     // does it implement the countable interface?
-    Countable *countable = dynamic_cast<Countable*>(cpp_object(object TSRMLS_CC));
+    Countable *countable = dynamic_cast<Countable*>(ObjectImpl::find(object TSRMLS_CC)->object());
 
     // if it does not implement the Countable interface, we rely on the default implementation
     if (countable) 
@@ -650,7 +626,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
     
      
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -695,7 +671,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
 void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -737,7 +713,7 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC
 int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -787,7 +763,7 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_D
 void ClassImpl::unsetDimension(zval *object, zval *member TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
-    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(cpp_object(object TSRMLS_CC));
+    ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
     
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
     if (arrayaccess) 
@@ -871,13 +847,13 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
     // that is in most cases simply impossible.
 
     // retrieve the object and class
-    Base *base = cpp_object(object TSRMLS_CC);
+    Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
     
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // we need the C++ class meta-information object
-    ClassImpl *impl = cpp_impl(entry);
+    ClassImpl *impl = self(entry);
     ClassBase *meta = impl->_base;
     
     // the default implementation throws an exception, so by catching 
@@ -945,13 +921,13 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
 #endif
 {
     // retrieve the object and class
-    Base *base = cpp_object(object TSRMLS_CC);
+    Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
     
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // we need the C++ class meta-information object
-    ClassImpl *impl = cpp_impl(entry);
+    ClassImpl *impl = self(entry);
     ClassBase *meta = impl->_base;
 
     // the default implementation throws an exception, if we catch that
@@ -1030,13 +1006,13 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
     try
     {
         // get the cpp object
-        Base *base = cpp_object(object TSRMLS_CC);
+        Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
         
         // retrieve the class entry linked to this object
         auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
         // we need the C++ class meta-information object
-        ClassImpl *impl = cpp_impl(entry);
+        ClassImpl *impl = self(entry);
         ClassBase *meta = impl->_base;
         
         // convert the name to a Value object
@@ -1107,7 +1083,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
         auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
         // we need the C++ class meta-information object
-        ClassImpl *impl = cpp_impl(entry);
+        ClassImpl *impl = self(entry);
         
         // property name
         Value name(member);
@@ -1116,7 +1092,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
         auto iter = impl->_properties.find(name);
         
         // if the property does not exist, we forward to the __unset
-        if (iter == impl->_properties.end()) impl->_base->callUnset(cpp_object(object TSRMLS_CC), member);
+        if (iter == impl->_properties.end()) impl->_base->callUnset(ObjectImpl::find(object TSRMLS_CC)->object(), member);
         
         // callback properties cannot be unset
         zend_error(E_ERROR, "Property %s can not be unset", (const char *)name);
@@ -1150,17 +1126,17 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
  */
 void ClassImpl::destructObject(zend_object *object, zend_object_handle handle TSRMLS_DC)
 {
-    // allocate memory for the object
-    MixedObject *obj = (MixedObject *)object;
+    // find object
+    ObjectImpl *obj = ObjectImpl::find(object);
     
     // get meta info
-    ClassImpl *impl = cpp_impl(object->ce);
+    ClassImpl *impl = self(object->ce);
     
     // prevent exceptions
     try
     {
         // call the destruct function
-        if (obj->cpp) impl->_base->callDestruct(obj->cpp);
+        if (obj->object()) impl->_base->callDestruct(obj->object());
     }
     catch (const NotImplemented &exception)
     {
@@ -1183,13 +1159,10 @@ void ClassImpl::destructObject(zend_object *object, zend_object_handle handle TS
 void ClassImpl::freeObject(zend_object *object TSRMLS_DC)
 {
     // allocate memory for the object
-    MixedObject *obj = (MixedObject *)object;
+    ObjectImpl *obj = ObjectImpl::find(object);
     
-    // deallocate the cpp object
-    if (obj->cpp) delete obj->cpp;
-    
-    // pass on to the default destructor
-    zend_objects_free_object_storage(object TSRMLS_CC);
+    // no longer need it
+    obj->destruct(TSRMLS_CC);
 }
 
 /**
@@ -1202,7 +1175,7 @@ void ClassImpl::freeObject(zend_object *object TSRMLS_DC)
 zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
 {
     // we need the C++ class meta-information object
-    ClassImpl *impl = cpp_impl(entry);
+    ClassImpl *impl = self(entry);
 
     // create a new base C++ object
     auto *cpp = impl->_base->construct();
@@ -1216,11 +1189,11 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
     // set the handlers
     result.handlers = impl->objectHandlers();
     
-    // store the object
-    cpp->store(entry TSRMLS_CC);
-
+    // create the object in the zend engine
+    ObjectImpl *object = new ObjectImpl(entry, cpp TSRMLS_CC);
+    
     // store the object in the object cache
-    result.handle = cpp->handle();
+    result.handle = object->handle();
     
     // done
     return result;
@@ -1240,7 +1213,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
     if (by_ref) throw Php::Exception("Foreach by ref is not possible");
     
     // retrieve the traversable object
-    Traversable *traversable = dynamic_cast<Traversable*>(cpp_object(object TSRMLS_CC));
+    Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object TSRMLS_CC)->object());
     
     // user may throw an exception in the getIterator() function
     try
@@ -1274,7 +1247,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
 int ClassImpl::serialize(zval *object, unsigned char **buffer, zend_uint *buf_len, zend_serialize_data *data TSRMLS_DC)
 {
     // get the serializable object
-    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(object TSRMLS_CC));
+    Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(object TSRMLS_CC)->object());
     
     // call the serialize method on the object
     auto value = serializable->serialize();
@@ -1304,7 +1277,7 @@ int ClassImpl::unserialize(zval **object, zend_class_entry *entry, const unsigne
     object_init_ex(*object, entry);
     
     // turn this into a serializale
-    Serializable *serializable = dynamic_cast<Serializable*>(cpp_object(*object TSRMLS_CC));
+    Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(*object TSRMLS_CC)->object());
     
     // call the unserialize method on it
     serializable->unserialize((const char *)buffer, buf_len);

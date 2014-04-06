@@ -79,7 +79,6 @@
 /**
  *  Interface files for internal use only
  */
-#include "mixedobject.h"
 #include "callable.h"
 #include "function.h"
 #include "method.h"
@@ -100,6 +99,7 @@
 #include "iteratorimpl.h"
 #include "streambuf.h"
 #include "classimpl.h"
+#include "objectimpl.h"
 #include "extensionimpl.h"
 
 #ifndef ZVAL_COPY_VALUE

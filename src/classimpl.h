@@ -134,13 +134,6 @@ public:
     }
 
     /**
-     *  Retrieve the extension's class object
-     *  @param  entry
-     *  @return ClassBase
-     */
-    static ClassBase *base(zend_class_entry *entry);
-
-    /**
      *  Initialize the class, given its name
      * 
      *  The module functions are registered on module startup, but classes are
