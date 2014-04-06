@@ -9,12 +9,6 @@
  */
 
 /**
- *  Forward definitions
- */
-struct _zend_function_entry;
-struct _zend_arg_info;
- 
-/**
  *  Set up namespace
  */
 namespace Php {
@@ -99,7 +93,7 @@ public:
      *  @param  classname   Optional class name
      *  @param  flags       Access flags
      */
-    void initialize(struct _zend_function_entry *entry, const char *classname = nullptr, int flags = 0) const;
+    void initialize(zend_function_entry *entry, const char *classname = nullptr, int flags = 0) const;
 
     /**
      *  Fill function info
@@ -107,7 +101,7 @@ public:
      *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      */
-    void initialize(struct _zend_arg_info *info, const char *classname = nullptr) const;
+    void initialize(zend_arg_info *info, const char *classname = nullptr) const;
 
 
 protected:
@@ -139,7 +133,7 @@ protected:
      *  The arguments
      *  @var zend_arg_info[]
      */
-    struct _zend_arg_info *_argv = nullptr;
+    zend_arg_info *_argv = nullptr;
     
     /**
      *  Private helper method to fill an argument object

@@ -184,8 +184,8 @@ install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	${CP} ${PHP_LIBRARY} ${INSTALL_LIB}
-	${CP} ${HHVM_LIBRARY} ${INSTALL_LIB}
+	if [ -e ${PHP_LIBRARY} ]; then ${CP} ${PHP_LIBRARY} ${INSTALL_LIB}; fi
+	if [ -e ${HHVM_LIBRARY} ]; then ${CP} ${HHVM_LIBRARY} ${INSTALL_LIB}; fi
 	${CONFIG_UTILITY} > ${INSTALL_HEADERS}/phpcpp/config.h
 
 test:

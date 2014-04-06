@@ -67,7 +67,7 @@ public:
      *  @param  prefix      Active namespace prefix
      *  @param  entry       Entry to be filled
      */
-    void initialize(const std::string &prefix, struct _zend_function_entry *entry)
+    void initialize(const std::string &prefix, zend_function_entry *entry)
     {
         // if there is a namespace prefix, we should adjust the name
         if (prefix.size()) _ptr = HiddenPointer<Callable>(this, prefix+"\\"+(const char *)_ptr);

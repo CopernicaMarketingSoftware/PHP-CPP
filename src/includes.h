@@ -100,6 +100,7 @@
 #include "iteratorimpl.h"
 #include "streambuf.h"
 #include "classimpl.h"
+#include "extensionimpl.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \
