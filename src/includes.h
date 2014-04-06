@@ -74,11 +74,11 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
-#include "../include/init.h"
 
 /**
  *  Interface files for internal use only
  */
+#include "init.h"
 #include "callable.h"
 #include "function.h"
 #include "method.h"
