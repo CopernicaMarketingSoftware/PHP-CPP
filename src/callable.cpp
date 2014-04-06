@@ -35,7 +35,7 @@ static void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
     Value result(return_value, true);
 
     // construct parameters
-    Parameters params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
+    ParametersImpl params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
 
     // the function could throw an exception
     try

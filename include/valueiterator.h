@@ -12,12 +12,6 @@
  */
 
 /**
- *  Forward declaration
- */
-struct _hashtable;
-struct bucket;
-
-/**
  *  Set up namespace
  */
 namespace Php {

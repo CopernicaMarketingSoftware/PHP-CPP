@@ -100,6 +100,7 @@
 #include "streambuf.h"
 #include "classimpl.h"
 #include "objectimpl.h"
+#include "parametersimpl.h"
 #include "extensionimpl.h"
 
 #ifndef ZVAL_COPY_VALUE
