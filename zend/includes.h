@@ -23,9 +23,9 @@
 // for debug
 #include <iostream>
 
-#define ZTS
-#define THREAD_T pthread_t
-#define MUTEX_T pthread_mutex_t *
+//#define ZTS
+//#define THREAD_T pthread_t
+//#define MUTEX_T pthread_mutex_t *
 
 /**
  *  PHP includes

@@ -120,12 +120,13 @@ MKDIR           =   mkdir -p
 #   The source files
 #
 #   For this we use a special Makefile function that automatically scans the
-#   src/ directory for all *.cpp files. No changes are probably necessary here
+#   src/, zend/ and hhvm/ directories for all *.cpp files. No changes are 
+#   probably necessary here
 #
 
 SOURCES         =   $(wildcard src/*.cpp)
-PHP_SOURCES     =   $(wildcard src/zend/*.cpp)
-HHVM_SOURCES    =   $(wildcard src/hhvm/*.cpp)
+PHP_SOURCES     =   $(wildcard zend/*.cpp)
+HHVM_SOURCES    =   $(wildcard hhvm/*.cpp)
 
 #
 #   The object files
