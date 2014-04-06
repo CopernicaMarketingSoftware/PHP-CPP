@@ -114,7 +114,7 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
     catch (Exception &exception)
     {
         // process the exception
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
@@ -155,12 +155,11 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
     {
         // because of the two-step nature, we are going to report the error ourselves
         zend_error(E_ERROR, "Function name must be a string");
-
     }
     catch (Exception &exception)
     {
         // process the exception
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
@@ -419,7 +418,7 @@ int ClassImpl::compare(zval *val1, zval *val2 TSRMLS_DC)
     {
         // a Php::Exception was thrown by the extension __compare function, 
         // pass this on to user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
         
         // what shall we return here...
         return 1;
@@ -492,7 +491,7 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
     catch (Exception &exception)
     {
         // pass on the exception to php userspace
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
         
         // done
         return FAILURE;
@@ -577,7 +576,7 @@ int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
         catch (Exception &exception)
         {
             // process the exception
-            exception.process(TSRMLS_C);
+            process(exception TSRMLS_CC);
             
             // unreachable
             return FAILURE;
@@ -640,7 +639,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            exception.process(TSRMLS_C);
+            process(exception TSRMLS_CC);
             
             // unreachable
             return Value(nullptr).detach();
@@ -685,7 +684,7 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC
         catch (Exception &exception)
         {
             // process the exception (send it to user space
-            exception.process(TSRMLS_C);
+            process(exception TSRMLS_CC);
         }
     }
     else
@@ -734,7 +733,7 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_D
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            exception.process(TSRMLS_C);
+            process(exception TSRMLS_CC);
             
             // unreachable
             return false;
@@ -777,7 +776,7 @@ void ClassImpl::unsetDimension(zval *object, zval *member TSRMLS_DC)
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            exception.process(TSRMLS_C);
+            process(exception TSRMLS_CC);
         }
     }
     else
@@ -894,7 +893,7 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
         
         // unreachable
         return Value(nullptr).detach();
@@ -971,7 +970,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
@@ -1052,7 +1051,7 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
         
         // unreachable
         return false;
@@ -1113,7 +1112,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
     {
         // user threw an exception in its magic method 
         // implementation, send it to user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
@@ -1147,7 +1146,7 @@ void ClassImpl::destructObject(zend_object *object, zend_object_handle handle TS
     {
         // a regular Php::Exception was thrown by the extension, pass it on
         // to PHP user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
@@ -1162,7 +1161,7 @@ void ClassImpl::freeObject(zend_object *object TSRMLS_DC)
     ObjectImpl *obj = ObjectImpl::find(object);
     
     // no longer need it
-    obj->destruct(TSRMLS_CC);
+    obj->destruct(TSRMLS_C);
 }
 
 /**
@@ -1228,7 +1227,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
     {
         // user threw an exception in its method 
         // implementation, send it to user space
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
         
         // unreachable
         return nullptr;

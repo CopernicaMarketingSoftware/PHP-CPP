@@ -30,42 +30,51 @@ private:
      */
     int _code;
     
+    /**
+     *  Has this exception been processed by native C++ code?
+     *  @var    bool
+     */
+    bool _processed = false;
+    
 public:
     /**
      *  Constructor
      *  @param  &string
      */
-    Exception(const std::string &message, int code = 0) : std::exception(), _message(message), _code(code)
-    {
-    }
+    Exception(const std::string &message, int code = 0) : std::exception(), _message(message), _code(code) {}
     
     /**
      *  Destructor
      */
-    virtual ~Exception() throw()
+    virtual ~Exception() throw() {}
+    
+    /**
+     *  Overridden what method
+     *  @return const char *
+     */
+    virtual const char *what() const noexcept override
     {
+        return _message.c_str();
     }
     
     /**
      *  Returns the message of the exception.
      *  @return &string
      */
-    std::string &message() throw()
+    const std::string &message() const throw()
     {
         return _message;
     }
 
     /**
-     *  Process the exception
-     * 
-     *  This method is called only from within the PHP-CPP library,
-     *  and will turn the exception into a PHP exception
-     * 
-     *  @param  tsrm_ls
-     * 
-     *  @internal
+     *  Is this a native exception (one that was thrown from C++ code)
+     *  @return bool
      */
-    virtual void process(TSRMLS_D);
+    virtual bool native() const
+    {
+        // yes, it is native
+        return true;
+    }
 };
 
 /**

@@ -166,7 +166,7 @@ private:
      *  Initialize the namespace after it was registered
      *  @param  tsrm_ls
      */
-    void initialize(TSRMLS_DC);
+    void initialize(TSRMLS_D);
 
     /**
      *  Function that is called when the extension initializes

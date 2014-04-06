@@ -140,24 +140,13 @@ OBJECTS         =   $(SOURCES:%.cpp=%.o)
 PHP_OBJECTS     =   $(PHP_SOURCES:%.cpp=%.o)
 HHVM_OBJECTS    =   $(HHVM_SOURCES:%.cpp=%.o)
 
-#
-#   Configuration program
-#
-#   During installation, a configuration utility will be installed. It is
-#   compiled with the following instructions
-#
-
-CONFIG_UTILITY  =   ./create_config
-CONFIG_SOURCES  =   $(wildcard config/*.cpp)
-CONFIG_FLAGS    =   `php-config --includes` -o
-
 
 #
 #   End of the variables section. Here starts the list of instructions and
 #   dependencies that are used by the compiler.
 #
 
-all: ${PHP_LIBRARY} ${CONFIG_UTILITY}
+all: ${PHP_LIBRARY}
 
 ${PHP_LIBRARY}: ${OBJECTS} ${PHP_OBJECTS}
 	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${OBJECTS} ${PHP_OBJECTS}
@@ -165,11 +154,8 @@ ${PHP_LIBRARY}: ${OBJECTS} ${PHP_OBJECTS}
 ${HHVM_LIBRARY}: ${OBJECTS} ${HHVM_OBJECTS}
 	${LINKER} ${HHVM_LINKER_FLAGS} -o $@ ${OBJECTS} ${HHVM_OBJECTS}
 
-${CONFIG_UTILITY}:
-	${COMPILER} ${CONFIG_FLAGS} $@ ${CONFIG_SOURCES}
-
 clean:
-	${RM} ${OBJECTS} ${PHP_OBJECTS} ${HHVM_OBJECTS} ${PHP_LIBRARY} ${HHVM_LIBRARY} ${CONFIG_UTILITY}
+	${RM} ${OBJECTS} ${PHP_OBJECTS} ${HHVM_OBJECTS} ${PHP_LIBRARY} ${HHVM_LIBRARY}
 
 ${OBJECTS}: 
 	${COMPILER} ${PHP_COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
@@ -186,10 +172,8 @@ install:
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
 	if [ -e ${PHP_LIBRARY} ]; then ${CP} ${PHP_LIBRARY} ${INSTALL_LIB}; fi
 	if [ -e ${HHVM_LIBRARY} ]; then ${CP} ${HHVM_LIBRARY} ${INSTALL_LIB}; fi
-	${CONFIG_UTILITY} > ${INSTALL_HEADERS}/phpcpp/config.h
 
 test:
 	mkdir -p ./tests/include/zts/phpcpp
-	${CONFIG_UTILITY} > ./tests/include/zts/phpcpp/config.h
 	cd tests && ./test.sh -p "${PHP_BIN}"
 

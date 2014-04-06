@@ -1257,7 +1257,7 @@ static Value do_exec(zval **object, zval *method, int argc, zval ***params)
     {
         // was an exception thrown inside the function? In that case we throw a C++ new exception 
         // to give the C++ code the chance to catch it
-        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
+        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
 
         // no (additional) exception was thrown
         return retval ? Value(retval) : nullptr;

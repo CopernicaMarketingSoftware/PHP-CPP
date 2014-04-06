@@ -115,7 +115,7 @@ int ExtensionImpl::onStartup(int type, int module_number TSRMLS_DC)
     auto *extension = find(module_number TSRMLS_CC);
     
     // initialize the extension
-    extension->initialize(TSRMLS_CC);
+    extension->initialize(TSRMLS_C);
     
     // is the callback registered?
     if (extension->_onStartup) extension->_onStartup();
@@ -289,7 +289,7 @@ void ExtensionImpl::initialize(TSRMLS_D)
     _data->apply([TSRMLS_C](const std::string &prefix, ClassBase &c) {
         
         // forward to implementation class
-        c.implementation()->initialize(&c, prefix TSRMLS_C);
+        c.implementation()->initialize(&c, prefix TSRMLS_CC);
     });
 }
 

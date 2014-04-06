@@ -46,7 +46,7 @@ static void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
     catch (Exception &exception)
     {
         // process the exception
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
