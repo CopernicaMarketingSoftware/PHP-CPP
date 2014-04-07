@@ -949,6 +949,7 @@ protected:
     friend class TraverseIterator;
     friend class HashMember<int>;
     friend class HashMember<std::string>;
+    friend class Callable;
 };
 
 /**

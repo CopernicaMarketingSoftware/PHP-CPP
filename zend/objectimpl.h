@@ -20,7 +20,7 @@ class ObjectImpl
 {
 private:
     /**
-     *  Structure with a first element which is a mixed object, so that
+     *  Structure with a first element which is a zend_object, so that
      *  it can be casted to a zend_object
      *  @var    MixedObject
      */
@@ -40,7 +40,7 @@ private:
         ObjectImpl *self;
         
         
-    } _mixed;
+    } *_mixed;
     
     /**
      *  Pointer to the C++ implementation
@@ -66,15 +66,18 @@ public:
      */
     ObjectImpl(zend_class_entry *entry, Base *base TSRMLS_DC)
     {
+        // allocate a mixed object (for some reason this does not have to deallocated)
+        _mixed = (MixedObject *)emalloc(sizeof(MixedObject));
+        
         // copy properties to the mixed object
-        _mixed.php.ce = entry;
-        _mixed.self = this;
+        _mixed->php.ce = entry;
+        _mixed->self = this;
         
         // store the c++ object
         _object = base;
         
         // initialize the object
-        zend_object_std_init(&_mixed.php, entry TSRMLS_CC);
+        zend_object_std_init(&_mixed->php, entry TSRMLS_CC);
         
 #if PHP_VERSION_ID < 50399
 
@@ -82,12 +85,12 @@ public:
         zval *tmp;
     
         // initialize the properties, php 5.3 way
-        zend_hash_copy(_mixed.php.properties, &entry->default_properties, (copy_ctor_func_t) zval_property_ctor, &tmp, sizeof(zval*));
+        zend_hash_copy(_mixed->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_property_ctor, &tmp, sizeof(zval*));
 
 #else
 
         // version higher than 5.3 have an easier way to initialize
-        object_properties_init(&_mixed.php, entry);
+        object_properties_init(&_mixed->php, entry);
 
 #endif    
 
@@ -112,7 +115,7 @@ public:
 
         // the destructor and clone handlers are set to NULL. I dont know why, but they do not
         // seem to be necessary...
-        _handle = zend_objects_store_put(&_mixed, (zend_objects_store_dtor_t)destructMethod, (zend_objects_free_object_storage_t)freeMethod, NULL TSRMLS_CC);
+        _handle = zend_objects_store_put(php(), (zend_objects_store_dtor_t)destructMethod, (zend_objects_free_object_storage_t)freeMethod, NULL TSRMLS_CC);
         
         // the object may remember that we are its implementation object
         base->_impl = this;
@@ -124,7 +127,7 @@ public:
     virtual ~ObjectImpl()
     {
         // deallocate the cpp object
-        delete _object;
+        if (_object) delete _object;
     }
 
     /**
@@ -134,7 +137,7 @@ public:
     void destruct(TSRMLS_D)
     {
         // pass on to the default destructor
-        zend_objects_free_object_storage(&_mixed.php TSRMLS_CC);
+        zend_objects_free_object_storage(php() TSRMLS_CC);
         
         // destruct the object
         delete this;
@@ -184,7 +187,7 @@ public:
      */
     zend_object *php() 
     {
-        return &_mixed.php;
+        return &_mixed->php;
     }
     
     /**

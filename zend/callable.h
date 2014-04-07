@@ -181,6 +181,19 @@ protected:
         info->allow_null = arg.allowNull();
         info->pass_by_reference = arg.byReference();
     }
+
+    /**
+     *  Function that is called by the Zend engine every time that a function gets called
+     *  @param  ht
+     *  @param  return_value
+     *  @param  return_value_ptr
+     *  @param  this_ptr
+     *  @param  return_value_used
+     *  @param  tsrm_ls
+     *  @return integer
+     */
+    static void invoke(INTERNAL_FUNCTION_PARAMETERS);
+
 };
 
 /**
