@@ -169,7 +169,7 @@ protected:
 #else
 
         // php 5.3 code
-        info->array_type_hint = type == Type::Array;
+        info->array_type_hint = arg.type() == Type::Array;
         info->return_reference = false;
         info->required_num_args = 0;   // @todo is this correct?
 
