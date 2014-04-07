@@ -79,6 +79,7 @@
  *  Common header files for internal use only
  */
 #include "../common/extensionbase.h"
+#include "../common/streambuf.h"
 
 /**
  *  Specific zend implementation  files for internal use only
@@ -102,7 +103,6 @@
 #include "invaliditerator.h"
 #include "traverseiterator.h"
 #include "iteratorimpl.h"
-#include "streambuf.h"
 #include "classimpl.h"
 #include "objectimpl.h"
 #include "parametersimpl.h"

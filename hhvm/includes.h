@@ -16,6 +16,7 @@
 #include <vector>
 #include <map>
 #include <string.h>
+#include <iostream>
 
 /**
  *  HHVM includes
@@ -45,6 +46,7 @@
  *  Generic implementation header files
  */
 #include "../common/extensionbase.h"
+#include "../common/streambuf.h"
 
 /**
  *  Specific HHVM header files for the implementation only

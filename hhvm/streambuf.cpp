@@ -32,13 +32,18 @@ int StreamBuf::sync()
         // parameter. We can not specify pbase() directly, because (1) it is
         // not null terminated and (2) it could contain % signs and allow all
         // sorts of buffer overflows.
-        zend_error(_error, "%.*s", (int)size, pbase());
+        
+        // @todo hhvm implementation
+        
+//        zend_error(_error, "%.*s", (int)size, pbase());
         
     }
     else
     {
+        // @todo hhvm implementation
+        
         // write to zend
-        zend_write(pbase(), size);
+//        zend_write(pbase(), size);
     }
     
     // reset the buffer
@@ -52,4 +57,3 @@ int StreamBuf::sync()
  *  End namespace
  */
 }
- 
