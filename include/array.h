@@ -31,7 +31,7 @@ public:
     Array(const Value &value) : Value(value) 
     {
         // type must be valid
-        if (value.type() != Type::Array) throw Php::Exception("Assiging a non-array to an array variable");
+        if (value.type() != Type::Array) throw Php::Exception("Assigning a non-array to an array variable");
     }
 
     /**
@@ -93,7 +93,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Array) throw Php::Exception("Assiging a non-array to a fixed array variable");
+        if (value.type() != Type::Array) throw Php::Exception("Assigning a non-array to a fixed array variable");
         
         // call base
         Value::operator=(value);
