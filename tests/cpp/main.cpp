@@ -11,6 +11,7 @@
 #include "h/ValueIterator.h"
 #include "h/Classes_and_objects.h"
 #include "h/variables.h"
+#include "h/ini_entries.h"
 
 
 
@@ -127,6 +128,33 @@ extern "C"
         Php::Class<TestVariables::Obj2Scalar> cObj2Scalar("TestVariables\\Obj2Scalar");
         extension.add(std::move(cObj2Scalar));
 
+
+        extension
+            .add(Php::Ini("ini1", "valIni1"))
+            .add(Php::Ini("ini2", "valIni2", "OrigValIni2"))
+            .add(Php::Ini("ini3", "valIni3", "OrigValIni3", Php::Ini::Place::System))
+            .add(Php::Ini("ini4", true,      false, Php::Ini::Place::User))
+            .add(Php::Ini("ini5",            false));
+
+        Php::Ini ini6("ini6", 55, 11);
+        extension
+            .add(ini6)
+            .add(Php::Ini("ini7", 74));
+
+        Php::Ini ini8("ini8", 3.1415926, 6.2831852);
+        Php::Ini ini9("ini9", 2.7182818, 5.4365636, Php::Ini::Place::User);
+        extension.add(ini8);
+        extension.add(std::move(ini9));
+
+
+
+
+        /**
+         *  tests ini entries
+         * 
+         */
+        extension.add("TestIniEntries\\iniTest1", TestIniEntries::iniTest1);
+         
 
 
 

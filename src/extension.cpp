@@ -110,10 +110,25 @@ int Extension::onStartup(int type, int module_number TSRMLS_DC)
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
-    
+
+
     // get the extension
     Extension *extension = find(module_number TSRMLS_CC);
+
+    // array contains ini settings
+    static zend_ini_entry *ini_entries = new zend_ini_entry[ extension->_ini_entries.size()+1 ];
+
+    // Filling ini_entries
+    unsigned int Ind = 0;
+    for (auto &ini : extension->_ini_entries) ini->fill(&ini_entries[Ind++], module_number);
+
+    // add last empty ini entry (Zend, for some reason, it requires)
+    zend_ini_entry empty_entry { 0, 0, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr, 0, 0, 0, nullptr };
+    ini_entries[Ind] = empty_entry;
     
+    // register
+    REGISTER_INI_ENTRIES();
+
     // initialize namespace
     extension->initialize("" TSRMLS_CC);
     
@@ -135,7 +150,13 @@ int Extension::onShutdown(int type, int module_number TSRMLS_DC)
 {
     // get the extension
     Extension *extension = find(module_number TSRMLS_CC);
-    
+
+
+    UNREGISTER_INI_ENTRIES();
+    // free memory from array ini entries
+    static zend_ini_entry *ini_entries;
+    delete [] ini_entries;
+
     // is the callback registered?
     if (extension->_onShutdown) extension->_onShutdown();
     
@@ -204,7 +225,7 @@ Extension::Extension(const char *name, const char *version) : Namespace("")
     _entry->zend_api = ZEND_MODULE_API_NO;                  // api number
     _entry->zend_debug = ZEND_DEBUG;                        // debug mode enabled?
     _entry->zts = USING_ZTS;                                // is thread safety enabled?
-    _entry->ini_entry = NULL;                               // the php.ini record
+    _entry->ini_entry = NULL;                               // the php.ini record, will be filled by Zend engine
     _entry->deps = NULL;                                    // dependencies on other modules
     _entry->name = name;                                    // extension name
     _entry->functions = NULL;                               // functions supported by this module (none for now)

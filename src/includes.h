@@ -34,6 +34,7 @@
 #include <php.h>
 #include <zend_exceptions.h>
 #include <zend_interfaces.h>
+#include <zend_ini.h>
 
 /**
  *  Macro to convert results to success status
@@ -43,6 +44,7 @@
 /**
  *  Include other files from this library
  */
+#include "../include/ini.h"
 #include "../include/exception.h"
 #include "../include/streams.h"
 #include "../include/type.h"

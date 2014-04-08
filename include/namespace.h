@@ -167,6 +167,41 @@ public:
         return *this;
     }
 
+    
+    /**
+     *  Add a ini entry to the extension by moving it
+     *  @param  ini        The class implementation
+     *  @return Namespace   Same object to allow chaining
+     */
+    Namespace &add(Ini &&ini)
+    {
+        // make a copy of the object
+        auto *copy = new Ini(std::move(ini));
+        
+        // and add it to the list of classes
+        _ini_entries.push_back(std::unique_ptr<Ini>(copy));
+        
+        // allow chaining
+        return *this;
+    }
+
+    /**
+     *  Add a ini entry to the extension by copying it
+     *  @param  ini        The class implementation
+     *  @param  Namespace   Same object to allow chaining
+     */
+    Namespace &add(const Ini &ini)
+    {
+        // make a copy of the object
+        auto *copy = new Ini(std::move(ini));
+        
+        // and add it to the list of classes
+        _ini_entries.push_back(std::unique_ptr<Ini>(copy));
+        
+        // allow chaining
+        return *this;
+    }
+
 
 protected:
     /**
@@ -192,6 +227,12 @@ protected:
      *  @var    list
      */
     std::list<std::shared_ptr<Namespace>> _namespaces;
+
+    /**
+     *  Ini entry defined by the extension
+     *  @var    list
+     */
+    std::list<std::shared_ptr<Ini>> _ini_entries;
     
     /**
      *  The total number of functions

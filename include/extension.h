@@ -139,7 +139,7 @@ public:
     {
         return module();
     }
-    
+
 private:
     /**
      *  The information that is passed to the Zend engine
