@@ -49,6 +49,7 @@ inline Value array_key_exists(int key, const Value &array) { return array.contai
 inline Value array_key_exists(const char *key, const Value &array) { return array.contains(key); }
 inline Value array_key_exists(const std::string &key, const Value &array) { return array.contains(key); }
 inline Value array_keys(const Value &value) { return call("array_keys", value); }
+inline Value array_push(const Value &array, const Value &value) { return call("array_push", array, value); }
 inline Value array_values(const Value &value) { return call("array_values", value); }
 inline Value count(const Value &value) { return call("count", value); }
 inline Value echo(const char *input) { out << input; return nullptr; }
