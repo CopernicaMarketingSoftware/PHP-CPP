@@ -116,17 +116,12 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     auto *extension = find(module_number TSRMLS_CC);
 
     // array contains ini settings
-    static zend_ini_entry *ini_entries = new zend_ini_entry[ extension->_ini_entries.size()+1 ];
+    static zend_ini_entry *ini_entries = new zend_ini_entry[ extension->_data->ini_size()+1 ];
 
-    // Filling ini_entries
-    unsigned int Ind = 0;
-    for (auto &ini : extension->_ini_entries) ini->fill(&ini_entries[Ind++], module_number);
-
-    // add last empty ini entry (Zend, for some reason, it requires)
-    zend_ini_entry empty_entry { 0, 0, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr, 0, 0, 0, nullptr };
-    ini_entries[Ind] = empty_entry;
+    // Filling ini entries
+    extension->_data->fill_ini(ini_entries, module_number);
     
-    // register
+    // register ini entries in Zend core
     REGISTER_INI_ENTRIES();
 
     // initialize the extension

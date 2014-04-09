@@ -207,6 +207,15 @@ public:
         // done
         return result;
     }
+
+    /**
+     *  The total number of ini entries
+     *  @return size_t
+     */
+    size_t ini_size()
+    {
+        return _ini_entries.size();
+    }
     
     /**
      *  Apply a callback to each registered function
@@ -227,6 +236,14 @@ public:
      *  @param  callback
      */
     void apply(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
+
+    /**
+     *  Filling ini entries into external zend_ini_entry array
+     *  @param  zend_ini_entry*
+     */
+    void fill_ini(_zend_ini_entry *ini_entries, int module_number);
+
+
     
 };
     
