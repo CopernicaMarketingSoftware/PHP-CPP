@@ -140,7 +140,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Object) throw Php::Exception("Assiging a non-object to an object variable");
+        if (value.type() != Type::Object) throw Php::Exception("Assigning a non-object to an object variable");
         
         // call base
         Value::operator=(value);
