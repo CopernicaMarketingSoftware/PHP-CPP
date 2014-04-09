@@ -51,8 +51,8 @@ static void init_globals(zend_phpcpp_globals *globals) {}
  * 
  *  @var map
  */
-static std::map<std::string,Extension*> name2extension;
-static std::map<int,Extension*> number2extension;
+static std::map<std::string,ExtensionImpl*> name2extension;
+static std::map<int,ExtensionImpl*> number2extension;
 
 /**
  *  Handler function that is used in combination with zend_hash_apply()
@@ -61,9 +61,9 @@ static std::map<int,Extension*> number2extension;
  *  an extension number. We loop through the list of all registered modules, and 
  *  for each module we check if we know the extension based on the name
  * 
- *  @param  _zend_module_entry
+ *  @param  zend_module_entry
  */
-static int match_module(_zend_module_entry *entry)
+static int match_module(zend_module_entry *entry)
 {
     // check if there is an extension with this name
     auto iter = name2extension.find(entry->name);
@@ -82,7 +82,7 @@ static int match_module(_zend_module_entry *entry)
  *  @param  tsrm_ls
  *  @return Extension*
  */
-static Extension *find(int number TSRMLS_DC)
+static ExtensionImpl *find(int number TSRMLS_DC)
 {
     // do we already have an extension with this number?
     auto iter = number2extension.find(number);
@@ -106,14 +106,14 @@ static Extension *find(int number TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int Extension::onStartup(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
 
 
     // get the extension
-    Extension *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number TSRMLS_CC);
 
     // array contains ini settings
     static zend_ini_entry *ini_entries = new zend_ini_entry[ extension->_ini_entries.size()+1 ];
@@ -129,8 +129,8 @@ int Extension::onStartup(int type, int module_number TSRMLS_DC)
     // register
     REGISTER_INI_ENTRIES();
 
-    // initialize namespace
-    extension->initialize("" TSRMLS_CC);
+    // initialize the extension
+    extension->initialize(TSRMLS_C);
     
     // is the callback registered?
     if (extension->_onStartup) extension->_onStartup();
@@ -146,10 +146,10 @@ int Extension::onStartup(int type, int module_number TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return int
  */
-int Extension::onShutdown(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
 {
     // get the extension
-    Extension *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number TSRMLS_CC);
 
 
     UNREGISTER_INI_ENTRIES();
@@ -171,10 +171,10 @@ int Extension::onShutdown(int type, int module_number TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int Extension::onRequest(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processRequest(int type, int module_number TSRMLS_DC)
 {
     // get the extension
-    Extension *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number TSRMLS_CC);
     
     // is the callback registered?
     if (extension->_onRequest) extension->_onRequest();
@@ -190,10 +190,10 @@ int Extension::onRequest(int type, int module_number TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int Extension::onIdle(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processIdle(int type, int module_number TSRMLS_DC)
 {
     // get the extension
-    Extension *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number TSRMLS_CC);
     
     // is the callback registered?
     if (extension->_onIdle) extension->_onIdle();
@@ -204,52 +204,45 @@ int Extension::onIdle(int type, int module_number TSRMLS_DC)
 
 /**
  *  Constructor
+ *  @param  data        Pointer to the extension object created by the extension programmer
  *  @param  name        Name of the extension
  *  @param  version     Version number
- *  @param  start       Request start callback
- *  @param  stop        Request stop callback
  */
-Extension::Extension(const char *name, const char *version) : Namespace("")
+ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *version) : ExtensionBase(data)
 {
     // keep extension pointer based on the name
     name2extension[name] = this;
     
-    // allocate memory (we allocate this on the heap so that the size of the
-    // entry does not have to be defined in the .h file. We pay a performance
-    // price for this, but we pay this price becuase the design goal of the
-    // PHP-C++ library is to have an interface that is as simple as possible
-    _entry = new _zend_module_entry;
-    
     // assign all members (apart from the globals)
-    _entry->size = sizeof(zend_module_entry);               // size of the data
-    _entry->zend_api = ZEND_MODULE_API_NO;                  // api number
-    _entry->zend_debug = ZEND_DEBUG;                        // debug mode enabled?
-    _entry->zts = USING_ZTS;                                // is thread safety enabled?
-    _entry->ini_entry = NULL;                               // the php.ini record, will be filled by Zend engine
-    _entry->deps = NULL;                                    // dependencies on other modules
-    _entry->name = name;                                    // extension name
-    _entry->functions = NULL;                               // functions supported by this module (none for now)
-    _entry->module_startup_func = &Extension::onStartup;    // startup function for the whole extension
-    _entry->module_shutdown_func = &Extension::onShutdown;  // shutdown function for the whole extension
-    _entry->request_startup_func = &Extension::onRequest;   // startup function per request
-    _entry->request_shutdown_func = &Extension::onIdle;     // shutdown function per request
-    _entry->info_func = NULL;                               // information for retrieving info
-    _entry->version = version;                              // version string
-    _entry->globals_size = 0;                               // size of the global variables
-    _entry->globals_ctor = NULL;                            // constructor for global variables
-    _entry->globals_dtor = NULL;                            // destructor for global variables
-    _entry->post_deactivate_func = NULL;                    // unknown function
-    _entry->module_started = 0;                             // module is not yet started
-    _entry->type = 0;                                       // temporary or persistent module, will be filled by Zend engine
-    _entry->handle = NULL;                                  // dlopen() handle, will be filled by Zend engine
-    _entry->module_number = 0;                              // module number will be filled in by Zend engine
-    _entry->build_id = (char *)ZEND_MODULE_BUILD_ID;        // check if extension and zend engine are compatible
+    _entry.size = sizeof(zend_module_entry);                       // size of the data
+    _entry.zend_api = ZEND_MODULE_API_NO;                          // api number
+    _entry.zend_debug = ZEND_DEBUG;                                // debug mode enabled?
+    _entry.zts = USING_ZTS;                                        // is thread safety enabled?
+    _entry.ini_entry = NULL;                                       // the php.ini record, will be filled by Zend engine
+    _entry.deps = NULL;                                            // dependencies on other modules
+    _entry.name = name;                                            // extension name
+    _entry.functions = NULL;                                       // functions supported by this module (none for now)
+    _entry.module_startup_func = &ExtensionImpl::processStartup;   // startup function for the whole extension
+    _entry.module_shutdown_func = &ExtensionImpl::processShutdown; // shutdown function for the whole extension
+    _entry.request_startup_func = &ExtensionImpl::processRequest;  // startup function per request
+    _entry.request_shutdown_func = &ExtensionImpl::processIdle;    // shutdown function per request
+    _entry.info_func = NULL;                                       // information for retrieving info
+    _entry.version = version;                                      // version string
+    _entry.globals_size = 0;                                       // size of the global variables
+    _entry.globals_ctor = NULL;                                    // constructor for global variables
+    _entry.globals_dtor = NULL;                                    // destructor for global variables
+    _entry.post_deactivate_func = NULL;                            // unknown function
+    _entry.module_started = 0;                                     // module is not yet started
+    _entry.type = 0;                                               // temporary or persistent module, will be filled by Zend engine
+    _entry.handle = NULL;                                          // dlopen() handle, will be filled by Zend engine
+    _entry.module_number = 0;                                      // module number will be filled in by Zend engine
+    _entry.build_id = (char *)ZEND_MODULE_BUILD_ID;                // check if extension and zend engine are compatible
 
     // things that only need to be initialized
 #ifdef ZTS
-    _entry->globals_id_ptr = NULL;
+    _entry.globals_id_ptr = NULL;
 #else
-    _entry->globals_ptr = NULL;
+    _entry.globals_ptr = NULL;
 #endif
 
 }
@@ -257,29 +250,42 @@ Extension::Extension(const char *name, const char *version) : Namespace("")
 /**
  *  Destructor
  */
-Extension::~Extension()
+ExtensionImpl::~ExtensionImpl()
 {
     // deallocate functions
-    if (_entry->functions) delete[] _entry->functions;
-    
-    // deallocate entry
-    delete _entry;
+    if (_entry.functions) delete[] _entry.functions;
 }
 
 /**
  *  Retrieve the module entry
  *  @return zend_module_entry
  */
-zend_module_entry *Extension::module()
+zend_module_entry *ExtensionImpl::module()
 {
     // check if functions we're already defined
-    if (_entry->functions || _functions.size() == 0) return _entry;
+    if (_entry.functions) return &_entry;
+
+    // the number of functions
+    int count = _data->functions();
+    
+    // skip if there are no functions
+    if (count == 0) return &_entry;
 
     // allocate memory for the functions
-    zend_function_entry *entries = new zend_function_entry[functions() + 1];
+    zend_function_entry *entries = new zend_function_entry[count + 1];
 
-    // initialize the entries
-    int count = Namespace::initialize("", entries);
+    // index being processed
+    int i = 0;
+
+    // apply a function to each function
+    _data->apply([&i, entries](const std::string &prefix, Function &function) {
+        
+        // initialize the function
+        function.initialize(prefix, &entries[i]);
+        
+        // move on to the next iteration
+        i++;
+    });
 
     // last entry should be set to all zeros
     zend_function_entry *last = &entries[count];
@@ -288,10 +294,24 @@ zend_module_entry *Extension::module()
     memset(last, 0, sizeof(zend_function_entry));
 
     // store functions in entry object
-    _entry->functions = entries;
+    _entry.functions = entries;
 
     // return the entry
-    return _entry;
+    return &_entry;
+}
+
+/**
+ *  Initialize the extension after it was started
+ *  @param  tsrm_ls
+ */
+void ExtensionImpl::initialize(TSRMLS_D)
+{
+    // we need to register each class, find out all classes
+    _data->apply([TSRMLS_C](const std::string &prefix, ClassBase &c) {
+        
+        // forward to implementation class
+        c.implementation()->initialize(&c, prefix TSRMLS_CC);
+    });
 }
 
 /**

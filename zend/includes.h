@@ -76,12 +76,17 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
-#include "../include/init.h"
 
 /**
- *  Interface files for internal use only
+ *  Common header files for internal use only
  */
-#include "mixedobject.h"
+#include "../common/extensionbase.h"
+#include "../common/streambuf.h"
+
+/**
+ *  Specific zend implementation  files for internal use only
+ */
+#include "init.h"
 #include "callable.h"
 #include "function.h"
 #include "method.h"
@@ -95,12 +100,15 @@
 #include "origexception.h"
 #include "notimplemented.h"
 #include "property.h"
-#include "iteratorimpl.h"
+#include "valueiteratorimpl.h"
 #include "hashiterator.h"
 #include "invaliditerator.h"
 #include "traverseiterator.h"
-#include "streambuf.h"
+#include "iteratorimpl.h"
 #include "classimpl.h"
+#include "objectimpl.h"
+#include "parametersimpl.h"
+#include "extensionimpl.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

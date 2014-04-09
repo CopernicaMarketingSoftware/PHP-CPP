@@ -12,12 +12,6 @@
  */
 
 /**
- *  Forward declaration
- */
-struct _hashtable;
-struct bucket;
-
-/**
  *  Set up namespace
  */
 namespace Php {
@@ -25,7 +19,7 @@ namespace Php {
 /**
  *  Forward declarations
  */
-class IteratorImpl;
+class ValueIteratorImpl;
 
 /**
  *  Class definition
@@ -37,7 +31,7 @@ public:
      *  Constructor
      *  @param  impl        Implementation iterator
      */
-    ValueIterator(IteratorImpl *impl) : _impl(impl) {}
+    ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
     
     /**
      *  Copy constructor
@@ -125,7 +119,7 @@ private:
      *  Pointer to the actual implementation
      *  @var    std::unique_ptr
      */
-    IteratorImpl *_impl;
+    ValueIteratorImpl *_impl;
 
 };
 

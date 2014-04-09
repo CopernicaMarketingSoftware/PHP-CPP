@@ -78,57 +78,54 @@ Namespace &Namespace::add(const char *name, const native_callback_3 &function, c
 }
 
 /**
- *  Initialize all functions in this namespace
- *  @param  parent      Namespace prefix of the parent
- *  @param  entries     The array to be filled
- *  @return int         Number of functions that were initialized
+ *  Apply a callback to each registered function
+ * 
+ *  The callback will be called with the name of the namespace, and
+ *  a reference to the registered function.
+ * 
+ *  @param  callback
  */
-size_t Namespace::initialize(const std::string &parent, struct _zend_function_entry entries[])
+void Namespace::apply(const std::function<void(const std::string &ns, Function &func)> &callback)
 {
-    // keep iterator counter
-    int count = 0;
+    // loop through the functions, and apply the callback
+    for (auto &function : _functions) callback(_name, *function);
     
-    // the namespace to use
-    std::string prefix = parent.size() ? parent + "\\" + _name : _name;
-
-    // loop through the functions
-    for (auto &function : _functions)
-    {
-        // retrieve entry
-        zend_function_entry *entry = &entries[count++];
-
-        // let the function fill the entry
-        function->initialize(prefix, entry);
-    }
-    
-    // loop through the namespace
-    for (auto &ns : _namespaces)
-    {
-        // let the namespace initialize
-        count += ns->initialize(prefix, &entries[count]);
-    }
-    
-    // done
-    return count;
+    // loop through the other namespaces
+    for (auto &ns : _namespaces) ns->apply([this, callback](const std::string &ns, Function &func) {
+        
+        // if this is the root namespace, we don't have to change the prefix
+        if (_name.size() == 0) return callback(ns, func);
+        
+        // construct a new prefix
+        // @todo this could be slightly inefficient
+        return callback(_name + "\\" + ns, func);
+    });
 }
 
 /**
- *  Initialize the namespace after it was registered
- *  @param  parent      Parent namespace
- *  @param  tsrm_ls
+ *  Apply a callback to each registered class
+ * 
+ *  The callback will be called with the name of the namespace, and
+ *  a reference to the registered class.
+ * 
+ *  @param  callback
  */
-void Namespace::initialize(const std::string &parent TSRMLS_DC)
+void Namespace::apply(const std::function<void(const std::string &ns, ClassBase &clss)> &callback)
 {
-    // the namespace to use
-    std::string prefix = parent.size() ? parent + "\\" + _name : _name;
+    // loop through the classes, and apply the callback
+    for (auto &c : _classes) callback(_name, *c);
     
-    // loop through the classes in this namespace
-    for (auto &c : _classes) c->implementation()->initialize(c.get(), prefix TSRMLS_CC);
-    
-    // and loop through the other namespaces
-    for (auto &n : _namespaces) n->initialize(prefix TSRMLS_CC);
+    // loop through the other namespaces
+    for (auto &ns : _namespaces) ns->apply([this, callback](const std::string &ns, ClassBase &clss) {
+        
+        // if this is the root namespace, we don't have to change the prefix
+        if (_name.size() == 0) return callback(ns, clss);
+        
+        // construct a new prefix
+        // @todo this could be slightly inefficient
+        return callback(_name + "\\" + ns, clss);
+    });
 }
-
 
 /**
  *  End namespace

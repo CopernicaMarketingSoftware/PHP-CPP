@@ -20,7 +20,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class HashIterator : public IteratorImpl
+class HashIterator : public ValueIteratorImpl
 {
 public:
     /**
@@ -70,9 +70,9 @@ public:
     /**
      *  Clone the object
      *  @param  tsrm_ls
-     *  @return IteratorImpl
+     *  @return ValueIteratorImpl
      */
-    virtual IteratorImpl *clone()
+    virtual ValueIteratorImpl *clone()
     {
         // create a new instance
         return new HashIterator(*this);
@@ -136,7 +136,7 @@ public:
      *  @param  that
      *  @return bool
      */
-    virtual bool equals(const IteratorImpl *that) const override
+    virtual bool equals(const ValueIteratorImpl *that) const override
     {
         // this always is a hash iterator
         HashIterator *other = (HashIterator *)that;

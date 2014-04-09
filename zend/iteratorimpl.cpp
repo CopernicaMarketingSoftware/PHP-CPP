@@ -14,20 +14,24 @@
 namespace Php {
 
 /**
+ *  Helper method to get access to ourselves
+ *  @param  iter
+ *  @return IteratorImpl
+ */
+static IteratorImpl *self(zend_object_iterator *iter)
+{
+    return (IteratorImpl *)iter->data;
+}
+
+/**
  *  Iterator destructor method
  *  @param  iter
  *  @param  tsrm_ls
  */
-void Iterator::destructor(zend_object_iterator *iter TSRMLS_DC)
+void IteratorImpl::destructor(zend_object_iterator *iter TSRMLS_DC)
 {
-    // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
-    
-    // delete the iterator
-    delete iterator;
-    
-    // free memory for the meta object
-    efree(iter);
+    // delete the object
+    delete self(iter);
 }
 
 /**
@@ -37,13 +41,10 @@ void Iterator::destructor(zend_object_iterator *iter TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return int
  */
-int Iterator::valid(zend_object_iterator *iter TSRMLS_DC)
+int IteratorImpl::valid(zend_object_iterator *iter TSRMLS_DC)
 {
-    // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
-    
     // check if valid
-    return iterator->valid() ? SUCCESS : FAILURE;
+    return self(iter)->valid() ? SUCCESS : FAILURE;
 }
 
 /**
@@ -52,10 +53,10 @@ int Iterator::valid(zend_object_iterator *iter TSRMLS_DC)
  *  @param  data
  *  @param  tsrm_ls
  */
-void Iterator::current(zend_object_iterator *iter, zval ***data TSRMLS_DC)
+void IteratorImpl::current(zend_object_iterator *iter, zval ***data TSRMLS_DC)
 {
     // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
+    IteratorImpl *iterator = self(iter);
 
     // retrieve the value (and store it in a member so that it is not
     // destructed when the function returns)
@@ -74,13 +75,10 @@ void Iterator::current(zend_object_iterator *iter, zval ***data TSRMLS_DC)
  *  @param  key
  *  @param  tsrm_ls
  */
-void Iterator::key(zend_object_iterator *iter, zval *key TSRMLS_DC)
+void IteratorImpl::key(zend_object_iterator *iter, zval *key TSRMLS_DC)
 {
-    // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
-    
     // retrieve the key
-    Value retval(iterator->key());
+    Value retval(self(iter)->key());
 
     // detach the underlying zval
     zval *val = retval.detach();
@@ -98,13 +96,10 @@ void Iterator::key(zend_object_iterator *iter, zval *key TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
  */
-int Iterator::key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC)
+int IteratorImpl::key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC)
 {
-    // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
-
     // retrieve the key
-    Value retval(iterator->key());
+    Value retval(self(iter)->key());
     
     // is this a numeric string?
     if (retval.isString())
@@ -131,13 +126,10 @@ int Iterator::key(zend_object_iterator *iter, char **str_key, uint *str_key_len,
  *  @param  iter
  *  @param  tsrm_ls
  */
-void Iterator::next(zend_object_iterator *iter TSRMLS_DC)
+void IteratorImpl::next(zend_object_iterator *iter TSRMLS_DC)
 {
-    // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
-
     // call the next method
-    iterator->next();
+    self(iter)->next();
 }
 
 /**
@@ -145,20 +137,17 @@ void Iterator::next(zend_object_iterator *iter TSRMLS_DC)
  *  @param  iter
  *  @param  tsrm_ls
  */
-void Iterator::rewind(zend_object_iterator *iter TSRMLS_DC)
+void IteratorImpl::rewind(zend_object_iterator *iter TSRMLS_DC)
 {
-    // get the actual iterator
-    Iterator *iterator = (Iterator *)iter->data;
-    
     // call the rewind method
-    iterator->rewind();
+    self(iter)->rewind();
 }
 
 /**
  *  Get access to all iterator functions
  *  @return zend_object_iterator_funcs
  */
-zend_object_iterator_funcs *Iterator::functions()
+zend_object_iterator_funcs *IteratorImpl::functions()
 {
     // static variable with all functions
     static zend_object_iterator_funcs funcs;
@@ -170,12 +159,12 @@ zend_object_iterator_funcs *Iterator::functions()
     if (initialized) return &funcs;
     
     // set the members
-    funcs.dtor = &Iterator::destructor;
-    funcs.valid = &Iterator::valid;
-    funcs.get_current_data = &Iterator::current;
-    funcs.get_current_key = &Iterator::key;
-    funcs.move_forward = &Iterator::next;
-    funcs.rewind = &Iterator::rewind;
+    funcs.dtor = &IteratorImpl::destructor;
+    funcs.valid = &IteratorImpl::valid;
+    funcs.get_current_data = &IteratorImpl::current;
+    funcs.get_current_key = &IteratorImpl::key;
+    funcs.move_forward = &IteratorImpl::next;
+    funcs.rewind = &IteratorImpl::rewind;
     
     // invalidate is not yet supported
     funcs.invalidate_current = nullptr;
@@ -185,24 +174,6 @@ zend_object_iterator_funcs *Iterator::functions()
     
     // done
     return &funcs;
-}
-
-/**
- *  Internal method that returns the implementation object
- *  @return zend_object_iterator
- */
-struct _zend_object_iterator *Iterator::implementation()
-{
-    // create an iterator
-    zend_object_iterator *iterator = (zend_object_iterator *)emalloc(sizeof(zend_object_iterator));
-    
-    // initialize all properties
-    iterator->data = this;
-    iterator->index = 0;
-    iterator->funcs = functions();
-
-    // done
-    return iterator;
 }
 
 /**

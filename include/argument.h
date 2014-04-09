@@ -8,13 +8,8 @@
  *  classes instead.
  * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013, 2014 Copernica BV
  */
-
-/**
- *  Forward declaration
- */
-struct _zend_arg_info;
 
 /**
  *  Set up namespace
@@ -28,21 +23,9 @@ class Argument
 {
 public:
     /**
-     *  Copy constructor
-     *  @param  argument
-     */
-    Argument(const Argument &argument);
-
-    /**
-     *  Move constructor
-     *  @param  argument
-     */
-    Argument(Argument &&argument);
-
-    /**
      *  Destructor
      */
-    virtual ~Argument();
+    virtual ~Argument() {}
     
 protected:
     /**
@@ -52,7 +35,8 @@ protected:
      *  @param  required    Is this argument required?
      *  @param  byref       Is this a reference argument
      */
-    Argument(const char *name, Type type, bool required = true, bool byref = false);
+    Argument(const char *name, Type type, bool required = true, bool byref = false) : 
+        _name(name), _type(type), _required(required), _byReference(byref) {}
     
     /**
      *  Constructor
@@ -62,16 +46,10 @@ protected:
      *  @param  required    Is this argument required?
      *  @param  byref       Is this a reference argument?
      */
-    Argument(const char *name, const char *classname, bool nullable = true, bool required = true, bool byref = false);
+    Argument(const char *name, const char *classname, bool nullable = true, bool required = true, bool byref = false) :
+        _name(name), _type(Type::Object), _classname(classname), _nullable(nullable), _required(required), _byReference(byref) {}
     
 public:
-    /**
-     *  Fill an arg_info structure with data
-     *  @param  info
-     *  @internal
-     */
-    void fill(struct _zend_arg_info *info) const;
-    
     /**
      *  Is this a required argument?
      *  @return bool
@@ -81,19 +59,88 @@ public:
     {
         return _required;
     }
-
+    
+    /**
+     *  Name of the argument
+     *  @return std::string
+     */
+    const std::string &name() const
+    {
+        return _name;
+    }
+    
+    /** 
+     *  Type-hint for the argument
+     *  @return Type
+     */
+    Type type() const
+    {
+        return _type;
+    }
+    
+    /**
+     *  If the type is a class, the name of the class
+     *  @return std::string
+     */
+    const std::string &classname() const
+    {
+        return _classname;
+    }
+    
+    /**
+     *  Is it allowed to pass parameter with a null value?
+     *  @return bool
+     */
+    bool allowNull() const
+    {
+        return _nullable;
+    }
+    
+    /**
+     *  Is this a parameter-by-reference?
+     *  @return bool
+     */
+    bool byReference() const
+    {
+        return _byReference;
+    }
+    
 private:
     /**
-     *  The argument info
-     *  @var    zend_arg_info
+     *  Name of the argument
+     *  @var std::string
      */
-    struct _zend_arg_info *_info;
+    std::string _name;
     
+    /**
+     *  Type of argument
+     *  @var Type
+     */
+    Type _type;
+
+    /**
+     *  Classname, if this is a parameter that is supposed to be an instance of a class
+     *  @var std::string
+     */
+    std::string _classname;
+    
+    /**
+     *  May the parameter be null?
+     *  @var bool
+     */
+    bool _nullable;
+
     /**
      *  Is this a required argument
      *  @var    bool
      */
     bool _required;
+    
+    /**
+     *  Is this a 'by-reference' parameter?
+     *  @var    bool
+     */
+    bool _byReference;
 };
 
 /**

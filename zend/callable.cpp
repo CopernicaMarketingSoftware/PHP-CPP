@@ -23,7 +23,7 @@ namespace Php {
  *  @param  tsrm_ls
  *  @return integer
  */
-static void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
+void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 {
     // find the function name
     const char *name = get_active_function_name(TSRMLS_C);
@@ -31,22 +31,27 @@ static void invoke_callable(INTERNAL_FUNCTION_PARAMETERS)
     // uncover the hidden pointer inside the function name
     Callable *callable = HiddenPointer<Callable>(name);
 
-    // wrap the return value
-    Value result(return_value, true);
-
     // construct parameters
-    Parameters params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
+    ParametersImpl params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
 
     // the function could throw an exception
     try
     {
         // get the result
-        result = callable->invoke(params);
+        Value result(callable->invoke(params));
+        
+        // detach the zval (we don't want it to be destructed)
+        zval *val = result.detach();
+        
+        // @todo php 5.6 has a RETVAL_ZVAL_FAST macro that can be used instead (and is faster)
+        
+        // return a full copy of the zval, and do not destruct it
+        RETVAL_ZVAL(val, 1, 0);
     }
     catch (Exception &exception)
     {
         // process the exception
-        exception.process(TSRMLS_C);
+        process(exception TSRMLS_CC);
     }
 }
 
@@ -64,7 +69,7 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = (const char *)_ptr;
-    entry->handler = invoke_callable;
+    entry->handler = &Callable::invoke;
     entry->arg_info = _argv;
     entry->num_args = _argc;
     entry->flags = flags;

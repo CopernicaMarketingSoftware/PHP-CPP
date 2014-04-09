@@ -16,11 +16,6 @@
  */
 
 /**
- *  Zend/SPL interfaces that we support
- */
-extern struct _zend_class_entry *zend_ce_arrayaccess;
-
-/**
  *  Set up namespace
  */
 namespace Php {

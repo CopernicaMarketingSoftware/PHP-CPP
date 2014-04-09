@@ -943,12 +943,13 @@ protected:
     friend class Globals;
     friend class Member;
     friend class ClassImpl;
-    friend class Iterator;
+    friend class IteratorImpl;
     friend class Extension;
     friend class HashIterator;
     friend class TraverseIterator;
     friend class HashMember<int>;
     friend class HashMember<std::string>;
+    friend class Callable;
 };
 
 /**

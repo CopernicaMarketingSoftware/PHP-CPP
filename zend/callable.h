@@ -9,12 +9,6 @@
  */
 
 /**
- *  Forward definitions
- */
-struct _zend_function_entry;
-struct _zend_arg_info;
- 
-/**
  *  Set up namespace
  */
 namespace Php {
@@ -43,11 +37,11 @@ public:
         // loop through the arguments
         for (auto it = arguments.begin(); it != arguments.end(); it++)
         {
-            // increment required
+            // increment counter with number of required parameters
             if (it->required()) _required++;
             
             // fill the arg info
-            it->fill(&_argv[i++]);
+            fill(&_argv[i], *it);
         }
     }
     
@@ -99,7 +93,7 @@ public:
      *  @param  classname   Optional class name
      *  @param  flags       Access flags
      */
-    void initialize(struct _zend_function_entry *entry, const char *classname = nullptr, int flags = 0) const;
+    void initialize(zend_function_entry *entry, const char *classname = nullptr, int flags = 0) const;
 
     /**
      *  Fill function info
@@ -107,7 +101,7 @@ public:
      *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      */
-    void initialize(struct _zend_arg_info *info, const char *classname = nullptr) const;
+    void initialize(zend_arg_info *info, const char *classname = nullptr) const;
 
 
 protected:
@@ -139,7 +133,66 @@ protected:
      *  The arguments
      *  @var zend_arg_info[]
      */
-    struct _zend_arg_info *_argv = nullptr;
+    zend_arg_info *_argv = nullptr;
+    
+    /**
+     *  Private helper method to fill an argument object
+     *  @param  info        object from the zend engine
+     *  @param  arg         original object
+     */
+    void fill(zend_arg_info *info, const Argument &arg) const
+    {
+        // fill members
+        info->name = arg.name().c_str();
+        info->name_len = arg.name().size();
+
+#if PHP_VERSION_ID >= 50400
+
+        // since php 5.4 there is a type-hint, but we only support arrays, objects and callables
+        switch (arg.type()) {
+        case Type::Array:       info->type_hint = IS_ARRAY; break;
+        case Type::Callable:    info->type_hint = IS_CALLABLE; break;
+        case Type::Object:      info->type_hint = IS_OBJECT; break;
+        default:                info->type_hint = IS_NULL; break;
+        }
+        
+# if PHP_VERSION_ID >= 50600
+
+        // from PHP 5.6 and onwards, an is_variadic property can be set, this 
+        // specifies whether this argument is the first argument that specifies
+        // the type for a variable length list of arguments. For now we only
+        // support methods and functions with a fixed number of arguments.
+        info->is_variadic = false;
+
+# endif
+
+#else
+
+        // php 5.3 code
+        info->array_type_hint = arg.type() == Type::Array;
+        info->return_reference = false;
+        info->required_num_args = 0;   // @todo is this correct?
+
+#endif
+
+        // this parameter is a regular type
+        info->class_name = arg.type() == Type::Object ? arg.classname().c_str() : nullptr;
+        info->class_name_len = arg.type() == Type::Object ? arg.classname().size() : 0;
+        info->allow_null = arg.allowNull();
+        info->pass_by_reference = arg.byReference();
+    }
+
+    /**
+     *  Function that is called by the Zend engine every time that a function gets called
+     *  @param  ht
+     *  @param  return_value
+     *  @param  return_value_ptr
+     *  @param  this_ptr
+     *  @param  return_value_used
+     *  @param  tsrm_ls
+     *  @return integer
+     */
+    static void invoke(INTERNAL_FUNCTION_PARAMETERS);
 
 };
 

@@ -22,15 +22,25 @@ class Base;
  */
 class Parameters : public std::vector<Value>
 {
-public:
+private:
     /**
-     *  Constructor
-     *  @param  this_ptr    Optional this_ptr
-     *  @param  argc        Number of arguments
-     *  @param  tsrm_ls
+     *  The base object
+     *  @var Base
      */
-    Parameters(struct _zval_struct *this_ptr, int argc TSRMLS_DC);
+    Base *_object = nullptr;
 
+protected:
+    /**
+     *  Protected constructor
+     * 
+     *  The constructor is protected because extension programmers are not
+     *  supposed to instantiate parameters objects themselves
+     * 
+     *  @param  object      The 'this' object
+     */
+    Parameters(Base *object) : _object(object) {}
+    
+public:
     /**
      *  Destructor
      */
@@ -44,13 +54,6 @@ public:
     {
         return _object;
     }
-    
-private:
-    /**
-     *  The base object
-     *  @var Base
-     */
-    Base *_object = nullptr;
 };
 
 /**

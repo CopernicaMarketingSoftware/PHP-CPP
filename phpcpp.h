@@ -23,32 +23,6 @@
 #include <map>
 
 /**
- *  Include PHP config
- */
-#include <phpcpp/config.h>
-
-/**
- *  Is ZTS enabled?
- */
-#ifdef ZTS
-
-    // enable TSRM
-#   define TSRMLS_C     tsrm_ls
-#   define TSRMLS_CC    ,tsrm_ls
-#   define TSRMLS_D     void ***tsrm_ls
-#   define TSRMLS_DC    ,void ***tsrm_ls
-
-#else
-
-    // disable TSRM
-#   define TSRMLS_C    
-#   define TSRMLS_CC    
-#   define TSRMLS_D
-#   define TSRMLS_DC    
-
-#endif
-
-/**
  *  Include all headers files that are related to this library
  */
 #include <phpcpp/ini.h>

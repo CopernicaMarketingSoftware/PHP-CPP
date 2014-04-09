@@ -2,17 +2,17 @@
  *  Iterator.h
  *
  *  Base class for iterators. Extension writers that want to create traversable
- *  classes, should override this class and implement all pure virtual methods
- *  in it.
+ *  classes, should override the Php::Traversable base class. This base class
+ *  forces you to implement a getIterator() method that returns an instance of 
+ *  a Php::Iterator class.
+ * 
+ *  In this file you find the signature of the Php::Iterator class. It mostly has
+ *  pure virtual methods, which means that you should create a derived class
+ *  that implements all these methods.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV
  */
-
-/**
- *  Forward declarations
- */
-struct _zend_object_iterator_funcs;
 
 /**
  *  Set up namespace
@@ -64,7 +64,7 @@ public:
      */
     virtual void rewind() = 0;
     
-private:
+protected:
     /**
      *  During the lifetime of the iterator, the object over which
      *  it iterates is keps as a private variable. This ensures that
@@ -73,92 +73,6 @@ private:
      */
     Value _object;
     
-    /**
-     *  The current() method that is called by the Zend engine wants a 
-     *  pointer-to-pointer-to-a-zval. Because of this, we have to keep the 
-     *  current value in memory after the current() method returns because 
-     *  the pointer would otherwise fall out of scope. This is (once again)
-     *  odd behavior of the Zend engine, but we'll have to live with that
-     *  @var    Value
-     */
-    Value _current;
-    
-    /**
-     *  Internal method that returns the implementation object
-     *  @return zend_object_iterator
-     */
-    struct _zend_object_iterator *implementation();
-    
-    /**
-     *  Iterator destructor method
-     *  @param  iter
-     *  @param  tsrm_ls
-     */
-    static void destructor(struct _zend_object_iterator *iter TSRMLS_DC);
-
-    /**
-     *  Iterator valid function
-     *  Returns FAILURE or SUCCESS
-     *  @param  iter
-     *  @param  tsrm_ls
-     *  @return int
-     */
-    static int valid(struct _zend_object_iterator *iter TSRMLS_DC);
-
-    /**
-     *  Fetch the current item
-     *  @param  iter
-     *  @param  data
-     *  @param  tsrm_ls
-     */
-    static void current(struct _zend_object_iterator *iter, struct _zval_struct ***data TSRMLS_DC);
-
-    /**
-     *  Fetch the key for the current element (optional, may be NULL). The key
-     *  should be written into the provided zval* using the ZVAL_* macros. If
-     *  this handler is not provided auto-incrementing integer keys will be
-     *  used.
-     *  @param  iter
-     *  @param  data
-     *  @param  tsrm_ls
-     */
-    static void key(struct _zend_object_iterator *iter, struct _zval_struct *data TSRMLS_DC);
-
-    /**
-     *  Function to retrieve the current key, php 5.3 style
-     *  @param  iter
-     *  @param  str_key
-     *  @param  str_key_len
-     *  @param  int_key
-     *  @param  tsrm_ls
-     *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
-     */
-    static int key(struct _zend_object_iterator *iter, char **str_key, unsigned int *str_key_len, unsigned long *int_key TSRMLS_DC);
-
-    /**
-     *  Step forwards to the next element
-     *  @param  iter
-     *  @param  tsrm_ls
-     */
-    static void next(struct _zend_object_iterator *iter TSRMLS_DC);
-
-    /**
-     *  Rewind the iterator back to the start
-     *  @param  iter
-     *  @param  tsrm_ls
-     */
-    static void rewind(struct _zend_object_iterator *iter TSRMLS_DC);
-
-    /**
-     *  Get access to all iterator functions
-     *  @return zend_object_iterator_funcs
-     */
-    static struct _zend_object_iterator_funcs *functions();
-
-    /**
-     *  Classbase is a friend
-     */
-    friend class ClassImpl;
 };
     
 /**

@@ -17,7 +17,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class TraverseIterator : public IteratorImpl
+class TraverseIterator : public ValueIteratorImpl
 {
 public:
     /**
@@ -73,9 +73,9 @@ public:
     /**
      *  Clone the object
      *  @param  tsrm_ls
-     *  @return IteratorImpl*
+     *  @return ValueIteratorImpl*
      */
-    virtual IteratorImpl *clone() override
+    virtual ValueIteratorImpl *clone() override
     {
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
@@ -119,7 +119,7 @@ public:
      *  @param  that
      *  @return bool
      */
-    virtual bool equals(const IteratorImpl *that) const override
+    virtual bool equals(const ValueIteratorImpl *that) const override
     {
         // of course if the objects are identical
         if (this == that) return true;
