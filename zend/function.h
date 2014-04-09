@@ -53,6 +53,9 @@ public:
      */
     virtual Value invoke(Parameters &params) override
     {
+	if(params.size()<_required){//enforce minimal parameters count
+	    throw Php::Exception(_name + std::string("() expects at least ") + std::to_string(_required) + std::string(" parameters, ") + std::to_string(params.size()) + std::string(" given"));
+	}
         switch (_type) {
         case 0:     _function.f0(); return Value();
         case 1:     _function.f1(params); return Value();

@@ -77,6 +77,9 @@ public:
      */
     virtual Value invoke(Parameters &parameters) override
     {
+	if(parameters.size()<_required){//enforce minimal parameters count
+	    throw Php::Exception(_name + std::string("() expects at least ") + std::to_string(_required) + std::string(" parameters, ") + std::to_string(parameters.size()) + std::string(" given"));
+	}
         // the object to call a method on
         Base *base = parameters.object();
         

@@ -29,6 +29,9 @@ public:
         // construct vector for arguments
         _argc = arguments.size();
         _argv = new zend_arg_info[_argc+1];
+	
+	//record the name for later use
+	_name = name;
         
         // the first record is initialized with information about the function,
         // so we skip that here
@@ -110,6 +113,12 @@ protected:
      *  @var    HiddenPointer
      */
     HiddenPointer<Callable> _ptr;
+    
+    /**
+     * function/method name
+     * @var	char[]
+     */
+    std::string _name;
 
     /**
      *  Suggestion for the return type
