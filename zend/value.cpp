@@ -1841,6 +1841,51 @@ void Value::set(const char *key, int size, const Value &value)
 }
 
 /**
+ *  Unset a member by its index
+ *  @param  index
+ */
+void Value::unset(int index)
+{
+    // only necessary for arrays
+    if (!isArray()) return;
+
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    
+    // remove the index
+    zend_hash_index_del(Z_ARRVAL_P(_val), index);
+}
+
+/**
+ *  Unset by key name and length of the key
+ *  @param  key
+ *  @param  size
+ */
+void Value::unset(const char *key, int size)
+{
+    // is this an object?
+    if (isObject())
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // we need the tsrm_ls variable
+        TSRMLS_FETCH();
+
+        // in the zend header files, unsetting properties is redirected to setting it to null...
+        add_property_null_ex(_val, key, size TSRMLS_CC);
+    }
+    else if (isArray())
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // remove the index
+        zend_hash_del(Z_ARRVAL_P(_val), key, size);
+    }
+}
+
+/**
  *  Array access operator
  *  This can be used for accessing arrays
  *  @param  index
@@ -1849,6 +1894,16 @@ void Value::set(const char *key, int size, const Value &value)
 HashMember<int> Value::operator[](int index) 
 {
     return HashMember<int>(this, index);
+}
+
+/**
+ *  Index by other value object
+ *  @param  key
+ *  @return HashMember<std::string>
+ */
+HashMember<Value> Value::operator[](const Value &key)
+{
+    return HashMember<Value>(this, key);
 }
 
 /**
