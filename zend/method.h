@@ -77,6 +77,10 @@ public:
      */
     virtual Value invoke(Parameters &parameters) override
     {
+	if(parameters.size()<_required){//enforce minimal parameters count
+	    Php::warning << _name << "() expects at least " << _required << " parameters, " << parameters.size() << " given" << std::flush;
+	    return Value().setType(Type::Null);//return null
+	}
         // the object to call a method on
         Base *base = parameters.object();
         
