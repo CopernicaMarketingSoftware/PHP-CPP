@@ -90,8 +90,7 @@ void Namespace::apply(const std::function<void(const std::string &ns, Function &
     // loop through the functions, and apply the callback
     for (auto &function : _functions) callback(_name, *function);
     
-    // loop through the other namespaces
-    for (auto &ns : _namespaces) ns->apply([this, callback](const std::string &ns, Function &func) {
+    const std::function<void(const std::string&, Function&)>func = [this, callback](const std::string &ns, Function &func) {
         
         // if this is the root namespace, we don't have to change the prefix
         if (_name.size() == 0) return callback(ns, func);
@@ -99,7 +98,9 @@ void Namespace::apply(const std::function<void(const std::string &ns, Function &
         // construct a new prefix
         // @todo this could be slightly inefficient
         return callback(_name + "\\" + ns, func);
-    });
+    };
+    // loop through the other namespaces
+    for (auto &ns : _namespaces) ns->apply(func);
 }
 
 /**
@@ -115,8 +116,7 @@ void Namespace::apply(const std::function<void(const std::string &ns, ClassBase 
     // loop through the classes, and apply the callback
     for (auto &c : _classes) callback(_name, *c);
     
-    // loop through the other namespaces
-    for (auto &ns : _namespaces) ns->apply([this, callback](const std::string &ns, ClassBase &clss) {
+    const std::function<void(const std::string&, ClassBase&)>func = [this, callback](const std::string &ns, ClassBase &clss) {
         
         // if this is the root namespace, we don't have to change the prefix
         if (_name.size() == 0) return callback(ns, clss);
@@ -124,7 +124,9 @@ void Namespace::apply(const std::function<void(const std::string &ns, ClassBase 
         // construct a new prefix
         // @todo this could be slightly inefficient
         return callback(_name + "\\" + ns, clss);
-    });
+    };
+    // loop through the other namespaces
+    for (auto &ns : _namespaces) ns->apply(func);
 }
 
 /**
