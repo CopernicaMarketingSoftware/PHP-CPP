@@ -94,7 +94,7 @@ void Callable::initialize(zend_arg_info *info, const char *classname) const
     // because we do not support returning references in PHP-CPP, although Zend
     // engine allows it. Inside the name we hide a pointer to the current object
     finfo->_name = _ptr;
-    finfo->_name_len = strlen(_ptr);
+    finfo->_name_len = ::strlen(_ptr);
     finfo->_class_name = classname;
 
     // number of required arguments, and the expected return type

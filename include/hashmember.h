@@ -497,7 +497,7 @@ public:
     /**
      *  Unset the member
      */
-    void unset()
+    void unset() const
     {
         _parent->unset(_index);
     }
@@ -599,6 +599,7 @@ private:
      *  Friend classes
      */
     friend class HashMember<std::string>;
+    friend class HashMember<Value>;
     friend class HashMember<int>;
     friend class Base;
     friend class Value;

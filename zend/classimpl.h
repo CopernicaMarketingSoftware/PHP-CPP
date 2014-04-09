@@ -408,7 +408,7 @@ public:
     void property(const char *name, bool value, int flags = Php::Public)                { _members.push_back(std::make_shared<BoolMember>   (name,  value,                flags & PropertyModifiers)); }
     void property(const char *name, char value, int flags = Php::Public)                { _members.push_back(std::make_shared<StringMember> (name, &value,             1, flags & PropertyModifiers)); }
     void property(const char *name, const std::string &value, int flags = Php::Public)  { _members.push_back(std::make_shared<StringMember> (name,  value,                flags & PropertyModifiers)); }
-    void property(const char *name, const char *value, int flags = Php::Public)         { _members.push_back(std::make_shared<StringMember> (name,  value, strlen(value), flags & PropertyModifiers)); }
+    void property(const char *name, const char *value, int flags = Php::Public)         { _members.push_back(std::make_shared<StringMember> (name,  value, ::strlen(value), flags & PropertyModifiers)); }
     void property(const char *name, double value, int flags = Php::Public)              { _members.push_back(std::make_shared<FloatMember>  (name,  value,                flags & PropertyModifiers)); }
 
     /**

@@ -126,7 +126,7 @@ Value::Value(const char *value, int size)
 {
     // create a string zval
     MAKE_STD_ZVAL(_val);
-    ZVAL_STRINGL(_val, value, size < 0 ? strlen(value) : size, 1);
+    ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size, 1);
 }
 
 /**
@@ -1640,7 +1640,7 @@ bool Value::contains(int index) const
 bool Value::contains(const char *key, int size) const
 {
     // calculate size
-    if (size < 0) size = strlen(key);
+    if (size < 0) size = ::strlen(key);
 
     // deal with arrays
     if (isArray())
@@ -1704,7 +1704,7 @@ Value Value::get(const char *key, int size) const
     if (!isArray() && !isObject()) return Value();
 
     // calculate size
-    if (size < 0) size = strlen(key);
+    if (size < 0) size = ::strlen(key);
     
     // are we in an object or an array?
     if (isArray())
