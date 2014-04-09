@@ -182,7 +182,7 @@ public:
      * 
      *  @param  callback
      */
-    void apply(const std::function<void(const std::string &ns, Function &func)> &callback);
+    void functions(const std::function<void(const std::string &ns, Function &func)> &callback);
     
     /**
      *  Apply a callback to each registered class
@@ -192,7 +192,7 @@ public:
      * 
      *  @param  callback
      */
-    void apply(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
+    void classes(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
     
 };
     
