@@ -31,27 +31,40 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     // uncover the hidden pointer inside the function name
     Callable *callable = HiddenPointer<Callable>(name);
 
-    // construct parameters
-    ParametersImpl params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
+    // check if sufficient parameters were passed (for some reason this check
+    // is not done by Zend, so we do it here ourselves)
+    if (ZEND_NUM_ARGS() < callable->_required)
+    {
+        // PHP itself only generates a warning when this happens, so we do the same too
+        Php::warning << name << "() expects at least " << callable->_required << " parameters, " << ZEND_NUM_ARGS() << " given" << std::flush;
 
-    // the function could throw an exception
-    try
-    {
-        // get the result
-        Value result(callable->invoke(params));
-        
-        // detach the zval (we don't want it to be destructed)
-        zval *val = result.detach();
-        
-        // @todo php 5.6 has a RETVAL_ZVAL_FAST macro that can be used instead (and is faster)
-        
-        // return a full copy of the zval, and do not destruct it
-        RETVAL_ZVAL(val, 1, 0);
+        // and we return null
+        RETURN_NULL();
     }
-    catch (Exception &exception)
+    else
     {
-        // process the exception
-        process(exception TSRMLS_CC);
+        // construct parameters
+        ParametersImpl params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
+
+        // the function could throw an exception
+        try
+        {
+            // get the result
+            Value result(callable->invoke(params));
+            
+            // detach the zval (we don't want it to be destructed)
+            zval *val = result.detach();
+            
+            // @todo php 5.6 has a RETVAL_ZVAL_FAST macro that can be used instead (and is faster)
+            
+            // return a full copy of the zval, and do not destruct it
+            RETVAL_ZVAL(val, 1, 0);
+        }
+        catch (Exception &exception)
+        {
+            // process the exception
+            process(exception TSRMLS_CC);
+        }
     }
 }
 
