@@ -30,7 +30,7 @@ public:
     HiddenPointer(Type *pointer, const char *text, int size=-1)
     {
         // calculate size of the text
-        if (size < 0) size = strlen(text);
+        if (size < 0) size = ::strlen(text);
 
         // allocate data + trailing null + size of pointer
         char *buffer = new char[size + 1 + sizeof(Type *)];

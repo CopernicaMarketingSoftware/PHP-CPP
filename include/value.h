@@ -571,7 +571,7 @@ public:
      */
     bool contains(const char *key) const
     {
-        return contains(key, strlen(key));
+        return contains(key, ::strlen(key));
     }
     
     /**
@@ -741,7 +741,7 @@ public:
      */
     void set(const char *key, const Value &value)
     {
-        set(key, strlen(key), value);
+        set(key, ::strlen(key), value);
     }
     
     /**
@@ -787,7 +787,7 @@ public:
      */
     void unset(const char *key)
     {
-        unset(key, strlen(key));
+        unset(key, ::strlen(key));
     }
 
     /**
