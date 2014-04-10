@@ -21,8 +21,8 @@ namespace Php {
     {
         ini_entry->module_number     = module_number;
         ini_entry->modifiable        = static_cast<int>(this->_place);
-        ini_entry->name              = const_cast<char*>(this->_name);
-        ini_entry->name_length       = strlen(this->_name)+1;
+        ini_entry->name              = const_cast<char*>(this->_name.c_str());
+        ini_entry->name_length       = this->_name.size()+1;
         ini_entry->on_modify         = OnUpdateString;
         ini_entry->mh_arg1           = nullptr;
         #ifdef ZTS

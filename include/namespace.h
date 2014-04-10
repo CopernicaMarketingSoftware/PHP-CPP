@@ -52,7 +52,7 @@ protected:
      *  Ini entry defined by the extension
      *  @var    list
      */
-    std::list<std::shared_ptr<Ini>> _ini_entries;
+    std::set<std::shared_ptr<Ini>, Ini::Compare> _ini_entries;
 
 public:
     /**
@@ -172,7 +172,7 @@ public:
     Namespace &add(Ini &&ini)
     {
         // and add it to the list of classes
-        _ini_entries.push_back(std::unique_ptr<Ini>(new Ini(std::move(ini))));
+        _ini_entries.emplace(new Ini(std::move(ini)));
         
         // allow chaining
         return *this;
@@ -186,7 +186,7 @@ public:
     Namespace &add(const Ini &ini)
     {
         // and add it to the list of classes
-        _ini_entries.push_back(std::unique_ptr<Ini>(new Ini(ini)));
+        _ini_entries.emplace(new Ini(ini));
         
         // allow chaining
         return *this;

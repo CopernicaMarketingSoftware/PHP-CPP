@@ -116,9 +116,20 @@ namespace Php {
          *  @param  int module_number
          */
         void fill(_zend_ini_entry *ini_entry, int module_number);
-        
 
 
+        /**
+         *  Compare by name
+         *  A predicate that takes two arguments of type Ini.
+         *  Used when adding elements of type Ini in the container std::set
+         */
+        struct Compare
+        {
+            int operator()(const std::shared_ptr<Ini> &s1, const std::shared_ptr<Ini> &s2) const
+            {
+                return s1->_name.compare(s2->_name);
+            }
+        };
 
     private:
 
@@ -128,7 +139,7 @@ namespace Php {
         }
         
         // ini entry name
-        const char* _name;
+        std::string _name;
 
         // ini entry value
         std::string _value;

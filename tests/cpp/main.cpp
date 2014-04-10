@@ -147,6 +147,8 @@ extern "C"
 
         Php::Ini ini8("ini8", 3.1415926, 6.2831852);
         Php::Ini ini9("ini9", 2.7182818, 5.4365636, Php::Ini::User);
+        extension.add(Php::Ini("ini9", 0.333333, 0.777777, Php::Ini::Perdir));
+
         extension.add(ini8);
         extension.add(std::move(ini9));
 
