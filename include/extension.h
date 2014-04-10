@@ -131,6 +131,13 @@ public:
         // allow chaining
         return *this;
     }
+    
+    /**
+     *  Because the add function exists in both the Namespace base class
+     *  as well as this extended Extension class, we have to tell the compiler
+     *  that the add methods from the base are accessble too
+     */
+    using Namespace::add;
 
     /**
      *  The total number of php.ini variables
