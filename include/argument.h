@@ -62,9 +62,9 @@ public:
     
     /**
      *  Name of the argument
-     *  @return std::string
+     *  @return const char *
      */
-    const std::string &name() const
+    const char *name() const
     {
         return _name;
     }
@@ -80,9 +80,9 @@ public:
     
     /**
      *  If the type is a class, the name of the class
-     *  @return std::string
+     *  @return const char *
      */
-    const std::string &classname() const
+    const char *classname() const
     {
         return _classname;
     }
@@ -108,39 +108,39 @@ public:
 private:
     /**
      *  Name of the argument
-     *  @var std::string
+     *  @var const char *
      */
-    std::string _name;
+    const char *_name = nullptr;
     
     /**
      *  Type of argument
      *  @var Type
      */
-    Type _type;
+    Type _type = Type::Null;
 
     /**
      *  Classname, if this is a parameter that is supposed to be an instance of a class
      *  @var std::string
      */
-    std::string _classname;
+    const char *_classname = nullptr;
     
     /**
      *  May the parameter be null?
      *  @var bool
      */
-    bool _nullable;
+    bool _nullable = false;
 
     /**
      *  Is this a required argument
      *  @var    bool
      */
-    bool _required;
+    bool _required = true;
     
     /**
      *  Is this a 'by-reference' parameter?
      *  @var    bool
      */
-    bool _byReference;
+    bool _byReference = false;
 };
 
 /**

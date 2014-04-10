@@ -143,8 +143,8 @@ protected:
     void fill(zend_arg_info *info, const Argument &arg) const
     {
         // fill members
-        info->name = arg.name().c_str();
-        info->name_len = arg.name().size();
+        info->name = arg.name();
+         info->name_len = ::strlen(arg.name());
 
 #if PHP_VERSION_ID >= 50400
 
@@ -176,8 +176,8 @@ protected:
 #endif
 
         // this parameter is a regular type
-        info->class_name = arg.type() == Type::Object ? arg.classname().c_str() : nullptr;
-        info->class_name_len = arg.type() == Type::Object ? arg.classname().size() : 0;
+        info->class_name = arg.type() == Type::Object ? arg.classname() : nullptr;
+        info->class_name_len = arg.type() == Type::Object ? ::strlen(arg.classname()) : 0;
         info->allow_null = arg.allowNull();
         info->pass_by_reference = arg.byReference();
     }
