@@ -21,10 +21,12 @@
 #include <list>
 #include <exception>
 #include <map>
+#include <set>
 
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/ini.h>
 #include <phpcpp/exception.h>
 #include <phpcpp/streams.h>
 #include <phpcpp/type.h>

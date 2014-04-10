@@ -48,6 +48,12 @@ protected:
      */
     std::list<std::shared_ptr<Namespace>> _namespaces;
 
+    /**
+     *  Ini entry defined by the extension
+     *  @var    list
+     */
+    std::set<std::shared_ptr<Ini>, Ini::Compare> _ini_entries;
+
 public:
     /**
      *  Constructor
@@ -159,6 +165,34 @@ public:
     }
 
     /**
+     *  Add a ini entry to the extension by moving it
+     *  @param  ini        The class implementation
+     *  @return Namespace   Same object to allow chaining
+     */
+    Namespace &add(Ini &&ini)
+    {
+        // and add it to the list of classes
+        _ini_entries.emplace(new Ini(std::move(ini)));
+        
+        // allow chaining
+        return *this;
+    }
+
+    /**
+     *  Add a ini entry to the extension by copying it
+     *  @param  ini        The class implementation
+     *  @param  Namespace   Same object to allow chaining
+     */
+    Namespace &add(const Ini &ini)
+    {
+        // and add it to the list of classes
+        _ini_entries.emplace(new Ini(ini));
+        
+        // allow chaining
+        return *this;
+    }
+
+    /**
      *  The total number of functions
      *  @return size_t
      */
@@ -172,6 +206,15 @@ public:
         
         // done
         return result;
+    }
+
+    /**
+     *  The total number of ini entries
+     *  @return size_t
+     */
+    size_t ini_size()
+    {
+        return _ini_entries.size();
     }
     
     /**
@@ -193,7 +236,13 @@ public:
      *  @param  callback
      */
     void classes(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
-    
+
+    /**
+     *  Filling ini entries into external zend_ini_entry array
+     *  @param  zend_ini_entry*
+     */
+    void fill_ini(_zend_ini_entry *ini_entries, int module_number);
+
 };
     
 /**

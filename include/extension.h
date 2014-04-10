@@ -123,7 +123,7 @@ public:
     {
         return module();
     }
-    
+
 private:
     /**
      *  The implementation object

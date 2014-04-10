@@ -67,7 +67,7 @@ inline void  unset(const HashMember<Value> &member) { member.unset(); }
 /**
  *  The isset function conflicts with the 'isset' macro defined by the Zend engine
  */
-#pragma push_macro("isset");
+#pragma push_macro("isset")
 #undef isset
 
 /**
@@ -81,7 +81,7 @@ inline Value isset(const HashMember<Value> &member) { return member.exists() && 
 /**
  *  Re-install the ISSET macro
  */
-#pragma pop_macro("isset");
+#pragma pop_macro("isset")
 
 /**
  *  End of namespace

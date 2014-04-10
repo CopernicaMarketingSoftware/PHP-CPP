@@ -128,6 +128,21 @@ void Namespace::classes(const std::function<void(const std::string &ns, ClassBas
 }
 
 /**
+ *  Filling ini entries into external zend_ini_entry array
+ *  @param  zend_ini_entry*
+ */
+void Namespace::fill_ini(zend_ini_entry *ini_entries, int module_number)
+{
+    // loop through the ini entries
+    unsigned int Ind = 0;
+    for (auto &ini : _ini_entries) ini->fill(&ini_entries[Ind++], module_number);
+
+    // add last empty ini entry (Zend, for some reason, it requires)
+    zend_ini_entry empty_entry { 0, 0, nullptr, 0, nullptr, nullptr, nullptr, nullptr, nullptr, 0, nullptr, 0, 0, 0, nullptr };
+    ini_entries[Ind] = empty_entry;
+}
+
+/**
  *  End namespace
  */
 }
