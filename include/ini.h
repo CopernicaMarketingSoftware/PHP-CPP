@@ -33,13 +33,12 @@ namespace Php {
          *  Usually you would choose where the setting can be changed based on how it is used. For example if you want to access
          *  the setting during RINIT stage then you would want PHP_INI_PERDIR because the setting would have no use after RINIT.
          */
-        enum class Place : int {
+        enum Place : int {
             User      = (1<<0),                         // ZEND_INI_USER   (1<<0)
             Perdir    = (1<<1),                         // ZEND_INI_PERDIR (1<<1)
             System    = (1<<2),                         // ZEND_INI_SYSTEM (1<<2)
             All       = (1<<0) | (1<<1) | (1<<2)        // ZEND_INI_ALL  (ZEND_INI_USER|ZEND_INI_PERDIR|ZEND_INI_SYSTEM)
         };
-
 
         /**
          *  default constructors
