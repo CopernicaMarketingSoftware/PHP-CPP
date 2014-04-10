@@ -111,16 +111,31 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
 
-
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
     // array contains ini settings
-    static zend_ini_entry *ini_entries = new zend_ini_entry[ extension->_data->ini_size()+1 ];
+    zend_ini_entry *ini_entries = new zend_ini_entry[extension->_data->iniVariables()+1];
 
-    // Filling ini entries
-    extension->_data->fill_ini(ini_entries, module_number);
+    // the entry that we're filling
+    int i=0;
+
+    // Fill the php.ini entries
+    extension->_data->iniVariables([ini_entries, &i, module_number](Ini &ini) {
     
+        // initialize the function
+        zend_ini_entry *entry = &ini_entries[i];
+        
+        // fill the property
+        ini.fill(entry, module_number);
+        
+        // move on to the next iteration
+        i++;
+    });
+
+    // last entry should be set to all zero's
+    memset(&ini_entries[i], 0, sizeof(zend_ini_entry));
+
     // register ini entries in Zend core
     REGISTER_INI_ENTRIES();
 

@@ -105,6 +105,52 @@ public:
     Extension &onIdle(const Callback &callback);
     
     /**
+     *  Add a ini entry to the extension by moving it
+     *  @param  ini         The php.ini setting
+     *  @return Extension   Same object to allow chaining
+     */
+    Extension &add(Ini &&ini)
+    {
+        // and add it to the list of classes
+        _ini_entries.emplace_back(new Ini(std::move(ini)));
+        
+        // allow chaining
+        return *this;
+    }
+
+    /**
+     *  Add a ini entry to the extension by copying it
+     *  @param  ini         The php.ini setting
+     *  @param  Extension   Same object to allow chaining
+     */
+    Extension &add(const Ini &ini)
+    {
+        // and add it to the list of classes
+        _ini_entries.emplace_back(new Ini(ini));
+        
+        // allow chaining
+        return *this;
+    }
+
+    /**
+     *  The total number of php.ini variables
+     *  @return size_t
+     */
+    size_t iniVariables() const
+    {
+        return _ini_entries.size();
+    }
+
+    /**
+     *  Apply a callback to each php.ini variable
+     * 
+     *  The callback will be called with a reference to the ini variable.
+     * 
+     *  @param  callback
+     */
+    void iniVariables(const std::function<void(Ini &ini)> &callback);
+
+    /**
      *  Retrieve the module pointer
      * 
      *  This is the memory address that should be exported by the get_module()
@@ -131,6 +177,13 @@ private:
      *  @var ExtensionImpl
      */
     ExtensionImpl *_impl;
+
+    /**
+     *  Ini entry defined by the extension
+     *  @var    list
+     */
+    std::list<std::shared_ptr<Ini>> _ini_entries;
+
 };
 
 /**
