@@ -177,7 +177,7 @@ protected:
 
         // this parameter is a regular type
         info->class_name = arg.type() == Type::Object ? arg.classname() : nullptr;
-        info->class_name_len = arg.type() == Type::Object ? ::strlen(arg.classname()) : 0;
+        info->class_name_len = arg.type() == Type::Object && arg.classname() ? ::strlen(arg.classname()) : 0;
         info->allow_null = arg.allowNull();
         info->pass_by_reference = arg.byReference();
     }
