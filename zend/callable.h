@@ -41,7 +41,7 @@ public:
             if (it->required()) _required++;
             
             // fill the arg info
-            fill(&_argv[i], *it);
+            fill(&_argv[i++], *it);
         }
     }
     
