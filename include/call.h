@@ -44,17 +44,44 @@ Value call(const char *name, Params&&... params)
  *  make the code run on the highway), it is not expected that these functions
  *  are going to be used very often anyway.
  */
-inline Value array_keys(const Value &value)                 { return call("array_keys", value); }
-inline Value array_values(const Value &value)               { return call("array_values", value); }
-inline Value echo(const char *input)                        { out << input; return nullptr; }
-inline Value echo(const std::string &input)                 { out << input; return nullptr; }
-inline Value empty(const Value &value)                      { return value.isNull() || !value.boolValue(); }
-inline Value empty(const HashMember<std::string> &member)   { return !member.exists() || empty(member.value()); }
-inline Value empty(const HashMember<int> &member)           { return !member.exists() || empty(member.value()); }
-inline Value ini_get(const Value &value)                    { return call("ini_get", value); }
-//inline Value isset(const Value &value)                      { return call("isset", value); }
-//inline Value isset(const HashMember<std::string> &member)   { return member.exists() && isset(member.value()); }
-//inline Value isset(const HashMember<int> &member)           { return member.exists() && isset(member.value()); }
+inline Value array_key_exists(const Value &key, const Value &array) { return array.contains(key); }
+inline Value array_key_exists(int key, const Value &array) { return array.contains(key); }
+inline Value array_key_exists(const char *key, const Value &array) { return array.contains(key); }
+inline Value array_key_exists(const std::string &key, const Value &array) { return array.contains(key); }
+inline Value array_keys(const Value &value) { return call("array_keys", value); }
+inline Value array_push(const Value &array, const Value &value) { return call("array_push", array, value); }
+inline Value array_values(const Value &value) { return call("array_values", value); }
+inline Value count(const Value &value) { return call("count", value); }
+inline Value echo(const char *input) { out << input; return nullptr; }
+inline Value echo(const std::string &input) { out << input; return nullptr; }
+inline Value empty(const Value &value) { return value.isNull() || !value.boolValue(); }
+inline Value empty(const HashMember<std::string> &member) { return !member.exists() || empty(member.value()); }
+inline Value empty(const HashMember<int> &member) { return !member.exists() || empty(member.value()); }
+inline Value ini_get(const Value &value) { return call("ini_get", value); }
+inline Value is_array(const Value &value) { return value.isArray(); }
+inline Value strlen(const Value &value) { return call("strlen", value); }
+inline void  unset(const HashMember<std::string> &member) { member.unset(); }
+inline void  unset(const HashMember<int> &member) { member.unset(); }
+inline void  unset(const HashMember<Value> &member) { member.unset(); }
+
+/**
+ *  The isset function conflicts with the 'isset' macro defined by the Zend engine
+ */
+#pragma push_macro("isset");
+#undef isset
+
+/**
+ *  Define the isset function
+ */
+inline Value isset(const Value &value) { return call("isset", value); }
+inline Value isset(const HashMember<std::string> &member) { return member.exists() && isset(member.value()); }
+inline Value isset(const HashMember<int> &member) { return member.exists() && isset(member.value()); }
+inline Value isset(const HashMember<Value> &member) { return member.exists() && isset(member.value()); }
+
+/**
+ *  Re-install the ISSET macro
+ */
+#pragma pop_macro("isset");
 
 /**
  *  End of namespace

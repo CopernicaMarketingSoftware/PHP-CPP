@@ -56,6 +56,13 @@ public:
     virtual bool contains(int index) const = 0;
     
     /**
+     *  Check if a certain index exists in the array/object
+     *  @param  key
+     *  @return bool
+     */
+    virtual bool contains(const Value &index) const = 0;
+    
+    /**
      *  Retrieve the value at a string index
      *  @param  key
      *  @return Value
@@ -68,6 +75,13 @@ public:
      *  @return Value
      */
     virtual Value get(int index) const = 0;
+
+    /**
+     *  Retrieve the value at a value index
+     *  @param  key
+     *  @return Value
+     */
+    virtual Value get(const Value &key) const = 0;
     
     /**
      *  Overwrite the value at a certain string index
@@ -82,6 +96,31 @@ public:
      *  @param  value
      */
     virtual void set(int index, const Value &value) = 0;
+    
+    /**
+     *  Overwrite the value at a certain variant index
+     *  @param  key
+     *  @param  value
+     */
+    virtual void set(const Value &key, const Value &value) = 0;
+    
+    /**
+     *  Unset a member by its index
+     *  @param  index
+     */
+    virtual void unset(int index) = 0;
+    
+    /**
+     *  Unset a member by its key
+     *  @param  key
+     */
+    virtual void unset(const std::string &key) = 0;
+
+    /**
+     *  Unset a member by its key
+     *  @param  key
+     */
+    virtual void unset(const Value &key) = 0;
     
 };
 

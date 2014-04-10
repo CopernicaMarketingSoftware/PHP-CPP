@@ -34,7 +34,7 @@ Value Super::operator[](const std::string &key)
     TSRMLS_FETCH();
     
     // call zend_is_auto_global to ensure that the just-in-time globals are loaded
-    if (_name) { zend_is_auto_global(_name, strlen(_name) TSRMLS_CC); _name = nullptr; }
+    if (_name) { zend_is_auto_global(_name, ::strlen(_name) TSRMLS_CC); _name = nullptr; }
     
     // create a value object that wraps around the actual zval
     Value value(PG(http_globals)[_index]);
@@ -55,7 +55,7 @@ Value Super::operator[](const char *key)
     TSRMLS_FETCH();
 
     // call zend_is_auto_global to ensure that the just-in-time globals are loaded
-    if (_name) { zend_is_auto_global(_name, strlen(_name) TSRMLS_CC); _name = nullptr; }
+    if (_name) { zend_is_auto_global(_name, ::strlen(_name) TSRMLS_CC); _name = nullptr; }
     
     // create a value object that wraps around the actual zval
     Value value(PG(http_globals)[_index]);

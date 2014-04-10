@@ -1,7 +1,7 @@
 /**
  *  StringMember.h
  *
- *  Implementation for a property that is initially set to a strnig value
+ *  Implementation for a property that is initially set to a string value
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -40,7 +40,7 @@ public:
      *  @param  value
      *  @param  flags
      */
-    StringMember(const char *name, const char *value, int flags) : StringMember(name, value, strlen(value), flags) {}
+    StringMember(const char *name, const char *value, int flags) : StringMember(name, value, ::strlen(value), flags) {}
 
     /**
      *  Constructor

@@ -33,7 +33,7 @@ Object::Object(const char *name, Base *base)
         // this is a brand new object that should be allocated, the C++ instance
         // is already there (created by the extension) but it is not yet stored
         // in PHP, find out the classname first
-        auto *entry = zend_fetch_class(name, strlen(name), 0 TSRMLS_CC);
+        auto *entry = zend_fetch_class(name, ::strlen(name), 0 TSRMLS_CC);
         if (!entry) throw Php::Exception(std::string("Unknown class name ") + name);
         
         // construct an implementation (this will also set the implementation
@@ -55,7 +55,7 @@ void Object::instantiate(const char *name)
     TSRMLS_FETCH();
 
     // convert the name into a class_entry
-    auto *entry = zend_fetch_class(name, strlen(name), 0 TSRMLS_CC);
+    auto *entry = zend_fetch_class(name, ::strlen(name), 0 TSRMLS_CC);
     if (!entry) throw Php::Exception(std::string("Unknown class name ") + name);
 
     // initiate the zval (which was already allocated in the base constructor)

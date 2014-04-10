@@ -273,7 +273,7 @@ zend_module_entry *ExtensionImpl::module()
     int i = 0;
 
     // apply a function to each function
-    _data->apply([&i, entries](const std::string &prefix, Function &function) {
+    _data->functions([&i, entries](const std::string &prefix, Function &function) {
         
         // initialize the function
         function.initialize(prefix, &entries[i]);
@@ -302,7 +302,7 @@ zend_module_entry *ExtensionImpl::module()
 void ExtensionImpl::initialize(TSRMLS_D)
 {
     // we need to register each class, find out all classes
-    _data->apply([TSRMLS_C](const std::string &prefix, ClassBase &c) {
+    _data->classes([TSRMLS_C](const std::string &prefix, ClassBase &c) {
         
         // forward to implementation class
         c.implementation()->initialize(&c, prefix TSRMLS_CC);

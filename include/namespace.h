@@ -225,7 +225,7 @@ public:
      * 
      *  @param  callback
      */
-    void apply(const std::function<void(const std::string &ns, Function &func)> &callback);
+    void functions(const std::function<void(const std::string &ns, Function &func)> &callback);
     
     /**
      *  Apply a callback to each registered class
@@ -235,7 +235,7 @@ public:
      * 
      *  @param  callback
      */
-    void apply(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
+    void classes(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
 
     /**
      *  Filling ini entries into external zend_ini_entry array
@@ -243,8 +243,6 @@ public:
      */
     void fill_ini(_zend_ini_entry *ini_entries, int module_number);
 
-
-    
 };
     
 /**

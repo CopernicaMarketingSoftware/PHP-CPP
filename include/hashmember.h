@@ -381,13 +381,24 @@ public:
     
     /**
      *  Check if a certain index exists in the array/object
-     *  @param  key
+     *  @param  index
      *  @return bool
      */
     virtual bool contains(int index) const override
     {
         // object must exist, and the value must contain the key
         return exists() && value().contains(index);
+    }
+
+    /**
+     *  Check if a certain index exists in the array/object
+     *  @param  key
+     *  @return bool
+     */
+    virtual bool contains(const Value &key) const override
+    {
+        // object must exist, and the value must contain the key
+        return exists() && value().contains(key);
     }
     
     /**
@@ -416,6 +427,20 @@ public:
         
         // ask the value
         return value().get(index);
+    }
+
+    /**
+     *  Retrieve the value at a variant index
+     *  @param  key
+     *  @return Value
+     */
+    virtual Value get(const Value &key) const override
+    {
+        // return null if it does not exist
+        if (!exists()) return nullptr;
+        
+        // ask the value
+        return value().get(key);
     }
     
     /**
@@ -452,6 +477,97 @@ public:
         _parent->set(_index, current);
     }
 
+    /**
+     *  Overwrite the value at a certain variant index
+     *  @param  key
+     *  @param  value
+     */
+    virtual void set(const Value &key, const Value &value) override
+    {
+        // get the current value
+        Value current(this->value());
+        
+        // add the value
+        current[key] = value;
+        
+        // pass this to the base
+        _parent->set(_index, current);
+    }
+
+    /**
+     *  Unset the member
+     */
+    void unset() const
+    {
+        _parent->unset(_index);
+    }
+
+    /**
+     *  Unset a member by its index
+     *  @param  index
+     */
+    virtual void unset(int index) override
+    {
+        // if the current property does not even exist, we do not have to add anything
+        if (!exists()) return;
+        
+        // get the current value
+        Value current(this->value());
+        
+        // skip if the property does not exist
+        if (!current.contains(index)) return;
+        
+        // remove the index
+        current.unset(index);
+        
+        // pass the new value to the base
+        _parent->set(_index, current);
+    }
+    
+    /**
+     *  Unset a member by its key
+     *  @param  key
+     */
+    virtual void unset(const std::string &key) override
+    {
+        // if the current property does not even exist, we do not have to add anything
+        if (!exists()) return;
+        
+        // get the current value
+        Value current(this->value());
+        
+        // skip if the property does not exist
+        if (!current.contains(key)) return;
+        
+        // remove the index
+        current.unset(key);
+        
+        // pass the new value to the base
+        _parent->set(_index, current);
+    }
+
+    /**
+     *  Unset a member by its key
+     *  @param  key
+     */
+    virtual void unset(const Value &key) override
+    {
+        // if the current property does not even exist, we do not have to add anything
+        if (!exists()) return;
+        
+        // get the current value
+        Value current(this->value());
+        
+        // skip if the property does not exist
+        if (!current.contains(key)) return;
+        
+        // remove the index
+        current.unset(key);
+        
+        // pass the new value to the base
+        _parent->set(_index, current);
+    }
+
 protected:
     /**
      *  Protected copy constructor
@@ -483,6 +599,7 @@ private:
      *  Friend classes
      */
     friend class HashMember<std::string>;
+    friend class HashMember<Value>;
     friend class HashMember<int>;
     friend class Base;
     friend class Value;

@@ -575,6 +575,18 @@ public:
     }
     
     /**
+     *  Is a certain key set in the array, when that key is stored as value object
+     *  @param  key
+     *  @return bool
+     */
+    virtual bool contains(const Value &value) const override
+    {
+        if (value.isNumeric()) return contains(value.numericValue());
+        if (value.isString()) return contains(value.rawValue(), value.size());
+        return contains(value.stringValue());
+    }
+    
+    /**
      *  Cast to a number
      *  @return int32_t
      */
@@ -692,6 +704,18 @@ public:
     }
     
     /**
+     *  Get access to a certain variant member
+     *  @param  key
+     *  @return Value
+     */
+    virtual Value get(const Value &key) const override
+    {
+        if (key.isNumeric()) return get(key.numericValue());
+        if (key.isString()) return get(key.rawValue(), key.size());
+        return get(key.stringValue());
+    }
+    
+    /**
      *  Set a certain property
      *  Calling this method will turn the value into an array
      *  @param  index       Index of the property to set
@@ -729,6 +753,61 @@ public:
     virtual void set(const std::string &key, const Value &value) override
     {
         return set(key.c_str(), key.size(), value);
+    }
+    
+    /**
+     *  Overwrite the value at a certain variant index
+     *  @param  key
+     *  @param  value
+     */
+    virtual void set(const Value &key, const Value &value) override
+    {
+        if (key.isNumeric()) return set(key.numericValue(), value);
+        if (key.isString()) return set(key.rawValue(), key.size(), value);
+        return set(key.stringValue(), value);
+    }
+
+    /**
+     *  Unset a member by its index
+     *  @param  index
+     */
+    virtual void unset(int index) override;
+    
+    /**
+     *  Unset by key name and length of the key
+     *  @param  key
+     *  @param  size
+     */
+    void unset(const char *key, int size);
+    
+    /**
+     *  Unset by key name and length of the key
+     *  @param  key
+     *  @param  size
+     */
+    void unset(const char *key)
+    {
+        unset(key, strlen(key));
+    }
+
+    /**
+     *  Unset a member by its key
+     *  @param  key
+     */
+    virtual void unset(const std::string &key) override
+    {
+        return unset(key.c_str(), key.size());
+    }
+
+    /**
+     *  Unset a member by its key
+     *  @param  key
+     */
+    virtual void unset(const Value &key) override
+    {
+        if (key.isNumeric()) return unset(key.numericValue());
+        if (key.isString()) return unset(key.rawValue(), key.size());
+        return unset(key.stringValue());
     }
     
     /**
@@ -787,6 +866,26 @@ public:
     {
         return get(key);
     }
+    
+    /**
+     *  Index by other value object
+     *  @param  key
+     *  @return HashMember<std::string>
+     */
+    HashMember<Value> operator[](const Value &key);
+
+    /**
+     *  Index by other value object
+     *  @param  key
+     *  @return HashMember<std::string>
+     */
+    Value operator[](const Value &key) const
+    {
+        if (key.isNumeric()) return get(key.numericValue());
+        if (key.isString()) return get(key.rawValue(), key.size());
+        return get(key.stringValue());
+    }
+    
 
     /**
      *  Call the function in PHP

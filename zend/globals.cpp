@@ -43,7 +43,7 @@ Global Globals::operator[](const char *name)
     TSRMLS_FETCH();
     
     // check if the variable already exists
-    if (zend_hash_find(&EG(symbol_table), name, strlen(name)+1, (void**)&varvalue) == FAILURE) 
+    if (zend_hash_find(&EG(symbol_table), name, ::strlen(name)+1, (void**)&varvalue) == FAILURE) 
     {
         // the variable does not already exist, return a global object
         // that will automatically set the value when it is updated

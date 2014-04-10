@@ -126,7 +126,7 @@ Value::Value(const char *value, int size)
 {
     // create a string zval
     MAKE_STD_ZVAL(_val);
-    ZVAL_STRINGL(_val, value, size < 0 ? strlen(value) : size, 1);
+    ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size, 1);
 }
 
 /**
@@ -1640,7 +1640,7 @@ bool Value::contains(int index) const
 bool Value::contains(const char *key, int size) const
 {
     // calculate size
-    if (size < 0) size = strlen(key);
+    if (size < 0) size = ::strlen(key);
 
     // deal with arrays
     if (isArray())
@@ -1704,7 +1704,7 @@ Value Value::get(const char *key, int size) const
     if (!isArray() && !isObject()) return Value();
 
     // calculate size
-    if (size < 0) size = strlen(key);
+    if (size < 0) size = ::strlen(key);
     
     // are we in an object or an array?
     if (isArray())
@@ -1841,6 +1841,51 @@ void Value::set(const char *key, int size, const Value &value)
 }
 
 /**
+ *  Unset a member by its index
+ *  @param  index
+ */
+void Value::unset(int index)
+{
+    // only necessary for arrays
+    if (!isArray()) return;
+
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    
+    // remove the index
+    zend_hash_index_del(Z_ARRVAL_P(_val), index);
+}
+
+/**
+ *  Unset by key name and length of the key
+ *  @param  key
+ *  @param  size
+ */
+void Value::unset(const char *key, int size)
+{
+    // is this an object?
+    if (isObject())
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // we need the tsrm_ls variable
+        TSRMLS_FETCH();
+
+        // in the zend header files, unsetting properties is redirected to setting it to null...
+        add_property_null_ex(_val, key, size TSRMLS_CC);
+    }
+    else if (isArray())
+    {
+        // if this is not a reference variable, we should detach it to implement copy on write
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+        // remove the index
+        zend_hash_del(Z_ARRVAL_P(_val), key, size);
+    }
+}
+
+/**
  *  Array access operator
  *  This can be used for accessing arrays
  *  @param  index
@@ -1849,6 +1894,16 @@ void Value::set(const char *key, int size, const Value &value)
 HashMember<int> Value::operator[](int index) 
 {
     return HashMember<int>(this, index);
+}
+
+/**
+ *  Index by other value object
+ *  @param  key
+ *  @return HashMember<std::string>
+ */
+HashMember<Value> Value::operator[](const Value &key)
+{
+    return HashMember<Value>(this, key);
 }
 
 /**
