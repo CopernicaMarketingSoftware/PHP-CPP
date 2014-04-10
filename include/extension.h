@@ -155,7 +155,11 @@ public:
      * 
      *  @param  callback
      */
-    void iniVariables(const std::function<void(Ini &ini)> &callback);
+    void iniVariables(const std::function<void(Ini &ini)> &callback)
+    {
+        // loop through the entries and apply the callback to each one
+        for (auto ini : _ini_entries) callback(*ini);
+    }
 
     /**
      *  Retrieve the module pointer
