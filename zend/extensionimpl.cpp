@@ -115,16 +115,16 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     auto *extension = find(module_number TSRMLS_CC);
 
     // array contains ini settings
-    zend_ini_entry *ini_entries = new zend_ini_entry[extension->_data->iniVariables()+1];
+    _ini = new zend_ini_entry[extension->_data->iniVariables()+1];
 
     // the entry that we're filling
     int i=0;
 
     // Fill the php.ini entries
-    extension->_data->iniVariables([ini_entries, &i, module_number](Ini &ini) {
+    extension->_data->iniVariables([this, &i, module_number](Ini &ini) {
     
         // initialize the function
-        zend_ini_entry *entry = &ini_entries[i];
+        zend_ini_entry *entry = &_ini[i];
         
         // fill the property
         ini.fill(entry, module_number);
@@ -134,10 +134,10 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     });
 
     // last entry should be set to all zero's
-    memset(&ini_entries[i], 0, sizeof(zend_ini_entry));
+    memset(&_ini[i], 0, sizeof(zend_ini_entry));
 
     // register ini entries in Zend core
-    REGISTER_INI_ENTRIES();
+    zend_register_ini_entries(_ini, module_number TSRMLS_CC);
 
     // initialize the extension
     extension->initialize(TSRMLS_C);
@@ -161,11 +161,8 @@ int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
-
-    UNREGISTER_INI_ENTRIES();
-    // free memory from array ini entries
-    static zend_ini_entry *ini_entries;
-    delete [] ini_entries;
+    // unregister the ini entries
+    zend_unregister_ini_entries(module_number TSRMLS_CC);
 
     // is the callback registered?
     if (extension->_onShutdown) extension->_onShutdown();
@@ -262,6 +259,9 @@ ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *vers
  */
 ExtensionImpl::~ExtensionImpl()
 {
+    // deallocate the php.ini entries
+    if (_ini) delete[] _ini;
+    
     // deallocate functions
     if (_entry.functions) delete[] _entry.functions;
 }

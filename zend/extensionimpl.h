@@ -28,6 +28,13 @@ protected:
      *  @var zend_module_entry
      */
     zend_module_entry _entry;
+    
+    /**
+     *  The .ini entries
+     *  
+     *  @var zend_ini_entry
+     */
+    zend_ini_entry *_ini = nullptr;
         
 public:
     /**
