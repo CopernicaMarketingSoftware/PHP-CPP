@@ -132,10 +132,7 @@ private:
  *  @param  ini_val
  *  @return ostream
  */
-std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val)
-{
-    return stream << static_cast<const char*>(ini_val);
-}
+std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val);
 
 
 /**

@@ -78,6 +78,17 @@ IniValue::operator double() const
 }
 
 /**
+ *  Custom output stream operator
+ *  @param  stream
+ *  @param  ini_val
+ *  @return ostream
+ */
+std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val)
+{
+    return stream << static_cast<const char*>(ini_val);
+}
+
+/**
  *  End of namespace
  */
 }
