@@ -57,7 +57,16 @@ inline Value echo(const std::string &input) { out << input; return nullptr; }
 inline Value empty(const Value &value) { return value.isNull() || !value.boolValue(); }
 inline Value empty(const HashMember<std::string> &member) { return !member.exists() || empty(member.value()); }
 inline Value empty(const HashMember<int> &member) { return !member.exists() || empty(member.value()); }
-inline Value ini_get(const Value &value) { return call("ini_get", value); }
+
+inline IniValue ini_get(const char* name)
+{
+    return IniValue(name, false);
+}
+inline IniValue ini_get_orig(const char* name)
+{
+    return IniValue(name, true);
+}
+
 inline Value is_array(const Value &value) { return value.isArray(); }
 inline Value strlen(const Value &value) { return call("strlen", value); }
 inline void  unset(const HashMember<std::string> &member) { member.unset(); }

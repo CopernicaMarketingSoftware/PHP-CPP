@@ -23,10 +23,10 @@ namespace TestIniEntries {
             Ini::get("ini1")
             */
 
-        Php::out << "Ini::get(ini1) = {{" << Php::Ini::get("ini1") << " | " << Php::Ini::get_orig("ini1") << "}}" << std::endl;
-        Php::out << "Ini::get(ini2) = {{" << Php::Ini::get("ini2") << " | " << Php::Ini::get_orig("ini2") << "}}" << std::endl;
-        Php::out << "Ini::get(ini3) = {{" << Php::Ini::get("ini3") << " | " << Php::Ini::get_orig("ini3") << "}}" << std::endl;
-        Php::out << "Ini::get(ini4) = {{" << Php::Ini::get("ini4") << " | " << Php::Ini::get_orig("ini4") << "}}" << std::endl;
+        Php::out << "ini_get(ini1) = {{" << Php::ini_get("ini1") << " | " << Php::ini_get_orig("ini1") << "}}" << std::endl;
+        Php::out << "ini_get(ini2) = {{" << Php::ini_get("ini2") << " | " << Php::ini_get_orig("ini2") << "}}" << std::endl;
+        Php::out << "ini_get(ini3) = {{" << Php::ini_get("ini3") << " | " << Php::ini_get_orig("ini3") << "}}" << std::endl;
+        Php::out << "ini_get(ini4) = {{" << Php::ini_get("ini4") << " | " << Php::ini_get_orig("ini4") << "}}" << std::endl;
         /*
         Php::out << "extension_for_tests.some_string ={{" << Php::ini_get("extension_for_tests.some_string") << "}}" << std::endl;
         Php::out << "extension_for_tests.some_string2 ={{" << Php::ini_get("extension_for_tests.some_string2") << "}}" << std::endl;

@@ -155,9 +155,8 @@ extern "C"
         extension.add("TestIniEntries\\iniTest1", TestIniEntries::iniTest1);
 
         extension.onStartup([](){
-            Php::out << "Ini::get(ini1) = {{" << Php::Ini::get("ini1") << " | " << Php::Ini::get_orig("ini1") << "}}" << std::endl;
-            Php::out << "Ini::get(ini2) = {{" << Php::Ini::get("ini2") << " | " << Php::Ini::get_orig("ini2") << "}}" << std::endl;
-            //Php::out << "Ini::get(ini2) = {{" << Php::ini_get("ini2") << "}}" << std::endl; // <-- Error. Php core not loaded yet.
+            Php::out << "ini_get(ini1) = {{" << Php::ini_get("ini1") << " | " << Php::ini_get_orig("ini1") << "}}" << std::endl;
+            Php::out << "ini_get(ini2) = {{" << Php::ini_get("ini2") << " | " << Php::ini_get_orig("ini2") << "}}" << std::endl;
         });
          
 

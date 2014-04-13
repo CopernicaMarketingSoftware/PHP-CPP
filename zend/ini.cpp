@@ -50,45 +50,6 @@ void Ini::fill(zend_ini_entry *ini_entry, int module_number)
 
 
 /**
- *  Cast to a number
- *  @return uint64_t
- */
-int64_t IniValue::numericValue() const
-{
-    return zend_ini_long(const_cast<char*>(_name.c_str()), _name.size()+1, _isorig);
-
-}
-
-/**
- *  Get access to the raw buffer for read operationrs.
- *  @return const char *
- */
-const char* IniValue::rawValue() const
-{
-    return zend_ini_string(const_cast<char*>(_name.c_str()), _name.size()+1, _isorig);
-}
-
-/**
- *  Cast to a floating point
- *  @return double
- */
-IniValue::operator double() const
-{
-    return zend_ini_double(const_cast<char*>(_name.c_str()), _name.size()+1, _isorig);
-}
-
-/**
- *  Custom output stream operator
- *  @param  stream
- *  @param  ini_val
- *  @return ostream
- */
-std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val)
-{
-    return stream << static_cast<const char*>(ini_val);
-}
-
-/**
  *  End of namespace
  */
 }
