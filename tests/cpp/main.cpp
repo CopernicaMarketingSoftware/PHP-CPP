@@ -147,12 +147,18 @@ extern "C"
 
         Php::Ini ini8("ini8", 3.1415926, 6.2831852);
         Php::Ini ini9("ini9", 2.7182818, 5.4365636, Php::Ini::User);
-        extension.add(Php::Ini("ini9", 0.333333, 0.777777, Php::Ini::Perdir));
+        //extension.add(Php::Ini("ini9", 0.333333, 0.777777, Php::Ini::Perdir));
 
         extension.add(ini8);
         extension.add(std::move(ini9));
 
         extension.add("TestIniEntries\\iniTest1", TestIniEntries::iniTest1);
+
+        extension.onStartup([](){
+            Php::out << "Ini::get(ini1) = {{" << Php::Ini::get("ini1") << " | " << Php::Ini::get_orig("ini1") << "}}" << std::endl;
+            Php::out << "Ini::get(ini2) = {{" << Php::Ini::get("ini2") << " | " << Php::Ini::get_orig("ini2") << "}}" << std::endl;
+            //Php::out << "Ini::get(ini2) = {{" << Php::ini_get("ini2") << "}}" << std::endl; // <-- Error. Php core not loaded yet.
+        });
          
 
 

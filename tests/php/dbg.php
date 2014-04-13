@@ -12,7 +12,8 @@
 
 
 
-
+TestIniEntries\iniTest1();
+exit;
 echo "\x1b[1;31m";
 (new ReflectionExtension('extension_for_tests') )->info();
 echo "\x1b[0m";
