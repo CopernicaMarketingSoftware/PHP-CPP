@@ -17,6 +17,7 @@ struct _zend_ini_entry;
  */
 namespace Php {
 
+
 /**
  *  Class definition
  */
@@ -116,6 +117,7 @@ public:
      *  @param  module_number
      */
     void fill(struct _zend_ini_entry *ini_entry, int module_number);
+
 
 private:
     /**

@@ -26,6 +26,7 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/inivalue.h>
 #include <phpcpp/ini.h>
 #include <phpcpp/exception.h>
 #include <phpcpp/streams.h>
