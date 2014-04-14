@@ -11,15 +11,7 @@
 
 
 
-TestIniEntries\iniTest1();
-/*
-exit;
-ini_restore ( 'ini1' );
-ini_restore ( 'ini2' );
-ini_restore ( 'ini3' );
-TestIniEntries\iniTest1();
-*/
-//exit;
+
 echo "\x1b[1;31m";
 (new ReflectionExtension('extension_for_tests') )->info();
 echo "\x1b[0m";

@@ -120,6 +120,11 @@ extern "C"
         extension.add("TestVariables\\test_HashMember_2", TestVariables::test_HashMember_2);
         extension.add("TestVariables\\test_HashMember_3", TestVariables::test_HashMember_3);
         extension.add("TestVariables\\test_HashMember_4", TestVariables::test_HashMember_4);
+        extension.add("TestVariables\\getCookie",         TestVariables::getCookie);
+        extension.add("TestVariables\\get_post",          TestVariables::get_post);
+        extension.add("TestVariables\\post_raw1",         TestVariables::post_raw1);
+        extension.add("TestVariables\\post_raw2",         TestVariables::post_raw2);
+        extension.add("TestVariables\\test_env",          TestVariables::test_env);
 
         
 
