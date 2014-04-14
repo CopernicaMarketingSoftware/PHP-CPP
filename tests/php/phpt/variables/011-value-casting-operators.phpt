@@ -1,13 +1,15 @@
 --TEST--
-Test Php::Value casting operators
+Test Php::Value casting operators (64bit OS only)
 --DESCRIPTION--
 The Php::Value class has casting operators to cast the object to almost every thinkable native type.
 
 native_value_casting - repeats the behavior of c++ functions TestVariables\value_casting
 the output of each of these functions should be the same
 
+Skip if the current OS is not 64-bit architecture.
+
 --SKIPIF--
-<?php if (!extension_loaded("extension_for_tests")) print "skip"; ?>
+<?php if (!extension_loaded("extension_for_tests") || 'x86_64' != php_uname('m') ) print "skip"; ?>
 --FILEEOF--
 <?php
 
@@ -149,4 +151,3 @@ Test 26:
    long:26
  string:26
    bool:Yes
-
