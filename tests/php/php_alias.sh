@@ -16,4 +16,4 @@ fi
 LD_LIBRARY_PATH="$(cd $PWD/../.. && echo $PWD):${LD_LIBRARY_PATH}"
 export LD_LIBRARY_PATH
 
-/usr/bin/php -d extension_dir=../ext_dir -d extension=extfortest.so -d ini7=47 -d extension_for_tests.frcli=frcli $1 $2 $3 $4 $5
+/usr/bin/php -d extension_dir=../ext_dir -d extension=extfortest.so -d ini7=47 -d ini1=ReValIni1 -d ini2=ReValIni2 $1 $2 $3 $4 $5

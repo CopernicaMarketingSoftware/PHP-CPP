@@ -22,11 +22,11 @@
 #include "../include/variables/020-HashMember-2.h"
 #include "../include/variables/021-HashMember-3.h"
 #include "../include/variables/022-HashMember-4.h"
-//#include "../include/variables/.h"
-//#include "../include/variables/.h"
-//#include "../include/variables/.h"
-//#include "../include/variables/.h"
-//#include "../include/variables/.h"
+#include "../include/variables/023-cookie.h"
+#include "../include/variables/024-get-post.h"
+#include "../include/variables/025-post-raw1.h"
+#include "../include/variables/026-post-raw2.h"
+#include "../include/variables/027-env.h"
 //#include "../include/variables/.h"
 
 

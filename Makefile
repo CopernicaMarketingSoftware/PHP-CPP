@@ -155,6 +155,9 @@ hhvmcpp: ${HHVM_LIBRARY}
 
 ${PHP_LIBRARY}: ${COMMON_OBJECTS} ${PHP_OBJECTS}
 	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
+	@echo
+	@echo "Build complete."
+	@echo "Don't forget to run 'make test'."
 
 ${HHVM_LIBRARY}: ${COMMON_OBJECTS} ${HHVM_OBJECTS}
 	${LINKER} ${HHVM_LINKER_FLAGS} -o $@ ${COMMON_OBJECTS} ${HHVM_OBJECTS}

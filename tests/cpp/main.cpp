@@ -120,6 +120,11 @@ extern "C"
         extension.add("TestVariables\\test_HashMember_2", TestVariables::test_HashMember_2);
         extension.add("TestVariables\\test_HashMember_3", TestVariables::test_HashMember_3);
         extension.add("TestVariables\\test_HashMember_4", TestVariables::test_HashMember_4);
+        extension.add("TestVariables\\getCookie",         TestVariables::getCookie);
+        extension.add("TestVariables\\get_post",          TestVariables::get_post);
+        extension.add("TestVariables\\post_raw1",         TestVariables::post_raw1);
+        extension.add("TestVariables\\post_raw2",         TestVariables::post_raw2);
+        extension.add("TestVariables\\test_env",          TestVariables::test_env);
 
         
 
@@ -155,8 +160,8 @@ extern "C"
         extension.add("TestIniEntries\\iniTest1", TestIniEntries::iniTest1);
 
         extension.onStartup([](){
-            Php::out << "ini_get(ini1) = {{" << Php::ini_get("ini1") << " | " << Php::ini_get_orig("ini1") << "}}" << std::endl;
-            Php::out << "ini_get(ini2) = {{" << Php::ini_get("ini2") << " | " << Php::ini_get_orig("ini2") << "}}" << std::endl;
+            // Retrieve a value at boot extension
+            TestIniEntries::ini6val = Php::ini_get("ini6");
         });
          
 
