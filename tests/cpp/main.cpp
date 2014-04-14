@@ -154,10 +154,10 @@ extern "C"
 
         extension.add("TestIniEntries\\iniTest1", TestIniEntries::iniTest1);
 
-        //extension.onStartup([](){
-        //    Php::out << "ini_get(ini1) = {{" << Php::ini_get("ini1") << " | " << Php::ini_get_orig("ini1") << "}}" << std::endl;
-        //    Php::out << "ini_get(ini2) = {{" << Php::ini_get("ini2") << " | " << Php::ini_get_orig("ini2") << "}}" << std::endl;
-        //});
+        extension.onStartup([](){
+            // Retrieve a value at boot extension
+            TestIniEntries::ini6val = Php::ini_get("ini6");
+        });
          
 
 
