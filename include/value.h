@@ -59,6 +59,7 @@ public:
     Value(const std::string &value);
     Value(const char *value, int size = -1);
     Value(double value);
+    Value(const IniValue &value);
 
     /**
      *  Construct to a specific type

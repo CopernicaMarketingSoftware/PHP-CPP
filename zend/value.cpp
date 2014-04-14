@@ -205,6 +205,14 @@ Value::Value(const Base *object)
 }
 
 /**
+ *  Wrap around a php.ini value
+ *  @param  value
+ */
+Value::Value(const IniValue &value) : Value((const char *)value)
+{
+}
+
+/**
  *  Copy constructor
  *  @param  value
  */

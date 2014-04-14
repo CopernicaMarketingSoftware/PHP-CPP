@@ -57,21 +57,19 @@ inline Value echo(const std::string &input) { out << input; return nullptr; }
 inline Value empty(const Value &value) { return value.isNull() || !value.boolValue(); }
 inline Value empty(const HashMember<std::string> &member) { return !member.exists() || empty(member.value()); }
 inline Value empty(const HashMember<int> &member) { return !member.exists() || empty(member.value()); }
-
-inline IniValue ini_get(const char* name)
-{
-    return IniValue(name, false);
-}
-inline IniValue ini_get_orig(const char* name)
-{
-    return IniValue(name, true);
-}
-
 inline Value is_array(const Value &value) { return value.isArray(); }
 inline Value strlen(const Value &value) { return call("strlen", value); }
 inline void  unset(const HashMember<std::string> &member) { member.unset(); }
 inline void  unset(const HashMember<int> &member) { member.unset(); }
 inline void  unset(const HashMember<Value> &member) { member.unset(); }
+
+/**
+ *  The 'ini_get' function returns an IniValue, so that it can also be used
+ *  before the PHP engine is started.
+ */
+inline IniValue ini_get(const char* name) { return IniValue(name, false); }
+inline IniValue ini_get_orig(const char* name) { return IniValue(name, true); }
+
 
 /**
  *  The isset function conflicts with the 'isset' macro defined by the Zend engine
