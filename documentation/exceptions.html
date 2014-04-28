@@ -17,7 +17,7 @@
  *  and that divides them. Division by zero is of course
  *  not permitted - it will throw an exception then
  */
-Php::Value myDiv(Php::Parameters &params)
+Php::Value myDiv(Php::Parameters &amp;params)
 {
     // division by zero is not permitted, throw an exception when this happens
     if (params[1] == 0) throw Php::Exception("Division by zero");
