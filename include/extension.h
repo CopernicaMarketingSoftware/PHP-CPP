@@ -111,6 +111,9 @@ public:
      */
     Extension &add(Ini &&ini)
     {
+        // skip when locked
+        if (locked()) return *this;
+        
         // and add it to the list of classes
         _ini_entries.emplace_back(new Ini(std::move(ini)));
         
@@ -125,6 +128,9 @@ public:
      */
     Extension &add(const Ini &ini)
     {
+        // skip when locked
+        if (locked()) return *this;
+
         // and add it to the list of classes
         _ini_entries.emplace_back(new Ini(ini));
         
@@ -180,6 +186,16 @@ public:
     {
         return module();
     }
+    
+protected:
+    /**
+     *  Is the extension object in a locked state? This happens after the
+     *  get_module() function was called for the first time ("apache reload"
+     *  forces a new call to get_module())
+     * 
+     *  @return bool
+     */
+    virtual bool locked() const override;
 
 private:
     /**

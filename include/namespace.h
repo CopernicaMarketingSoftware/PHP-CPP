@@ -48,6 +48,25 @@ protected:
      */
     std::list<std::shared_ptr<Namespace>> _namespaces;
 
+    /**
+     *  Is the object locked?
+     * 
+     *  After the object is locked, no more elements can be added to it.
+     *  This happens after the call to get_module - it the no longer makes
+     *  sense to add more objects. When 'apache reload' is executed, the
+     *  get_module() function is called for a second (or third, or fourth)
+     *  time, but the classes, functions and namespaces will then not be
+     *  filled.
+     * 
+     *  @var bool
+     */
+    virtual bool locked() const
+    {
+        // by default, namespaces are not locked (only derived extension 
+        // objects can end up in a locked state
+        return false;
+    }
+
 
 public:
     /**
@@ -81,6 +100,9 @@ public:
     template<typename T>
     Namespace &add(Class<T> &&type)
     {
+        // skip when locked
+        if (locked()) return *this;
+        
         // make a copy of the object, and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(new Class<T>(std::move(type))));
         
@@ -96,6 +118,9 @@ public:
     template<typename T>
     Namespace &add(const Class<T> &type)
     {
+        // skip when locked
+        if (locked()) return *this;
+
         // and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(new Class<T>(type)));
         
@@ -110,6 +135,9 @@ public:
      */
     Namespace &add(Interface &&interface)
     {
+        // skip when locked
+        if (locked()) return *this;
+
         // make a copy and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(new Interface(std::move(interface))));
         
@@ -124,6 +152,9 @@ public:
      */
     Namespace &add(const Interface &interface)
     {
+        // skip when locked
+        if (locked()) return *this;
+
         // make a copy and add it to the list of classes
         _classes.push_back(std::unique_ptr<ClassBase>(new Interface(interface)));
         
@@ -138,6 +169,9 @@ public:
      */
     Namespace &add(Namespace &&ns)
     {
+        // skip when locked
+        if (locked()) return *this;
+
         // add it to the list of namespaces
         _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(std::move(ns))));
         
@@ -152,6 +186,9 @@ public:
      */
     Namespace &add(const Namespace &ns)
     {
+        // skip when locked
+        if (locked()) return *this;
+
         // make a copy and add it to the list of namespaces
         _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(ns)));
         

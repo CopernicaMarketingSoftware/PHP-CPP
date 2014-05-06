@@ -22,6 +22,9 @@ namespace Php {
  */
 Namespace &Namespace::add(const char *name, const native_callback_0 &function, const Arguments &arguments)
 {
+    // skip when locked
+    if (locked()) return *this;
+
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
     
@@ -38,6 +41,9 @@ Namespace &Namespace::add(const char *name, const native_callback_0 &function, c
  */
 Namespace &Namespace::add(const char *name, const native_callback_1 &function, const Arguments &arguments)
 {
+    // skip when locked
+    if (locked()) return *this;
+
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
 
@@ -54,6 +60,9 @@ Namespace &Namespace::add(const char *name, const native_callback_1 &function, c
  */
 Namespace &Namespace::add(const char *name, const native_callback_2 &function, const Arguments &arguments)
 {
+    // skip when locked
+    if (locked()) return *this;
+
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
 
@@ -70,6 +79,9 @@ Namespace &Namespace::add(const char *name, const native_callback_2 &function, c
  */
 Namespace &Namespace::add(const char *name, const native_callback_3 &function, const Arguments &arguments)
 {
+    // skip when locked
+    if (locked()) return *this;
+
     // add a function
     _functions.push_back(std::make_shared<Function>(name, function, arguments));
 
