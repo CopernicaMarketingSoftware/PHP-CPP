@@ -130,6 +130,41 @@ extern "C" {
     right before PHP shuts down. If there is anything to clean up, you can install
     such a callback and run the cleanup code from it.
 </p>
+<h2 id="apache-prefork-module">Forked engines (like Apache)</h2>
+<p>
+    If you run PHP on a pre-fork web server (like Apache), your extension is 
+    loaded and initialized <i>before</i> the various worker threads are
+    forked off. The consequence of this is that the get_module() function
+    and your optional onStartup() callback function are called by the parent
+    process, and all other callbacks and the actual page handling by the
+    child processes. A call to getpid() (or other functions to retrieve
+    information about the current process) will therefore return something
+    else inside the onStartup callback, as it does in any of the other
+    extension functions.
+</p>
+<p>
+    You may have to be careful because of this. It is better not to
+    do things in the startup functions that may not work when the process
+    is forked into different child processes (like opening file descriptors).
+    Something else to keep in mind is that the startup function is only called
+    by the parent processes when Apache starts up (or reloaded, see later),
+    while the shutdown function is called by <i>every</i> child process
+    that gracefully exits. The onShutdown is thus not only called when the
+    Apache process is stopped, but also when one of the worker processes
+    exits because it no longer is necessary, or because it is replaced by 
+    a fresh and new worker.
+</p>
+<p>
+    The get_module() function - as you've seen countles times before - is
+    called when your extension is initially loaded. But not only then. When
+    apache is reloaded (for example by giving the command line instruction
+    "apachectl reload"), your get_module() gets called for a second time,
+    and the callback that you registered with Extension::onStartup() too.
+    This is normally not a problem, because the static extension object is
+    in a locked state after the first get_module() call, and the functions 
+    and classes that you try to add to the extension object in the second
+    invokation of get_module() are simply ignored.
+</p>
 <h2 id="multi-threading">Watch out for multi-threading</h2>
 <p>
     If your extension runs on a multi-threaded PHP installation, you need to take 
