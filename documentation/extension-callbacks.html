@@ -151,7 +151,7 @@ extern "C" {
     while the shutdown function is called by <i>every</i> child process
     that gracefully exits. The onShutdown is thus not only called when the
     Apache process is stopped, but also when one of the worker processes
-    exits because it no longer is necessary, or because it is replaced by 
+    exits because it no longer is needed, or because it is replaced by 
     a fresh and new worker.
 </p>
 <p>
@@ -159,7 +159,8 @@ extern "C" {
     called when your extension is initially loaded. But not only then. When
     apache is reloaded (for example by giving the command line instruction
     "apachectl reload"), your get_module() gets called for a second time,
-    and the callback that you registered with Extension::onStartup() too.
+    and the callback that you registered with Extension::onStartup() is
+    called again too.
     This is normally not a problem, because the static extension object is
     in a locked state after the first get_module() call, and the functions 
     and classes that you try to add to the extension object in the second
