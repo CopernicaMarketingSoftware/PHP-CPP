@@ -402,6 +402,21 @@ Value &Value::operator=(Value &&value)
     // skip self assignment
     if (this == &value) return *this;
 
+    // If _val == nullptr, we can't validate Z_ISREF_P(_val)
+    // because `Z_ISREF_P(_val)` is `zval_isref_p(_val) { return _val->is_ref__gc;}` (see Zend/zend.h 413)
+    // Call `nullptr->is_ref__gc` is the reason for `SIGSEGV, Segmentation fault`.
+    if (_val == nullptr) {
+
+        // just copy the zval completely
+        _val = value._val;
+
+        // the other object is no longer valid
+        value._val = nullptr;
+
+        return *this;
+    }
+
+
     // is the object a reference?
     if (Z_ISREF_P(_val))
     {
