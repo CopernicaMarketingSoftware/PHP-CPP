@@ -1311,6 +1311,86 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
     return do_exec(&_val, method._val, argc, params);
 }
 
+
+/**
+ *  Comparison operators for hardcoded Value
+ *  @param  value
+ */
+bool Value::operator==(const Value &value) const
+{
+    auto tp = type();
+    if(tp != value.type())
+        return false;
+
+    switch (tp) {
+        case Type::Null:            return true;
+        case Type::Numeric:         return (_val->value.lval == value._val->value.lval);
+        case Type::Float:           return (_val->value.dval == value._val->value.dval);
+        case Type::Bool:            return (_val->value.lval == value._val->value.lval);
+        case Type::String:          return (_val->value.str.len && value._val->value.str.len) && (::strcmp(_val->value.str.val, value._val->value.str.val) == 0);
+        // @todo
+        case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
+        // @todo
+        case Type::Object:          throw Php::Exception("TODO implement comparison arrays"); break;
+        case Type::Resource:        return (_val->value.lval == value._val->value.lval);
+        case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
+
+    }
+    return false;
+}
+bool Value::operator< (const Value &value) const
+{
+    auto tp = type();
+    if(tp != value.type()){
+        // @todo maybe this can be improved
+        throw Php::Exception("It is not possible to compare different types");
+        return false;
+    }
+    switch (tp) {
+        case Type::Null:            return false;
+        case Type::Numeric:         return (_val->value.lval < value._val->value.lval);
+        case Type::Float:           return (_val->value.dval < value._val->value.dval);
+        case Type::Bool:            return (_val->value.lval < value._val->value.lval);
+        case Type::String:          return (::strcmp(_val->value.str.val, value._val->value.str.val) < 0);
+        // @todo
+        case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
+        // @todo
+        case Type::Object:          throw Php::Exception("TODO implement comparison arrays"); break;
+        case Type::Resource:        throw Php::Exception("Resource types is not comparable"); break;
+        case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    }
+    return true;
+}
+bool Value::operator> (const Value &value) const
+{
+    auto tp = type();
+    if(tp != value.type()){
+        // @todo maybe this can be improved
+        throw Php::Exception("It is not possible to compare different types");
+        return false;
+    }
+    switch (tp) {
+        case Type::Null:            return false;
+        case Type::Numeric:         return (_val->value.lval > value._val->value.lval);
+        case Type::Float:           return (_val->value.dval > value._val->value.dval);
+        case Type::Bool:            return (_val->value.lval > value._val->value.lval);
+        case Type::String:          return (::strcmp(_val->value.str.val, value._val->value.str.val) > 0);
+        // @todo
+        case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
+        // @todo
+        case Type::Object:          throw Php::Exception("TODO implement comparison arrays"); break;
+        case Type::Resource:        throw Php::Exception("Resource types is not comparable"); break;
+        case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    }
+    return true;
+}
+
 /**
  *  The type of object
  *  @return Type

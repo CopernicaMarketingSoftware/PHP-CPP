@@ -322,6 +322,17 @@ public:
     bool operator> (const char *value) const { return ::strcmp(rawValue(), value) >  0; }
 
     /**
+     *  Comparison operators for hardcoded Value
+     *  @param  value
+     */
+    bool operator==(const Value &value) const;
+    bool operator!=(const Value &value) const { return !operator==(value); }
+    bool operator< (const Value &value) const;
+    bool operator> (const Value &value) const;
+    bool operator<=(const Value &value) const { return !operator>(value); }
+    bool operator>=(const Value &value) const { return !operator<(value); }
+
+    /**
      *  Comparison operators
      *  @param  value
      */
