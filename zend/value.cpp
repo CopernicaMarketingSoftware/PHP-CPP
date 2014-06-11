@@ -1312,6 +1312,36 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
 }
 
 /**
+ *  Comparison operators== for hardcoded Value
+ *  @param  value
+ */
+bool Value::operator==(const Value &value) const
+{
+    zval result;
+    if(SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC) )
+    {
+        throw Php::Exception("Not comparable");
+        return false;
+    }
+    return (0 == result.value.lval);
+}
+
+/**
+ *  Comparison operators< for hardcoded Value
+ *  @param  value
+ */
+bool Value::operator< (const Value &value) const
+{
+    zval result;
+    if(SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC) )
+    {
+        throw Php::Exception("Not comparable");
+        return false;
+    }
+    return (-1 == result.value.lval);
+}
+
+/**
  *  The type of object
  *  @return Type
  */
