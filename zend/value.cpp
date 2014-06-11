@@ -403,7 +403,7 @@ Value &Value::operator=(Value &&value)
     if (this == &value) return *this;
 
     // is the object a reference?
-    if (Z_ISREF_P(_val))
+    if (_val && Z_ISREF_P(_val))
     {
         // @todo difference if the other object is a reference or not?
         
@@ -449,7 +449,7 @@ Value &Value::operator=(Value &&value)
     {
         // destruct the zval (this function will decrement the reference counter,
         // and only destruct if there are no other references left)
-        zval_ptr_dtor(&_val);
+        if (_val) zval_ptr_dtor(&_val);
 
         // just copy the zval completely
         _val = value._val;
