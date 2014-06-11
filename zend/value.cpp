@@ -1318,21 +1318,20 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
  */
 bool Value::operator==(const Value &value) const
 {
-    auto tp = type();
-    if(tp != value.type())
-        return false;
+    Type tp = type();
+    const _zval_struct *thatval = (tp == value.type()) ? value._val : value.clone(tp)._val;
 
     switch (tp) {
         case Type::Null:            return true;
-        case Type::Numeric:         return (_val->value.lval == value._val->value.lval);
-        case Type::Float:           return (_val->value.dval == value._val->value.dval);
-        case Type::Bool:            return (_val->value.lval == value._val->value.lval);
-        case Type::String:          return (_val->value.str.len && value._val->value.str.len) && (::strcmp(_val->value.str.val, value._val->value.str.val) == 0);
+        case Type::Numeric:         return (_val->value.lval == thatval->value.lval);
+        case Type::Float:           return (_val->value.dval == thatval->value.dval);
+        case Type::Bool:            return (_val->value.lval == thatval->value.lval);
+        case Type::String:          return (_val->value.str.len && thatval->value.str.len) && (::strcmp(_val->value.str.val, thatval->value.str.val) == 0);
         // @todo
         case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
         // @todo
         case Type::Object:          throw Php::Exception("TODO implement comparison arrays"); break;
-        case Type::Resource:        return (_val->value.lval == value._val->value.lval);
+        case Type::Resource:        return (_val->value.lval == thatval->value.lval);
         case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
         case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
         case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
@@ -1342,18 +1341,15 @@ bool Value::operator==(const Value &value) const
 }
 bool Value::operator< (const Value &value) const
 {
-    auto tp = type();
-    if(tp != value.type()){
-        // @todo maybe this can be improved
-        throw Php::Exception("It is not possible to compare different types");
-        return false;
-    }
+    Type tp = type();
+    const _zval_struct *thatval = (tp == value.type()) ? value._val : value.clone(tp)._val;
+
     switch (tp) {
         case Type::Null:            return false;
-        case Type::Numeric:         return (_val->value.lval < value._val->value.lval);
-        case Type::Float:           return (_val->value.dval < value._val->value.dval);
-        case Type::Bool:            return (_val->value.lval < value._val->value.lval);
-        case Type::String:          return (::strcmp(_val->value.str.val, value._val->value.str.val) < 0);
+        case Type::Numeric:         return (_val->value.lval < thatval->value.lval);
+        case Type::Float:           return (_val->value.dval < thatval->value.dval);
+        case Type::Bool:            return (_val->value.lval < thatval->value.lval);
+        case Type::String:          return (::strcmp(_val->value.str.val, thatval->value.str.val) < 0);
         // @todo
         case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
         // @todo
@@ -1367,18 +1363,15 @@ bool Value::operator< (const Value &value) const
 }
 bool Value::operator> (const Value &value) const
 {
-    auto tp = type();
-    if(tp != value.type()){
-        // @todo maybe this can be improved
-        throw Php::Exception("It is not possible to compare different types");
-        return false;
-    }
+    Type tp = type();
+    const _zval_struct *thatval = (tp == value.type()) ? value._val : value.clone(tp)._val;
+
     switch (tp) {
         case Type::Null:            return false;
-        case Type::Numeric:         return (_val->value.lval > value._val->value.lval);
-        case Type::Float:           return (_val->value.dval > value._val->value.dval);
-        case Type::Bool:            return (_val->value.lval > value._val->value.lval);
-        case Type::String:          return (::strcmp(_val->value.str.val, value._val->value.str.val) > 0);
+        case Type::Numeric:         return (_val->value.lval > thatval->value.lval);
+        case Type::Float:           return (_val->value.dval > thatval->value.dval);
+        case Type::Bool:            return (_val->value.lval > thatval->value.lval);
+        case Type::String:          return (::strcmp(_val->value.str.val, thatval->value.str.val) > 0);
         // @todo
         case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
         // @todo
