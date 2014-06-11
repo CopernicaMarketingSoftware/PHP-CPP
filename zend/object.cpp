@@ -22,7 +22,7 @@ Object::Object(const char *name, Base *base)
     // does the object already have a handle?
     if (base->implementation())
     {
-        // the object is already instantiated, we can assign it the this object
+        // the object is already instantiated, we can assign it to this object
         operator=(Value(base));
     }
     else
@@ -42,6 +42,9 @@ Object::Object(const char *name, Base *base)
         
         // now we can store it
         operator=(Value(base));
+        
+        // install the object handlers
+        Z_OBJVAL_P(_val).handlers = ClassImpl::objectHandlers(entry);
     }
 }
 

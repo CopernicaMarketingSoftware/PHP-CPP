@@ -2,9 +2,9 @@
  *  ClassBase.h
  *
  *  This is the base class of the "Class" class. This is an internal class that
- *  is used by the PHP-CPP library. But because the constructor is protected,
+ *  is used by the PHP-CPP library. Because the constructor is protected,
  *  you can not create any instances if this class yourself (and you are not
- *  supposed to do that either.
+ *  supposed to do that either).
  *
  *  Further more, because this base class is a 'private' base of Class, all 
  *  features of it are normally also inaccessible.

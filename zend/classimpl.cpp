@@ -330,52 +330,56 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
  */
 zend_object_handlers *ClassImpl::objectHandlers()
 {
-    // keep static structure
-    static zend_object_handlers handlers;
-    
-    // is the object already initialized?
-    static bool initialized = false;
-    
     // already initialized?
-    if (initialized) return &handlers;
+    if (_initialized) return &_handlers;
     
     // initialize the handlers
-    memcpy(&handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    memcpy(&_handlers, &std_object_handlers, sizeof(zend_object_handlers));
     
     // install custom clone function
-    if (!_base->clonable()) handlers.clone_obj = nullptr;
-    else handlers.clone_obj = &ClassImpl::cloneObject;
+    if (!_base->clonable()) _handlers.clone_obj = nullptr;
+    else _handlers.clone_obj = &ClassImpl::cloneObject;
     
     // functions for the Countable interface
-    handlers.count_elements = &ClassImpl::countElements;
+    _handlers.count_elements = &ClassImpl::countElements;
     
     // functions for the ArrayAccess interface
-    handlers.write_dimension = &ClassImpl::writeDimension;
-    handlers.read_dimension = &ClassImpl::readDimension;
-    handlers.has_dimension = &ClassImpl::hasDimension;
-    handlers.unset_dimension = &ClassImpl::unsetDimension;
+    _handlers.write_dimension = &ClassImpl::writeDimension;
+    _handlers.read_dimension = &ClassImpl::readDimension;
+    _handlers.has_dimension = &ClassImpl::hasDimension;
+    _handlers.unset_dimension = &ClassImpl::unsetDimension;
     
     // functions for the magic properties handlers (__get, __set, __isset and __unset)
-    handlers.write_property = &ClassImpl::writeProperty;
-    handlers.read_property = &ClassImpl::readProperty;
-    handlers.has_property = &ClassImpl::hasProperty;
-    handlers.unset_property = &ClassImpl::unsetProperty;
+    _handlers.write_property = &ClassImpl::writeProperty;
+    _handlers.read_property = &ClassImpl::readProperty;
+    _handlers.has_property = &ClassImpl::hasProperty;
+    _handlers.unset_property = &ClassImpl::unsetProperty;
     
     // when a method is called (__call and __invoke)
-    handlers.get_method = &ClassImpl::getMethod;
-    handlers.get_closure = &ClassImpl::getClosure;
+    _handlers.get_method = &ClassImpl::getMethod;
+    _handlers.get_closure = &ClassImpl::getClosure;
     
     // handler to cast to a different type
-    handlers.cast_object = &ClassImpl::cast;
+    _handlers.cast_object = &ClassImpl::cast;
     
     // method to compare two objects
-    handlers.compare_objects = &ClassImpl::compare;
+    _handlers.compare_objects = &ClassImpl::compare;
     
     // remember that object is now initialized
-    initialized = true;
+    _initialized = true;
     
     // done
-    return &handlers;
+    return &_handlers;
+}
+
+/**
+ *  Alternative way to retrieve object handlers, given a class entry
+ *  @param  entry
+ *  @return zend_object_handlers
+ */
+zend_object_handlers *ClassImpl::objectHandlers(zend_class_entry *entry)
+{
+    return self(entry)->objectHandlers();
 }
 
 /**
@@ -465,7 +469,7 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
         case Type::Float:       result = meta->callToFloat(object).detach();    break;
         case Type::Bool:        result = meta->callToBool(object).detach();     break;
         case Type::String:      result = meta->callToString(object).detach();   break;
-        default:                throw NotImplemented();             break;
+        default:                throw NotImplemented();                         break;
         }
         
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??

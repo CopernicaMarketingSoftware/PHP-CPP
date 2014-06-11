@@ -66,7 +66,7 @@ public:
      */
     ObjectImpl(zend_class_entry *entry, Base *base TSRMLS_DC)
     {
-        // allocate a mixed object (for some reason this does not have to deallocated)
+        // allocate a mixed object (for some reason this does not have to be deallocated)
         _mixed = (MixedObject *)emalloc(sizeof(MixedObject));
         
         // copy properties to the mixed object

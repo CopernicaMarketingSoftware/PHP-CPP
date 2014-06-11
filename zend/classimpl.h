@@ -84,6 +84,18 @@ private:
      *  @var    std::shared_ptr
      */
     std::shared_ptr<ClassImpl> _parent;
+    
+    /**
+     *  The object handlers for instances of this class
+     *  @var    zend_object_handlers
+     */
+    zend_object_handlers _handlers;
+    
+    /**
+     *  Are the handlers already initialized?
+     *  @var    bool
+     */
+    bool _initialized = false;
 
 
     /**
@@ -203,6 +215,13 @@ public:
      */
     zend_object_handlers *objectHandlers();
 
+    /**
+     *  Alternative way to retrieve object handlers, given a class entry
+     *  @param  entry
+     *  @return zend_object_handlers
+     */
+    static zend_object_handlers *objectHandlers(zend_class_entry *entry);
+    
     /**
      *  Function to create a new iterator to iterate over an object
      *  @param  entry                   The class entry
