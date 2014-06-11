@@ -27,6 +27,7 @@
 #include "../include/variables/025-post-raw1.h"
 #include "../include/variables/026-post-raw2.h"
 #include "../include/variables/027-env.h"
+#include "../include/variables/028-029-compare.h"
 //#include "../include/variables/.h"
 
 

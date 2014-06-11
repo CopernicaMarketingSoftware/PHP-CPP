@@ -1312,116 +1312,18 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
 }
 
 /**
- *  Helper method to prepare for comparison
- *  @param  value
- */
-bool Value::comparePrepare(const Value &value) const
-{
-    Type thisTp = type(), thatTp = value.type();
-    if(thisTp == Type::Resource || thatTp == Type::Resource)
-    {
-        throw Php::Exception("Resource types is not comparable");
-        return false;
-    }
-    if(thisTp == Type::Constant || thatTp == Type::Constant || thisTp == Type::ConstantArray || thatTp == Type::ConstantArray)
-    {
-        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable");
-        return false;
-    }
-    if(thisTp == Type::Callable || thatTp == Type::Callable)
-    {
-        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable");
-        return false;
-    }
-    return true;
-}
-
-/**
  *  Comparison operators== for hardcoded Value
  *  @param  value
  */
 bool Value::operator==(const Value &value) const
 {
-    if(!comparePrepare(value)) return false;
-
-    Type thisTp = type(), thatTp = value.type();
-
-    //Type tp = type();
-    //const _zval_struct *thatval = (tp == value.type()) ? value._val : value.clone(tp)._val;
-
-    if( (thatTp == Type::Array && thisTp != Type::Array) || (thisTp == Type::Array && thatTp != Type::Array) )
+    zval result;
+    if(SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC) )
     {
+        throw Php::Exception("Not comparable");
         return false;
     }
-    if(thatTp == Type::Array && thisTp == Type::Array)
-    {
-        if(size() != value.size()) return false;
-        auto thisIt = begin(), thatIt = value.begin(), thisEnd = end();;
-        while(thisIt != thisEnd)
-        {
-            if(*thisIt != *thatIt) return false;
-            ++thisIt;
-            ++thatIt;
-        }
-        return true;
-    }
-    
-    if(thatTp == Type::Null)
-    {
-        return (thisTp == Type::Null) || 
-               (
-                    (thisTp == Type::Numeric || thisTp == Type::Bool) &&
-                    _val->value.lval == 0
-               ) ||
-               ( (thisTp == Type::String) && _val->value.str.len == 0);
-    }
-    if(thisTp == Type::Null)
-    {
-        return (
-                    (thatTp == Type::Numeric || thatTp == Type::Bool) &&
-                    value._val->value.lval == 0
-               ) ||
-               ( (thatTp == Type::String) && value._val->value.str.len == 0);
-    }
-
-    if(thatTp == Type::Float)
-    {
-        return clone(Type::Float) == value._val->value.dval;
-    }
-    if(thisTp == Type::Float)
-    {
-        return value.clone(Type::Float) == _val->value.dval;
-    }
-
-    if(thatTp == Type::String)
-    {
-        return clone(Type::String) == value.rawValue();
-    }
-    if(thisTp == Type::String)
-    {
-        return value.clone(Type::String) == rawValue();
-    }
-
-    if(thatTp == Type::Numeric || thatTp == Type::Bool)
-    {
-        return clone(thatTp) == value._val->value.lval;
-    }
-    if(thisTp == Type::String)
-    {
-        return value.clone(thisTp) == _val->value.lval;
-    }
-
-
-    if( (thatTp == Type::Object && thisTp != Type::Object) || (thisTp == Type::Object && thatTp != Type::Object) )
-    {
-        return false;
-    }
-    if(thatTp == Type::Object && thisTp == Type::Object)
-    {
-        return !ClassImpl::compare(_val, value._val TSRMLS_CC);
-    }
-
-    return false;
+    return (0 == result.value.lval);
 }
 
 /**
@@ -1430,23 +1332,13 @@ bool Value::operator==(const Value &value) const
  */
 bool Value::operator< (const Value &value) const
 {
-    if(!comparePrepare(value)) return false;
-
-    Type tp = type();
-    const _zval_struct *thatval = (tp == value.type()) ? value._val : value.clone(tp)._val;
-
-    switch (tp) {
-        case Type::Null:            return false;
-        case Type::Numeric:         return (_val->value.lval < thatval->value.lval);
-        case Type::Float:           return (_val->value.dval < thatval->value.dval);
-        case Type::Bool:            return (_val->value.lval < thatval->value.lval);
-        case Type::String:          return (::strcmp(_val->value.str.val, thatval->value.str.val) < 0);
-        // @todo
-        case Type::Array:           throw Php::Exception("TODO implement comparison arrays"); break;
-        // @todo
-        case Type::Object:          throw Php::Exception("TODO implement comparison arrays"); break;
+    zval result;
+    if(SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC) )
+    {
+        throw Php::Exception("Not comparable");
+        return false;
     }
-    return true;
+    return (-1 == result.value.lval);
 }
 
 /**
