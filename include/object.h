@@ -31,7 +31,7 @@ public:
     Object(Value &&value) : Value(std::move(value)) 
     {
         // throw exception in case of problems
-        if (value.type() != Type::Object) throw Php::Exception("Constructing an object variable by moving a non object");
+        if (value.type() != Type::Object) throw FatalError("Constructing an object variable by moving a non object");
     }
 
     /**
@@ -123,7 +123,7 @@ public:
     virtual Value &setType(Type type) override
     {
         // throw exception if things are going wrong
-        if (type != Type::Object) throw Php::Exception("Changing type of a fixed object variable");
+        if (type != Type::Object) throw FatalError("Changing type of a fixed object variable");
         
         // call base
         return Value::setType(type);
@@ -140,7 +140,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Object) throw Php::Exception("Assigning a non-object to an object variable");
+        if (value.type() != Type::Object) throw FatalError("Assigning a non-object to an object variable");
         
         // call base
         Value::operator=(value);
@@ -160,7 +160,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Object) throw Php::Exception("Moving a non-object to an object variable");
+        if (value.type() != Type::Object) throw FatalError("Moving a non-object to an object variable");
         
         // call base
         Value::operator=(std::move(value));

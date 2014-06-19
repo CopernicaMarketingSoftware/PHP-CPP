@@ -31,7 +31,7 @@ public:
     Array(const Value &value) : Value(value) 
     {
         // type must be valid
-        if (value.type() != Type::Array) throw Php::Exception("Assigning a non-array to an array variable");
+        if (value.type() != Type::Array) throw FatalError("Assigning a non-array to an array variable");
     }
 
     /**
@@ -41,7 +41,7 @@ public:
     Array(Value &&value) : Value(std::move(value))
     {
         // type must be valid
-        if (value.type() != Type::Array) throw Php::Exception("Moving a non-array to an array variable");
+        if (value.type() != Type::Array) throw FatalError("Moving a non-array to an array variable");
     }
 
     /**
@@ -76,7 +76,7 @@ public:
     virtual Value &setType(Type type) override
     {
         // throw exception if things are going wrong
-        if (type != Type::Array) throw Php::Exception("Changing type of a fixed array variable");
+        if (type != Type::Array) throw FatalError("Changing type of a fixed array variable");
         
         // call base
         return Value::setType(Type::Array);
@@ -93,7 +93,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Array) throw Php::Exception("Assigning a non-array to a fixed array variable");
+        if (value.type() != Type::Array) throw FatalError("Assigning a non-array to a fixed array variable");
         
         // call base
         Value::operator=(value);
@@ -113,7 +113,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Array) throw Php::Exception("Moving a non-array to a fixed array variable");
+        if (value.type() != Type::Array) throw FatalError("Moving a non-array to a fixed array variable");
         
         // call base
         Value::operator=(std::move(value));

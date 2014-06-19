@@ -524,8 +524,10 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     
     // report error on failure (this does not occur because the cloneObject()
     // method is only installed as handler when we have seen that there is indeed
-    // a copy constructor)
-    if (!cpp) throw Php::Exception(std::string("Unable to clone ") + entry->name);
+    // a copy constructor). Because this function is directly called from the
+    // Zend engine, we can call zend_error() (which does a longjmp()) to throw
+    // an exception back to the Zend engine)
+    if (!cpp) zend_error(E_ERROR, "Unable to clone %s", entry->name);
 
     // the thing we're going to return
     zend_object_value result;
@@ -1183,8 +1185,10 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
     // create a new base C++ object
     auto *cpp = impl->_base->construct();
 
-    // report error on failure
-    if (!cpp) throw Php::Exception(std::string("Unable to instantiate ") + entry->name);
+    // report error on failure, because this function is called directly from the
+    // Zend engine, we can call zend_error() here (which does a longjmp() back to
+    // the Zend engine)
+    if (!cpp) zend_error(E_ERROR, "Unable to instantiate %s", entry->name);
 
     // the thing we're going to return
     zend_object_value result;
@@ -1212,8 +1216,10 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
  */
 zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *object, int by_ref TSRMLS_DC)
 {
-    // by-ref is not possible (copied from SPL)
-    if (by_ref) throw Php::Exception("Foreach by ref is not possible");
+    // by-ref is not possible (copied from SPL), this function is called directly
+    // from the Zend engine, so we can use zend_error() to longjmp() back to the 
+    // Zend engine)
+    if (by_ref) zend_error(E_ERROR, "Foreach by ref is not possible");
     
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object TSRMLS_CC)->object());

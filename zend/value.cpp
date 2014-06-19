@@ -192,7 +192,7 @@ Value::Value(const Base *object)
     auto *impl = object->implementation();
     
     // do we have a handle?
-    if (!impl) throw Php::Exception("Assigning an unassigned object to a variable");
+    if (!impl) throw FatalError("Assigning an unassigned object to a variable");
 
     // make a regular zval, and set it to an object
     MAKE_STD_ZVAL(_val);
@@ -1317,28 +1317,37 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
  */
 bool Value::operator==(const Value &value) const
 {
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // zval that will hold the result of the comparison
     zval result;
-    if(SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC) )
-    {
-        throw Php::Exception("Not comparable");
-        return false;
-    }
-    return (0 == result.value.lval);
+    
+    // run the comparison
+    if (SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC)) return false;
+    
+    // convert to boolean
+    return result.value.lval == 0;
 }
 
 /**
  *  Comparison operators< for hardcoded Value
  *  @param  value
+ *  @return bool
  */
-bool Value::operator< (const Value &value) const
+bool Value::operator<(const Value &value) const
 {
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // zval that will hold the result of the comparison
     zval result;
-    if(SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC) )
-    {
-        throw Php::Exception("Not comparable");
-        return false;
-    }
-    return (-1 == result.value.lval);
+    
+    // run the comparison
+    if (SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC)) return false;
+    
+    // convert to boolean
+    return result.value.lval < 0;
 }
 
 /**
@@ -1364,7 +1373,10 @@ Value &Value::setType(Type type)
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
     
-    // run the conversion
+    // run the conversion, when it fails we throw a fatal error which will
+    // in the end result in a zend_error() call. This FatalError class is necessary
+    // because a direct call to zend_error() will do a longjmp() which may not
+    // clean up the C++ objects created by the extension
     switch (type) {
     case Type::Null:            convert_to_null(_val); break;
     case Type::Numeric:         convert_to_long(_val); break;
@@ -1373,10 +1385,10 @@ Value &Value::setType(Type type)
     case Type::Array:           convert_to_array(_val); break;
     case Type::Object:          convert_to_object(_val); break;
     case Type::String:          convert_to_string(_val); break;
-    case Type::Resource:        throw Php::Exception("Resource types can not be handled by the PHP-CPP library"); break;
-    case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
-    case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
-    case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
+    case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
     }
     
     // done

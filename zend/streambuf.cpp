@@ -33,7 +33,6 @@ int StreamBuf::sync()
         // not null terminated and (2) it could contain % signs and allow all
         // sorts of buffer overflows.
         zend_error(_error, "%.*s", (int)size, pbase());
-        
     }
     else
     {
