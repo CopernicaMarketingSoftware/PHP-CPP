@@ -202,13 +202,39 @@ public:
     
 private:
     /**
+     *  Method to create the object if it is default constructable
+     *  @param  orig
+     *  @return Base*
+     */
+    template <typename X = T>
+    typename std::enable_if<std::is_default_constructible<X>::value, Base*>::type
+    static maybeConstruct()
+    {
+        // create a new instance
+        return new X();
+    }
+
+    /**
+     *  Method to create the object if it is not default constructable
+     *  @param  orig
+     *  @return Base*
+     */
+    template <typename X = T>
+    typename std::enable_if<!std::is_default_constructible<X>::value, Base*>::type
+    static maybeConstruct()
+    {
+        // create empty instance
+        return nullptr;
+    }
+
+    /**
      *  Construct a new instance of the object
      *  @return Base
      */
     virtual Base* construct() const override
     {
         // construct an instance
-        return new T();
+        return maybeConstruct<T>();
     }
     
     /**
@@ -225,7 +251,7 @@ private:
     }
 
     /**
-     *  Method to clone the object if it is copy constructable
+     *  Method to clone the object if it is not copy constructable
      *  @param  orig
      *  @return Base*
      */
