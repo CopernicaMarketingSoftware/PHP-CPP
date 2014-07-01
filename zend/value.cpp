@@ -1435,6 +1435,15 @@ bool Value::isList() const
 }
 
 /**
+ *  Check if the variable holds something that is ref
+ *  @return bool
+ */ 
+bool Value::isRef() const
+{
+    return Z_ISREF_P(_val);
+}
+
+/**
  *  Make a clone of the type
  *  @return Value
  */

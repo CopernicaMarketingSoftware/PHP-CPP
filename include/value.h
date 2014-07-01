@@ -382,6 +382,8 @@ public:
     bool isCallable()   const;
     bool isList()       const;
     bool isMap()        const { return type() == Type::Array && !isList(); }
+    bool isRef()        const;
+
     /**
      *  Get access to the raw buffer - you can use this for direct reading and
      *  writing to and from the buffer. Note that this only works for string
@@ -964,6 +966,11 @@ public:
         
         // try casting it
         return dynamic_cast<T*>(base);
+    }
+
+    bool refequals(Value &value) const
+    {
+        return isRef() && _val == value._val;
     }
 
 private:
