@@ -1409,6 +1409,32 @@ bool Value::isCallable() const
 }
 
 /**
+ *  Check if the variable holds something that is list
+ *  @return bool
+ */ 
+bool Value::isList() const
+{
+    // must be an array
+    if (!isArray()) return false;
+
+    const HashTable *ht = Z_ARRVAL_P(_val);
+
+    // get the number of elements
+    int count = zend_hash_num_elements(ht);
+
+    // zero length array
+    if (count == 0) return true;
+
+    // count == 1 and a[0] exists
+    if (count == 1 && zend_hash_index_exists(ht, 0) != FAILURE) return true;
+
+    // a[0] exists, a[count - 1] exists and the next index is count
+    return zend_hash_index_exists(ht, 0) != FAILURE &&
+           zend_hash_index_exists(ht, count - 1) != FAILURE &&
+           zend_hash_next_free_element(ht) == count;
+}
+
+/**
  *  Make a clone of the type
  *  @return Value
  */
