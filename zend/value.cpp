@@ -1685,11 +1685,8 @@ bool Value::contains(int index) const
     // must be an array
     if (!isArray()) return false;
 
-    // unused variable
-    zval **result;
-    
     // check if this index is already in the array
-    return zend_hash_index_find(Z_ARRVAL_P(_val), index, (void**)&result) != FAILURE;
+    return zend_hash_index_exists(Z_ARRVAL_P(_val), index) != FAILURE;
 }
 
 /**
@@ -1706,11 +1703,8 @@ bool Value::contains(const char *key, int size) const
     // deal with arrays
     if (isArray())
     {
-        // unused variable
-        zval **result;
-     
         // check if index is already in the array
-        return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
+        return zend_hash_exists(Z_ARRVAL_P(_val), key, size+1) != FAILURE;
     }
     else if (isObject())
     {
