@@ -968,7 +968,7 @@ public:
         return dynamic_cast<T*>(base);
     }
 
-    bool refequals(Value &value) const
+    bool refequals(const Value &value) const
     {
         return isRef() && _val == value._val;
     }
