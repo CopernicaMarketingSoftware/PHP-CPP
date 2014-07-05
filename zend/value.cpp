@@ -245,10 +245,9 @@ Value::Value(const Value &that)
         // simply use the same zval
         _val = that._val;
     }
-    
+
     // that zval has one more reference
     Z_ADDREF_P(_val);
-
 
 //  Below the old implementation - I thought really hard about it and I though
 //  it was a correct and very smart implementation. However, it does not work
@@ -1417,21 +1416,18 @@ bool Value::isList() const
     // must be an array
     if (!isArray()) return false;
 
-    const HashTable *ht = Z_ARRVAL_P(_val);
-
     // get the number of elements
-    int count = zend_hash_num_elements(ht);
+    int count = size();
 
     // zero length array
     if (count == 0) return true;
 
     // count == 1 and a[0] exists
-    if (count == 1 && zend_hash_index_exists(ht, 0) != FAILURE) return true;
+    if (count == 1 && contains(0)) return true;
 
     // a[0] exists, a[count - 1] exists and the next index is count
-    return zend_hash_index_exists(ht, 0) != FAILURE &&
-           zend_hash_index_exists(ht, count - 1) != FAILURE &&
-           zend_hash_next_free_element(ht) == count;
+    return contains(0) && contains(count - 1) &&
+           zend_hash_next_free_element(Z_ARRVAL_P(_val)) == count;
 }
 
 /**
@@ -1441,6 +1437,27 @@ bool Value::isList() const
 bool Value::isRef() const
 {
     return Z_ISREF_P(_val);
+}
+
+/**
+ *  get a hash value for hash_map, unordered_map
+ *  @return bool
+ */ 
+size_t Value::hash() const {
+    static std::hash<std::string> stringhash;
+    switch (type()) {
+        case Type::Null:            return 0; break;
+        case Type::Numeric:         return Z_LVAL_P(_val); break;
+        case Type::Float:           return (size_t)Z_DVAL_P(_val); break;
+        case Type::Bool:            return (size_t)Z_BVAL_P(_val); break;
+        case Type::Array:           return (size_t)(intptr_t)Z_ARRVAL_P(_val); break;
+        case Type::Object:          return (size_t)((intptr_t)Z_OBJ_HANDLE_P(_val) ^ (intptr_t)Z_OBJ_HT_P(_val)); break;
+        case Type::String:          return stringhash(stringValue()); break;
+        case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
+        case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    }
 }
 
 /**
@@ -1654,6 +1671,109 @@ std::map<std::string,Php::Value> Value::mapValue() const
 }
 
 /**
+ *  Get array keys, or object property names, include private & protected properties
+ *  @return std::vector
+ */
+std::vector<Php::Value> Value::keys() const {
+    if (isArray()) {
+        std::vector<Php::Value> result;
+
+        HashTable *table = Z_ARRVAL_P(_val);
+        Bucket *position = nullptr;
+
+        // move to first position
+        zend_hash_internal_pointer_reset_ex(table, &position);
+
+        do {
+
+            // zval to read the current key in
+            Value key;
+
+#if PHP_VERSION_ID >= 50500
+
+            // read in the current key
+            zend_hash_get_current_key_zval_ex(table, key._val, &position);
+
+            // if the key is set to NULL, it means that the object is not at a valid position
+            if (key.isNull()) continue;
+
+#else
+
+            // php 5.3 and php 5.4 need a different implementation because the function
+            // zend_hash_get_current_key_zval_ex is missing in php 5.3, declare variables
+            // we need for storing the key in
+            char *string_key;
+            unsigned int str_len;
+            unsigned long num_key;
+
+            // get the current key
+            int type = zend_hash_get_current_key_ex(table, &string_key, &str_len, &num_key, 0, &position);
+
+            // if key is not found, the iterator is at an invalid position
+            if (type == HASH_KEY_NON_EXISTANT) continue;
+            
+            // numeric keys are the easiest ones
+            if (type == HASH_KEY_IS_LONG) key = (int64_t)num_key;
+            else key = std::string(string_key, str_len - 1);
+            
+#endif
+            result.push_back(std::move(key));
+
+        // move the iterator forward
+        } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
+
+        return result;
+    }
+    if (isObject()) {
+        return clone(Type::Array).keys();
+    }
+    return std::vector<Php::Value>();
+}
+
+/**
+ *  Get object property names.
+ *  @param only_public
+ *  @return std::vector
+ */
+std::vector<std::string> Value::properties(bool only_public) const {
+    if (isObject()) {
+        std::vector<std::string> result;
+
+        // we need the TSRMLS_CC variable
+        TSRMLS_FETCH();
+
+        HashTable *table = Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC);
+        Bucket *position = nullptr;
+
+        // move to first position
+        zend_hash_internal_pointer_reset_ex(table, &position);
+
+        do {
+            char *string_key;
+            unsigned int str_len;
+            unsigned long num_key;
+
+            // get the current key
+            int type = zend_hash_get_current_key_ex(table, &string_key, &str_len, &num_key, 0, &position);
+
+            // if key is not found, the iterator is at an invalid position
+            if (type == HASH_KEY_NON_EXISTANT) continue;
+
+            // if only_public is true, only store public property
+            if (!only_public || string_key[0]) {
+                result.push_back(std::string(string_key, str_len - 1));
+            }
+
+        // move the iterator forward
+        } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
+
+        return result;
+
+    }
+    return std::vector<std::string>();
+}
+
+/**
  *  Internal helper method to retrieve an iterator
  *  @param  begin       Should the iterator start at the begin
  *  @return iterator
@@ -1661,7 +1781,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
 ValueIterator Value::createIterator(bool begin) const
 {
     // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin));
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin, true));
     
     // get access to the hast table
     if (isObject()) 
@@ -1709,7 +1829,7 @@ ValueIterator Value::end() const
 {
     return createIterator(false);
 }
-
+ 
 /**
  *  Does the array contain a certain index?
  *  @param  index
@@ -1720,8 +1840,11 @@ bool Value::contains(int index) const
     // must be an array
     if (!isArray()) return false;
 
+    // unused variable
+    zval **result;
+
     // check if this index is already in the array
-    return zend_hash_index_exists(Z_ARRVAL_P(_val), index) != FAILURE;
+    return zend_hash_index_find(Z_ARRVAL_P(_val), index, (void**)&result) != FAILURE;
 }
 
 /**
@@ -1738,8 +1861,11 @@ bool Value::contains(const char *key, int size) const
     // deal with arrays
     if (isArray())
     {
+        // unused variable
+        zval **result;
+
         // check if index is already in the array
-        return zend_hash_exists(Z_ARRVAL_P(_val), key, size+1) != FAILURE;
+        return zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&result) != FAILURE;
     }
     else if (isObject())
     {
@@ -1812,15 +1938,41 @@ Value Value::get(const char *key, int size) const
     {
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
-        
-        // retrieve the class entry
-        auto *entry = zend_get_class_entry(_val TSRMLS_CC);
-        
-        // read the property (case necessary for php 5.3)
-        zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
-        
+
+        // the zval that will hold the copy
+        zval *copy;
+
+        // allocate memory
+        ALLOC_ZVAL(copy);
+
+        if (key[0]) {
+            // retrieve the class entry
+            auto *entry = zend_get_class_entry(_val TSRMLS_CC);
+
+            // read the property (case necessary for php 5.3)
+            zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
+
+            // copy the data
+            INIT_PZVAL_COPY(copy, property);
+
+        }
+        // get private & protected property
+        else {
+            // the result value
+            zval **result;
+            
+            if (zend_hash_find(Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC), key, size + 1, (void **)&result) == FAILURE) return Value();
+
+            // copy the data
+            INIT_PZVAL_COPY(copy, *result);
+
+        }
+
+        // run the copy constructor to ensure that everything gets copied
+        zval_copy_ctor(copy);
+
         // wrap in value
-        return Value(property);
+        return Value(copy);
     }
 }
 
@@ -1897,7 +2049,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
 
         // add the value (this will reduce the refcount of the current value)
-        add_assoc_zval_ex(_val, key, size+1, value._val);
+        add_assoc_zval_ex(_val, key, size + 1, value._val);
 
         // the variable has one more reference (the array entry)
         Z_ADDREF_P(value._val);
@@ -1971,7 +2123,7 @@ void Value::unset(const char *key, int size)
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
 
         // remove the index
-        zend_hash_del(Z_ARRVAL_P(_val), key, size);
+        zend_hash_del(Z_ARRVAL_P(_val), key, size + 1);
     }
 }
 

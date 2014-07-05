@@ -385,6 +385,15 @@ public:
     bool isRef()        const;
 
     /**
+     * Get a reference of this Value.
+     *
+     * @return Value
+     */
+    Value ref() const {
+        return Value(_val, true);
+    }
+
+    /**
      *  Get access to the raw buffer - you can use this for direct reading and
      *  writing to and from the buffer. Note that this only works for string
      *  variables - other variables return nullptr.
@@ -509,7 +518,20 @@ public:
         // done
         return result;
     }
-    
+
+    /**
+     *  Get array keys, or object property names, include private & protected properties
+     *  @return std::vector
+     */
+    std::vector<Php::Value> keys() const;
+
+    /**
+     *  Get object property names.
+     *  @param only_public
+     *  @return std::vector
+     */
+    std::vector<std::string> properties(bool only_public = true) const;
+
     /**
      *  Define the iterator type
      */
@@ -552,7 +574,7 @@ public:
     {
         return size();
     }
-    
+
     /**
      *  Is a certain index set in the array
      *  @param  index
@@ -972,6 +994,8 @@ public:
     {
         return isRef() && _val == value._val;
     }
+
+    size_t hash() const;
 
 private:
     /**
