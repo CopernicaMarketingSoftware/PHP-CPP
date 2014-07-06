@@ -990,12 +990,34 @@ public:
         return dynamic_cast<T*>(base);
     }
 
+    /**
+     *  To check for reference equality.
+     *  @param  value
+     *  @return bool
+     */
     bool refequals(const Value &value) const
     {
         return isRef() && _val == value._val;
     }
 
+    /**
+     *  Return a hash value for unordered_map.
+     *  @return size_t
+     */
     size_t hash() const;
+
+    /**
+     *  Return the class name of object.
+     *  Return empty string when this value is not a object.
+     *  @return std::string
+     */
+    std::string className() const;
+
+    /**
+     *  Return a id of object. (It is like spl_object_hash)
+     *  @return std::string
+     */
+    std::string id() const;
 
 private:
     /**

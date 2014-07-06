@@ -1439,7 +1439,7 @@ bool Value::isRef() const
 }
 
 /**
- *  get a hash value for hash_map, unordered_map
+ *  get a hash value for unordered_map.
  *  @return bool
  */ 
 size_t Value::hash() const {
@@ -1457,6 +1457,31 @@ size_t Value::hash() const {
         case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
         case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
     }
+}
+
+/**
+ *  Return the class name of object.
+ *  Return empty string when this value is not a object.
+ *  @return std::string
+ */
+std::string Value::className() const {
+    return Z_OBJ_CLASS_NAME_P(_val);
+}
+
+/**
+ *  Return a id of this value. (It is like spl_object_hash)
+ *  @return std::string
+ */
+std::string Value::id() const {
+    if (!isObject()) return "";
+    static intptr_t hash_mask_handle = rand();
+    static intptr_t hash_mask_handlers = rand();
+    char id[33];
+    intptr_t hash_handle, hash_handlers;
+    hash_handle = hash_mask_handle ^ (intptr_t)Z_OBJ_HANDLE_P(_val);
+    hash_handlers = hash_mask_handlers ^ (intptr_t)Z_OBJ_HT_P(_val);
+    sprintf(id, "%016lx%016lx", hash_handle, hash_handlers);
+    return id;
 }
 
 /**
