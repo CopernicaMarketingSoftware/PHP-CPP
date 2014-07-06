@@ -90,8 +90,6 @@ inline Value isset(const HashMember<Value> &member) { return member.exists() && 
  */
 #pragma pop_macro("isset")
 
-Value eval(const std::string &phpCode);
-
 /**
  *  End of namespace
  */
