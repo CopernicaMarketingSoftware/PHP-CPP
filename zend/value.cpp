@@ -161,6 +161,9 @@ Value::Value(struct _zval_struct *val, bool ref)
     // just copy the zval into this object
     _val = val;
     
+    // we see ourselves as reference too
+    Z_ADDREF_P(_val);
+
     // if the variable is not already a reference, and it has more than one
     // variable pointing to it, we should seperate it so that any changes
     // we're going to make will not change the other variable
@@ -169,10 +172,6 @@ Value::Value(struct _zval_struct *val, bool ref)
         // separate the zval
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
     }
-    
-    // we see ourselves as reference too
-    Z_ADDREF_P(_val);
-    
     // we're ready if we do not have to force it as a reference
     if (!ref || Z_ISREF_P(_val)) return;
     
@@ -1939,12 +1938,6 @@ Value Value::get(const char *key, int size) const
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
 
-        // the zval that will hold the copy
-        zval *copy;
-
-        // allocate memory
-        ALLOC_ZVAL(copy);
-
         if (key[0]) {
             // retrieve the class entry
             auto *entry = zend_get_class_entry(_val TSRMLS_CC);
@@ -1952,9 +1945,7 @@ Value Value::get(const char *key, int size) const
             // read the property (case necessary for php 5.3)
             zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
 
-            // copy the data
-            INIT_PZVAL_COPY(copy, property);
-
+            return Value(property);
         }
         // get private & protected property
         else {
@@ -1963,16 +1954,9 @@ Value Value::get(const char *key, int size) const
             
             if (zend_hash_find(Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC), key, size + 1, (void **)&result) == FAILURE) return Value();
 
-            // copy the data
-            INIT_PZVAL_COPY(copy, *result);
-
+            // wrap in value
+            return Value(*result);
         }
-
-        // run the copy constructor to ensure that everything gets copied
-        zval_copy_ctor(copy);
-
-        // wrap in value
-        return Value(copy);
     }
 }
 
