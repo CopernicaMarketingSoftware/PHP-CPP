@@ -391,6 +391,25 @@ int Value::refcount()
 }
 
 /**
+ * Set this Value to a reference.
+ *
+ * @return Value &
+ */
+Value &Value::setRef() {
+    // we're ready if we do not have to force it as a reference
+    if (Z_ISREF_P(_val)) return *this;
+
+    if (Z_REFCOUNT_P(_val) > 1) {
+        // separate the zval
+        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    }
+    // make this a reference
+    Z_SET_ISREF_P(_val);
+
+    return *this;
+}
+
+/**
  *  Move operator
  *  @param  value
  *  @return Value

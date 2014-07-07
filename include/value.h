@@ -394,6 +394,13 @@ public:
     }
 
     /**
+     * set this Value to a reference.
+     *
+     * @return Value &
+     */
+    Value &setRef();
+
+    /**
      *  Get access to the raw buffer - you can use this for direct reading and
      *  writing to and from the buffer. Note that this only works for string
      *  variables - other variables return nullptr.
