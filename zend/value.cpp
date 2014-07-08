@@ -332,7 +332,6 @@ Value::~Value()
 
     // if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
 
-
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
     zval_ptr_dtor(&_val);
@@ -1865,7 +1864,7 @@ std::vector<std::string> Value::properties(bool only_public) const {
         // we need the TSRMLS_CC variable
         TSRMLS_FETCH();
 
-        HashTable *table = Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC);
+        HashTable *table = Z_OBJPROP_P(_val);
         Bucket *position = nullptr;
 
         // move to first position
@@ -1883,8 +1882,18 @@ std::vector<std::string> Value::properties(bool only_public) const {
             if (type == HASH_KEY_NON_EXISTANT) continue;
 
             // if only_public is true, only store public property
-            if (!only_public || string_key[0]) {
+            if (only_public) {
+                if (string_key[0] == '\0') continue;
                 result.push_back(std::string(string_key, str_len - 1));
+            }
+            else {
+                std::string key = std::string(string_key, str_len - 1);
+                if (key[0] == '\0') {
+                    key = key.substr(key.find('\0', 1) + 1);
+                }
+                if (std::find(result.begin(), result.end(), key) == result.end()) {
+                    result.push_back(std::move(key));
+                }
             }
 
         // move the iterator forward
@@ -1925,7 +1934,7 @@ ValueIterator Value::createIterator(bool begin) const
         else
         {
             // construct a regular iterator
-            return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC), begin));
+            return ValueIterator(new HashIterator(Z_OBJPROP_P(_val), begin));
         }
     }
     
@@ -2076,7 +2085,7 @@ Value Value::get(const char *key, int size) const
             // the result value
             zval **result;
             
-            if (zend_hash_find(Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC), key, size + 1, (void **)&result) == FAILURE) return Value();
+            if (zend_hash_find(Z_OBJPROP_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
 
             // wrap in value
             return Value(*result);
