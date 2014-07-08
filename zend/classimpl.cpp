@@ -1382,14 +1382,25 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
     if (_parent) 
     {
         // check if the base class was already defined
-        if (_parent->_entry) entry.parent = _parent->_entry;
-        
+        if (_parent->_entry)
+        {
+            // register the class
+            _entry = zend_register_internal_class_ex(&entry, _parent->_entry, const_cast<char*>(_parent->name().c_str()) TSRMLS_CC);
+        }
+
         // otherwise an error is reported
-        else std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
+        else
+        {
+            std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
+            // register the class
+            _entry = zend_register_internal_class(&entry TSRMLS_CC);
+        }
     }
-    
-    // register the class
-    _entry = zend_register_internal_class(&entry TSRMLS_CC);
+    else
+    {
+        // register the class
+        _entry = zend_register_internal_class(&entry TSRMLS_CC);
+    }
     
     // register the classes
     for (auto &interface : _interfaces)
