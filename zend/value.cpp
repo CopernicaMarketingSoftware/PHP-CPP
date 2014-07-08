@@ -85,6 +85,17 @@ Value::Value(int64_t value)
 }
 
 /**
+ *  Constructor based on long value
+ *  @param  value
+ */
+Value::Value(long value)
+{
+    // create an integer zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_LONG(_val, value);
+}
+
+/**
  *  Constructor based on boolean value
  *  @param  value
  */
@@ -611,6 +622,26 @@ Value &Value::operator=(int64_t value)
  *  @param  value
  *  @return Value
  */
+Value &Value::operator=(long value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+    
+    // set new value
+    ZVAL_LONG(_val, value);
+
+    // update the object
+    return *this;
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
 Value &Value::operator=(bool value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
@@ -715,6 +746,7 @@ Value &Value::operator+=(const Value &value)        { return Arithmetic<std::plu
 Value &Value::operator+=(int16_t value)             { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(int32_t value)             { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(int64_t value)             { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(long value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(bool value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(char value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const std::string &value)  { return Arithmetic<std::plus>(this).assign(value); }
@@ -730,6 +762,7 @@ Value &Value::operator-=(const Value &value)        { return Arithmetic<std::min
 Value &Value::operator-=(int16_t value)             { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(int32_t value)             { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(int64_t value)             { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(long value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(bool value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(char value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const std::string &value)  { return Arithmetic<std::minus>(this).assign(value); }
@@ -745,6 +778,7 @@ Value &Value::operator*=(const Value &value)        { return Arithmetic<std::mul
 Value &Value::operator*=(int16_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(int32_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(int64_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(long value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(bool value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(char value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const std::string &value)  { return Arithmetic<std::multiplies>(this).assign(value); }
@@ -760,6 +794,7 @@ Value &Value::operator/=(const Value &value)        { return Arithmetic<std::div
 Value &Value::operator/=(int16_t value)             { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(int32_t value)             { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(int64_t value)             { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(long value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(bool value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(char value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const std::string &value)  { return Arithmetic<std::divides>(this).assign(value); }
@@ -776,6 +811,7 @@ Value &Value::operator%=(const Value &value)        { return operator=(numericVa
 Value &Value::operator%=(int16_t value)             { return operator=(numericValue() % value); }
 Value &Value::operator%=(int32_t value)             { return operator=(numericValue() % value); }
 Value &Value::operator%=(int64_t value)             { return operator=(numericValue() % value); }
+Value &Value::operator%=(long value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(bool value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
@@ -791,6 +827,7 @@ Value Value::operator+(const Value &value)          { return Arithmetic<std::plu
 Value Value::operator+(int16_t value)               { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(int32_t value)               { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(int64_t value)               { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(long value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(bool value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(char value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const std::string &value)    { return Arithmetic<std::plus>(this).apply(value); }
@@ -806,6 +843,7 @@ Value Value::operator-(const Value &value)          { return Arithmetic<std::min
 Value Value::operator-(int16_t value)               { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(int32_t value)               { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(int64_t value)               { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(long value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(bool value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(char value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const std::string &value)    { return Arithmetic<std::minus>(this).apply(value); }
@@ -821,6 +859,7 @@ Value Value::operator*(const Value &value)          { return Arithmetic<std::mul
 Value Value::operator*(int16_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(int32_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(int64_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(long value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(bool value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(char value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const std::string &value)    { return Arithmetic<std::multiplies>(this).apply(value); }
@@ -836,6 +875,7 @@ Value Value::operator/(const Value &value)          { return Arithmetic<std::div
 Value Value::operator/(int16_t value)               { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(int32_t value)               { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(int64_t value)               { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(long value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(bool value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(char value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const std::string &value)    { return Arithmetic<std::divides>(this).apply(value); }
@@ -851,6 +891,7 @@ Value Value::operator%(const Value &value)          { return Value(numericValue(
 Value Value::operator%(int16_t value)               { return Value(numericValue() % value); }
 Value Value::operator%(int32_t value)               { return Value(numericValue() % value); }
 Value Value::operator%(int64_t value)               { return Value(numericValue() % value); }
+Value Value::operator%(long value)                  { return Value(numericValue() % value); }
 Value Value::operator%(bool value)                  { return Value(numericValue() % value); }
 Value Value::operator%(char value)                  { return Value(numericValue() % value); }
 Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }
@@ -1435,7 +1476,7 @@ bool Value::isList() const
     if (!isArray()) return false;
 
     // get the number of elements
-    int count = size();
+    ulong count = zend_hash_num_elements(Z_ARRVAL_P(_val));
 
     // zero length array
     if (count == 0) return true;
@@ -1476,6 +1517,7 @@ size_t Value::hash() const {
         case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
         case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
     }
+    return 0;
 }
 
 /**
@@ -1499,7 +1541,7 @@ std::string Value::id() const {
     intptr_t hash_handle, hash_handlers;
     hash_handle = hash_mask_handle ^ (intptr_t)Z_OBJ_HANDLE_P(_val);
     hash_handlers = hash_mask_handlers ^ (intptr_t)Z_OBJ_HT_P(_val);
-    sprintf(id, "%016lx%016lx", hash_handle, hash_handlers);
+    sprintf(id, "%016lx%016lx", (long)hash_handle, (long)hash_handlers);
     return id;
 }
 

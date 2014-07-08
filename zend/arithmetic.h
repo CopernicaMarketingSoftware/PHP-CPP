@@ -87,6 +87,20 @@ public:
     }
         
     /**
+     *  Apply a number, and return a new value object after running the arithmetic function
+     *  @param  value
+     *  @return Value
+     */
+    Value apply(long value)
+    {
+        // check if the current object is a floating point number
+        if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
+        
+        // apply to natural numbers
+        return Value(F<long>()(_value->numericValue(), value));
+    }
+
+    /**
      *  Apply a boolean (treat is as 0 or 1), and return a new value object after running the arithmetic function
      *  @param  value
      *  @return Value
@@ -203,6 +217,20 @@ public:
         
         // do a numeric operation
         return _value->operator=(F<int64_t>()(_value->numericValue(), value));
+    }
+
+    /**
+     *  Assign long int, applying the arithmetic operation
+     *  @param  value
+     *  @return Value
+     */
+    Value &assign(long value)
+    {
+        // is the current object a floating point type?
+        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
+        
+        // do a numeric operation
+        return _value->operator=(F<long>()(_value->numericValue(), value));
     }
 
     /**
