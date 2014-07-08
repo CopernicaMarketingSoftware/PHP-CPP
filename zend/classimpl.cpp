@@ -1387,12 +1387,12 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
             // register the class
             _entry = zend_register_internal_class_ex(&entry, _parent->_entry, const_cast<char*>(_parent->name().c_str()) TSRMLS_CC);
         }
-
-        // otherwise an error is reported
         else
         {
+            // report an error - the extension programmer probably made an error
             std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
-            // register the class
+            
+            // register the class, but without the base class
             _entry = zend_register_internal_class(&entry TSRMLS_CC);
         }
     }
