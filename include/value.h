@@ -54,6 +54,7 @@ public:
     Value(int16_t value);
     Value(int32_t value);
     Value(int64_t value);
+    Value(long value);
     Value(bool value);
     Value(char value);
     Value(const std::string &value);
@@ -100,7 +101,7 @@ public:
      *  @param  value
      */
     template <typename T>
-    Value(const std::map<std::string,T> &value)
+    Value(const std::map<std::string,T> &value) : Value(Type::Array)
     {
         // set all elements
         for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
@@ -154,6 +155,7 @@ public:
     Value &operator=(int16_t value);
     Value &operator=(int32_t value);
     Value &operator=(int64_t value);
+    Value &operator=(long value);
     Value &operator=(bool value);
     Value &operator=(char value);
     Value &operator=(const std::string &value);
@@ -169,6 +171,7 @@ public:
     Value &operator+=(int16_t value);
     Value &operator+=(int32_t value);
     Value &operator+=(int64_t value);
+    Value &operator+=(long value);
     Value &operator+=(bool value);
     Value &operator+=(char value);
     Value &operator+=(const std::string &value);
@@ -184,6 +187,7 @@ public:
     Value &operator-=(int16_t value);
     Value &operator-=(int32_t value);
     Value &operator-=(int64_t value);
+    Value &operator-=(long value);
     Value &operator-=(bool value);
     Value &operator-=(char value);
     Value &operator-=(const std::string &value);
@@ -199,6 +203,7 @@ public:
     Value &operator*=(int16_t value);
     Value &operator*=(int32_t value);
     Value &operator*=(int64_t value);
+    Value &operator*=(long value);
     Value &operator*=(bool value);
     Value &operator*=(char value);
     Value &operator*=(const std::string &value);
@@ -214,6 +219,7 @@ public:
     Value &operator/=(int16_t value);
     Value &operator/=(int32_t value);
     Value &operator/=(int64_t value);
+    Value &operator/=(long value);
     Value &operator/=(bool value);
     Value &operator/=(char value);
     Value &operator/=(const std::string &value);
@@ -229,6 +235,7 @@ public:
     Value &operator%=(int16_t value);
     Value &operator%=(int32_t value);
     Value &operator%=(int64_t value);
+    Value &operator%=(long value);
     Value &operator%=(bool value);
     Value &operator%=(char value);
     Value &operator%=(const std::string &value);
@@ -244,6 +251,7 @@ public:
     Value operator+(int16_t value);
     Value operator+(int32_t value);
     Value operator+(int64_t value);
+    Value operator+(long value);
     Value operator+(bool value);
     Value operator+(char value);
     Value operator+(const std::string &value);
@@ -259,6 +267,7 @@ public:
     Value operator-(int16_t value);
     Value operator-(int32_t value);
     Value operator-(int64_t value);
+    Value operator-(long value);
     Value operator-(bool value);
     Value operator-(char value);
     Value operator-(const std::string &value);
@@ -274,6 +283,7 @@ public:
     Value operator*(int16_t value);
     Value operator*(int32_t value);
     Value operator*(int64_t value);
+    Value operator*(long value);
     Value operator*(bool value);
     Value operator*(char value);
     Value operator*(const std::string &value);
@@ -289,6 +299,7 @@ public:
     Value operator/(int16_t value);
     Value operator/(int32_t value);
     Value operator/(int64_t value);
+    Value operator/(long value);
     Value operator/(bool value);
     Value operator/(char value);
     Value operator/(const std::string &value);
@@ -304,6 +315,7 @@ public:
     Value operator%(int16_t value);
     Value operator%(int32_t value);
     Value operator%(int64_t value);
+    Value operator%(long value);
     Value operator%(bool value);
     Value operator%(char value);
     Value operator%(const std::string &value);
@@ -380,6 +392,18 @@ public:
     bool isObject()     const { return type() == Type::Object; }
     bool isArray()      const { return type() == Type::Array; }
     bool isCallable()   const;
+    bool isList()       const;
+    bool isMap()        const { return type() == Type::Array && !isList(); }
+    bool isRef()        const;
+
+    /**
+     * Get a reference of this Value.
+     *
+     * @return Value
+     */
+    Value ref() const {
+        return Value(_val, true);
+    }
 
     /**
      *  Get access to the raw buffer - you can use this for direct reading and
@@ -502,11 +526,26 @@ public:
         
         // result variable
         std::map<std::string,T> result;
+
+        for (auto &iter : map) result[iter.first] = iter.second;
         
         // done
         return result;
     }
-    
+
+    /**
+     *  Get array keys, or object property names, include private & protected properties
+     *  @return std::vector
+     */
+    std::vector<Php::Value> keys() const;
+
+    /**
+     *  Get object property names.
+     *  @param only_public
+     *  @return std::vector
+     */
+    std::vector<std::string> properties(bool only_public = true) const;
+
     /**
      *  Define the iterator type
      */
@@ -549,7 +588,7 @@ public:
     {
         return size();
     }
-    
+
     /**
      *  Is a certain index set in the array
      *  @param  index
@@ -623,6 +662,15 @@ public:
     operator int64_t () const
     {
         return numericValue();
+    }
+
+    /**
+     *  Cast to a number
+     *  @return long
+     */
+    operator long () const
+    {
+        return (long)numericValue();
     }
     
     /**
@@ -965,7 +1013,58 @@ public:
         return dynamic_cast<T*>(base);
     }
 
+    /**
+     *  To check for reference equality.
+     *  @param  value
+     *  @return bool
+     */
+    bool refequals(const Value &value) const
+    {
+        return isRef() && _val == value._val;
+    }
+
+    /**
+     *  Return a hash value for unordered_map.
+     *  @return size_t
+     */
+    size_t hash() const;
+
+    /**
+     *  Return the class name of object.
+     *  Return empty string when this value is not a object.
+     *  @return std::string
+     */
+    std::string className() const;
+
+    /**
+     *  Return a id of object. (It is like spl_object_hash)
+     *  @return std::string
+     */
+    std::string id() const;
+
+    /**
+     *  Checks if this object is of the class or has the class as one of its parents
+     *  @param classname
+     *  @param allow_string
+     *  @return bool
+     */
+    inline bool is(const std::string &classname, bool allow_string=false) const {
+        return isImpl(classname, allow_string, false);
+    }
+
+    /**
+     *  Checks if this object has the class as one of its parents
+     *  @param classname
+     *  @return bool
+     */
+    inline bool isSubClassOf(const std::string &classname, bool allow_string=true) const {
+        return isImpl(classname, allow_string, true);
+    }
+
 private:
+
+    bool isImpl(const std::string &classname, bool allow_string, bool only_subclass) const;
+
     /**
      *  Call function with a number of parameters
      *  @param  argc        Number of parameters

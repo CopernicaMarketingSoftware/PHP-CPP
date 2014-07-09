@@ -85,6 +85,17 @@ Value::Value(int64_t value)
 }
 
 /**
+ *  Constructor based on long value
+ *  @param  value
+ */
+Value::Value(long value)
+{
+    // create an integer zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_LONG(_val, value);
+}
+
+/**
  *  Constructor based on boolean value
  *  @param  value
  */
@@ -169,10 +180,10 @@ Value::Value(struct _zval_struct *val, bool ref)
         // separate the zval
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
     }
-    
+
     // we see ourselves as reference too
     Z_ADDREF_P(_val);
-    
+
     // we're ready if we do not have to force it as a reference
     if (!ref || Z_ISREF_P(_val)) return;
     
@@ -229,26 +240,37 @@ Value::Value(const IniValue &value) : Value((const char *)value)
  */
 Value::Value(const Value &that)
 {
-    // is the other variable a reference?
-    if (Z_ISREF_P(that._val))
-    {
-        // because this is supposed to be a COPY, we can not add ourselves
-        // to the variable but have to allocate a new variable
-        ALLOC_ZVAL(_val);
-        INIT_PZVAL_COPY(_val, that._val);
-        
-        // we have to call the copy constructor to copy the entire other zval
-        zval_copy_ctor(_val);
-    }
-    else
-    {
-        // simply use the same zval
-        _val = that._val;
-    }
-    
+    _val = that._val;
+
     // that zval has one more reference
     Z_ADDREF_P(_val);
 
+
+//  Below the another old implementation - it does't work when we want to keep a
+//  reference in a container, such as std::vector, because it will copy a new
+//  value to the container, it's different between the old value when the old
+//  one is a reference. so the simple and right implementation is that we don't
+//  need to care about it's value or reference, keep up its original appearance.
+
+//    // is the other variable a reference?
+//    if (Z_ISREF_P(that._val))
+//    {
+//        // because this is supposed to be a COPY, we can not add ourselves
+//        // to the variable but have to allocate a new variable
+//        ALLOC_ZVAL(_val);
+//        INIT_PZVAL_COPY(_val, that._val);
+//        
+//        // we have to call the copy constructor to copy the entire other zval
+//        zval_copy_ctor(_val);
+//    }
+//    else
+//    {
+//        // simply use the same zval
+//        _val = that._val;
+//    }
+//
+//    // that zval has one more reference
+//    Z_ADDREF_P(_val);
 
 //  Below the old implementation - I thought really hard about it and I though
 //  it was a correct and very smart implementation. However, it does not work
@@ -299,11 +321,16 @@ Value::~Value()
 {
     // ignore if moved
     if (!_val) return;
-    
+
+
     // if there were two references or less, we're going to remove a reference
     // and only one reference will remain, the object will then impossible be
     // a reference
-    if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
+
+    // but we don't have to manually do this step,
+    // because zval_ptr_dtor(&_val) has automatically done this.
+
+    // if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
 
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
@@ -412,9 +439,13 @@ Value &Value::operator=(Value &&value)
         // the current refcount
         int refcount = Z_REFCOUNT_P(_val);
         
+        // clean up the current zval (but keep the zval structure)
+        zval_dtor(_val);
+
         // make the copy
         *_val = *value._val;
-        
+        zval_copy_ctor(_val);
+
         // restore reference and refcount setting
         Z_SET_ISREF_TO_P(_val, true);
         Z_SET_REFCOUNT_P(_val, refcount);
@@ -427,10 +458,6 @@ Value &Value::operator=(Value &&value)
             // to it, and we still need to store its contents, with one 
             // reference less
             Z_DELREF_P(value._val);
-            
-            // and we need to run the copy constructor on the current
-            // value, because we're making a deep copy
-            zval_copy_ctor(_val);
         }
         else
         {
@@ -594,6 +621,26 @@ Value &Value::operator=(int64_t value)
  *  @param  value
  *  @return Value
  */
+Value &Value::operator=(long value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+    
+    // set new value
+    ZVAL_LONG(_val, value);
+
+    // update the object
+    return *this;
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
 Value &Value::operator=(bool value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
@@ -698,6 +745,7 @@ Value &Value::operator+=(const Value &value)        { return Arithmetic<std::plu
 Value &Value::operator+=(int16_t value)             { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(int32_t value)             { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(int64_t value)             { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(long value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(bool value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(char value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const std::string &value)  { return Arithmetic<std::plus>(this).assign(value); }
@@ -713,6 +761,7 @@ Value &Value::operator-=(const Value &value)        { return Arithmetic<std::min
 Value &Value::operator-=(int16_t value)             { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(int32_t value)             { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(int64_t value)             { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(long value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(bool value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(char value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const std::string &value)  { return Arithmetic<std::minus>(this).assign(value); }
@@ -728,6 +777,7 @@ Value &Value::operator*=(const Value &value)        { return Arithmetic<std::mul
 Value &Value::operator*=(int16_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(int32_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(int64_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(long value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(bool value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(char value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const std::string &value)  { return Arithmetic<std::multiplies>(this).assign(value); }
@@ -743,6 +793,7 @@ Value &Value::operator/=(const Value &value)        { return Arithmetic<std::div
 Value &Value::operator/=(int16_t value)             { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(int32_t value)             { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(int64_t value)             { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(long value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(bool value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(char value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const std::string &value)  { return Arithmetic<std::divides>(this).assign(value); }
@@ -759,6 +810,7 @@ Value &Value::operator%=(const Value &value)        { return operator=(numericVa
 Value &Value::operator%=(int16_t value)             { return operator=(numericValue() % value); }
 Value &Value::operator%=(int32_t value)             { return operator=(numericValue() % value); }
 Value &Value::operator%=(int64_t value)             { return operator=(numericValue() % value); }
+Value &Value::operator%=(long value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(bool value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
@@ -774,6 +826,7 @@ Value Value::operator+(const Value &value)          { return Arithmetic<std::plu
 Value Value::operator+(int16_t value)               { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(int32_t value)               { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(int64_t value)               { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(long value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(bool value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(char value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const std::string &value)    { return Arithmetic<std::plus>(this).apply(value); }
@@ -789,6 +842,7 @@ Value Value::operator-(const Value &value)          { return Arithmetic<std::min
 Value Value::operator-(int16_t value)               { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(int32_t value)               { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(int64_t value)               { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(long value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(bool value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(char value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const std::string &value)    { return Arithmetic<std::minus>(this).apply(value); }
@@ -804,6 +858,7 @@ Value Value::operator*(const Value &value)          { return Arithmetic<std::mul
 Value Value::operator*(int16_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(int32_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(int64_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(long value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(bool value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(char value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const std::string &value)    { return Arithmetic<std::multiplies>(this).apply(value); }
@@ -819,6 +874,7 @@ Value Value::operator/(const Value &value)          { return Arithmetic<std::div
 Value Value::operator/(int16_t value)               { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(int32_t value)               { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(int64_t value)               { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(long value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(bool value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(char value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const std::string &value)    { return Arithmetic<std::divides>(this).apply(value); }
@@ -834,6 +890,7 @@ Value Value::operator%(const Value &value)          { return Value(numericValue(
 Value Value::operator%(int16_t value)               { return Value(numericValue() % value); }
 Value Value::operator%(int32_t value)               { return Value(numericValue() % value); }
 Value Value::operator%(int64_t value)               { return Value(numericValue() % value); }
+Value Value::operator%(long value)                  { return Value(numericValue() % value); }
 Value Value::operator%(bool value)                  { return Value(numericValue() % value); }
 Value Value::operator%(char value)                  { return Value(numericValue() % value); }
 Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }
@@ -1409,6 +1466,123 @@ bool Value::isCallable() const
 }
 
 /**
+ *  Check if the variable holds something that is list
+ *  @return bool
+ */ 
+bool Value::isList() const
+{
+    // must be an array
+    if (!isArray()) return false;
+
+    // get the number of elements
+    ulong count = zend_hash_num_elements(Z_ARRVAL_P(_val));
+
+    // zero length array
+    if (count == 0) return true;
+
+    // count == 1 and a[0] exists
+    if (count == 1 && contains(0)) return true;
+
+    // a[0] exists, a[count - 1] exists and the next index is count
+    return contains(0) && contains(count - 1) &&
+           zend_hash_next_free_element(Z_ARRVAL_P(_val)) == count;
+}
+
+/**
+ *  Check if the variable holds something that is ref
+ *  @return bool
+ */ 
+bool Value::isRef() const
+{
+    return Z_ISREF_P(_val);
+}
+
+/**
+ *  get a hash value for unordered_map.
+ *  @return bool
+ */ 
+size_t Value::hash() const {
+    static std::hash<std::string> stringhash;
+    switch (type()) {
+        case Type::Null:            return 0; break;
+        case Type::Numeric:         return Z_LVAL_P(_val); break;
+        case Type::Float:           return (size_t)Z_DVAL_P(_val); break;
+        case Type::Bool:            return (size_t)Z_BVAL_P(_val); break;
+        case Type::Array:           return (size_t)(intptr_t)Z_ARRVAL_P(_val); break;
+        case Type::Object:          return (size_t)((intptr_t)Z_OBJ_HANDLE_P(_val) ^ (intptr_t)Z_OBJ_HT_P(_val)); break;
+        case Type::String:          return stringhash(stringValue()); break;
+        case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
+        case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    }
+    return 0;
+}
+
+/**
+ *  Return the class name of object.
+ *  Return empty string when this value is not a object.
+ *  @return std::string
+ */
+std::string Value::className() const {
+    return Z_OBJ_CLASS_NAME_P(_val);
+}
+
+/**
+ *  Return a id of this value. (It is like spl_object_hash)
+ *  @return std::string
+ */
+std::string Value::id() const {
+    if (!isObject()) return "";
+    static intptr_t hash_mask_handle = rand();
+    static intptr_t hash_mask_handlers = rand();
+    char id[33];
+    intptr_t hash_handle, hash_handlers;
+    hash_handle = hash_mask_handle ^ (intptr_t)Z_OBJ_HANDLE_P(_val);
+    hash_handlers = hash_mask_handlers ^ (intptr_t)Z_OBJ_HT_P(_val);
+    sprintf(id, "%016lx%016lx", (long)hash_handle, (long)hash_handlers);
+    return id;
+}
+
+bool Value::isImpl(const std::string &classname, bool allow_string, bool only_subclass) const {
+    /*
+     * allow_string - is default is false, isSubclassOf is true.
+     *   if it's allowed, the the autoloader will be called if the class does not exist.
+     *   default behaviour is different, as 'is' used to be used to test mixed return
+     *   values and there is no easy way to deprecate this.
+     */
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    zend_class_entry *instance_ce;
+    zend_class_entry **ce;
+
+    if (allow_string && isString()) {
+        zend_class_entry **the_ce;
+        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &the_ce TSRMLS_CC) == FAILURE) {
+            return false;
+        }
+        instance_ce = *the_ce;
+    }
+    else if (isObject() && HAS_CLASS_ENTRY(*_val)) {
+        instance_ce = Z_OBJCE_P(_val);
+    }
+    else {
+        return false;
+    }
+
+    if (zend_lookup_class_ex(classname.c_str(), (int32_t)classname.length(), NULL, 0, &ce TSRMLS_CC) == FAILURE) {
+        return false;
+    }
+
+    if (only_subclass && instance_ce == *ce) {
+        return false;
+    }
+
+    return instanceof_function(instance_ce, *ce TSRMLS_CC);
+}
+
+/**
  *  Make a clone of the type
  *  @return Value
  */
@@ -1619,6 +1793,119 @@ std::map<std::string,Php::Value> Value::mapValue() const
 }
 
 /**
+ *  Get array keys, or object property names, include private & protected properties
+ *  @return std::vector
+ */
+std::vector<Php::Value> Value::keys() const {
+    if (isArray()) {
+        std::vector<Php::Value> result;
+
+        HashTable *table = Z_ARRVAL_P(_val);
+        Bucket *position = nullptr;
+
+        // move to first position
+        zend_hash_internal_pointer_reset_ex(table, &position);
+
+        do {
+
+            // zval to read the current key in
+            Value key;
+
+#if PHP_VERSION_ID >= 50500
+
+            // read in the current key
+            zend_hash_get_current_key_zval_ex(table, key._val, &position);
+
+            // if the key is set to NULL, it means that the object is not at a valid position
+            if (key.isNull()) continue;
+
+#else
+
+            // php 5.3 and php 5.4 need a different implementation because the function
+            // zend_hash_get_current_key_zval_ex is missing in php 5.3, declare variables
+            // we need for storing the key in
+            char *string_key;
+            unsigned int str_len;
+            unsigned long num_key;
+
+            // get the current key
+            int type = zend_hash_get_current_key_ex(table, &string_key, &str_len, &num_key, 0, &position);
+
+            // if key is not found, the iterator is at an invalid position
+            if (type == HASH_KEY_NON_EXISTANT) continue;
+            
+            // numeric keys are the easiest ones
+            if (type == HASH_KEY_IS_LONG) key = (int64_t)num_key;
+            else key = std::string(string_key, str_len - 1);
+            
+#endif
+            result.push_back(std::move(key));
+
+        // move the iterator forward
+        } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
+
+        return result;
+    }
+    if (isObject()) {
+        return clone(Type::Array).keys();
+    }
+    return std::vector<Php::Value>();
+}
+
+/**
+ *  Get object property names.
+ *  @param only_public
+ *  @return std::vector
+ */
+std::vector<std::string> Value::properties(bool only_public) const {
+    if (isObject()) {
+        std::vector<std::string> result;
+
+        // we need the TSRMLS_CC variable
+        TSRMLS_FETCH();
+
+        HashTable *table = Z_OBJPROP_P(_val);
+        Bucket *position = nullptr;
+
+        // move to first position
+        zend_hash_internal_pointer_reset_ex(table, &position);
+
+        do {
+            char *string_key;
+            unsigned int str_len;
+            unsigned long num_key;
+
+            // get the current key
+            int type = zend_hash_get_current_key_ex(table, &string_key, &str_len, &num_key, 0, &position);
+
+            // if key is not found, the iterator is at an invalid position
+            if (type == HASH_KEY_NON_EXISTANT) continue;
+
+            // if only_public is true, only store public property
+            if (only_public) {
+                if (string_key[0] == '\0') continue;
+                result.push_back(std::string(string_key, str_len - 1));
+            }
+            else {
+                std::string key = std::string(string_key, str_len - 1);
+                if (key[0] == '\0') {
+                    key = key.substr(key.find('\0', 1) + 1);
+                }
+                if (std::find(result.begin(), result.end(), key) == result.end()) {
+                    result.push_back(std::move(key));
+                }
+            }
+
+        // move the iterator forward
+        } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
+
+        return result;
+
+    }
+    return std::vector<std::string>();
+}
+
+/**
  *  Internal helper method to retrieve an iterator
  *  @param  begin       Should the iterator start at the begin
  *  @return iterator
@@ -1626,7 +1913,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
 ValueIterator Value::createIterator(bool begin) const
 {
     // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin));
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin, true));
     
     // get access to the hast table
     if (isObject()) 
@@ -1647,7 +1934,7 @@ ValueIterator Value::createIterator(bool begin) const
         else
         {
             // construct a regular iterator
-            return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC), begin));
+            return ValueIterator(new HashIterator(Z_OBJPROP_P(_val), begin));
         }
     }
     
@@ -1674,7 +1961,7 @@ ValueIterator Value::end() const
 {
     return createIterator(false);
 }
-
+ 
 /**
  *  Does the array contain a certain index?
  *  @param  index
@@ -1687,7 +1974,7 @@ bool Value::contains(int index) const
 
     // unused variable
     zval **result;
-    
+
     // check if this index is already in the array
     return zend_hash_index_find(Z_ARRVAL_P(_val), index, (void**)&result) != FAILURE;
 }
@@ -1708,9 +1995,9 @@ bool Value::contains(const char *key, int size) const
     {
         // unused variable
         zval **result;
-     
+
         // check if index is already in the array
-        return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
+        return zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&result) != FAILURE;
     }
     else if (isObject())
     {
@@ -1783,15 +2070,26 @@ Value Value::get(const char *key, int size) const
     {
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
-        
-        // retrieve the class entry
-        auto *entry = zend_get_class_entry(_val TSRMLS_CC);
-        
-        // read the property (case necessary for php 5.3)
-        zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
-        
-        // wrap in value
-        return Value(property);
+
+        if (key[0]) {
+            // retrieve the class entry
+            auto *entry = zend_get_class_entry(_val TSRMLS_CC);
+
+            // read the property (case necessary for php 5.3)
+            zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
+
+            return Value(property);
+        }
+        // get private & protected property
+        else {
+            // the result value
+            zval **result;
+            
+            if (zend_hash_find(Z_OBJPROP_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
+
+            // wrap in value
+            return Value(*result);
+        }
     }
 }
 
@@ -1868,7 +2166,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
 
         // add the value (this will reduce the refcount of the current value)
-        add_assoc_zval_ex(_val, key, size+1, value._val);
+        add_assoc_zval_ex(_val, key, size + 1, value._val);
 
         // the variable has one more reference (the array entry)
         Z_ADDREF_P(value._val);
@@ -1942,7 +2240,7 @@ void Value::unset(const char *key, int size)
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
 
         // remove the index
-        zend_hash_del(Z_ARRVAL_P(_val), key, size);
+        zend_hash_del(Z_ARRVAL_P(_val), key, size + 1);
     }
 }
 
