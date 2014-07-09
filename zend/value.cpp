@@ -439,9 +439,13 @@ Value &Value::operator=(Value &&value)
         // the current refcount
         int refcount = Z_REFCOUNT_P(_val);
         
+        // clean up the current zval (but keep the zval structure)
+        zval_dtor(_val);
+
         // make the copy
         *_val = *value._val;
-        
+        zval_copy_ctor(_val);
+
         // restore reference and refcount setting
         Z_SET_ISREF_TO_P(_val, true);
         Z_SET_REFCOUNT_P(_val, refcount);
@@ -454,10 +458,6 @@ Value &Value::operator=(Value &&value)
             // to it, and we still need to store its contents, with one 
             // reference less
             Z_DELREF_P(value._val);
-            
-            // and we need to run the copy constructor on the current
-            // value, because we're making a deep copy
-            zval_copy_ctor(_val);
         }
         else
         {
