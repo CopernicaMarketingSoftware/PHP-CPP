@@ -971,6 +971,13 @@ public:
      */
     size_t hash() const;
 
+    /**
+     *  Return the class name of the object.
+     *  Return empty string when the value is not an object.
+     *  @return std::string
+     */
+    std::string className() const;
+
 private:
     /**
      *  Call function with a number of parameters

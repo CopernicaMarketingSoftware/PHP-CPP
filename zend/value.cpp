@@ -2021,11 +2021,6 @@ std::ostream &operator<<(std::ostream &stream, const Value &value)
 }
 
 /**
- *  End of namespace
- */
-}
-
-/**
  *  get a hash value for unordered_map.
  *  @return bool
  */ 
@@ -2045,4 +2040,18 @@ size_t Value::hash() const {
         case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
     }
     return 0;
+}
+
+/**
+ *  Return the class name of the object.
+ *  Return empty string when the value is not an object.
+ *  @return std::string
+ */
+std::string Value::className() const {
+    return Z_OBJ_CLASS_NAME_P(_val);
+}
+
+/**
+ *  End of namespace
+ */
 }
