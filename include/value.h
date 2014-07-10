@@ -965,7 +965,28 @@ public:
         return dynamic_cast<T*>(base);
     }
 
+    /**
+     *  Checks if this object is of the class or has the class as one of its parents
+     *  @param classname
+     *  @param allow_string
+     *  @return bool
+     */
+    inline bool is(const std::string &classname, bool allow_string=false) const {
+        return isImpl(classname, allow_string, false);
+    }
+
+    /**
+     *  Checks if this object has the class as one of its parents
+     *  @param classname
+     *  @return bool
+     */
+    inline bool isSubClassOf(const std::string &classname, bool allow_string=true) const {
+        return isImpl(classname, allow_string, true);
+    }
+
 private:
+
+    bool isImpl(const std::string &classname, bool allow_string, bool only_subclass) const;
     /**
      *  Call function with a number of parameters
      *  @param  argc        Number of parameters
