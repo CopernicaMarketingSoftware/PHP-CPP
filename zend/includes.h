@@ -20,7 +20,8 @@
 #include <list>
 #include <exception>
 #include <type_traits>
-
+#include <algorithm>
+ 
 // for debug
 #include <iostream>
 
