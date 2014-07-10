@@ -382,6 +382,14 @@ public:
     bool isCallable()   const;
 
     /**
+     * Get a reference of this Value.
+     *
+     * @return Value
+     */
+    Value ref() const {
+        return Value(_val, true);
+    }
+    /**
      *  Get access to the raw buffer - you can use this for direct reading and
      *  writing to and from the buffer. Note that this only works for string
      *  variables - other variables return nullptr.
