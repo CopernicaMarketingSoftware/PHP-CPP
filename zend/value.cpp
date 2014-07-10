@@ -2025,3 +2025,24 @@ std::ostream &operator<<(std::ostream &stream, const Value &value)
  */
 }
 
+/**
+ *  get a hash value for unordered_map.
+ *  @return bool
+ */ 
+size_t Value::hash() const {
+    static std::hash<std::string> stringhash;
+    switch (type()) {
+        case Type::Null:            return 0; break;
+        case Type::Numeric:         return Z_LVAL_P(_val); break;
+        case Type::Float:           return (size_t)Z_DVAL_P(_val); break;
+        case Type::Bool:            return (size_t)Z_BVAL_P(_val); break;
+        case Type::Array:           return (size_t)(intptr_t)Z_ARRVAL_P(_val); break;
+        case Type::Object:          return (size_t)((intptr_t)Z_OBJ_HANDLE_P(_val) ^ (intptr_t)Z_OBJ_HT_P(_val)); break;
+        case Type::String:          return stringhash(stringValue()); break;
+        case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
+        case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    }
+    return 0;
+}

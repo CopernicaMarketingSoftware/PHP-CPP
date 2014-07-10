@@ -965,6 +965,12 @@ public:
         return dynamic_cast<T*>(base);
     }
 
+    /**
+     *  Return a hash value for unordered_map.
+     *  @return size_t
+     */
+    size_t hash() const;
+
 private:
     /**
      *  Call function with a number of parameters
