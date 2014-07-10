@@ -978,6 +978,12 @@ public:
      */
     std::string className() const;
 
+    /**
+     *  Return an id of the object. (It is like spl_object_hash)
+     *  Return empty string when the value is not an object.
+     *  @return std::string
+     */
+    std::string id() const;
 private:
     /**
      *  Call function with a number of parameters

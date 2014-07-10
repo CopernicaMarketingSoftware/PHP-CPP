@@ -2052,6 +2052,22 @@ std::string Value::className() const {
 }
 
 /**
+ *  Return an id of the object. (It is like spl_object_hash)
+ *  Return empty string when the value is not an object.
+ *  @return std::string
+ */
+std::string Value::id() const {
+    if (!isObject()) return "";
+    static intptr_t hash_mask_handle = rand();
+    static intptr_t hash_mask_handlers = rand();
+    char id[33];
+    intptr_t hash_handle, hash_handlers;
+    hash_handle = hash_mask_handle ^ (intptr_t)Z_OBJ_HANDLE_P(_val);
+    hash_handlers = hash_mask_handlers ^ (intptr_t)Z_OBJ_HT_P(_val);
+    sprintf(id, "%016lx%016lx", (long)hash_handle, (long)hash_handlers);
+    return id;
+}
+/**
  *  End of namespace
  */
 }
