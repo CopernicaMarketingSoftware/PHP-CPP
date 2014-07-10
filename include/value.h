@@ -389,6 +389,17 @@ public:
     Value ref() const {
         return Value(_val, true);
     }
+
+    /**
+     *  To check for reference equality.
+     *  @param  value
+     *  @return bool
+     */
+    bool refequals(const Value &value) const
+    {
+        return isRef() && _val == value._val;
+    }
+
     /**
      *  Get access to the raw buffer - you can use this for direct reading and
      *  writing to and from the buffer. Note that this only works for string
