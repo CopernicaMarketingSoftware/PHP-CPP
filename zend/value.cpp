@@ -229,26 +229,37 @@ Value::Value(const IniValue &value) : Value((const char *)value)
  */
 Value::Value(const Value &that)
 {
-    // is the other variable a reference?
-    if (Z_ISREF_P(that._val))
-    {
-        // because this is supposed to be a COPY, we can not add ourselves
-        // to the variable but have to allocate a new variable
-        ALLOC_ZVAL(_val);
-        INIT_PZVAL_COPY(_val, that._val);
-        
-        // we have to call the copy constructor to copy the entire other zval
-        zval_copy_ctor(_val);
-    }
-    else
-    {
-        // simply use the same zval
-        _val = that._val;
-    }
-    
+    _val = that._val;
+
     // that zval has one more reference
     Z_ADDREF_P(_val);
 
+//  Below the another old implementation - it does't work when we want to keep a
+//  reference in a container, such as std::vector, because it will copy a new
+//  value to the container, it's different between the old value when the old
+//  one is a reference. so the simple and right implementation is that we don't
+//  need to care about it's value or reference, keep up its original appearance.
+
+//    // is the other variable a reference?
+//    if (Z_ISREF_P(that._val))
+//    {
+//        // because this is supposed to be a COPY, we can not add ourselves
+//        // to the variable but have to allocate a new variable
+//        ALLOC_ZVAL(_val);
+//        INIT_PZVAL_COPY(_val, that._val);
+//        
+//        // we have to call the copy constructor to copy the entire other zval
+//        zval_copy_ctor(_val);
+//    }
+//    else
+//    {
+//        // simply use the same zval
+//        _val = that._val;
+//    }
+//    
+//    // that zval has one more reference
+//    Z_ADDREF_P(_val);
+//
 
 //  Below the old implementation - I thought really hard about it and I though
 //  it was a correct and very smart implementation. However, it does not work
@@ -303,7 +314,10 @@ Value::~Value()
     // if there were two references or less, we're going to remove a reference
     // and only one reference will remain, the object will then impossible be
     // a reference
-    if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
+    // but we don't have to manually do this step,
+    // because zval_ptr_dtor(&_val) has automatically done this.
+
+    // if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
 
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
@@ -412,8 +426,12 @@ Value &Value::operator=(Value &&value)
         // the current refcount
         int refcount = Z_REFCOUNT_P(_val);
         
+        // clean up the current zval (but keep the zval structure)
+        zval_dtor(_val);
+
         // make the copy
         *_val = *value._val;
+        zval_copy_ctor(_val);
         
         // restore reference and refcount setting
         Z_SET_ISREF_TO_P(_val, true);
@@ -427,10 +445,6 @@ Value &Value::operator=(Value &&value)
             // to it, and we still need to store its contents, with one 
             // reference less
             Z_DELREF_P(value._val);
-            
-            // and we need to run the copy constructor on the current
-            // value, because we're making a deep copy
-            zval_copy_ctor(_val);
         }
         else
         {
