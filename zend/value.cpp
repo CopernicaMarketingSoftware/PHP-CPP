@@ -1625,7 +1625,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
  */
 std::vector<std::string> Value::properties(bool only_public) const {
     if (isObject()) {
-        std::vector<std::string> result;
+        std::set<std::string> result;
 
         // we need the TSRMLS_CC variable
         TSRMLS_FETCH();
@@ -1647,25 +1647,18 @@ std::vector<std::string> Value::properties(bool only_public) const {
             // if key is not found, the iterator is at an invalid position
             if (type == HASH_KEY_NON_EXISTANT) continue;
 
-            // if only_public is true, only store public property
-            if (only_public) {
-                if (string_key[0] == '\0') continue;
-                result.push_back(std::string(string_key, str_len - 1));
+            std::string key = std::string(string_key, str_len - 1);
+            if (key[0] == '\0') {
+                // if only_public is true, only store public property
+                if (only_public) continue;
+                key = key.substr(key.find('\0', 1) + 1);
             }
-            else {
-                std::string key = std::string(string_key, str_len - 1);
-                if (key[0] == '\0') {
-                    key = key.substr(key.find('\0', 1) + 1);
-                }
-                if (std::find(result.begin(), result.end(), key) == result.end()) {
-                    result.push_back(std::move(key));
-                }
-            }
+            result.insert(std::move(key));
 
         // move the iterator forward
         } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
 
-        return result;
+        return std::vector<std::string>(result.begin(), result.end());
 
     }
     return std::vector<std::string>();
