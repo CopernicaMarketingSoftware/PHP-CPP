@@ -1783,15 +1783,26 @@ Value Value::get(const char *key, int size) const
     {
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
-        
-        // retrieve the class entry
-        auto *entry = zend_get_class_entry(_val TSRMLS_CC);
-        
-        // read the property (case necessary for php 5.3)
-        zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
-        
-        // wrap in value
-        return Value(property);
+
+        if (key[0]) {
+            // retrieve the class entry
+            auto *entry = zend_get_class_entry(_val TSRMLS_CC);
+
+            // read the property (case necessary for php 5.3)
+            zval *property = zend_read_property(entry, _val, (char *)key, size, 1 TSRMLS_CC);
+
+            return Value(property);
+        }
+        // get private & protected property
+        else {
+            // the result value
+            zval **result;
+
+            if (zend_hash_find(Z_OBJPROP_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
+
+            // wrap in value
+            return Value(*result);
+        }
     }
 }
 
@@ -1856,11 +1867,20 @@ void Value::setRaw(const char *key, int size, const Value &value)
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
 
-        // retrieve the class entry
-        auto *entry = zend_get_class_entry(_val TSRMLS_CC);
+        if (key[0]) {
+            // retrieve the class entry
+            auto *entry = zend_get_class_entry(_val TSRMLS_CC);
 
-        // update the property (cast necessary for php 5.3)
-        zend_update_property(entry, _val, (char *)key, size, value._val TSRMLS_CC);
+            // update the property (cast necessary for php 5.3)
+            zend_update_property(entry, _val, (char *)key, size, value._val TSRMLS_CC);
+        }
+        // set private & protected property
+        else {
+            // update the property
+            zend_hash_update(Z_OBJPROP_P(_val), key, size + 1, (void *)&value._val, sizeof(zval *), NULL);
+            // the variable has one more reference (the array entry)
+            Z_ADDREF_P(value._val);
+        }
     }
     else
     {
