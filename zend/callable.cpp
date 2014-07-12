@@ -51,14 +51,73 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
         {
             // get the result
             Value result(callable->invoke(params));
-            
+
             // detach the zval (we don't want it to be destructed)
             zval *val = result.detach();
-            
+
             // @todo php 5.6 has a RETVAL_ZVAL_FAST macro that can be used instead (and is faster)
-            
+
             // return a full copy of the zval, and do not destruct it
             RETVAL_ZVAL(val, 1, 0);
+        }
+        catch (Exception &exception)
+        {
+            // process the exception
+            process(exception TSRMLS_CC);
+        }
+    }
+}
+
+/**
+ *  Function that is called by the Zend engine every time that a function gets called
+ *  @param  ht
+ *  @param  return_value
+ *  @param  return_value_ptr
+ *  @param  this_ptr
+ *  @param  return_value_used
+ *  @param  tsrm_ls
+ *  @return integer
+ */
+void Callable::invoke_return_ref(INTERNAL_FUNCTION_PARAMETERS)
+{
+    // find the function name
+    const char *name = get_active_function_name(TSRMLS_C);
+
+    // uncover the hidden pointer inside the function name
+    Callable *callable = HiddenPointer<Callable>(name);
+
+    // check if sufficient parameters were passed (for some reason this check
+    // is not done by Zend, so we do it here ourselves)
+    if (ZEND_NUM_ARGS() < callable->_required)
+    {
+        // PHP itself only generates a warning when this happens, so we do the same too
+        Php::warning << name << "() expects at least " << callable->_required << " parameters, " << ZEND_NUM_ARGS() << " given" << std::flush;
+
+        // and we return null
+        RETURN_NULL();
+    }
+    else
+    {
+        // construct parameters
+        ParametersImpl params(this_ptr, ZEND_NUM_ARGS() TSRMLS_CC);
+
+        // the function could throw an exception
+        try
+        {
+            // get the result
+            Value result(callable->invoke(params));
+
+            // detach the zval (we don't want it to be destructed)
+            zval *val = result.detach();
+
+            // get the reference of the result
+            SEPARATE_ZVAL_TO_MAKE_IS_REF(&val);
+
+            // destroy the old return value
+            zval_ptr_dtor(return_value_ptr);
+
+            // return the reference
+            *return_value_ptr = val;
         }
         catch (Exception &exception)
         {
@@ -82,7 +141,12 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
 {
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = (const char *)_ptr;
-    entry->handler = &Callable::invoke;
+    if (_return_ref) {
+        entry->handler = &Callable::invoke_return_ref;
+    }
+    else {
+        entry->handler = &Callable::invoke;
+    }
     entry->arg_info = _argv;
     entry->num_args = _argc;
     entry->flags = flags;
@@ -103,9 +167,8 @@ void Callable::initialize(zend_arg_info *info, const char *classname) const
     // later it is casted to a zend_internal_function object
     auto *finfo = (zend_internal_function_info *)info;
     
-    // fill in all the members, note that return reference is false by default,
-    // because we do not support returning references in PHP-CPP, although Zend
-    // engine allows it. Inside the name we hide a pointer to the current object
+    // fill in all the members.
+    // Inside the name we hide a pointer to the current object
     finfo->_name = _ptr;
     finfo->_name_len = ::strlen(_ptr);
     finfo->_class_name = classname;
@@ -114,8 +177,8 @@ void Callable::initialize(zend_arg_info *info, const char *classname) const
     finfo->required_num_args = _required;
     finfo->_type_hint = (unsigned char)_return;
 
-    // we do not support return-by-reference
-    finfo->return_reference = false;
+    // we support return-by-reference
+    finfo->return_reference = _return_ref;
  
 # if PHP_VERSION_ID >= 50600
     // since php 5.6 there are _allow_null and _is_variadic properties. It's
@@ -138,7 +201,7 @@ void Callable::initialize(zend_arg_info *info, const char *classname) const
     info->array_type_hint = false;
     info->allow_null = false;
     info->pass_by_reference = false;
-    info->return_reference = false;
+    info->return_reference = _return_ref;
     info->required_num_args = _required;
 #endif
 }

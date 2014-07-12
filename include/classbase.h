@@ -183,15 +183,16 @@ protected:
      *  @param  method      The actual method
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
+     *  @param  return_ref  Return reference or not
      */
-    void method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const method_callback_0 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_1 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_2 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_3 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_4 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_5 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_6 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const method_callback_7 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
 
     /**
      *  Add a static method to the class
@@ -204,11 +205,12 @@ protected:
      *  @param  method      The actual method
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
+     *  @param  return_ref  Return reference or not
      */
-    void method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {});
-    void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {});
+    void method(const char *name, const native_callback_0 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const native_callback_1 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const native_callback_2 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
+    void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {}, bool return_ref = false);
 
     /**
      *  Add an abstract method to the class
@@ -216,8 +218,9 @@ protected:
      *  @param  name        Name of the method
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
+     *  @param  return_ref  Return reference or not
      */
-    void method(const char *name, int flags=0, const Arguments &args = {});
+    void method(const char *name, int flags=0, const Arguments &args = {}, bool return_ref = false);
 
     /**
      *  Add a property to the class

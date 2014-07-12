@@ -23,11 +23,13 @@ public:
      *  Constructor
      *  @param  name            Function name
      *  @param  function        The native C function
+     *  @param  arguments       Information about the arguments
+     *  @param  return_ref      Return reference or not
      */
-    Function(const char *name, const native_callback_0 &function, const Arguments &arguments = {}) : Callable(name, arguments), _type(0) { _function.f0 = function; }
-    Function(const char *name, const native_callback_1 &function, const Arguments &arguments = {}) : Callable(name, arguments), _type(1) { _function.f1 = function; }
-    Function(const char *name, const native_callback_2 &function, const Arguments &arguments = {}) : Callable(name, arguments), _type(2) { _function.f2 = function; }
-    Function(const char *name, const native_callback_3 &function, const Arguments &arguments = {}) : Callable(name, arguments), _type(3) { _function.f3 = function; }
+    Function(const char *name, const native_callback_0 &function, const Arguments &arguments = {}, bool return_ref = false) : Callable(name, arguments, return_ref), _type(0) { _function.f0 = function; }
+    Function(const char *name, const native_callback_1 &function, const Arguments &arguments = {}, bool return_ref = false) : Callable(name, arguments, return_ref), _type(1) { _function.f1 = function; }
+    Function(const char *name, const native_callback_2 &function, const Arguments &arguments = {}, bool return_ref = false) : Callable(name, arguments, return_ref), _type(2) { _function.f2 = function; }
+    Function(const char *name, const native_callback_3 &function, const Arguments &arguments = {}, bool return_ref = false) : Callable(name, arguments, return_ref), _type(3) { _function.f3 = function; }
 
     /**
      *  Copy constructor

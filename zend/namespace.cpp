@@ -18,15 +18,16 @@ namespace Php {
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @param  return_ref  Return reference or not
  *  @return Namespace   Same object to allow chaining
  */
-Namespace &Namespace::add(const char *name, const native_callback_0 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_0 &function, const Arguments &arguments, bool return_ref)
 {
     // skip when locked
     if (locked()) return *this;
 
     // add a function
-    _functions.push_back(std::make_shared<Function>(name, function, arguments));
+    _functions.push_back(std::make_shared<Function>(name, function, arguments, return_ref));
     
     // allow chaining
     return *this;
@@ -37,15 +38,16 @@ Namespace &Namespace::add(const char *name, const native_callback_0 &function, c
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @param  return_ref  Return reference or not
  *  @return Namespace   Same object to allow chaining
  */
-Namespace &Namespace::add(const char *name, const native_callback_1 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_1 &function, const Arguments &arguments, bool return_ref)
 {
     // skip when locked
     if (locked()) return *this;
 
     // add a function
-    _functions.push_back(std::make_shared<Function>(name, function, arguments));
+    _functions.push_back(std::make_shared<Function>(name, function, arguments, return_ref));
 
     // allow chaining
     return *this;
@@ -56,15 +58,16 @@ Namespace &Namespace::add(const char *name, const native_callback_1 &function, c
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @param  return_ref  Return reference or not
  *  @return Namespace   Same object to allow chaining
  */
-Namespace &Namespace::add(const char *name, const native_callback_2 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_2 &function, const Arguments &arguments, bool return_ref)
 {
     // skip when locked
     if (locked()) return *this;
 
     // add a function
-    _functions.push_back(std::make_shared<Function>(name, function, arguments));
+    _functions.push_back(std::make_shared<Function>(name, function, arguments, return_ref));
 
     // allow chaining
     return *this;
@@ -75,15 +78,16 @@ Namespace &Namespace::add(const char *name, const native_callback_2 &function, c
  *  @param  name        Name of the function
  *  @param  function    The function to add
  *  @param  arguments   Optional argument specification
+ *  @param  return_ref  Return reference or not
  *  @return Namespace   Same object to allow chaining
  */
-Namespace &Namespace::add(const char *name, const native_callback_3 &function, const Arguments &arguments)
+Namespace &Namespace::add(const char *name, const native_callback_3 &function, const Arguments &arguments, bool return_ref)
 {
     // skip when locked
     if (locked()) return *this;
 
     // add a function
-    _functions.push_back(std::make_shared<Function>(name, function, arguments));
+    _functions.push_back(std::make_shared<Function>(name, function, arguments, return_ref));
 
     // allow chaining
     return *this;

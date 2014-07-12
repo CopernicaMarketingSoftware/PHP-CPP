@@ -85,12 +85,13 @@ public:
      *  @param  name        Name of the function
      *  @param  function    The function to add
      *  @param  arguments   Optional argument specification
+     *  @param  return_ref  Return reference or not
      *  @return Namespace   Same object to allow chaining
      */
-    Namespace &add(const char *name, const native_callback_0 &function, const Arguments &arguments = {});
-    Namespace &add(const char *name, const native_callback_1 &function, const Arguments &arguments = {});
-    Namespace &add(const char *name, const native_callback_2 &function, const Arguments &arguments = {});
-    Namespace &add(const char *name, const native_callback_3 &function, const Arguments &arguments = {});
+    Namespace &add(const char *name, const native_callback_0 &function, const Arguments &arguments = {}, bool return_ref = false);
+    Namespace &add(const char *name, const native_callback_1 &function, const Arguments &arguments = {}, bool return_ref = false);
+    Namespace &add(const char *name, const native_callback_2 &function, const Arguments &arguments = {}, bool return_ref = false);
+    Namespace &add(const char *name, const native_callback_3 &function, const Arguments &arguments = {}, bool return_ref = false);
     
     /**
      *  Add a native class to the namespace by moving it

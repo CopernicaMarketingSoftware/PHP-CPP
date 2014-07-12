@@ -23,8 +23,9 @@ public:
      *  Constructor
      *  @param  name        Function or method name
      *  @param  arguments   Information about the arguments
+     *  @param  return_ref  Return reference or not
      */
-    Callable(const char *name, const Arguments &arguments = {}) : _ptr(this, name)
+    Callable(const char *name, const Arguments &arguments = {}, bool return_ref = false) : _ptr(this, name), _return_ref(return_ref)
     {
         // construct vector for arguments
         _argc = arguments.size();
@@ -52,6 +53,7 @@ public:
     Callable(const Callable &that) :
         _ptr(that._ptr),
         _return(that._return),
+        _return_ref(that._return_ref),
         _required(that._required),
         _argc(that._argc),
         _argv(nullptr) {}
@@ -63,6 +65,7 @@ public:
     Callable(Callable &&that) :
         _ptr(std::move(that._ptr)),
         _return(that._return),
+        _return_ref(that._return_ref),
         _required(that._required),
         _argc(that._argc),
         _argv(that._argv) 
@@ -116,6 +119,12 @@ protected:
      *  @var    Type
      */
     Type _return = Type::Null;
+
+    /**
+     *  Return reference or value
+     *  @var    bool
+     */
+    bool _return_ref = false;
 
     /**
      *  Required number of arguments
@@ -194,6 +203,17 @@ protected:
      */
     static void invoke(INTERNAL_FUNCTION_PARAMETERS);
 
+    /**
+     *  Function that is called by the Zend engine every time that a function gets called
+     *  @param  ht
+     *  @param  return_value
+     *  @param  return_value_ptr
+     *  @param  this_ptr
+     *  @param  return_value_used
+     *  @param  tsrm_ls
+     *  @return integer
+     */
+    static void invoke_return_ref(INTERNAL_FUNCTION_PARAMETERS);
 };
 
 /**
