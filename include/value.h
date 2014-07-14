@@ -51,10 +51,10 @@ public:
      *  @param  value
      */
     Value(std::nullptr_t value);
-    Value(int16_t value);
-    Value(int32_t value);
-    Value(int64_t value);
+    Value(short value);
+    Value(int value);
     Value(long value);
+    Value(long long value);
     Value(bool value);
     Value(char value);
     Value(const std::string &value);
@@ -152,10 +152,10 @@ public:
      */
     Value &operator=(std::nullptr_t value);
     Value &operator=(const Value &value);
-    Value &operator=(int16_t value);
-    Value &operator=(int32_t value);
-    Value &operator=(int64_t value);
+    Value &operator=(short value);
+    Value &operator=(int value);
     Value &operator=(long value);
+    Value &operator=(long long value);
     Value &operator=(bool value);
     Value &operator=(char value);
     Value &operator=(const std::string &value);
@@ -168,10 +168,10 @@ public:
      *  @return Value
      */
     Value &operator+=(const Value &value);
-    Value &operator+=(int16_t value);
-    Value &operator+=(int32_t value);
-    Value &operator+=(int64_t value);
+    Value &operator+=(short value);
+    Value &operator+=(int value);
     Value &operator+=(long value);
+    Value &operator+=(long long value);
     Value &operator+=(bool value);
     Value &operator+=(char value);
     Value &operator+=(const std::string &value);
@@ -184,10 +184,10 @@ public:
      *  @return Value
      */
     Value &operator-=(const Value &value);
-    Value &operator-=(int16_t value);
-    Value &operator-=(int32_t value);
-    Value &operator-=(int64_t value);
+    Value &operator-=(short value);
+    Value &operator-=(int value);
     Value &operator-=(long value);
+    Value &operator-=(long long value);
     Value &operator-=(bool value);
     Value &operator-=(char value);
     Value &operator-=(const std::string &value);
@@ -200,10 +200,10 @@ public:
      *  @return Value
      */
     Value &operator*=(const Value &value);
-    Value &operator*=(int16_t value);
-    Value &operator*=(int32_t value);
-    Value &operator*=(int64_t value);
+    Value &operator*=(short value);
+    Value &operator*=(int value);
     Value &operator*=(long value);
+    Value &operator*=(long long value);
     Value &operator*=(bool value);
     Value &operator*=(char value);
     Value &operator*=(const std::string &value);
@@ -216,10 +216,10 @@ public:
      *  @return Value
      */
     Value &operator/=(const Value &value);
-    Value &operator/=(int16_t value);
-    Value &operator/=(int32_t value);
-    Value &operator/=(int64_t value);
+    Value &operator/=(short value);
+    Value &operator/=(int value);
     Value &operator/=(long value);
+    Value &operator/=(long long value);
     Value &operator/=(bool value);
     Value &operator/=(char value);
     Value &operator/=(const std::string &value);
@@ -232,10 +232,10 @@ public:
      *  @return Value
      */
     Value &operator%=(const Value &value);
-    Value &operator%=(int16_t value);
-    Value &operator%=(int32_t value);
-    Value &operator%=(int64_t value);
+    Value &operator%=(short value);
+    Value &operator%=(int value);
     Value &operator%=(long value);
+    Value &operator%=(long long value);
     Value &operator%=(bool value);
     Value &operator%=(char value);
     Value &operator%=(const std::string &value);
@@ -248,10 +248,10 @@ public:
      *  @return Value
      */
     Value operator+(const Value &value);
-    Value operator+(int16_t value);
-    Value operator+(int32_t value);
-    Value operator+(int64_t value);
+    Value operator+(short value);
+    Value operator+(int value);
     Value operator+(long value);
+    Value operator+(long long value);
     Value operator+(bool value);
     Value operator+(char value);
     Value operator+(const std::string &value);
@@ -264,10 +264,10 @@ public:
      *  @return Value
      */
     Value operator-(const Value &value);
-    Value operator-(int16_t value);
-    Value operator-(int32_t value);
-    Value operator-(int64_t value);
+    Value operator-(short value);
+    Value operator-(int value);
     Value operator-(long value);
+    Value operator-(long long value);
     Value operator-(bool value);
     Value operator-(char value);
     Value operator-(const std::string &value);
@@ -280,10 +280,10 @@ public:
      *  @return Value
      */
     Value operator*(const Value &value);
-    Value operator*(int16_t value);
-    Value operator*(int32_t value);
-    Value operator*(int64_t value);
+    Value operator*(short value);
+    Value operator*(int value);
     Value operator*(long value);
+    Value operator*(long long value);
     Value operator*(bool value);
     Value operator*(char value);
     Value operator*(const std::string &value);
@@ -296,10 +296,10 @@ public:
      *  @return Value
      */
     Value operator/(const Value &value);
-    Value operator/(int16_t value);
-    Value operator/(int32_t value);
-    Value operator/(int64_t value);
+    Value operator/(short value);
+    Value operator/(int value);
     Value operator/(long value);
+    Value operator/(long long value);
     Value operator/(bool value);
     Value operator/(char value);
     Value operator/(const std::string &value);
@@ -312,10 +312,10 @@ public:
      *  @return Value
      */
     Value operator%(const Value &value);
-    Value operator%(int16_t value);
-    Value operator%(int32_t value);
-    Value operator%(int64_t value);
+    Value operator%(short value);
+    Value operator%(int value);
     Value operator%(long value);
+    Value operator%(long long value);
     Value operator%(bool value);
     Value operator%(char value);
     Value operator%(const std::string &value);
@@ -612,29 +612,20 @@ public:
     
     /**
      *  Cast to a number
-     *  @return int32_t
+     *  @return short
      */
-    operator int16_t () const
+    operator short () const
     {
-        return (int16_t)numericValue();
+        return (short)numericValue();
     }
 
     /**
      *  Cast to a number
-     *  @return int32_t
+     *  @return int
      */
-    operator int32_t () const
+    operator int () const
     {
-        return (int32_t)numericValue();
-    }
-
-    /**
-     *  Cast to a number
-     *  @return uint64_t
-     */
-    operator int64_t () const
-    {
-        return numericValue();
+        return (int)numericValue();
     }
 
     /**
@@ -644,6 +635,15 @@ public:
     operator long () const
     {
         return (long)numericValue();
+    }
+
+    /**
+     *  Cast to a number
+     *  @return long long
+     */
+    operator long long () const
+    {
+        return (long long)numericValue();
     }
     
     /**

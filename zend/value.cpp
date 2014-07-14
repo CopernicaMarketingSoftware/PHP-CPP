@@ -52,10 +52,10 @@ Value::Value(std::nullptr_t value)
 }
 
 /**
- *  Constructor based on integer value
+ *  Constructor based on short value
  *  @param  value
  */
-Value::Value(int16_t value)
+Value::Value(short value)
 {
     // create an integer zval
     MAKE_STD_ZVAL(_val);
@@ -63,21 +63,10 @@ Value::Value(int16_t value)
 }
 
 /**
- *  Constructor based on integer value
+ *  Constructor based on int value
  *  @param  value
  */
-Value::Value(int32_t value)
-{
-    // create an integer zval
-    MAKE_STD_ZVAL(_val);
-    ZVAL_LONG(_val, value);
-}
-
-/**
- *  Constructor based on int64_t value
- *  @param  value
- */
-Value::Value(int64_t value)
+Value::Value(int value)
 {
     // create an integer zval
     MAKE_STD_ZVAL(_val);
@@ -89,6 +78,17 @@ Value::Value(int64_t value)
  *  @param  value
  */
 Value::Value(long value)
+{
+    // create an integer zval
+    MAKE_STD_ZVAL(_val);
+    ZVAL_LONG(_val, value);
+}
+
+/**
+ *  Constructor based on long long value
+ *  @param  value
+ */
+Value::Value(long long value)
 {
     // create an integer zval
     MAKE_STD_ZVAL(_val);
@@ -545,7 +545,7 @@ Value &Value::operator=(std::nullptr_t value)
  *  @param  value
  *  @return Value
  */
-Value &Value::operator=(int16_t value)
+Value &Value::operator=(short value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -565,27 +565,7 @@ Value &Value::operator=(int16_t value)
  *  @param  value
  *  @return Value
  */
-Value &Value::operator=(int32_t value)
-{
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
-
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-    
-    // set new value
-    ZVAL_LONG(_val, value);
-
-    // update the object
-    return *this;
-}
-
-/**
- *  Assignment operator
- *  @param  value
- *  @return Value
- */
-Value &Value::operator=(int64_t value)
+Value &Value::operator=(int value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -606,6 +586,26 @@ Value &Value::operator=(int64_t value)
  *  @return Value
  */
 Value &Value::operator=(long value)
+{
+    // if this is not a reference variable, we should detach it to implement copy on write
+    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+
+    // deallocate current zval (without cleaning the zval structure)
+    zval_dtor(_val);
+    
+    // set new value
+    ZVAL_LONG(_val, value);
+
+    // update the object
+    return *this;
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(long long value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
@@ -726,10 +726,10 @@ Value &Value::operator=(double value)
  *  @return Value
  */
 Value &Value::operator+=(const Value &value)        { return Arithmetic<std::plus>(this).assign(value); }
-Value &Value::operator+=(int16_t value)             { return Arithmetic<std::plus>(this).assign(value); }
-Value &Value::operator+=(int32_t value)             { return Arithmetic<std::plus>(this).assign(value); }
-Value &Value::operator+=(int64_t value)             { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(short value)               { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(int value)                 { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(long value)                { return Arithmetic<std::plus>(this).assign(value); }
+Value &Value::operator+=(long long value)           { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(bool value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(char value)                { return Arithmetic<std::plus>(this).assign(value); }
 Value &Value::operator+=(const std::string &value)  { return Arithmetic<std::plus>(this).assign(value); }
@@ -742,10 +742,10 @@ Value &Value::operator+=(double value)              { return Arithmetic<std::plu
  *  @return Value
  */
 Value &Value::operator-=(const Value &value)        { return Arithmetic<std::minus>(this).assign(value); }
-Value &Value::operator-=(int16_t value)             { return Arithmetic<std::minus>(this).assign(value); }
-Value &Value::operator-=(int32_t value)             { return Arithmetic<std::minus>(this).assign(value); }
-Value &Value::operator-=(int64_t value)             { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(short value)               { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(int value)                 { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(long value)                { return Arithmetic<std::minus>(this).assign(value); }
+Value &Value::operator-=(long long value)           { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(bool value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(char value)                { return Arithmetic<std::minus>(this).assign(value); }
 Value &Value::operator-=(const std::string &value)  { return Arithmetic<std::minus>(this).assign(value); }
@@ -758,10 +758,10 @@ Value &Value::operator-=(double value)              { return Arithmetic<std::min
  *  @return Value
  */
 Value &Value::operator*=(const Value &value)        { return Arithmetic<std::multiplies>(this).assign(value); }
-Value &Value::operator*=(int16_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
-Value &Value::operator*=(int32_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
-Value &Value::operator*=(int64_t value)             { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(short value)               { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(int value)                 { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(long value)                { return Arithmetic<std::multiplies>(this).assign(value); }
+Value &Value::operator*=(long long value)           { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(bool value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(char value)                { return Arithmetic<std::multiplies>(this).assign(value); }
 Value &Value::operator*=(const std::string &value)  { return Arithmetic<std::multiplies>(this).assign(value); }
@@ -774,10 +774,10 @@ Value &Value::operator*=(double value)              { return Arithmetic<std::mul
  *  @return Value
  */
 Value &Value::operator/=(const Value &value)        { return Arithmetic<std::divides>(this).assign(value); }
-Value &Value::operator/=(int16_t value)             { return Arithmetic<std::divides>(this).assign(value); }
-Value &Value::operator/=(int32_t value)             { return Arithmetic<std::divides>(this).assign(value); }
-Value &Value::operator/=(int64_t value)             { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(short value)               { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(int value)                 { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(long value)                { return Arithmetic<std::divides>(this).assign(value); }
+Value &Value::operator/=(long long value)           { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(bool value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(char value)                { return Arithmetic<std::divides>(this).assign(value); }
 Value &Value::operator/=(const std::string &value)  { return Arithmetic<std::divides>(this).assign(value); }
@@ -791,10 +791,10 @@ Value &Value::operator/=(double value)              { return Arithmetic<std::div
  *  @return Value
  */
 Value &Value::operator%=(const Value &value)        { return operator=(numericValue() % value.numericValue()); }
-Value &Value::operator%=(int16_t value)             { return operator=(numericValue() % value); }
-Value &Value::operator%=(int32_t value)             { return operator=(numericValue() % value); }
-Value &Value::operator%=(int64_t value)             { return operator=(numericValue() % value); }
+Value &Value::operator%=(short value)               { return operator=(numericValue() % value); }
+Value &Value::operator%=(int value)                 { return operator=(numericValue() % value); }
 Value &Value::operator%=(long value)                { return operator=(numericValue() % value); }
+Value &Value::operator%=(long long value)           { return operator=(numericValue() % value); }
 Value &Value::operator%=(bool value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(char value)                { return operator=(numericValue() % value); }
 Value &Value::operator%=(const std::string &value)  { return operator=(numericValue() % atoi(value.c_str())); }
@@ -807,10 +807,10 @@ Value &Value::operator%=(double value)              { return operator=(numericVa
  *  @return Value
  */
 Value Value::operator+(const Value &value)          { return Arithmetic<std::plus>(this).apply(value); }
-Value Value::operator+(int16_t value)               { return Arithmetic<std::plus>(this).apply(value); }
-Value Value::operator+(int32_t value)               { return Arithmetic<std::plus>(this).apply(value); }
-Value Value::operator+(int64_t value)               { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(short value)                 { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(int value)                   { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(long value)                  { return Arithmetic<std::plus>(this).apply(value); }
+Value Value::operator+(long long value)             { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(bool value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(char value)                  { return Arithmetic<std::plus>(this).apply(value); }
 Value Value::operator+(const std::string &value)    { return Arithmetic<std::plus>(this).apply(value); }
@@ -823,10 +823,10 @@ Value Value::operator+(double value)                { return Arithmetic<std::plu
  *  @return Value
  */
 Value Value::operator-(const Value &value)          { return Arithmetic<std::minus>(this).apply(value); }
-Value Value::operator-(int16_t value)               { return Arithmetic<std::minus>(this).apply(value); }
-Value Value::operator-(int32_t value)               { return Arithmetic<std::minus>(this).apply(value); }
-Value Value::operator-(int64_t value)               { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(short value)                 { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(int value)                   { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(long value)                  { return Arithmetic<std::minus>(this).apply(value); }
+Value Value::operator-(long long value)             { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(bool value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(char value)                  { return Arithmetic<std::minus>(this).apply(value); }
 Value Value::operator-(const std::string &value)    { return Arithmetic<std::minus>(this).apply(value); }
@@ -839,10 +839,10 @@ Value Value::operator-(double value)                { return Arithmetic<std::min
  *  @return Value
  */
 Value Value::operator*(const Value &value)          { return Arithmetic<std::multiplies>(this).apply(value); }
-Value Value::operator*(int16_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
-Value Value::operator*(int32_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
-Value Value::operator*(int64_t value)               { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(short value)                 { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(int value)                   { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(long value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
+Value Value::operator*(long long value)             { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(bool value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(char value)                  { return Arithmetic<std::multiplies>(this).apply(value); }
 Value Value::operator*(const std::string &value)    { return Arithmetic<std::multiplies>(this).apply(value); }
@@ -855,10 +855,10 @@ Value Value::operator*(double value)                { return Arithmetic<std::mul
  *  @return Value
  */
 Value Value::operator/(const Value &value)          { return Arithmetic<std::divides>(this).apply(value); }
-Value Value::operator/(int16_t value)               { return Arithmetic<std::divides>(this).apply(value); }
-Value Value::operator/(int32_t value)               { return Arithmetic<std::divides>(this).apply(value); }
-Value Value::operator/(int64_t value)               { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(short value)                 { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(int value)                   { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(long value)                  { return Arithmetic<std::divides>(this).apply(value); }
+Value Value::operator/(long long value)             { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(bool value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(char value)                  { return Arithmetic<std::divides>(this).apply(value); }
 Value Value::operator/(const std::string &value)    { return Arithmetic<std::divides>(this).apply(value); }
@@ -871,10 +871,10 @@ Value Value::operator/(double value)                { return Arithmetic<std::div
  *  @return Value
  */
 Value Value::operator%(const Value &value)          { return Value(numericValue() % value.numericValue()); }
-Value Value::operator%(int16_t value)               { return Value(numericValue() % value); }
-Value Value::operator%(int32_t value)               { return Value(numericValue() % value); }
-Value Value::operator%(int64_t value)               { return Value(numericValue() % value); }
+Value Value::operator%(short value)                 { return Value(numericValue() % value); }
+Value Value::operator%(int value)                   { return Value(numericValue() % value); }
 Value Value::operator%(long value)                  { return Value(numericValue() % value); }
+Value Value::operator%(long long value)             { return Value(numericValue() % value); }
 Value Value::operator%(bool value)                  { return Value(numericValue() % value); }
 Value Value::operator%(char value)                  { return Value(numericValue() % value); }
 Value Value::operator%(const std::string &value)    { return Value(numericValue() % atoi(value.c_str())); }

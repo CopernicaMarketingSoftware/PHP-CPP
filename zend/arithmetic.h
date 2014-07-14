@@ -49,7 +49,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value apply(int16_t value)
+    Value apply(short value)
     {
         // check if the current object is a floating point number
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
@@ -63,7 +63,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value apply(int32_t value)
+    Value apply(int value)
     {
         // check if the current object is a floating point number
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
@@ -77,7 +77,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value apply(int64_t value)
+    Value apply(long value)
     {
         // check if the current object is a floating point number
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
@@ -91,7 +91,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value apply(long value)
+    Value apply(long long value)
     {
         // check if the current object is a floating point number
         if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
@@ -178,11 +178,11 @@ public:
     }
 
     /**
-     *  Assign a 16bit number, applying the arithmetic operation
+     *  Assign a short, applying the arithmetic operation
      *  @param  value
      *  @return Value
      */
-    Value &assign(int16_t value)
+    Value &assign(short value)
     {
         // is the current object a floating point type?
         if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
@@ -192,11 +192,11 @@ public:
     }
     
     /**
-     *  Assign 32bit integer, applying the arithmetic operation
+     *  Assign a int, applying the arithmetic operation
      *  @param  value
      *  @return Value
      */
-    Value &assign(int32_t value)
+    Value &assign(int value)
     {
         // is the current object a floating point type?
         if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
@@ -206,21 +206,7 @@ public:
     }
 
     /**
-     *  Assign 64bit integer, applying the arithmetic operation
-     *  @param  value
-     *  @return Value
-     */
-    Value &assign(int64_t value)
-    {
-        // is the current object a floating point type?
-        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
-        
-        // do a numeric operation
-        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
-    }
-
-    /**
-     *  Assign long int, applying the arithmetic operation
+     *  Assign long, applying the arithmetic operation
      *  @param  value
      *  @return Value
      */
@@ -230,7 +216,21 @@ public:
         if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
         
         // do a numeric operation
-        return _value->operator=(F<long>()(_value->numericValue(), value));
+        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
+    }
+
+    /**
+     *  Assign long long, applying the arithmetic operation
+     *  @param  value
+     *  @return Value
+     */
+    Value &assign(long long value)
+    {
+        // is the current object a floating point type?
+        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
+        
+        // do a numeric operation
+        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
     }
 
     /**
