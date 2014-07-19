@@ -1629,6 +1629,8 @@ std::vector<Php::Value> Value::keys() const {
 
     HashTable *table = isArray() ? Z_ARRVAL_P(_val) : Z_OBJPROP_P(_val);
 
+    result.reserve(zend_hash_num_elements(table));
+
     Bucket *position = nullptr;
 
     // move to first position
