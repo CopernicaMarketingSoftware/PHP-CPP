@@ -29,7 +29,7 @@ public:
      *  @param  first           Should it start on the first position?
      *  @param  tsrm_ls
      */
-    HashIterator(HashTable *hashtable, bool first) : _table(hashtable)
+    HashIterator(HashTable *hashtable, bool first, bool is_array = false) : _table(hashtable), _is_array(is_array)
     {
         // reset the hash pointer to the internal position
         if (hashtable && first) 
@@ -56,7 +56,7 @@ public:
      *  @param  tsrm_ls
      */
     HashIterator(const HashIterator &that TSRMLS_DC) :
-        _table(that._table), _position(that._position)
+        _table(that._table), _position(that._position), _is_array(that._is_array)
     {
         // read current position
         read();
@@ -166,7 +166,13 @@ private:
      *  @var    HashPosition
      */
     Bucket *_position = nullptr;
-    
+
+    /**
+     * Is a hash interator in array
+     * @var     bool
+     */
+     bool _is_array = false;
+
     /**
      *  The current key and value
      *  @var    std::pair
@@ -207,7 +213,7 @@ private:
 
         // numeric keys are the easiest ones
         if (type == HASH_KEY_IS_LONG) key = (int64_t)num_key;
-        else key = string_key;
+        else key = std::string(string_key, str_len - 1);
 
 #endif
 
@@ -223,7 +229,7 @@ private:
 
         // if the key is private (it starts with a null character) we should return
         // false to report that the object is not in a completely valid state
-        return !_current.first.isString() || _current.first.rawValue()[0];
+        return _is_array || !_current.first.isString() || _current.first.rawValue()[0];
     }
 
     /**
