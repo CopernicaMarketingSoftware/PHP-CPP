@@ -52,7 +52,11 @@ public:
      *  Overridden what method
      *  @return const char *
      */
+#ifdef _NOEXCEPT
+    virtual const char *what() const _NOEXCEPT override
+#else
     virtual const char *what() const noexcept override
+#endif
     {
         return _message.c_str();
     }

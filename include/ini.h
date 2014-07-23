@@ -125,7 +125,11 @@ private:
      *  @param  value
      *  @return string
      */
+#ifdef _MSC_VER
+    static const char* bool2str(const bool value)
+#else
     static constexpr const char* bool2str(const bool value)
+#endif
     {
         // cast to a string
         return (  static_cast<bool>(value) ? "On" : "Off");

@@ -87,7 +87,7 @@ public:
      */
     Value operator[](const char *name) const
     {
-        return Value(this)[name];
+        return Value(this).get(name);
     }
 
     /**
@@ -97,7 +97,7 @@ public:
      */
     Value operator[](const std::string &name) const
     {
-        return Value(this)[name];
+        return Value(this).get(name);
     }
     
     /**
@@ -107,7 +107,7 @@ public:
      */
     Value property(const char *name) const
     {
-        return Value(this)[name];
+        return Value(this).get(name);
     }
     
     /**
@@ -117,7 +117,7 @@ public:
      */
     Value property(const std::string &name) const
     {
-        return Value(this)[name];
+        return Value(this).get(name);
     }
     
     /**

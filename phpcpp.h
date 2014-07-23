@@ -22,6 +22,7 @@
 #include <exception>
 #include <map>
 #include <set>
+#include <functional>
 
 /**
  *  Include all headers files that are related to this library

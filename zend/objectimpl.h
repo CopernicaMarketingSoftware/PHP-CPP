@@ -98,20 +98,20 @@ public:
 
         // when in thread safety mode, the destruct method and free method have
         // an extra parameter holding thread information
-        using DestructType = void(zend_object*,unsigned int,void***);
-        using FreeType = void(zend_object*,void***);
+        typedef void(*DestructType)(zend_object*,unsigned int,void***);
+        typedef void(*FreeType)(zend_object*,void***);
     
 #else
 
         // not in thread mode: no special parameter for the tsrm_ls variable
-        using DestructType = void(zend_object*,unsigned int);
-        using FreeType = void(zend_object*);
+        typedef void(*DestructType)(zend_object*, unsigned int);
+        typedef void(*FreeType)(zend_object*);
     
 #endif
     
         // store the two destruct methods in temporary vars
-        DestructType *destructMethod = &ClassImpl::destructObject;
-        FreeType *freeMethod = &ClassImpl::freeObject;
+        DestructType destructMethod = &ClassImpl::destructObject;
+        FreeType freeMethod = &ClassImpl::freeObject;
 
         // the destructor and clone handlers are set to NULL. I dont know why, but they do not
         // seem to be necessary...
