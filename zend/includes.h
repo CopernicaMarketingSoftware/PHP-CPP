@@ -79,6 +79,7 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
+#include "../include/fastcall.h"
 
 /**
  *  Common header files for internal use only
