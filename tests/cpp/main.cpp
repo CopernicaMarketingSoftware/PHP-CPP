@@ -127,7 +127,7 @@ extern "C"
         extension.add("TestVariables\\test_env",          TestVariables::test_env);
         extension.add("TestVariables\\test_compare1",     TestVariables::test_compare1);
         extension.add("TestVariables\\test_compare2",     TestVariables::test_compare2);
-
+        extension.add("TestVariables\\test_constants",     TestVariables::test_constants);
 
         
 
