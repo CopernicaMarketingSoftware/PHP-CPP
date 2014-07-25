@@ -25,7 +25,7 @@ namespace TestVariables {
 	    
 	    Php::Value param5;
 	    param5.set(0, "param5");
-	    param5.set(1, 3.14159265359);
+	    param5.set(1, 3.14159265358979);
 	    param5.set(2, 28032014);
 	    param5.set("key", "value");
 
@@ -58,7 +58,7 @@ namespace TestVariables {
 	    
 	    Php::Value param5;
 	    param5.set(0, "param5");
-	    param5.set(1, 3.14159265359);
+	    param5.set(1, 3.14159265358979);
 	    param5.set(2, 28032014);
 	    param5.set("key", "value");
 

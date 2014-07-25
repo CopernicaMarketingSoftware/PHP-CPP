@@ -63,7 +63,9 @@ namespace TestVariables {
         out << "content1 : ";
         out.write(buffer0, length0);
         out << std::endl;
-        out << "content2 : "<< buffer1 << std::endl;
+        out << "content2 : ";
+        out.write(buffer1, length1);
+        out << std::endl;
        
         delete[] buffer0;
         delete[] buffer1;
