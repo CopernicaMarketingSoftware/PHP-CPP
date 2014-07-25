@@ -33,8 +33,8 @@ namespace Php {
      *  @param  case_insensitive
      *  @return bool
      */
-    bool define(const std::string &constant_name, const Php::Value &value, bool case_insensitive = false) {
-        char *name = constant_name.c_str();
+    bool define(const std::string &constant_name, const Php::Value &value, bool case_insensitive) {
+        char *name = (char *)constant_name.c_str();
         int name_len = constant_name.length();
         zval *val = value._val;
         zval *val_free = nullptr;
@@ -81,7 +81,7 @@ namespace Php {
         if (val_free) {
             zval_ptr_dtor(&val_free);
         }
-        c.flags = case_sensitive; /* non persistent */
+        c.flags = !case_insensitive; /* non persistent */
         c.name = IS_INTERNED(name) ? name : zend_strndup(name, name_len);
         if(c.name == NULL) {
             return false;
