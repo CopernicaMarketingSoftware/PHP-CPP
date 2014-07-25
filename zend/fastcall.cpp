@@ -42,7 +42,7 @@ namespace Php {
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
         /* class constant, check if there is name and make sure class is valid & exists */
-        if (zend_memnstr(name, "::", sizeof("::") - 1, name + name_len)) {
+        if (zend_memnstr(name, (char *)"::", sizeof("::") - 1, name + name_len)) {
             zend_error(E_WARNING, "Class constants cannot be defined or redefined");
             return false;
         }
