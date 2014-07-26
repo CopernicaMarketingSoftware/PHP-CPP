@@ -2,7 +2,7 @@
  *  phpcpp.h
  *
  *  Library to build PHP extensions with CPP
- *
+ * 
  *  @copyright 2013 CopernicA BV
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
