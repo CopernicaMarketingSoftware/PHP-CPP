@@ -1408,6 +1408,44 @@ bool Value::isCallable() const
     return zend_is_callable(_val, 0, NULL TSRMLS_CC);
 }
 
+bool Value::isImpl(const std::string &classname, bool allow_string, bool only_subclass) const {
+    /*
+     * allow_string - is default is false, isSubclassOf is true.
+     *   if it's allowed, the the autoloader will be called if the class does not exist.
+     *   default behaviour is different, as 'is' used to be used to test mixed return
+     *   values and there is no easy way to deprecate this.
+     */
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    zend_class_entry *instance_ce;
+    zend_class_entry **ce;
+
+    if (allow_string && isString()) {
+        zend_class_entry **the_ce;
+        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &the_ce TSRMLS_CC) == FAILURE) {
+            return false;
+        }
+        instance_ce = *the_ce;
+    }
+    else if (isObject() && HAS_CLASS_ENTRY(*_val)) {
+        instance_ce = Z_OBJCE_P(_val);
+    }
+    else {
+        return false;
+    }
+
+    if (zend_lookup_class_ex(classname.c_str(), (int32_t)classname.length(), NULL, 0, &ce TSRMLS_CC) == FAILURE) {
+        return false;
+    }
+
+    if (only_subclass && instance_ce == *ce) {
+        return false;
+    }
+
+    return instanceof_function(instance_ce, *ce TSRMLS_CC);
+}
+
 /**
  *  Make a clone of the type
  *  @return Value
