@@ -13,6 +13,11 @@
 namespace Php {
 
 /**
+ *  List of functions that are available for use in PHP
+ */
+Value eval(const std::string &phpCode);
+
+/**
  *  Call a function in PHP
  *  @param  name        Name of the function to call
  *  @param  params      Variable number of parameters
