@@ -1413,14 +1413,11 @@ bool Value::isCallable() const
  *  @param  allowString
  *  @return zend_class_entry
  */
-zend_class_entry Value::classEntry(bool allowString) const
+zend_class_entry *Value::classEntry(bool allowString) const
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
 
-    // the class-entry of 'this'
-    zend_class_entry *this_entry;
-    
     // is this an object
     if (isObject())
     {
@@ -1439,7 +1436,7 @@ zend_class_entry Value::classEntry(bool allowString) const
         zend_class_entry **ce;
         
         // find the class entry
-        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &ce TSRMLS_CC) == FAILURE) return return;
+        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &ce TSRMLS_CC) == FAILURE) return nullptr;
     
         // found the entry
         return *ce;
