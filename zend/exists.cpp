@@ -44,10 +44,10 @@ bool class_exists(const char *classname, size_t len, bool autoload)
         std::unique_ptr<char[]> lc_name(new char[len + 1]);
         
         // copy the name to lowercase, but ignore the starting slash (if there is one)
-        zend_str_tolower_copy(lc_name, classname, len);
+        zend_str_tolower_copy(lc_name.get(), classname, len);
 
         // see if there is a class with this name
-        if (SUCCESS != zend_hash_find(EG(class_table), name, len + 1, (void **) &ce)) return false;
+        if (SUCCESS != zend_hash_find(EG(class_table), lc_name.get(), len + 1, (void **) &ce)) return false;
         
         // the found "class" could also be an interface or trait, which we do no want
         return !(((*ce)->ce_flags & (ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT)) > ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
@@ -55,7 +55,7 @@ bool class_exists(const char *classname, size_t len, bool autoload)
     else
     {
         // no auto-load
-        if (SUCCESS != zend_lookup_class(str, len, &ce TSRMLS_CC) == SUCCESS) return false;
+        if (SUCCESS != zend_lookup_class(classname, len, &ce TSRMLS_CC)) return false;
 
         // the found "class" could also be an interface or trait, which we do no want
         return ((*ce)->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;

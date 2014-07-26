@@ -15,10 +15,10 @@ namespace Php {
 /**
  *  List of functions that are available for use in PHP
  */
-bool  class_exists(const char *classname, size_t size, bool autoload = true);
-bool  class_exists(const char *classname, bool autoload = true) { return class_exists(classname, strlen(classname), autoload); }
-bool  class_exists(const std::string &classname, bool autoload = true) { return class_exists(classname.c_str(), classname.size(), autoload); }
-Value eval(const std::string &phpCode);
+extern bool  class_exists(const char *classname, size_t size, bool autoload = true);
+inline bool  class_exists(const char *classname, bool autoload = true) { return class_exists(classname, strlen(classname), autoload); }
+inline bool  class_exists(const std::string &classname, bool autoload = true) { return class_exists(classname.c_str(), classname.size(), autoload); }
+extern Value eval(const std::string &phpCode);
 
 /**
  *  Call a function in PHP
