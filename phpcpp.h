@@ -60,7 +60,6 @@
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/call.h>
-#include <phpcpp/fastcall.h>
 
 /**
  *  Macro to export a function
