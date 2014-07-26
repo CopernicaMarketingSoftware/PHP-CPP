@@ -1408,42 +1408,105 @@ bool Value::isCallable() const
     return zend_is_callable(_val, 0, NULL TSRMLS_CC);
 }
 
-bool Value::isImpl(const std::string &classname, bool allow_string, bool only_subclass) const {
-    /*
-     * allow_string - is default is false, isSubclassOf is true.
-     *   if it's allowed, the the autoloader will be called if the class does not exist.
-     *   default behaviour is different, as 'is' used to be used to test mixed return
-     *   values and there is no easy way to deprecate this.
-     */
+/**
+ *  Retrieve the class entry
+ *  @param  allowString
+ *  @return zend_class_entry
+ */
+zend_class_entry Value::classEntry(bool allowString) const
+{
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
 
-    zend_class_entry *instance_ce;
+    // the class-entry of 'this'
+    zend_class_entry *this_entry;
+    
+    // is this an object
+    if (isObject())
+    {
+        // should have a class entry
+        if (!HAS_CLASS_ENTRY(*_val)) return nullptr;
+        
+        // class entry can be easily found
+        return Z_OBJCE_P(_val);
+    }
+    else
+    {
+        // the value is not an object, is this allowed?
+        if (!allowString || !isString()) return nullptr;
+        
+        // temporary variable
+        zend_class_entry **ce;
+        
+        // find the class entry
+        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &ce TSRMLS_CC) == FAILURE) return return;
+    
+        // found the entry
+        return *ce;
+    }
+}
+
+/**
+ *  Check whether this object is an instance of a certain class
+ * 
+ *  If you set the parameter 'allowString' to true, and the Value object
+ *  holds a string, the string will be treated as class name.
+ * 
+ *  @param  classname   The class of which this should be an instance
+ *  @param  size        Length of the classname string
+ *  @param  allowString Is it allowed for 'this' to be a string
+ *  @return bool
+ */
+bool Value::instanceOf(const char *classname, size_t size, bool allowString) const 
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // the class-entry of 'this'
+    zend_class_entry *this_ce = classEntry(allowString);
+    if (!this_ce) return false;
+    
+    // class entry of the parameter
     zend_class_entry **ce;
+    
+    // now we can look up the actual class
+    if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
+    
+    // check if this is a subclass
+    return instanceof_function(this_ce, *ce TSRMLS_CC);
+}
 
-    if (allow_string && isString()) {
-        zend_class_entry **the_ce;
-        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &the_ce TSRMLS_CC) == FAILURE) {
-            return false;
-        }
-        instance_ce = *the_ce;
-    }
-    else if (isObject() && HAS_CLASS_ENTRY(*_val)) {
-        instance_ce = Z_OBJCE_P(_val);
-    }
-    else {
-        return false;
-    }
+/**
+ *  Check whether this object is derived from a certain class
+ * 
+ *  If you set the parameter 'allowString' to true, and the Value object
+ *  holds a string, the string will be treated as class name.
+ * 
+ *  @param  classname   The class of which this should be an instance
+ *  @param  size        Length of the classname string
+ *  @param  allowString Is it allowed for 'this' to be a string
+ *  @return bool
+ */
+bool Value::subclassOf(const char *classname, size_t size, bool allowString) const 
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
 
-    if (zend_lookup_class_ex(classname.c_str(), (int32_t)classname.length(), NULL, 0, &ce TSRMLS_CC) == FAILURE) {
-        return false;
-    }
-
-    if (only_subclass && instance_ce == *ce) {
-        return false;
-    }
-
-    return instanceof_function(instance_ce, *ce TSRMLS_CC);
+    // the class-entry of 'this'
+    zend_class_entry *this_ce = classEntry(allowString);
+    if (!this_ce) return false;
+    
+    // class entry of the parameter
+    zend_class_entry **ce;
+    
+    // now we can look up the actual class
+    if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
+    
+    // should not be identical, it must be a real derived object
+    if (this_ce == *ce) return false;
+    
+    // check if this is a subclass
+    return instanceof_function(this_ce, *ce TSRMLS_CC);
 }
 
 /**
