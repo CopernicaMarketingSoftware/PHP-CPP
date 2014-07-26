@@ -35,6 +35,14 @@ bool class_exists(const char *classname, size_t len, bool autoload)
     // should we autoload the class?
     if (autoload) 
     {
+        // no auto-load
+        if (SUCCESS != zend_lookup_class(classname, len, &ce TSRMLS_CC)) return false;
+
+        // the found "class" could also be an interface or trait, which we do no want
+        return ((*ce)->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
+    }
+    else
+    {
         // starting slashes can be ignored
         if (len > 0 && classname[0] == '\\') { classname++; len--; }
         
@@ -51,14 +59,6 @@ bool class_exists(const char *classname, size_t len, bool autoload)
         
         // the found "class" could also be an interface or trait, which we do no want
         return !(((*ce)->ce_flags & (ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT)) > ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
-    }
-    else
-    {
-        // no auto-load
-        if (SUCCESS != zend_lookup_class(classname, len, &ce TSRMLS_CC)) return false;
-
-        // the found "class" could also be an interface or trait, which we do no want
-        return ((*ce)->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0;
     }
 }
 
