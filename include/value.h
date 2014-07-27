@@ -1102,6 +1102,8 @@ protected:
     friend class HashMember<int>;
     friend class HashMember<std::string>;
     friend class Callable;
+    friend Php::Value constant(const std::string &constant_name);
+    friend bool define(const std::string &constant_name, const Php::Value &value, bool case_insensitive);
 };
 
 /**
