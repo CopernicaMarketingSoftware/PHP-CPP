@@ -42,8 +42,10 @@ public:
     Object(const Value &value) : Value()
     {
         // string types are instantiated
-        if (value.isString()) instantiate(value);
-        
+        if (value.isString()) {
+            instantiate(value);
+            call("__construct");
+        }
         // otherwise copy the other object
         else operator=(value);
     }
