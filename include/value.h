@@ -100,7 +100,7 @@ public:
      *  @param  value
      */
     template <typename T>
-    Value(const std::map<std::string,T> &value)
+    Value(const std::map<std::string,T> &value) : Value(Type::Array)
     {
         // set all elements
         for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
@@ -502,6 +502,8 @@ public:
         
         // result variable
         std::map<std::string,T> result;
+
+        for (auto &iter : map) result[iter.first] = iter.second;
         
         // done
         return result;
