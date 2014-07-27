@@ -22,7 +22,7 @@ extern Value eval(const std::string &phpCode);
 inline bool  is_a(const Value &obj, const char *classname, size_t size, bool allow_string = false) { return obj.instanceOf(classname, size, allow_string); }
 inline bool  is_a(const Value &obj, const char *classname, bool allow_string = false) { return is_a(obj, classname, strlen(classname), allow_string); }
 inline bool  is_a(const Value &obj, const std::string &classname, bool allow_string = false) { return is_a(obj, classname.c_str(), classname.size(), allow_string); }
-inline bool  is_subclass_of(const Value &obj, const char *classname, size_t size, bool allow_string = true) { return obj.subclassOf(classname, size, allow_string); }
+inline bool  is_subclass_of(const Value &obj, const char *classname, size_t size, bool allow_string = true) { return obj.derivedFrom(classname, size, allow_string); }
 inline bool  is_subclass_of(const Value &obj, const char *classname, bool allow_string = true) { return is_subclass_of(obj, classname, strlen(classname), allow_string); }
 inline bool  is_subclass_of(const Value &obj, const std::string &classname, bool allow_string = true) { return is_subclass_of(obj, classname.c_str(), classname.size(), allow_string); }
 

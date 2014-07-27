@@ -991,9 +991,9 @@ public:
      *  @param  allowString Is it allowed for 'this' to be a string
      *  @return bool
      */
-    bool subclassOf(const char *classname, size_t size, bool allowString = false) const;
-    bool subclassOf(const char *classname, bool allowString = false) const { return subclassOf(classname, strlen(classname), allowString); }
-    bool subclassOf(const std::string &classname, bool allowString = false) const { return subclassOf(classname.c_str(), classname.size(), allowString); }
+    bool derivedFrom(const char *classname, size_t size, bool allowString = false) const;
+    bool derivedFrom(const char *classname, bool allowString = false) const { return derivedFrom(classname, strlen(classname), allowString); }
+    bool derivedFrom(const std::string &classname, bool allowString = false) const { return derivedFrom(classname.c_str(), classname.size(), allowString); }
 
 
 private:

@@ -1484,7 +1484,7 @@ bool Value::instanceOf(const char *classname, size_t size, bool allowString) con
  *  @param  allowString Is it allowed for 'this' to be a string
  *  @return bool
  */
-bool Value::subclassOf(const char *classname, size_t size, bool allowString) const 
+bool Value::derivedFrom(const char *classname, size_t size, bool allowString) const 
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
