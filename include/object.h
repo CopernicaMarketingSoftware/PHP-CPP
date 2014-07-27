@@ -41,13 +41,21 @@ public:
      */
     Object(const Value &value) : Value()
     {
-        // string types are instantiated
-        if (value.isString()) {
+        // when a string is passed in, we are going to make a new instance of the
+        // passed in string
+        if (value.isString()) 
+        {
+            // instantiate the object
             instantiate(value);
+            
+            // and call the __construct method
             call("__construct");
         }
-        // otherwise copy the other object
-        else operator=(value);
+        else 
+        {
+            // this simply copies the other object
+            operator=(value);
+        }
     }
 
     /**
