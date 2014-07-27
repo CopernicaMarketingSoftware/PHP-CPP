@@ -503,6 +503,7 @@ public:
         // result variable
         std::map<std::string,T> result;
 
+        // loop through the original map, and copy everything to the result
         for (auto &iter : map) result[iter.first] = iter.second;
         
         // done
