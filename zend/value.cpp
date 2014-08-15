@@ -1710,7 +1710,12 @@ std::map<std::string,Php::Value> Value::mapValue() const
     std::map<std::string,Php::Value> result;
     
     // iterate over the object
-    for (auto &iter : *this) result[iter.first.rawValue()] = iter.second;
+    for (auto &iter : *this)
+    {
+        auto &key = iter.first;
+        if (key.isNumeric()) result[std::to_string(key.numericValue())] = iter.second;
+        else result[iter.first.rawValue()] = iter.second;
+    }
     
     // done
     return result;
