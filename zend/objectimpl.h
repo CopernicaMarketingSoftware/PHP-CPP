@@ -98,14 +98,14 @@ public:
 
         // when in thread safety mode, the destruct method and free method have
         // an extra parameter holding thread information
-        typedef void(*DestructType)(zend_object*,unsigned int,void***);
-        typedef void(*FreeType)(zend_object*,void***);
+        using DestructType = void(*)(zend_object*,unsigned int,void***);
+        using FreeType = void(*)(zend_object*,void***);
     
 #else
 
         // not in thread mode: no special parameter for the tsrm_ls variable
-        typedef void(*DestructType)(zend_object*, unsigned int);
-        typedef void(*FreeType)(zend_object*);
+        using DestructType = void(*)(zend_object*, unsigned int);
+        using FreeType = void(*)(zend_object*);
     
 #endif
     
