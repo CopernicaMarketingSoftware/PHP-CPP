@@ -1,8 +1,10 @@
 /**
- *  fastcall.cpp
+ *  constant.cpp
  *
- *  This file holds some PHP functions implementation in C directly.
+ *  This file holds the implementation for the Php::constant(),
+ *  Php::define() and Php::defiend() functions
  *
+ *  @author andot <https://github.com/andot>
  */
 
 #include "includes.h"
