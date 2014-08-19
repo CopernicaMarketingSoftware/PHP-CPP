@@ -1445,10 +1445,10 @@ zend_class_entry *Value::classEntry(bool allowString) const
 
 /**
  *  Check whether this object is an instance of a certain class
- * 
+ *
  *  If you set the parameter 'allowString' to true, and the Value object
  *  holds a string, the string will be treated as class name.
- * 
+ *
  *  @param  classname   The class of which this should be an instance
  *  @param  size        Length of the classname string
  *  @param  allowString Is it allowed for 'this' to be a string
@@ -1462,23 +1462,29 @@ bool Value::instanceOf(const char *classname, size_t size, bool allowString) con
     // the class-entry of 'this'
     zend_class_entry *this_ce = classEntry(allowString);
     if (!this_ce) return false;
-    
+
     // class entry of the parameter
     zend_class_entry **ce;
-    
+
     // now we can look up the actual class
+    // the signature of zend_lookup_class_ex is slightly different since 5.4
+    // TODO The signature of this changed once again as of 5.6!
+#if PHP_VERSION_ID >= 50400
     if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
-    
+#else
+    if (zend_lookup_class_ex(classname, size, 0, &ce TSRMLS_CC) == FAILURE) return false;
+#endif
+
     // check if this is a subclass
     return instanceof_function(this_ce, *ce TSRMLS_CC);
 }
 
 /**
  *  Check whether this object is derived from a certain class
- * 
+ *
  *  If you set the parameter 'allowString' to true, and the Value object
  *  holds a string, the string will be treated as class name.
- * 
+ *
  *  @param  classname   The class of which this should be an instance
  *  @param  size        Length of the classname string
  *  @param  allowString Is it allowed for 'this' to be a string
@@ -1492,16 +1498,22 @@ bool Value::derivedFrom(const char *classname, size_t size, bool allowString) co
     // the class-entry of 'this'
     zend_class_entry *this_ce = classEntry(allowString);
     if (!this_ce) return false;
-    
+
     // class entry of the parameter
     zend_class_entry **ce;
-    
+
     // now we can look up the actual class
+    // the signature of zend_lookup_class_ex is slightly different since 5.4
+    // TODO The signature of this changed once again as of 5.6!
+#if PHP_VERSION_ID >= 50400
     if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
-    
+#else
+    if (zend_lookup_class_ex(classname, size, 0, &ce TSRMLS_CC) == FAILURE) return false;
+#endif
+
     // should not be identical, it must be a real derived object
     if (this_ce == *ce) return false;
-    
+
     // check if this is a subclass
     return instanceof_function(this_ce, *ce TSRMLS_CC);
 }

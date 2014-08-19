@@ -13,6 +13,15 @@
 #include "includes.h"
 
 /**
+ *  On php 5.3 ZEND_ACC_TRAIT isn't defined, so we simply define it to 0
+ *  so all operations with it are basically no-ops. Currently unconfirmed
+ *  if this actually works correctly on php 5.3, but it at least compiles.
+ */
+#ifndef ZEND_ACC_TRAIT
+#define ZEND_ACC_TRAIT 0
+#endif
+
+/**
  *  Open the PHP namespace
  */
 namespace Php {
