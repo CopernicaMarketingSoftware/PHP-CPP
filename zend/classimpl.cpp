@@ -20,11 +20,6 @@ ClassImpl::~ClassImpl()
 {
     // destruct the entries
     if (_entries) delete[] _entries;
-
-    // php 5.3 deallocates the doc_comment by iself
-#if PHP_VERSION_ID >= 50400    
-    if (_comment) free(_comment);
-#endif
 }
 
 /**
@@ -41,18 +36,21 @@ static ClassImpl *self(zend_class_entry *entry)
     // we need the base class (in user space the class may have been overridden,
     // but we are not interested in these user space classes)
     while (entry->parent) entry = entry->parent;
-    
+
 #if PHP_VERSION_ID >= 50400
     // retrieve the comment (it has a pointer hidden in it to the ClassBase object)
     const char *comment = entry->info.user.doc_comment;
-#else
-    // retrieve the comment php5.3 style (it has a pointer hidden in it to the ClassBase object)
-    const char *comment = entry->doc_comment;
-#endif    
-    
+
     // the first byte of the comment is an empty string (null character), but
     // the next bytes contain a pointer to the ClassBase class
     return *((ClassImpl **)(comment + 1));
+#else
+    // on php 5.3 we store the pointer to impl after the name in the entry
+    ClassImpl** impl = (ClassImpl**)(entry->name + 1 + entry->name_length);
+
+    // return the actual implementation
+    return *impl;
+#endif
 }
 
 /**
@@ -1411,34 +1409,37 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
         // otherwise report an error
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
-    
+
+    // this pointer has to be copied to temporary pointer, as &this causes compiler error
+    ClassImpl *impl = this;
+
+#if PHP_VERSION_ID >= 50400
+
     // allocate doc comment to contain an empty string + a hidden pointer
-    if (!_comment)
-    {
-        // allocate now
-        _comment = (char *)malloc(1 + sizeof(ClassBase *));
-        
-        // empty string on first position
-        _comment[0] = '\0';
-        
-        // this pointer has to be copied to temporary pointer, as &this causes compiler error
-        ClassImpl *impl = this;
-        
-        // copy the 'this' pointer to the doc-comment
-        memcpy(_comment+1, &impl, sizeof(ClassImpl *));
-    }
-    
-    // store pointer to the class in the unused doc_comment member
-#if PHP_VERSION_ID >= 50400    
+    char *_comment = (char *)malloc(1 + sizeof(ClassImpl *));
+
+    // empty string on first position
+    _comment[0] = '\0';
+
+    // copy the 'this' pointer to the doc-comment
+    memcpy(_comment+1, &impl, sizeof(ClassImpl *));
+
+    // set our comment in the actual class entry
     _entry->info.user.doc_comment = _comment;
+
 #else
-    // and store the wrapper inside the comment
-    _entry->doc_comment = _comment;
+
+    // Reallocate some extra space in the name in the zend_class_entry so we can fit a pointer behind it
+    _entry->name = (char *) realloc(_entry->name, _entry->name_length + 1 + sizeof(ClassImpl *));
+
+    // Copy the pointer after it
+    memcpy(_entry->name + _entry->name_length + 1, &impl, sizeof(ClassImpl *));
+
 #endif
 
     // set access types flags for class
     _entry->ce_flags = (int)_type;
-    
+
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry TSRMLS_CC);
 }

@@ -32,12 +32,6 @@ private:
     std::string _name;
 
     /**
-     *  The comment for reflexion, with a stored pointer to ourselves
-     *  @var    char*
-     */
-    char *_comment = nullptr;
-
-    /**
      *  The class type (this can be values like Php::Abstract and Php::Final)
      *  @var    ClassType
      */
