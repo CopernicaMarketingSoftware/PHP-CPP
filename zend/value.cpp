@@ -124,9 +124,19 @@ Value::Value(const std::string &value)
  */
 Value::Value(const char *value, int size)
 {
-    // create a string zval
-    MAKE_STD_ZVAL(_val);
-    ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size, 1);
+    // is there a value?
+    if (value)
+    {
+        // create a string zval
+        MAKE_STD_ZVAL(_val);
+        ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size, 1);
+    }
+    else
+    {
+        // create a null zval
+        MAKE_STD_ZVAL(_val);
+        ZVAL_NULL(_val);
+    }
 }
 
 /**

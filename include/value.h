@@ -441,8 +441,6 @@ public:
     template <typename T>
     std::vector<T> vectorValue() const
     {
-        
-        
         // only works for arrays, other types return an empty vector
         if (!isArray()) return std::vector<T>();
 
