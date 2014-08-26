@@ -1871,7 +1871,7 @@ Value Value::get(int index) const
  */
 Value Value::get(const char *key, int size) const
 {
-    // must be an array
+    // must be an array or object
     if (!isArray() && !isObject()) return Value();
 
     // calculate size
@@ -1891,6 +1891,9 @@ Value Value::get(const char *key, int size) const
     }
     else
     {
+        // key should not start with a null byte
+        if (size > 0 && key[0] == 0) return Value();
+        
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
         
@@ -1957,6 +1960,9 @@ void Value::set(int index, const Value &value)
  */
 void Value::setRaw(const char *key, int size, const Value &value)
 {
+    // does not work for empty keys
+    if (!key || (size > 0 && key[0] == 0)) return;
+    
     // is this an object?
     if (isObject())
     {
@@ -1968,7 +1974,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
 
         // retrieve the class entry
         auto *entry = zend_get_class_entry(_val TSRMLS_CC);
-
+        
         // update the property (cast necessary for php 5.3)
         zend_update_property(entry, _val, (char *)key, size, value._val TSRMLS_CC);
     }
