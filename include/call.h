@@ -13,6 +13,21 @@
 namespace Php {
 
 /**
+ *  List of functions that are available for use in PHP
+ */
+extern bool  class_exists(const char *classname, size_t size, bool autoload = true);
+inline bool  class_exists(const char *classname, bool autoload = true) { return class_exists(classname, strlen(classname), autoload); }
+inline bool  class_exists(const std::string &classname, bool autoload = true) { return class_exists(classname.c_str(), classname.size(), autoload); }
+extern Value eval(const std::string &phpCode);
+inline bool  is_a(const Value &obj, const char *classname, size_t size, bool allow_string = false) { return obj.instanceOf(classname, size, allow_string); }
+inline bool  is_a(const Value &obj, const char *classname, bool allow_string = false) { return is_a(obj, classname, strlen(classname), allow_string); }
+inline bool  is_a(const Value &obj, const std::string &classname, bool allow_string = false) { return is_a(obj, classname.c_str(), classname.size(), allow_string); }
+inline bool  is_subclass_of(const Value &obj, const char *classname, size_t size, bool allow_string = true) { return obj.derivedFrom(classname, size, allow_string); }
+inline bool  is_subclass_of(const Value &obj, const char *classname, bool allow_string = true) { return is_subclass_of(obj, classname, strlen(classname), allow_string); }
+inline bool  is_subclass_of(const Value &obj, const std::string &classname, bool allow_string = true) { return is_subclass_of(obj, classname.c_str(), classname.size(), allow_string); }
+
+
+/**
  *  Call a function in PHP
  *  @param  name        Name of the function to call
  *  @param  params      Variable number of parameters

@@ -97,6 +97,18 @@ void *Extension::module()
 }
 
 /**
+ *  Is the extension object in a locked state? This happens after the
+ *  get_module() function was called for the first time ("apache reload"
+ *  forces a new call to get_module())
+ * 
+ *  @return bool
+ */
+bool Extension::locked() const
+{
+    return _impl->locked();
+}
+
+/**
  *  End of namespace
  */
 }

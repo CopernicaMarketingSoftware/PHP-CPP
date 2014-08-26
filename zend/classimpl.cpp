@@ -20,11 +20,6 @@ ClassImpl::~ClassImpl()
 {
     // destruct the entries
     if (_entries) delete[] _entries;
-
-    // php 5.3 deallocates the doc_comment by iself
-#if PHP_VERSION_ID >= 50400    
-    if (_comment) free(_comment);
-#endif
 }
 
 /**
@@ -41,18 +36,21 @@ static ClassImpl *self(zend_class_entry *entry)
     // we need the base class (in user space the class may have been overridden,
     // but we are not interested in these user space classes)
     while (entry->parent) entry = entry->parent;
-    
+
 #if PHP_VERSION_ID >= 50400
     // retrieve the comment (it has a pointer hidden in it to the ClassBase object)
     const char *comment = entry->info.user.doc_comment;
-#else
-    // retrieve the comment php5.3 style (it has a pointer hidden in it to the ClassBase object)
-    const char *comment = entry->doc_comment;
-#endif    
-    
+
     // the first byte of the comment is an empty string (null character), but
     // the next bytes contain a pointer to the ClassBase class
     return *((ClassImpl **)(comment + 1));
+#else
+    // on php 5.3 we store the pointer to impl after the name in the entry
+    ClassImpl** impl = (ClassImpl**)(entry->name + 1 + entry->name_length);
+
+    // return the actual implementation
+    return *impl;
+#endif
 }
 
 /**
@@ -330,52 +328,56 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
  */
 zend_object_handlers *ClassImpl::objectHandlers()
 {
-    // keep static structure
-    static zend_object_handlers handlers;
-    
-    // is the object already initialized?
-    static bool initialized = false;
-    
     // already initialized?
-    if (initialized) return &handlers;
+    if (_initialized) return &_handlers;
     
     // initialize the handlers
-    memcpy(&handlers, &std_object_handlers, sizeof(zend_object_handlers));
+    memcpy(&_handlers, &std_object_handlers, sizeof(zend_object_handlers));
     
     // install custom clone function
-    if (!_base->clonable()) handlers.clone_obj = nullptr;
-    else handlers.clone_obj = &ClassImpl::cloneObject;
+    if (!_base->clonable()) _handlers.clone_obj = nullptr;
+    else _handlers.clone_obj = &ClassImpl::cloneObject;
     
     // functions for the Countable interface
-    handlers.count_elements = &ClassImpl::countElements;
+    _handlers.count_elements = &ClassImpl::countElements;
     
     // functions for the ArrayAccess interface
-    handlers.write_dimension = &ClassImpl::writeDimension;
-    handlers.read_dimension = &ClassImpl::readDimension;
-    handlers.has_dimension = &ClassImpl::hasDimension;
-    handlers.unset_dimension = &ClassImpl::unsetDimension;
+    _handlers.write_dimension = &ClassImpl::writeDimension;
+    _handlers.read_dimension = &ClassImpl::readDimension;
+    _handlers.has_dimension = &ClassImpl::hasDimension;
+    _handlers.unset_dimension = &ClassImpl::unsetDimension;
     
     // functions for the magic properties handlers (__get, __set, __isset and __unset)
-    handlers.write_property = &ClassImpl::writeProperty;
-    handlers.read_property = &ClassImpl::readProperty;
-    handlers.has_property = &ClassImpl::hasProperty;
-    handlers.unset_property = &ClassImpl::unsetProperty;
+    _handlers.write_property = &ClassImpl::writeProperty;
+    _handlers.read_property = &ClassImpl::readProperty;
+    _handlers.has_property = &ClassImpl::hasProperty;
+    _handlers.unset_property = &ClassImpl::unsetProperty;
     
     // when a method is called (__call and __invoke)
-    handlers.get_method = &ClassImpl::getMethod;
-    handlers.get_closure = &ClassImpl::getClosure;
+    _handlers.get_method = &ClassImpl::getMethod;
+    _handlers.get_closure = &ClassImpl::getClosure;
     
     // handler to cast to a different type
-    handlers.cast_object = &ClassImpl::cast;
+    _handlers.cast_object = &ClassImpl::cast;
     
     // method to compare two objects
-    handlers.compare_objects = &ClassImpl::compare;
+    _handlers.compare_objects = &ClassImpl::compare;
     
     // remember that object is now initialized
-    initialized = true;
+    _initialized = true;
     
     // done
-    return &handlers;
+    return &_handlers;
+}
+
+/**
+ *  Alternative way to retrieve object handlers, given a class entry
+ *  @param  entry
+ *  @return zend_object_handlers
+ */
+zend_object_handlers *ClassImpl::objectHandlers(zend_class_entry *entry)
+{
+    return self(entry)->objectHandlers();
 }
 
 /**
@@ -465,7 +467,7 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
         case Type::Float:       result = meta->callToFloat(object).detach();    break;
         case Type::Bool:        result = meta->callToBool(object).detach();     break;
         case Type::String:      result = meta->callToString(object).detach();   break;
-        default:                throw NotImplemented();             break;
+        default:                throw NotImplemented();                         break;
         }
         
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
@@ -520,8 +522,10 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     
     // report error on failure (this does not occur because the cloneObject()
     // method is only installed as handler when we have seen that there is indeed
-    // a copy constructor)
-    if (!cpp) throw Php::Exception(std::string("Unable to clone ") + entry->name);
+    // a copy constructor). Because this function is directly called from the
+    // Zend engine, we can call zend_error() (which does a longjmp()) to throw
+    // an exception back to the Zend engine)
+    if (!cpp) zend_error(E_ERROR, "Unable to clone %s", entry->name);
 
     // the thing we're going to return
     zend_object_value result;
@@ -1179,8 +1183,10 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
     // create a new base C++ object
     auto *cpp = impl->_base->construct();
 
-    // report error on failure
-    if (!cpp) throw Php::Exception(std::string("Unable to instantiate ") + entry->name);
+    // report error on failure, because this function is called directly from the
+    // Zend engine, we can call zend_error() here (which does a longjmp() back to
+    // the Zend engine)
+    if (!cpp) zend_error(E_ERROR, "Unable to instantiate %s", entry->name);
 
     // the thing we're going to return
     zend_object_value result;
@@ -1208,8 +1214,10 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
  */
 zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *object, int by_ref TSRMLS_DC)
 {
-    // by-ref is not possible (copied from SPL)
-    if (by_ref) throw Php::Exception("Foreach by ref is not possible");
+    // by-ref is not possible (copied from SPL), this function is called directly
+    // from the Zend engine, so we can use zend_error() to longjmp() back to the 
+    // Zend engine)
+    if (by_ref) zend_error(E_ERROR, "Foreach by ref is not possible");
     
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object TSRMLS_CC)->object());
@@ -1372,14 +1380,25 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
     if (_parent) 
     {
         // check if the base class was already defined
-        if (_parent->_entry) entry.parent = _parent->_entry;
-        
-        // otherwise an error is reported
-        else std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
+        if (_parent->_entry)
+        {
+            // register the class
+            _entry = zend_register_internal_class_ex(&entry, _parent->_entry, const_cast<char*>(_parent->name().c_str()) TSRMLS_CC);
+        }
+        else
+        {
+            // report an error - the extension programmer probably made an error
+            std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
+            
+            // register the class, but without the base class
+            _entry = zend_register_internal_class(&entry TSRMLS_CC);
+        }
     }
-    
-    // register the class
-    _entry = zend_register_internal_class(&entry TSRMLS_CC);
+    else
+    {
+        // register the class
+        _entry = zend_register_internal_class(&entry TSRMLS_CC);
+    }
     
     // register the classes
     for (auto &interface : _interfaces)
@@ -1390,34 +1409,37 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
         // otherwise report an error
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
-    
+
+    // this pointer has to be copied to temporary pointer, as &this causes compiler error
+    ClassImpl *impl = this;
+
+#if PHP_VERSION_ID >= 50400
+
     // allocate doc comment to contain an empty string + a hidden pointer
-    if (!_comment)
-    {
-        // allocate now
-        _comment = (char *)malloc(1 + sizeof(ClassBase *));
-        
-        // empty string on first position
-        _comment[0] = '\0';
-        
-        // this pointer has to be copied to temporary pointer, as &this causes compiler error
-        ClassImpl *impl = this;
-        
-        // copy the 'this' pointer to the doc-comment
-        memcpy(_comment+1, &impl, sizeof(ClassImpl *));
-    }
-    
-    // store pointer to the class in the unused doc_comment member
-#if PHP_VERSION_ID >= 50400    
+    char *_comment = (char *)malloc(1 + sizeof(ClassImpl *));
+
+    // empty string on first position
+    _comment[0] = '\0';
+
+    // copy the 'this' pointer to the doc-comment
+    memcpy(_comment+1, &impl, sizeof(ClassImpl *));
+
+    // set our comment in the actual class entry
     _entry->info.user.doc_comment = _comment;
+
 #else
-    // and store the wrapper inside the comment
-    _entry->doc_comment = _comment;
+
+    // Reallocate some extra space in the name in the zend_class_entry so we can fit a pointer behind it
+    _entry->name = (char *) realloc(_entry->name, _entry->name_length + 1 + sizeof(ClassImpl *));
+
+    // Copy the pointer after it
+    memcpy(_entry->name + _entry->name_length + 1, &impl, sizeof(ClassImpl *));
+
 #endif
 
     // set access types flags for class
     _entry->ce_flags = (int)_type;
-    
+
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry TSRMLS_CC);
 }

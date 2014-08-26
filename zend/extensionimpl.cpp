@@ -142,6 +142,10 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     // initialize the extension
     extension->initialize(TSRMLS_C);
     
+    // remember that we're initialized (when you use "apache reload" it is 
+    // possible that the processStartup() method is called more than once)
+    extension->_locked = true;
+    
     // is the callback registered?
     if (extension->_onStartup) extension->_onStartup();
 
@@ -163,6 +167,12 @@ int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
 
     // unregister the ini entries
     zend_unregister_ini_entries(module_number TSRMLS_CC);
+
+    // destruct the ini entries
+    if (extension->_ini) delete[] extension->_ini;
+
+    // forget the ini entries
+    extension->_ini = nullptr;
 
     // is the callback registered?
     if (extension->_onShutdown) extension->_onShutdown();
@@ -272,7 +282,7 @@ ExtensionImpl::~ExtensionImpl()
  */
 zend_module_entry *ExtensionImpl::module()
 {
-    // check if functions we're already defined
+    // check if functions were already defined
     if (_entry.functions) return &_entry;
 
     // the number of functions

@@ -124,17 +124,18 @@ Value::Value(const std::string &value)
  */
 Value::Value(const char *value, int size)
 {
+	// allocate the zval
+    MAKE_STD_ZVAL(_val);
+
     // is there a value?
     if (value)
     {
         // create a string zval
-        MAKE_STD_ZVAL(_val);
         ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size, 1);
     }
     else
     {
-        // create a null zval
-        MAKE_STD_ZVAL(_val);
+        // store null
         ZVAL_NULL(_val);
     }
 }
@@ -191,7 +192,7 @@ Value::Value(const Base *object)
     auto *impl = object->implementation();
     
     // do we have a handle?
-    if (!impl) throw Php::Exception("Assigning an unassigned object to a variable");
+    if (!impl) throw FatalError("Assigning an unassigned object to a variable");
 
     // make a regular zval, and set it to an object
     MAKE_STD_ZVAL(_val);
@@ -402,7 +403,7 @@ Value &Value::operator=(Value &&value)
     if (this == &value) return *this;
 
     // is the object a reference?
-    if (Z_ISREF_P(_val))
+    if (_val && Z_ISREF_P(_val))
     {
         // @todo difference if the other object is a reference or not?
         
@@ -448,7 +449,7 @@ Value &Value::operator=(Value &&value)
     {
         // destruct the zval (this function will decrement the reference counter,
         // and only destruct if there are no other references left)
-        zval_ptr_dtor(&_val);
+        if (_val) zval_ptr_dtor(&_val);
 
         // just copy the zval completely
         _val = value._val;
@@ -1311,6 +1312,45 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
 }
 
 /**
+ *  Comparison operators== for hardcoded Value
+ *  @param  value
+ */
+bool Value::operator==(const Value &value) const
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // zval that will hold the result of the comparison
+    zval result;
+    
+    // run the comparison
+    if (SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC)) return false;
+    
+    // convert to boolean
+    return result.value.lval == 0;
+}
+
+/**
+ *  Comparison operators< for hardcoded Value
+ *  @param  value
+ *  @return bool
+ */
+bool Value::operator<(const Value &value) const
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // zval that will hold the result of the comparison
+    zval result;
+    
+    // run the comparison
+    if (SUCCESS != compare_function(&result, _val, value._val TSRMLS_CC)) return false;
+    
+    // convert to boolean
+    return result.value.lval < 0;
+}
+
+/**
  *  The type of object
  *  @return Type
  */
@@ -1333,7 +1373,10 @@ Value &Value::setType(Type type)
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(&_val);
     
-    // run the conversion
+    // run the conversion, when it fails we throw a fatal error which will
+    // in the end result in a zend_error() call. This FatalError class is necessary
+    // because a direct call to zend_error() will do a longjmp() which may not
+    // clean up the C++ objects created by the extension
     switch (type) {
     case Type::Null:            convert_to_null(_val); break;
     case Type::Numeric:         convert_to_long(_val); break;
@@ -1342,10 +1385,10 @@ Value &Value::setType(Type type)
     case Type::Array:           convert_to_array(_val); break;
     case Type::Object:          convert_to_object(_val); break;
     case Type::String:          convert_to_string(_val); break;
-    case Type::Resource:        throw Php::Exception("Resource types can not be handled by the PHP-CPP library"); break;
-    case Type::Constant:        throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
-    case Type::ConstantArray:   throw Php::Exception("Constant types can not be assigned to a PHP-CPP library variable"); break;
-    case Type::Callable:        throw Php::Exception("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
+    case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
     }
     
     // done
@@ -1363,6 +1406,116 @@ bool Value::isCallable() const
     
     // we can not rely on the type, because strings can be callable as well
     return zend_is_callable(_val, 0, NULL TSRMLS_CC);
+}
+
+/**
+ *  Retrieve the class entry
+ *  @param  allowString
+ *  @return zend_class_entry
+ */
+zend_class_entry *Value::classEntry(bool allowString) const
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // is this an object
+    if (isObject())
+    {
+        // should have a class entry
+        if (!HAS_CLASS_ENTRY(*_val)) return nullptr;
+        
+        // class entry can be easily found
+        return Z_OBJCE_P(_val);
+    }
+    else
+    {
+        // the value is not an object, is this allowed?
+        if (!allowString || !isString()) return nullptr;
+        
+        // temporary variable
+        zend_class_entry **ce;
+        
+        // find the class entry
+        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &ce TSRMLS_CC) == FAILURE) return nullptr;
+    
+        // found the entry
+        return *ce;
+    }
+}
+
+/**
+ *  Check whether this object is an instance of a certain class
+ *
+ *  If you set the parameter 'allowString' to true, and the Value object
+ *  holds a string, the string will be treated as class name.
+ *
+ *  @param  classname   The class of which this should be an instance
+ *  @param  size        Length of the classname string
+ *  @param  allowString Is it allowed for 'this' to be a string
+ *  @return bool
+ */
+bool Value::instanceOf(const char *classname, size_t size, bool allowString) const 
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // the class-entry of 'this'
+    zend_class_entry *this_ce = classEntry(allowString);
+    if (!this_ce) return false;
+
+    // class entry of the parameter
+    zend_class_entry **ce;
+
+    // now we can look up the actual class
+    // the signature of zend_lookup_class_ex is slightly different since 5.4
+    // TODO The signature of this changed once again as of 5.6!
+#if PHP_VERSION_ID >= 50400
+    if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
+#else
+    if (zend_lookup_class_ex(classname, size, 0, &ce TSRMLS_CC) == FAILURE) return false;
+#endif
+
+    // check if this is a subclass
+    return instanceof_function(this_ce, *ce TSRMLS_CC);
+}
+
+/**
+ *  Check whether this object is derived from a certain class
+ *
+ *  If you set the parameter 'allowString' to true, and the Value object
+ *  holds a string, the string will be treated as class name.
+ *
+ *  @param  classname   The class of which this should be an instance
+ *  @param  size        Length of the classname string
+ *  @param  allowString Is it allowed for 'this' to be a string
+ *  @return bool
+ */
+bool Value::derivedFrom(const char *classname, size_t size, bool allowString) const 
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // the class-entry of 'this'
+    zend_class_entry *this_ce = classEntry(allowString);
+    if (!this_ce) return false;
+
+    // class entry of the parameter
+    zend_class_entry **ce;
+
+    // now we can look up the actual class
+    // the signature of zend_lookup_class_ex is slightly different since 5.4
+    // TODO The signature of this changed once again as of 5.6!
+#if PHP_VERSION_ID >= 50400
+    if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
+#else
+    if (zend_lookup_class_ex(classname, size, 0, &ce TSRMLS_CC) == FAILURE) return false;
+#endif
+
+    // should not be identical, it must be a real derived object
+    if (this_ce == *ce) return false;
+
+    // check if this is a subclass
+    return instanceof_function(this_ce, *ce TSRMLS_CC);
 }
 
 /**
@@ -1567,10 +1720,10 @@ std::map<std::string,Php::Value> Value::mapValue() const
 {
     // result variable
     std::map<std::string,Php::Value> result;
-    
+
     // iterate over the object
-    for (auto &iter : *this) result[iter.first.rawValue()] = iter.second;
-    
+    for (auto &iter : *this) result[iter.first.stringValue()] = iter.second;
+
     // done
     return result;
 }
@@ -1583,7 +1736,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
 ValueIterator Value::createIterator(bool begin) const
 {
     // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin));
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin, true));
     
     // get access to the hast table
     if (isObject()) 
@@ -1604,7 +1757,7 @@ ValueIterator Value::createIterator(bool begin) const
         else
         {
             // construct a regular iterator
-            return ValueIterator(new HashIterator(Z_OBJ_HT_P(_val)->get_properties(_val TSRMLS_CC), begin));
+            return ValueIterator(new HashIterator(Z_OBJPROP_P(_val), begin));
         }
     }
     

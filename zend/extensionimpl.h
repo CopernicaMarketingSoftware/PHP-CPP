@@ -20,14 +20,16 @@ class ExtensionImpl : public ExtensionBase
 protected:
     /**
      *  The information that is passed to the Zend engine
-     * 
-     *  Although it would be slightly faster to not make this a pointer, this
-     *  would require that client code also includes the PHP header files, which
-     *  we try to prevent with the PHP-CPP library, so we allocate it dynamically.
-     * 
      *  @var zend_module_entry
      */
     zend_module_entry _entry;
+    
+    /**
+     *  Is the object locked? This prevents crashes for 'apache reload'
+     *  because we then do not have to re-initialize the entire php engine
+     *  @var bool
+     */
+    bool _locked = false;
     
     /**
      *  The .ini entries
@@ -55,6 +57,17 @@ public:
      *  Destructor
      */
     virtual ~ExtensionImpl();
+    
+    /** 
+     *  Is the object locked (true) or is it still possible to add more functions,
+     *  classes and other elements to it?
+     *  @return bool
+     */
+    bool locked()
+    {
+        // return member
+        return _locked;
+    }
     
     /**
      *  Retrieve the module entry

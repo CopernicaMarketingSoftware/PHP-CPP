@@ -75,6 +75,16 @@ public:
         // yes, it is native
         return true;
     }
+    
+    /**
+     *  Report this error as a fatal error
+     *  @return bool
+     */
+    virtual bool report() const
+    {
+        // this is not done here
+        return false;
+    }
 };
 
 /**

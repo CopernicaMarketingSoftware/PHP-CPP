@@ -48,6 +48,7 @@
 #include "../include/inivalue.h"
 #include "../include/ini.h"
 #include "../include/exception.h"
+#include "../include/fatalerror.h"
 #include "../include/streams.h"
 #include "../include/type.h"
 #include "../include/hashparent.h"

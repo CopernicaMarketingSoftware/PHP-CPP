@@ -127,10 +127,12 @@ inline void process(Exception &exception TSRMLS_DC)
         // the exception is native, call the zend throw method
         zend_throw_exception(zend_exception_get_default(TSRMLS_C), (char *)exception.what(), 0 TSRMLS_CC);
     }
-    else
+    
+    // or does it have its own report function?
+    else if (!exception.report())
     {
         // this is not a native exception, so it was originally thrown by a 
-        // php script, and then not caught by the c++ of the extensiont, we are 
+        // php script, and then not caught by the c++ of the extension, we are 
         // going to tell to the exception that it is still active
         OrigException &orig = static_cast<OrigException&>(exception);
     

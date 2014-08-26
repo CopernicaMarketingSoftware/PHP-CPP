@@ -2,7 +2,7 @@
  *  phpcpp.h
  *
  *  Library to build PHP extensions with CPP
- * 
+ *
  *  @copyright 2013 CopernicA BV
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
@@ -29,6 +29,7 @@
 #include <phpcpp/inivalue.h>
 #include <phpcpp/ini.h>
 #include <phpcpp/exception.h>
+#include <phpcpp/fatalerror.h>
 #include <phpcpp/streams.h>
 #include <phpcpp/type.h>
 #include <phpcpp/hashparent.h>

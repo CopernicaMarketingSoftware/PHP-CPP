@@ -125,6 +125,9 @@ extern "C"
         extension.add("TestVariables\\post_raw1",         TestVariables::post_raw1);
         extension.add("TestVariables\\post_raw2",         TestVariables::post_raw2);
         extension.add("TestVariables\\test_env",          TestVariables::test_env);
+        extension.add("TestVariables\\test_compare1",     TestVariables::test_compare1);
+        extension.add("TestVariables\\test_compare2",     TestVariables::test_compare2);
+
 
         
 

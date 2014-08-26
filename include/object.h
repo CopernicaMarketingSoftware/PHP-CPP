@@ -31,7 +31,7 @@ public:
     Object(Value &&value) : Value(std::move(value)) 
     {
         // throw exception in case of problems
-        if (value.type() != Type::Object) throw Php::Exception("Constructing an object variable by moving a non object");
+        if (value.type() != Type::Object) throw FatalError("Constructing an object variable by moving a non object");
     }
 
     /**
@@ -41,11 +41,21 @@ public:
      */
     Object(const Value &value) : Value()
     {
-        // string types are instantiated
-        if (value.isString()) instantiate(value);
-        
-        // otherwise copy the other object
-        else operator=(value);
+        // when a string is passed in, we are going to make a new instance of the
+        // passed in string
+        if (value.isString()) 
+        {
+            // instantiate the object
+            instantiate(value);
+            
+            // and call the __construct method
+            call("__construct");
+        }
+        else 
+        {
+            // this simply copies the other object
+            operator=(value);
+        }
     }
 
     /**
@@ -123,7 +133,7 @@ public:
     virtual Value &setType(Type type) override
     {
         // throw exception if things are going wrong
-        if (type != Type::Object) throw Php::Exception("Changing type of a fixed object variable");
+        if (type != Type::Object) throw FatalError("Changing type of a fixed object variable");
         
         // call base
         return Value::setType(type);
@@ -140,7 +150,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Object) throw Php::Exception("Assigning a non-object to an object variable");
+        if (value.type() != Type::Object) throw FatalError("Assigning a non-object to an object variable");
         
         // call base
         Value::operator=(value);
@@ -160,7 +170,7 @@ public:
         if (this == &value) return *this;
         
         // type must be valid
-        if (value.type() != Type::Object) throw Php::Exception("Moving a non-object to an object variable");
+        if (value.type() != Type::Object) throw FatalError("Moving a non-object to an object variable");
         
         // call base
         Value::operator=(std::move(value));

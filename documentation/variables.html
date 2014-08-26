@@ -223,10 +223,10 @@ Php::Value readExample2(int fd)
     // result variable
     Php::Value result;
     
-    // resize the buffer to 4096 bytes, the resize() method resizes
+    // resize the buffer to 4096 bytes, the reserve() method resizes
     // the internal buffer to the appropriate size, and returns a pointer
     // to the buffer
-    char *buffer = result.resize(4096);
+    char *buffer = result.reserve(4096);
     
     // read in the bytes directly into the just allocated buffer
     ssize_t bytes = read(fd, buffer, 4096);
@@ -235,7 +235,7 @@ Php::Value readExample2(int fd)
     // resize the buffer to the actual number of bytes in it (this
     // is necessary, otherwise the PHP strlen() returns 4096 even
     // when less bytes were available
-    result.resize(bytes);
+    result.reserve(bytes);
     
     // return the result
     return result;
