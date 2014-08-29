@@ -20,6 +20,7 @@
 #include <list>
 #include <exception>
 #include <type_traits>
+#include <functional>
 
 // for debug
 #include <iostream>

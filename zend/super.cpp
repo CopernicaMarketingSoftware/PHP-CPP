@@ -40,7 +40,7 @@ Value Super::operator[](const std::string &key)
     Value value(PG(http_globals)[_index]);
     
     // pass on the call
-    return value[key];
+    return value.get(key);
 }
 
 /**
@@ -61,7 +61,7 @@ Value Super::operator[](const char *key)
     Value value(PG(http_globals)[_index]);
     
     // pass on the call
-    return value[key];
+    return value.get(key);
 }
 
 /**
