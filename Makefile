@@ -17,7 +17,7 @@
 #   installed in the default directory, you can change that here.
 #   
 
-PHP_CONFIG      =   php-config
+PHP_CONFIG      		=   php-config
 
 
 #
@@ -29,7 +29,7 @@ PHP_CONFIG      =   php-config
 #   Usually /usr/bin/php
 #
 
-PHP_BIN         =   $(shell ${PHP_CONFIG} --php-binary)
+PHP_BIN         		=   $(shell ${PHP_CONFIG} --php-binary)
 
 
 #
@@ -42,9 +42,9 @@ PHP_BIN         =   $(shell ${PHP_CONFIG} --php-binary)
 #   and /usr/local/lib. You can of course change it to whatever suits you best
 #   
 
-INSTALL_PREFIX  =   /usr
-INSTALL_HEADERS =   ${INSTALL_PREFIX}/include
-INSTALL_LIB     =   ${INSTALL_PREFIX}/lib
+INSTALL_PREFIX  		=   /usr
+INSTALL_HEADERS			=   ${INSTALL_PREFIX}/include
+INSTALL_LIB     		=   ${INSTALL_PREFIX}/lib
 
 
 #
@@ -55,8 +55,10 @@ INSTALL_LIB     =   ${INSTALL_PREFIX}/lib
 #   you can change that here.
 #
 
-PHP_LIBRARY     =   libphpcpp.so
-HHVM_LIBRARY    =   libhhvmcpp.so
+PHP_SHARED_LIBRARY     =   libphpcpp.so
+PHP_STATIC_LIBRARY     =   libphpcpp.a
+HHVM_SHARED_LIBRARY    =   libhhvmcpp.so
+HHVM_STATIC_LIBRARY    =   libhhvmcpp.so
 
 
 #
@@ -69,8 +71,9 @@ HHVM_LIBRARY    =   libhhvmcpp.so
 #   library file. By default, g++ (the GNU C++ compiler) is used for both.
 #
 
-COMPILER        =   g++
-LINKER          =   g++
+COMPILER        		=   g++
+LINKER     				=   g++
+ARCHIVER				=	ar rcs
 
 
 #
@@ -85,9 +88,11 @@ LINKER          =   g++
 #   you want to leave that flag out on production servers).
 #
 
-COMPILER_FLAGS      =   -Wall -c -g -std=c++11 -fpic
-PHP_COMPILER_FLAGS  =   ${COMPILER_FLAGS} `php-config --includes`
-HHVM_COMPILER_FLAGS =   ${COMPILER_FLAGS}
+COMPILER_FLAGS      	=   -Wall -c -g -std=c++11
+SHARED_COMPILER_FLAGS	=	-fpic
+STATIC_COMPILER_FLAGS	=
+PHP_COMPILER_FLAGS  	=   ${COMPILER_FLAGS} `php-config --includes`
+HHVM_COMPILER_FLAGS 	=   ${COMPILER_FLAGS}
 
 #
 #   Linker flags
@@ -99,9 +104,9 @@ HHVM_COMPILER_FLAGS =   ${COMPILER_FLAGS}
 #   to the linker flags
 #
 
-LINKER_FLAGS        =   -shared
-PHP_LINKER_FLAGS    =   ${LINKER_FLAGS} `php-config --ldflags`
-HHVM_LINKER_FLAGS   =   ${LINKER_FLAGS}
+LINKER_FLAGS        	=   -shared
+PHP_LINKER_FLAGS    	=   ${LINKER_FLAGS} `php-config --ldflags`
+HHVM_LINKER_FLAGS   	=   ${LINKER_FLAGS}
 
 
 #
@@ -111,9 +116,9 @@ HHVM_LINKER_FLAGS   =   ${LINKER_FLAGS}
 #   So you can probably leave this as it is
 #
 
-RM              =   rm -f
-CP              =   cp -f
-MKDIR           =   mkdir -p
+RM              		=   rm -f
+CP              		=   cp -f
+MKDIR           		=   mkdir -p
 
 
 #
@@ -124,9 +129,9 @@ MKDIR           =   mkdir -p
 #   probably necessary here
 #
 
-COMMON_SOURCES  =   $(wildcard common/*.cpp)
-PHP_SOURCES     =   $(wildcard zend/*.cpp)
-HHVM_SOURCES    =   $(wildcard hhvm/*.cpp)
+COMMON_SOURCES  		=   $(wildcard common/*.cpp)
+PHP_SOURCES     		=   $(wildcard zend/*.cpp)
+HHVM_SOURCES    		=   $(wildcard hhvm/*.cpp)
 
 #
 #   The object files
@@ -137,9 +142,12 @@ HHVM_SOURCES    =   $(wildcard hhvm/*.cpp)
 #   takes all source files.
 #
 
-COMMON_OBJECTS  =   $(COMMON_SOURCES:%.cpp=%.o)
-PHP_OBJECTS     =   $(PHP_SOURCES:%.cpp=%.o)
-HHVM_OBJECTS    =   $(HHVM_SOURCES:%.cpp=%.o)
+COMMON_SHARED_OBJECTS  	=   $(COMMON_SOURCES:%.cpp=shared/%.o)
+PHP_SHARED_OBJECTS     	=   $(PHP_SOURCES:%.cpp=shared/%.o)
+HHVM_SHARED_OBJECTS    	=   $(HHVM_SOURCES:%.cpp=shared/%.o)
+COMMON_STATIC_OBJECTS  	=   $(COMMON_SOURCES:%.cpp=static/%.o)
+PHP_STATIC_OBJECTS     	=   $(PHP_SOURCES:%.cpp=static/%.o)
+HHVM_STATIC_OBJECTS    	=   $(HHVM_SOURCES:%.cpp=static/%.o)
 
 
 #
@@ -147,39 +155,60 @@ HHVM_OBJECTS    =   $(HHVM_SOURCES:%.cpp=%.o)
 #   dependencies that are used by the compiler.
 #
 
-all: ${PHP_LIBRARY}
+all: phpcpp
 
-phpcpp: ${PHP_LIBRARY}
-
-hhvmcpp: ${HHVM_LIBRARY}
-
-${PHP_LIBRARY}: ${COMMON_OBJECTS} ${PHP_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
+phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo
 	@echo "Build complete."
 	@echo "Don't forget to run 'make test'."
 
-${HHVM_LIBRARY}: ${COMMON_OBJECTS} ${HHVM_OBJECTS}
-	${LINKER} ${HHVM_LINKER_FLAGS} -o $@ ${COMMON_OBJECTS} ${HHVM_OBJECTS}
+hhvmcpp: ${HHVM_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
+	@echo
+	@echo "Build complete."
+	@echo "Don't forget to run 'make test'."
+
+${PHP_SHARED_LIBRARY}: ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
+	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
+
+${PHP_STATIC_LIBRARY}: ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
+	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
+
+${HHVM_SHARED_LIBRARY}: ${COMMON_SHARED_OBJECTS} ${HHVM_SHARED_OBJECTS}
+	${LINKER} ${HHVM_LINKER_FLAGS} -o $@ ${COMMON_SHARED_OBJECTS} ${HHVM_SHARED_OBJECTS}
+
+${HHVM_STATIC_LIBRARY}: ${COMMON_STATIC_OBJECTS} ${HHVM_STATIC_OBJECTS}
+	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${HHVM_STATIC_OBJECTS}
 
 clean:
-	${RM} ${COMMON_OBJECTS} ${PHP_OBJECTS} ${HHVM_OBJECTS} ${PHP_LIBRARY} ${HHVM_LIBRARY}
+	${RM} ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS} ${HHVM_SHARED_OBJECTS} ${PHP_SHARED_LIBRARY} ${HHVM_SHARED_LIBRARY}
+	${RM} ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS} ${HHVM_STATIC_OBJECTS} ${PHP_STATIC_LIBRARY} ${HHVM_STATIC_LIBRARY}
 
-${COMMON_OBJECTS}: 
-	${COMPILER} ${COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
+${COMMON_SHARED_OBJECTS}: 
+	${COMPILER} ${COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
 
-${PHP_OBJECTS}: 
-	${COMPILER} ${PHP_COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
+${COMMON_STATIC_OBJECTS}: 
+	${COMPILER} ${COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
 
-${HHVM_OBJECTS}: 
-	${COMPILER} ${HHVM_COMPILER_FLAGS} -o $@ ${@:%.o=%.cpp}
+${PHP_SHARED_OBJECTS}: 
+	${COMPILER} ${PHP_COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
+
+${PHP_STATIC_OBJECTS}: 
+	${COMPILER} ${PHP_COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
+
+${HHVM_SHARED_OBJECTS}: 
+	${COMPILER} ${HHVM_COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
+
+${HHVM_STATIC_OBJECTS}: 
+	${COMPILER} ${HHVM_COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
 
 install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	if [ -e ${PHP_LIBRARY} ]; then ${CP} ${PHP_LIBRARY} ${INSTALL_LIB}; fi
-	if [ -e ${HHVM_LIBRARY} ]; then ${CP} ${HHVM_LIBRARY} ${INSTALL_LIB}; fi
+	if [ -e ${PHP_SHARED_LIBRARY} ]; then ${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}; fi
+	if [ -e ${PHP_STATIC_LIBRARY} ]; then ${CP} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}; fi
+	if [ -e ${HHVM_SHARED_LIBRARY} ]; then ${CP} ${HHVM_SHARED_LIBRARY} ${INSTALL_LIB}; fi
+	if [ -e ${HHVM_STATIC_LIBRARY} ]; then ${CP} ${HHVM_STATIC_LIBRARY} ${INSTALL_LIB}; fi
 
 test:
 	mkdir -p ./tests/include/zts/phpcpp

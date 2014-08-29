@@ -1,5 +1,4 @@
 *.o
+*.a
 *.so
 *.txt
-create_config
-/include/config.h
