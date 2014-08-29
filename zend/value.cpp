@@ -1729,6 +1729,52 @@ std::map<std::string,Php::Value> Value::mapValue() const
 }
 
 /**
+ *  Get object property names.
+ *  @param only_public
+ *  @return std::vector
+ */
+std::vector<std::string> Value::properties(bool only_public) const {
+    if (isObject()) {
+        std::set<std::string> result;
+
+        // we need the TSRMLS_CC variable
+        TSRMLS_FETCH();
+
+        HashTable *table = Z_OBJPROP_P(_val);
+        Bucket *position = nullptr;
+
+        // move to first position
+        zend_hash_internal_pointer_reset_ex(table, &position);
+
+        do {
+            char *string_key;
+            unsigned int str_len;
+            unsigned long num_key;
+
+            // get the current key
+            int type = zend_hash_get_current_key_ex(table, &string_key, &str_len, &num_key, 0, &position);
+
+            // if key is not found, the iterator is at an invalid position
+            if (type == HASH_KEY_NON_EXISTANT) continue;
+
+            std::string key = std::string(string_key, str_len - 1);
+            if (key[0] == '\0') {
+                // if only_public is true, only store public property
+                if (only_public) continue;
+                key = key.substr(key.find('\0', 1) + 1);
+            }
+            result.insert(std::move(key));
+
+        // move the iterator forward
+        } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
+
+        return std::vector<std::string>(result.begin(), result.end());
+
+    }
+    return std::vector<std::string>();
+}
+
+/**
  *  Internal helper method to retrieve an iterator
  *  @param  begin       Should the iterator start at the begin
  *  @return iterator
