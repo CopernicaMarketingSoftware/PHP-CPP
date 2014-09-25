@@ -18,7 +18,7 @@ namespace Php {
  *  The values are the same as the ones used internally in Zend
  */
 enum class Type : unsigned char {
-    Null            =   0,
+    Null            =   0, // Null will allow any type
     Numeric         =   1,
     Float           =   2,
     Bool            =   3,
