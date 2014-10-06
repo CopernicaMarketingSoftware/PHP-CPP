@@ -91,7 +91,7 @@ ARCHIVER				=	ar rcs
 COMPILER_FLAGS      	=   -Wall -c -g -std=c++11
 SHARED_COMPILER_FLAGS	=	-fpic
 STATIC_COMPILER_FLAGS	=
-PHP_COMPILER_FLAGS  	=   ${COMPILER_FLAGS} `php-config --includes`
+PHP_COMPILER_FLAGS  	=   ${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
 HHVM_COMPILER_FLAGS 	=   ${COMPILER_FLAGS}
 
 #
@@ -105,7 +105,7 @@ HHVM_COMPILER_FLAGS 	=   ${COMPILER_FLAGS}
 #
 
 LINKER_FLAGS        	=   -shared
-PHP_LINKER_FLAGS    	=   ${LINKER_FLAGS} `php-config --ldflags`
+PHP_LINKER_FLAGS    	=   ${LINKER_FLAGS} `${PHP_CONFIG} --ldflags`
 HHVM_LINKER_FLAGS   	=   ${LINKER_FLAGS}
 
 
