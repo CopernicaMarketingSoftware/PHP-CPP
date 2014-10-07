@@ -12,7 +12,7 @@ C++, and the PHP-CPP library uses all the power offered by C++11 to convert the 
 values from your functions to/and from PHP:
 
 ```c
-Php::Value hello_word()
+Php::Value hello_world()
 {
     return "hello world!";
 }
