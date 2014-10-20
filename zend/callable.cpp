@@ -110,6 +110,9 @@ void Callable::invoke_return_ref(INTERNAL_FUNCTION_PARAMETERS)
             // detach the zval (we don't want it to be destructed)
             zval *val = result.detach();
 
+            // add one more reference
+            Z_ADDREF_P(val);
+
             // get the reference of the result
             SEPARATE_ZVAL_TO_MAKE_IS_REF(&val);
 
