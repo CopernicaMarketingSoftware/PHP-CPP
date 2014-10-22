@@ -477,6 +477,40 @@ public:
     }
 
     /**
+     *  Convert the object to a set
+     *
+     *  This only works for regular arrays that are indexed by a number, start
+     *  with position 0 and have no empty spaces.
+     *
+     *  return  std::vector
+     */
+    template <typename T>
+    std::set<T> setValue() const
+    {
+        // only works for arrays, other types return an empty set
+        if (!isArray()) return std::set<T>();
+
+        // allocate a result
+        std::set<T> result;
+
+        // how many elements are we inserting
+        size_t count = size();
+
+        // and fill the result set
+        for (size_t i = 0; i<count; i++)
+        {
+            // check if the index exists
+            if (!contains(i)) continue;
+
+            // get the value and add it to the vector
+            result.insert(get(i));
+        }
+
+        // done
+        return result;
+    }
+
+    /**
      *  Convert the object to a map with string index and Php::Value value
      *  @return std::map
      */
@@ -667,6 +701,16 @@ public:
     operator std::vector<T>() const
     {
         return vectorValue<T>();
+    }
+
+    /**
+     *  Convert the object to a set
+     *  @return std::set
+     */
+    template <typename T>
+    operator std::set<T>() const
+    {
+        return setValue<T>();
     }
 
     /**
