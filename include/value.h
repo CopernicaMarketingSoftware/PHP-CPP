@@ -469,7 +469,7 @@ public:
             if (!contains(i)) continue;
 
             // get the value and add it to the vector
-            result.emplace_back(get(i));
+            result.push_back(get(i));
         }
 
         // done
