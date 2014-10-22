@@ -457,28 +457,25 @@ public:
 
         // allocate a result
         std::vector<T> result;
-        
+
         // reserve enough space
         size_t count = size();
         result.reserve(count);
-        
+
         // and fill the result vector
-        for (size_t i = 0; i<count; i++) 
+        for (size_t i = 0; i<count; i++)
         {
             // check if the index exists
             if (!contains(i)) continue;
-            
-            // get the value object
-            Value value(get(i));
-            
-            // add it to the vector
-            result.push_back(value);
+
+            // get the value and add it to the vector
+            result.emplace_back(get(i));
         }
-        
+
         // done
         return result;
     }
-    
+
     /**
      *  Convert the object to a map with string index and Php::Value value
      *  @return std::map
