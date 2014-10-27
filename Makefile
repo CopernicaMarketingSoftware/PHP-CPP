@@ -201,6 +201,7 @@ static_directories:
 clean:
 	${RM} shared ${PHP_SHARED_LIBRARY} ${HHVM_SHARED_LIBRARY}
 	${RM} static ${PHP_STATIC_LIBRARY} ${HHVM_STATIC_LIBRARY}
+	find -name *.o | xargs ${RM}
 
 ${COMMON_SHARED_OBJECTS}: 
 	${COMPILER} ${COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
