@@ -71,10 +71,19 @@ HHVM_STATIC_LIBRARY    =   libhhvmcpp.a
 #   library file. By default, g++ (the GNU C++ compiler) is used for both.
 #
 
-COMPILER        		=   g++
-LINKER     				=   g++
-ARCHIVER				=	ar rcs
+ifdef CXX
+ COMPILER			=   ${CXX}
+ LINKER                         =   ${CXX}
+else
+ COMPILER        		=   g++
+ LINKER                         =   g++
+endif
 
+ifdef AR
+  ARCHIVER                      = ${AR} rcs
+else
+  ARCHIVER			= ar rcs
+endif
 
 #
 #   Compiler flags
