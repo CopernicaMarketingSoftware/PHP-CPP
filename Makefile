@@ -71,10 +71,19 @@ HHVM_STATIC_LIBRARY    =   libhhvmcpp.a
 #   library file. By default, g++ (the GNU C++ compiler) is used for both.
 #
 
-COMPILER        		=   g++
-LINKER     				=   g++
-ARCHIVER				=	ar rcs
+ifdef CXX
+ COMPILER			=   ${CXX}
+ LINKER                         =   ${CXX}
+else
+ COMPILER        		=   g++
+ LINKER                         =   g++
+endif
 
+ifdef AR
+  ARCHIVER                      = ${AR} rcs
+else
+  ARCHIVER			= ar rcs
+endif
 
 #
 #   Compiler flags
@@ -192,6 +201,7 @@ static_directories:
 clean:
 	${RM} shared ${PHP_SHARED_LIBRARY} ${HHVM_SHARED_LIBRARY}
 	${RM} static ${PHP_STATIC_LIBRARY} ${HHVM_STATIC_LIBRARY}
+	find -name *.o | xargs ${RM}
 
 ${COMMON_SHARED_OBJECTS}: 
 	${COMPILER} ${COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
