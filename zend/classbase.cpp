@@ -53,15 +53,16 @@ void ClassBase::notImplemented()
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @param  return_ref  Return reference or not
  */
-void ClassBase::method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
-void ClassBase::method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args) { _impl->method(name, callback, flags, args); }
+void ClassBase::method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
+void ClassBase::method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args, bool return_ref) { _impl->method(name, callback, flags, args, return_ref); }
 
 /**
  *  Add a static method to the class
@@ -69,19 +70,21 @@ void ClassBase::method(const char *name, const method_callback_7 &callback, int 
  *  @param  method      The actual method
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
+ *  @param  return_ref  Return reference or not
  */
-void ClassBase::method(const char *name, const native_callback_0 &method, int flags, const Arguments &args) { _impl->method(name, method, flags, args); }
-void ClassBase::method(const char *name, const native_callback_1 &method, int flags, const Arguments &args) { _impl->method(name, method, flags, args); }
-void ClassBase::method(const char *name, const native_callback_2 &method, int flags, const Arguments &args) { _impl->method(name, method, flags, args); }
-void ClassBase::method(const char *name, const native_callback_3 &method, int flags, const Arguments &args) { _impl->method(name, method, flags, args); }
+void ClassBase::method(const char *name, const native_callback_0 &method, int flags, const Arguments &args, bool return_ref) { _impl->method(name, method, flags, args, return_ref); }
+void ClassBase::method(const char *name, const native_callback_1 &method, int flags, const Arguments &args, bool return_ref) { _impl->method(name, method, flags, args, return_ref); }
+void ClassBase::method(const char *name, const native_callback_2 &method, int flags, const Arguments &args, bool return_ref) { _impl->method(name, method, flags, args, return_ref); }
+void ClassBase::method(const char *name, const native_callback_3 &method, int flags, const Arguments &args, bool return_ref) { _impl->method(name, method, flags, args, return_ref); }
 
 /**
  *  Add an abstract method to the class
  *  @param  name        Name of the method
  *  @param  flags       Optional flags (like public or protected)
  *  @param  args        Description of the supported arguments
+ *  @param  return_ref  Return reference or not
  */
-void ClassBase::method(const char *name, int flags, const Arguments &args) { _impl->method(name, flags, args); }
+void ClassBase::method(const char *name, int flags, const Arguments &args, bool return_ref) { _impl->method(name, flags, args, return_ref); }
 
 /**
  *  Add a property to the class

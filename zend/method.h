@@ -26,20 +26,21 @@ public:
      *  @param  callback        Native callback
      *  @param  flags           Access flags
      *  @param  args            Argument description
+     *  @param  return_ref      Return reference or not
      */
-    Method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args) : Callable(name, args), _type(0),    _flags(flags) { _callback.m0  = callback; }
-    Method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args) : Callable(name, args), _type(1),    _flags(flags) { _callback.m1  = callback; }
-    Method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args) : Callable(name, args), _type(2),    _flags(flags) { _callback.m2  = callback; }
-    Method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args) : Callable(name, args), _type(3),    _flags(flags) { _callback.m3  = callback; }
-    Method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args) : Callable(name, args), _type(4),    _flags(flags) { _callback.m4  = callback; }
-    Method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args) : Callable(name, args), _type(5),    _flags(flags) { _callback.m5  = callback; }
-    Method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args) : Callable(name, args), _type(6),    _flags(flags) { _callback.m6  = callback; }
-    Method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args) : Callable(name, args), _type(7),    _flags(flags) { _callback.m7  = callback; }
-    Method(const char *name, const native_callback_0 &callback, int flags, const Arguments &args) : Callable(name, args), _type(8),    _flags(flags) { _callback.m8  = callback; }
-    Method(const char *name, const native_callback_1 &callback, int flags, const Arguments &args) : Callable(name, args), _type(9),    _flags(flags) { _callback.m9  = callback; }
-    Method(const char *name, const native_callback_2 &callback, int flags, const Arguments &args) : Callable(name, args), _type(10),   _flags(flags) { _callback.m10 = callback; }
-    Method(const char *name, const native_callback_3 &callback, int flags, const Arguments &args) : Callable(name, args), _type(11),   _flags(flags) { _callback.m11 = callback; }
-    Method(const char *name,                                    int flags, const Arguments &args) : Callable(name, args), _type(9999), _flags(flags) { _callback.m0 = nullptr;  }
+    Method(const char *name, const method_callback_0 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(0),    _flags(flags) { _callback.m0  = callback; }
+    Method(const char *name, const method_callback_1 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(1),    _flags(flags) { _callback.m1  = callback; }
+    Method(const char *name, const method_callback_2 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(2),    _flags(flags) { _callback.m2  = callback; }
+    Method(const char *name, const method_callback_3 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(3),    _flags(flags) { _callback.m3  = callback; }
+    Method(const char *name, const method_callback_4 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(4),    _flags(flags) { _callback.m4  = callback; }
+    Method(const char *name, const method_callback_5 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(5),    _flags(flags) { _callback.m5  = callback; }
+    Method(const char *name, const method_callback_6 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(6),    _flags(flags) { _callback.m6  = callback; }
+    Method(const char *name, const method_callback_7 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(7),    _flags(flags) { _callback.m7  = callback; }
+    Method(const char *name, const native_callback_0 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(8),    _flags(flags) { _callback.m8  = callback; }
+    Method(const char *name, const native_callback_1 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(9),    _flags(flags) { _callback.m9  = callback; }
+    Method(const char *name, const native_callback_2 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(10),   _flags(flags) { _callback.m10 = callback; }
+    Method(const char *name, const native_callback_3 &callback, int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(11),   _flags(flags) { _callback.m11 = callback; }
+    Method(const char *name,                                    int flags, const Arguments &args, bool return_ref = false) : Callable(name, args, return_ref), _type(9999), _flags(flags) { _callback.m0 = nullptr;  }
 
     /**
      *  Copy and move constructors
