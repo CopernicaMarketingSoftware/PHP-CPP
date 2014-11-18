@@ -81,6 +81,22 @@ public:
         // call base
         return Value::setType(Type::Array);
     }
+
+    /**
+     *  Push a Php::Value to the array as stack
+     *  @param  value
+     */
+    int push(Value val); 
+
+    /**
+     *  Pop a Php::Value from the array as stack
+     */
+    Value pop();
+    
+    /**
+     *  Get keys of the array like PHP's array_keys
+     */
+    Array getKeys();
     
     /**
      *  Assignment operator
