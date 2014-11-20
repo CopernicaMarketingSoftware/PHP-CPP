@@ -39,24 +39,7 @@ public:
      *  or when it is a string holding a classname
      *  @param  that        An other object
      */
-    Object(const Value &value) : Value()
-    {
-        // when a string is passed in, we are going to make a new instance of the
-        // passed in string
-        if (value.isString()) 
-        {
-            // instantiate the object
-            instantiate(value);
-            
-            // and call the __construct method
-            call("__construct");
-        }
-        else 
-        {
-            // this simply copies the other object
-            operator=(value);
-        }
-    }
+    Object(const Value &value);
 
     /**
      *  Constructor to create a new instance of a builtin class
@@ -183,9 +166,9 @@ private:
     /**
      *  Helper method to instantiate an object
      *  @param  name        Class name
+     *  @return zend_class_entry
      */
-    void instantiate(const char *name);
-    
+    struct _zend_class_entry *instantiate(const char *name);
 };
 
 /**

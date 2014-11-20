@@ -52,10 +52,38 @@ Object::Object(const char *name, Base *base)
 }
 
 /**
- *  Internal method to instantiate an object
- *  @param  name
+ *  Copy constructor is valid if the passed in object is also an object,
+ *  or when it is a string holding a classname
+ *  @param  that        An other object
  */
-void Object::instantiate(const char *name)
+Object::Object(const Value &value) : Value()
+{
+    // when a string is passed in, we are going to make a new instance of the
+    // passed in string
+    if (value.isString()) 
+    {
+        // instantiate the object
+        auto *entry = instantiate(value);
+        
+        // leap out if there is no __construct function
+        if (!zend_hash_exists(&entry->function_table, "__construct", 12)) return;
+        
+        // call the construct function
+        call("__construct");
+    }
+    else 
+    {
+        // this simply copies the other object
+        operator=(value);
+    }
+}
+
+/**
+ *  Internal method to instantiate an object
+ *  @param  name        Name of the class to instantiate
+ *  @return zend_class_entry
+ */
+zend_class_entry *Object::instantiate(const char *name)
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
@@ -79,6 +107,8 @@ void Object::instantiate(const char *name)
     // @todo    is this a memory leak? the base class first initializes a stdClass, 
     //          and then we overwrite it with a specific class
     
+    // return the class entry
+    return entry;
 }
 
 /**
