@@ -17,7 +17,7 @@ namespace Php {
  *  @param  name        Name of the class to instantiate
  *  @param  base        Implementation of the class
  */
-Object::Object(const char *name, Base *base)
+Object::Object(const char *name, Base *base) : Value(Type::Object)
 {
     // does the object already have a handle?
     if (base->implementation())
@@ -56,20 +56,14 @@ Object::Object(const char *name, Base *base)
  *  or when it is a string holding a classname
  *  @param  that        An other object
  */
-Object::Object(const Value &value) : Value()
+Object::Object(const Value &value) : Value(Type::Object)
 {
     // when a string is passed in, we are going to make a new instance of the
     // passed in string
     if (value.isString()) 
     {
         // instantiate the object
-        auto *entry = instantiate(value);
-        
-        // leap out if there is no __construct function
-        if (!zend_hash_exists(&entry->function_table, "__construct", 12)) return;
-        
-        // call the construct function
-        call("__construct");
+        if (instantiate(value)) call("__construct");
     }
     else 
     {
@@ -81,9 +75,9 @@ Object::Object(const Value &value) : Value()
 /**
  *  Internal method to instantiate an object
  *  @param  name        Name of the class to instantiate
- *  @return zend_class_entry
+ *  @return bool        True if there is a __construct function
  */
-zend_class_entry *Object::instantiate(const char *name)
+bool Object::instantiate(const char *name)
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
@@ -107,8 +101,8 @@ zend_class_entry *Object::instantiate(const char *name)
     // @todo    is this a memory leak? the base class first initializes a stdClass, 
     //          and then we overwrite it with a specific class
     
-    // return the class entry
-    return entry;
+    // return whether there is a __construct function
+    return zend_hash_exists(&entry->function_table, "__construct", 12);
 }
 
 /**
