@@ -1738,7 +1738,7 @@ ValueIterator Value::createIterator(bool begin) const
     // check type
     if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin, true));
     
-    // get access to the hast table
+    // get access to the hash table
     if (isObject()) 
     {
         // we need the TSRMLS_CC variable
@@ -1783,6 +1783,20 @@ ValueIterator Value::begin() const
 ValueIterator Value::end() const
 {
     return createIterator(false);
+}
+
+/**
+ *  Iterate over key value pairs
+ *  @param  callback
+ */
+void Value::iterate(const std::function<void(const Php::Value &,const Php::Value &)> &callback) const
+{
+    // iterate over the object
+    for (const auto &iter : *this)
+    {
+        // call the callback
+        callback(iter.first, iter.second);
+    }
 }
 
 /**

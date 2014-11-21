@@ -526,14 +526,19 @@ public:
         // must be an array or an object, otherwise the map is empty
         if (!isArray() && !isObject()) return std::map<std::string,T>();
         
-        // get the original map value
-        std::map<std::string,Php::Value> map(mapValue());
-        
         // result variable
         std::map<std::string,T> result;
-
-        // loop through the original map, and copy everything to the result
-        for (auto &iter : map) result[iter.first] = iter.second;
+        
+        // iterate over the values
+        iterate([&result](const Value &key, const Value &value) {
+            
+            // first convert the value to the appropriate type (otherwise
+            // compiler errors occur)
+            T val = value;
+            
+            // add the value to the array
+            result[key] = val;
+        });
         
         // done
         return result;
@@ -674,7 +679,7 @@ public:
     {
         return stringValue();
     }
-    
+
     /**
      *  Cast to byte array
      *  @return const char *
@@ -1039,6 +1044,12 @@ public:
 
 
 private:
+    /**
+     *  Iterate over key value pairs
+     *  @param  callback
+     */
+    void iterate(const std::function<void(const Php::Value &,const Php::Value &)> &callback) const;
+
     /**
      *  Call function with a number of parameters
      *  @param  argc        Number of parameters
