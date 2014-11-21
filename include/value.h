@@ -1071,7 +1071,7 @@ private:
      *  Refcount - the number of references to the value
      *  @return int
      */
-    int refcount();
+    int refcount() const;
 
 protected:
     /**

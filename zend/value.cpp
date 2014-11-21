@@ -303,13 +303,7 @@ Value::~Value()
     // if there were two references or less, we're going to remove a reference
     // and only one reference will remain, the object will then impossible be
     // a reference
-    //
-    // This initially seemed to be a good idea, because reference-variables
-    // are hard to deal with, and a reference with only one or even zero variables
-    // pointing towards it seem silly, but this line of code caused objects only
-    // to be destructed when the script exits
-    //
-    // if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
+    if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
 
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
@@ -393,7 +387,7 @@ void Value::attach(struct _hashtable *hashtable)
  *  Retrieve the refcount
  *  @return int
  */
-int Value::refcount()
+int Value::refcount() const
 {
     return Z_REFCOUNT_P(_val);
 }
