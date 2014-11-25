@@ -82,17 +82,17 @@ public:
      *  @param  arg8        Optional argument 9
      *  @param  arg9        Optional argument 10
      */
-    Object(const char *name) : Value(Type::Object) { if (instantiate(name)) call("__construct"); }
-    Object(const char *name, Value p0) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0); }
-    Object(const char *name, Value p0, Value p1) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1); }
-    Object(const char *name, Value p0, Value p1, Value p2) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) : Value(Type::Object) { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }
+    Object(const char *name) : Value() { if (instantiate(name)) call("__construct"); }
+    Object(const char *name, Value p0) : Value() { if (instantiate(name)) call("__construct", p0); }
+    Object(const char *name, Value p0, Value p1) : Value() { if (instantiate(name)) call("__construct", p0, p1); }
+    Object(const char *name, Value p0, Value p1, Value p2) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8); }
+    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }
     
     /**
      *  Destructor

@@ -17,7 +17,7 @@ namespace Php {
  *  @param  name        Name of the class to instantiate
  *  @param  base        Implementation of the class
  */
-Object::Object(const char *name, Base *base) : Value(Type::Object)
+Object::Object(const char *name, Base *base) : Value()
 {
     // does the object already have a handle?
     if (base->implementation())
@@ -29,7 +29,7 @@ Object::Object(const char *name, Base *base) : Value(Type::Object)
     {
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
-        
+
         // this is a brand new object that should be allocated, the C++ instance
         // is already there (created by the extension) but it is not yet stored
         // in PHP, find out the classname first (we use the FatalError class
@@ -38,14 +38,14 @@ Object::Object(const char *name, Base *base) : Value(Type::Object)
         // by the extension).
         auto *entry = zend_fetch_class(name, ::strlen(name), ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
         if (!entry) throw FatalError(std::string("Unknown class name ") + name);
-        
+
         // construct an implementation (this will also set the implementation
         // member in the base object)
         new ObjectImpl(entry, base TSRMLS_CC);
-        
+
         // now we can store it
         operator=(Value(base));
-        
+
         // install the object handlers
         Z_OBJVAL_P(_val).handlers = ClassImpl::objectHandlers(entry);
     }
@@ -56,7 +56,7 @@ Object::Object(const char *name, Base *base) : Value(Type::Object)
  *  or when it is a string holding a classname
  *  @param  that        An other object
  */
-Object::Object(const Value &value) : Value(Type::Object)
+Object::Object(const Value &value) : Value()
 {
     // when a string is passed in, we are going to make a new instance of the
     // passed in string

@@ -51,12 +51,12 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
         {
             // get the result
             Value result(callable->invoke(params));
-            
+
             // we're ready if the return value is not even used
             if (!return_value_used) return;
-            
+
             // @todo php 5.6 has a RETVAL_ZVAL_FAST macro that can be used instead (and is faster)
-            
+
             // return a full copy of the zval, and do not destruct it
             RETVAL_ZVAL(result._val, 1, 0);
         }

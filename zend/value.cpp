@@ -210,9 +210,6 @@ Value::Value(const Base *object)
     
     // store the handlers in the zval too (cast is necessary for php 5.3)
     Z_OBJ_HT_P(_val) = (zend_object_handlers*)obj_bucket->bucket.obj.handlers;
-    
-    // run the copy constructor
-    zval_copy_ctor(_val);
 }
 
 /**
