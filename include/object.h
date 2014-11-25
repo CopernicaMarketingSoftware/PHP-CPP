@@ -71,28 +71,10 @@ public:
      *  number of parameters that are passed to the constructor
      *  
      *  @param  name        Name of the class to instantiate
-     *  @param  arg0        Optional argument 1
-     *  @param  arg1        Optional argument 2
-     *  @param  arg2        Optional argument 3
-     *  @param  arg3        Optional argument 4
-     *  @param  arg4        Optional argument 5
-     *  @param  arg5        Optional argument 6
-     *  @param  arg6        Optional argument 7
-     *  @param  arg7        Optional argument 8
-     *  @param  arg8        Optional argument 9
-     *  @param  arg9        Optional argument 10
+     *  @param  args        Optional arguments
      */
-    Object(const char *name) : Value() { if (instantiate(name)) call("__construct"); }
-    Object(const char *name, Value p0) : Value() { if (instantiate(name)) call("__construct", p0); }
-    Object(const char *name, Value p0, Value p1) : Value() { if (instantiate(name)) call("__construct", p0, p1); }
-    Object(const char *name, Value p0, Value p1, Value p2) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8); }
-    Object(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) : Value() { if (instantiate(name)) call("__construct", p0, p1, p2, p3, p4, p5, p6, p7, p8, p9); }
+    template <typename ...Args>
+    Object(const char *name, Args&&... args) : Value() { if (instantiate(name)) call("__construct", std::forward<Value>(args)...); }
     
     /**
      *  Destructor
