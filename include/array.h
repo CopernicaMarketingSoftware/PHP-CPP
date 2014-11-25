@@ -38,7 +38,7 @@ public:
      *  Move constructor from a value object
      *  @param  value
      */
-    Array(Value &&value) : Value(std::move(value))
+    Array(Value &&value)  noexcept : Value(std::move(value))
     {
         // type must be valid
         if (value.type() != Type::Array) throw FatalError("Moving a non-array to an array variable");
@@ -107,7 +107,7 @@ public:
      *  @param  value
      *  @return Array
      */
-    Array &operator=(Value &&value)
+    Array &operator=(Value &&value) noexcept
     {
         // skip self assignment
         if (this == &value) return *this;
