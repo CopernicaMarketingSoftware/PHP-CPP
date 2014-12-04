@@ -31,6 +31,8 @@ Value eval(const std::string &phpCode)
 
     // the return zval
     zval* retval = nullptr;
+    MAKE_STD_ZVAL(retval);
+    
     if (zend_eval_stringl_ex((char *)phpCode.c_str(), (int32_t)phpCode.length(), retval, (char *)"", 1 TSRMLS_CC) != SUCCESS)
     {
         // Do we want to throw an exception here? The original author
