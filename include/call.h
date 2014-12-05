@@ -26,6 +26,34 @@ inline bool  is_subclass_of(const Value &obj, const char *classname, size_t size
 inline bool  is_subclass_of(const Value &obj, const char *classname, bool allow_string = true) { return is_subclass_of(obj, classname, strlen(classname), allow_string); }
 inline bool  is_subclass_of(const Value &obj, const std::string &classname, bool allow_string = true) { return is_subclass_of(obj, classname.c_str(), classname.size(), allow_string); }
 
+enum class ExecutionType : int {
+    Include       =  2,
+    IncludeOnce   =  4,
+    Require       =  8,
+    RequireOnce   =  16
+};
+
+extern Value executeFile(const std::string execution, ExecutionType execType);
+
+inline Value include(const std::string execution)
+{
+    return executeFile(execution, ExecutionType::Include);
+}
+
+inline Value include_once(const std::string execution)
+{
+    return executeFile(execution, ExecutionType::IncludeOnce);
+}
+
+inline Value require(const std::string execution)
+{
+    return executeFile(execution, ExecutionType::Require);
+}
+
+inline Value require_once(const std::string execution)
+{
+    return executeFile(execution, ExecutionType::RequireOnce);
+}
 
 /**
  *  Call a function in PHP
