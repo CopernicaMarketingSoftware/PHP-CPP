@@ -141,6 +141,9 @@ Value executeFile(const std::string execution, ExecutionType execType)
     // execute the kept op_array
     zend_execute(opArray TSRMLS_CC);
     
+    destroy_op_array(opArray TSRMLS_CC);
+    efree(opArray);
+    
     // give back globals of previous stack frame
     EG(return_value_ptr_ptr) = origRetVal;
     EG(opline_ptr) = origOpline;
