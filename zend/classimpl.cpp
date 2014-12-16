@@ -534,7 +534,7 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     result.handlers = impl->objectHandlers();
     
     // store the object
-    ObjectImpl *new_object = new ObjectImpl(entry, cpp TSRMLS_CC);
+    ObjectImpl *new_object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
 
     // store the object in the object cache
     result.handle = new_object->handle();
@@ -1195,7 +1195,7 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
     result.handlers = impl->objectHandlers();
     
     // create the object in the zend engine
-    ObjectImpl *object = new ObjectImpl(entry, cpp TSRMLS_CC);
+    ObjectImpl *object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
     
     // store the object in the object cache
     result.handle = object->handle();

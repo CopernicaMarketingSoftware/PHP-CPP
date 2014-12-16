@@ -188,7 +188,9 @@ Value::Value(const Base *object)
 {
     // there are two options: the object was constructed from user space,
     // and is already linked to a handle, or it was constructed from C++ 
-    // space, and no handle does yet exist, find the implementation object
+    // space, and no handle does yet exist. But if it was constructed from
+    // C++ space and not yet wrapped, this Value constructor should not be 
+    // called directly, but first via the derived Php::Object class. 
     auto *impl = object->implementation();
     
     // do we have a handle?
@@ -204,6 +206,9 @@ Value::Value(const Base *object)
 
     // we have to lookup the object in the object-table
     zend_object_store_bucket *obj_bucket = &EG(objects_store).object_buckets[impl->handle()];
+    
+    // there is one more reference to the object
+    obj_bucket->bucket.obj.refcount += 1;
     
     // this is copy-pasted from zend_objects.c - and it is necessary too!
     if (!obj_bucket->bucket.obj.handlers) obj_bucket->bucket.obj.handlers = &std_object_handlers;

@@ -40,8 +40,10 @@ Object::Object(const char *name, Base *base) : Value()
         if (!entry) throw FatalError(std::string("Unknown class name ") + name);
 
         // construct an implementation (this will also set the implementation
-        // member in the base object)
-        new ObjectImpl(entry, base TSRMLS_CC);
+        // member in the base object), this is a self-destructing object that
+        // will be destructed when the last reference to it has been removed,
+        // we already set the reference to zero
+        new ObjectImpl(entry, base, 0 TSRMLS_CC);
 
         // now we can store it
         operator=(Value(base));
