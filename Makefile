@@ -44,7 +44,7 @@ PHP_BIN         		=   $(shell ${PHP_CONFIG} --php-binary)
 
 INSTALL_PREFIX  		=   /usr
 INSTALL_HEADERS			=   ${INSTALL_PREFIX}/include
-INSTALL_LIB     		=   ${INSTALL_PREFIX}/lib
+INSTALL_LIB     		=   $(shell cat /etc/ld.so.conf.d/libc.conf | grep -v "\#" | head -1)
 
 
 #
