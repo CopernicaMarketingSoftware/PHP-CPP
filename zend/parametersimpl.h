@@ -36,7 +36,7 @@ public:
             zval **arg = (zval **) (zend_vm_stack_top(TSRMLS_C) - 1 - (argc-i));
             
             // append value
-            push_back(Value(*arg));
+            emplace_back(*arg);
         }
     }
     

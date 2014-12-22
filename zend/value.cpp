@@ -157,10 +157,8 @@ Value::Value(double value)
  *  @param  ref         Force this to be a reference
  */
 Value::Value(struct _zval_struct *val, bool ref)
+: _val(val)
 {
-    // just copy the zval into this object
-    _val = val;
-    
     // if the variable is not already a reference, and it has more than one
     // variable pointing to it, we should seperate it so that any changes
     // we're going to make will not change the other variable
@@ -169,13 +167,13 @@ Value::Value(struct _zval_struct *val, bool ref)
         // separate the zval
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
     }
-    
+
     // we see ourselves as reference too
     Z_ADDREF_P(_val);
-    
+
     // we're ready if we do not have to force it as a reference
     if (!ref || Z_ISREF_P(_val)) return;
-    
+
     // make this a reference
     Z_SET_ISREF_P(_val);
 }
@@ -1528,18 +1526,24 @@ Value Value::clone() const
 {
     // the zval that will hold the copy
     zval *copy;
-    
+
     // allocate memory
     ALLOC_ZVAL(copy);
-    
+
     // copy the data
     INIT_PZVAL_COPY(copy, _val);
-    
+
     // run the copy constructor to ensure that everything gets copied
     zval_copy_ctor(copy);
-    
+
+    // wrap it using the Value(zval*) constructor, this will +1 the refcount!!!!
+    Value output(copy);
+
+    // -1 the refcount to avoid future leaks
+    Z_DELREF_P(copy);
+
     // done
-    return Value(copy);
+    return output;
 }
 
 /**
