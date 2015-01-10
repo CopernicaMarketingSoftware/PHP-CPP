@@ -33,7 +33,7 @@ Value eval(const std::string &phpCode)
     zval* retval = nullptr;
     if (zend_eval_stringl_ex((char *)phpCode.c_str(), (int32_t)phpCode.length(), retval, (char *)"", 1 TSRMLS_CC) != SUCCESS)
     {
-        // Do we want to throw an exception here? The original author
+        // Do we want to throw an exception here? The original author of this code
         // did, but there are some reasons not to:
         //
         //  1. the PHP eval() function also does not throw exceptions.

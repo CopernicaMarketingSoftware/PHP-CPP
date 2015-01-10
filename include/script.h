@@ -62,7 +62,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Script();
+    virtual ~Script() {}
     
     /**
      *  Is the script a valid PHP script without syntax errors?
@@ -70,7 +70,7 @@ public:
      */
     bool valid() const
     {
-        return _opcodes != nullptr;
+        return _opcodes.valid();
     }
     
     /**
@@ -78,14 +78,26 @@ public:
      *  The return value of the script is returned
      *  @return Value
      */
-    Value execute() const;
+    Value execute() const
+    {
+        return _opcodes.execute();
+    }
     
 private:
     /**
      *  The opcodes
-     *  @var zend_op_array
+     *  @var Opcodes
      */
-    struct _zend_op_array *_opcodes;
+    Opcodes _opcodes;
+    
+    /**
+     *  Helper function to compile the source code
+     *  @param  name        name of the script
+     *  @param  script      actual PHP code
+     *  @param  size        length of the string
+     *  @return opcodes
+     */
+    static struct _zend_op_array *compile(const char *name, const char *phpcode, size_t size);
 
 };
     

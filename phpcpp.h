@@ -61,7 +61,9 @@
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/call.h>
+#include <phpcpp/opcodes.h>
 #include <phpcpp/script.h>
+#include <phpcpp/file.h>
 
 /**
  *  Macro to export a function
