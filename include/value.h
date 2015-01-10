@@ -129,7 +129,7 @@ public:
      *  Move constructor
      *  @param  value
      */
-    Value(Value &&that);
+    Value(Value &&that) noexcept;
     
     /**
      *  Destructor
@@ -141,7 +141,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value &operator=(Value &&value);
+    Value &operator=(Value &&value) noexcept;
     
     /**
      *  Assignment operator for various types
@@ -944,24 +944,32 @@ public:
         return get(key.stringValue());
     }
     
-
     /**
      *  Call the function in PHP
-     *  We have ten variants of this function, depending on the number of parameters
      *  This call operator is only useful when the variable represents a callable
      *  @return Value
      */
     Value operator()() const;
-    Value operator()(Value p0) const;
-    Value operator()(Value p0, Value p1) const;
-    Value operator()(Value p0, Value p1, Value p2) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) const;
+
+    /**
+     *  Call the function - if the variable holds a callable thing
+     *  @param  args        Optional arguments
+     *  @return Value
+     */
+    template <typename ...Args>
+    Value operator()(Args&&... args) const
+    {
+        // store arguments
+        Value vargs[] = { static_cast<Value>(args)... };
+        //Value vargs[] = { std::forward<Value>(args)... };
+
+        // array of parameters
+        _zval_struct **params[sizeof...(Args)];
+        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
+
+        // call the function
+        return exec(sizeof...(Args), params);
+    }
 
     /**
      *  Call a method
@@ -971,16 +979,27 @@ public:
      *  @return Value
      */
     Value call(const char *name);
-    Value call(const char *name, Value p0);
-    Value call(const char *name, Value p0, Value p1);
-    Value call(const char *name, Value p0, Value p1, Value p2);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+
+    /**
+     *
+     *  Call the method - if the variable holds an object with the given method
+     *  @param  name        name of the method to call
+     *  @param  p0          The first parameter
+     *  @return Value
+     */
+    template <typename ...Args>
+    Value call(const char *name, Args&&... args)
+    {
+        // store arguments
+        Value vargs[] = { static_cast<Value>(args)... };
+
+        // array of parameters
+        _zval_struct **params[sizeof...(Args)];
+        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
+
+        // call the function
+        return exec(name, sizeof...(Args), params);
+    }
 
     /**
      *  Retrieve the original implementation

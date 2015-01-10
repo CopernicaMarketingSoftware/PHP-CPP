@@ -45,7 +45,7 @@ public:
      *  Move constructor
      *  @param  argument
      */
-    ByVal(ByVal &&argument) : Argument(argument) {}
+    ByVal(ByVal &&argument) noexcept : Argument(argument) {}
 
     /**
      *  Destructor
