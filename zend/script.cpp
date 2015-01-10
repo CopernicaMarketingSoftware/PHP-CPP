@@ -172,8 +172,15 @@ Value Script::execute() const
     // destination for the long jump, so that we can catch a failure
     zend_try 
     {
+        // the current exception
+        zval* oldException = EG(exception);
+
         // execute the code
         zend_execute(_opcodes TSRMLS_CC);
+
+        // was an exception thrown inside the eval()'ed code? In that case we 
+        // throw a C++ new exception to give the C++ code the chance to catch it
+        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
     } 
     zend_catch
     {
