@@ -1170,6 +1170,7 @@ protected:
     friend class HashMember<int>;
     friend class HashMember<std::string>;
     friend class Callable;
+    friend class Script;
 };
 
 /**

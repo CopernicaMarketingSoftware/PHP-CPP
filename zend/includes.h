@@ -80,6 +80,7 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
+#include "../include/script.h"
 
 /**
  *  Common header files for internal use only
