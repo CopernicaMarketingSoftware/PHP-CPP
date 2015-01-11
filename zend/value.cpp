@@ -1698,7 +1698,7 @@ void Value::unset(const char *key, int size)
         SEPARATE_ZVAL_IF_NOT_REF(&_val);
 
         // remove the index
-        zend_hash_del(Z_ARRVAL_P(_val), key, size);
+        zend_hash_del(Z_ARRVAL_P(_val), key, size + 1);
     }
 }
 
