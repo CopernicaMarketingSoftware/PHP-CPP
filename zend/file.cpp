@@ -55,22 +55,22 @@ File::~File()
 }
 
 /**
- *  Execute the file
- *  @return Value
+ *  Compile the file
+ *  @return bool
  */
-Value File::execute() 
+bool File::compile()
 {
-    // do we already have the opcodes?
-    if (_opcodes) return _opcodes->execute();
-
-    // skip if there is no valid path
-    if (!_path) return nullptr;
-
+    // never works if the path is invalid
+    if (!_path) return false;
+    
+    // is the file already compiled?
+    if (_opcodes) return _opcodes->valid();
+    
     // we are going to open the file
     zend_file_handle fileHandle;
 
     // open the file
-    if (zend_stream_open(_path, &fileHandle TSRMLS_CC) == FAILURE) return nullptr;
+    if (zend_stream_open(_path, &fileHandle TSRMLS_CC) == FAILURE) return false;
 
     // make sure the path name is stored in the handle
     if (!fileHandle.opened_path) fileHandle.opened_path = estrdup(_path);
@@ -80,12 +80,55 @@ Value File::execute()
     
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
-    
+   
     // create the opcodes
     _opcodes = new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE TSRMLS_CC));
 
     // close the file handle
     zend_destroy_file_handle(&fileHandle TSRMLS_CC);
+    
+    // done
+    return _opcodes->valid();
+}
+
+/**
+ *  Does the file exist?
+ *  @return boolean
+ */
+bool File::exists()
+{
+    // it is of course not valid if the path could not be resolved
+    if (!_path) return false;
+    
+    // if we have valid opcodes, we're sure that it exists
+    if (_opcodes && _opcodes->valid()) return true;
+    
+    // retrieve stats
+    struct stat buf;
+    return stat(_path, &buf) == 0;
+}
+
+/**
+ *  Is this a valid file?
+ *  @return boolean
+ */
+bool File::valid()
+{
+    // check if file is compilable
+    return compile();
+}
+
+/**
+ *  Execute the file
+ *  @return Value
+ */
+Value File::execute() 
+{
+    // do we already have the opcodes?
+    if (_opcodes) return _opcodes->execute();
+
+    // try compiling the file
+    if (!compile()) return nullptr;
 
     // add the entry to the list of included files
     zend_hash_add_empty_element(&EG(included_files), _path, ::strlen(_path) + 1);
@@ -100,9 +143,8 @@ Value File::execute()
  */
 Value File::once() 
 {
-    // skip if the opcodes are already known (then we know for sure that the 
-    // file was already executed), also leap out if the filename was not even valid
-    if (_opcodes || !_path) return nullptr;
+    // skip if the path is invalid
+    if (!_path) return nullptr;
     
     // check if this file was already included
     if (zend_hash_exists(&EG(included_files), _path, ::strlen(_path) + 1)) return nullptr;

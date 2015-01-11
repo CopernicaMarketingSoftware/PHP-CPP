@@ -55,7 +55,19 @@ public:
     virtual ~File();
     
     /**
-     *  Include the file once
+     *  Does the file exist?
+     *  @return boolean
+     */
+    bool exists();
+    
+    /**
+     *  Is this a valid file?
+     *  @return boolean
+     */
+    bool valid();
+
+    /**
+     *  Execute the file once (do nothing if the file already was executed)
      *  @return Php::Value
      */
     Value once();
@@ -78,6 +90,12 @@ private:
      *  @var Opcodes
      */
     Opcodes *_opcodes = nullptr;
+
+    /**
+     *  Compile the file
+     *  @return bool
+     */
+    bool compile();
     
 };
     

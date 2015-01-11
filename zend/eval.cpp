@@ -63,6 +63,71 @@ Value eval(const std::string &phpCode)
 }
 
 /**
+ *  Include a file
+ *  @param  filename
+ *  @return Value
+ */
+Value include(const std::string &filename)
+{
+    // we can simply execute a file
+    return File(filename).execute();
+}
+
+/**
+ *  Include a file only once
+ *  @param  filename
+ *  @return Value
+ */
+Value include_once(const std::string &filename)
+{
+    // we can simply execute a file
+    return File(filename).execute();
+}
+
+/**
+ *  Require a file
+ *  This causes a fatal error if the file does not exist
+ *  @param  filename
+ *  @return Value
+ */
+Value require(const std::string &filename)
+{
+    // create the file
+    File file(filename);
+    
+    // execute if it exists
+    if (file.exists()) return file.execute();
+    
+    // trigger fatal error
+    error << filename << " does not exist" << std::flush;
+    
+    // unreachable
+    return nullptr;
+}
+
+/**
+ *  Require a file only once
+ *  This causes a fatal error if the file does not exist
+ *  @param  filename
+ *  @return Value
+ */
+Value require_once(const std::string &filename)
+{
+    // create the file
+    File file(filename);
+    
+    // execute if it exists
+    if (file.exists()) return file.once();
+    
+    // trigger fatal error
+    error << filename << " does not exist" << std::flush;
+    
+    // unreachable
+    return nullptr;
+}
+
+
+/**
  *  End of namespace
  */
 }

@@ -87,9 +87,6 @@ Value Opcodes::execute() const
     // pointer that is going to hold the return value of the script
     zval *retval_ptr = nullptr;
     
-    // @todo should retval_ptr be allocated?
-    
-
     // the zend engine is probably already busy processing opcodes, so we store
     // the current execute state before we're going to switch the runtime to
     // our own set of opcodes
@@ -103,35 +100,15 @@ Value Opcodes::execute() const
     if (!EG(active_symbol_table)) zend_rebuild_symbol_table(TSRMLS_C);
     CG(interactive) = 0;
     
-    // this code was copied from zend_execute_API.c. this is what I think it does:
-    // the zend_execute() call could result in all sort of disastrous things, one
-    // of them is a full crash of the executing script. if that happens, the zend
-    // engine does a long jump right up to some other point in the code. the
-    // 'zend_try' and 'zend_catch' macros prevent this: they install a new 
-    // destination for the long jump, so that we can catch a failure
-    zend_try 
-    {
-        // the current exception
-        zval* oldException = EG(exception);
+    // the current exception
+    zval* oldException = EG(exception);
 
-        // execute the code
-        zend_execute(_opcodes TSRMLS_CC);
+    // execute the code
+    zend_execute(_opcodes TSRMLS_CC);
 
-        // was an exception thrown inside the eval()'ed code? In that case we 
-        // throw a C++ new exception to give the C++ code the chance to catch it
-        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
-    } 
-    zend_catch
-    {
-        // the code could not be executed, and the zend engine is in big
-        // trouble now, in the original code the _opcodes are efree'd, but here
-        // we can just as well continue with the real bailout (the zend_try/
-        // zend_catch pair was maybe not even necessary???)
-        zend_bailout();
-    }
-    zend_end_try();
-
-    // @todo do we have to do something smart with zval copy'ing?
+    // was an exception thrown inside the eval()'ed code? In that case we 
+    // throw a C++ new exception to give the C++ code the chance to catch it
+    if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
 
     // we're ready if there is no return value
     if (!retval_ptr) return nullptr;
