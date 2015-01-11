@@ -33,6 +33,13 @@ File::File(const char *name, size_t size)
     
     // resolve the path
     _path = zend_resolve_path(name, size TSRMLS_CC);
+    
+    // the resolve-path function sometimes returns the original pointer, we
+    // do not want that because we may have to store the pathname in this object
+    if (_path != name) return;
+    
+    // make a full copy of the pathname
+    _path = estrndup(name, size);
 }
 
 /**
@@ -78,7 +85,10 @@ Value File::execute()
     _opcodes = new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE TSRMLS_CC));
 
     // close the file handle
-    zend_file_handle_dtor(&fileHandle TSRMLS_CC); 
+    zend_destroy_file_handle(&fileHandle TSRMLS_CC);
+
+    // add the entry to the list of included files
+    zend_hash_add_empty_element(&EG(included_files), _path, ::strlen(_path) + 1);
     
     // execute the opcodes
     return _opcodes->execute();
@@ -91,18 +101,12 @@ Value File::execute()
 Value File::once() 
 {
     // skip if the opcodes are already known (then we know for sure that the 
-    // file was already executed)
-    if (_opcodes) return nullptr;
-    
-    // also leap out if the filename was not even valid
-    if (!_path) return nullptr;
+    // file was already executed), also leap out if the filename was not even valid
+    if (_opcodes || !_path) return nullptr;
     
     // check if this file was already included
     if (zend_hash_exists(&EG(included_files), _path, ::strlen(_path) + 1)) return nullptr;
 
-    // add the entry to the list of included files
-    if (zend_hash_add_empty_element(&EG(included_files), _path, ::strlen(_path) + 1) == FAILURE) return nullptr;
-    
     // execute the file
     return execute();
 }

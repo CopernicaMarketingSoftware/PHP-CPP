@@ -38,6 +38,18 @@ public:
     File(const char *name) : File(name, ::strlen(name)) {}
 
     /**
+     *  Alternative constructor with a string object
+     *  @param  name        the filename
+     */
+    File(const std::string &name) : File(name.c_str(), name.size()) {}
+    
+    /**
+     *  Alternative constructor with a Value object
+     *  @param  name        the filename
+     */
+    File(const Value &value) : File(value.stringValue()) {}
+
+    /**
      *  Destructor
      */
     virtual ~File();

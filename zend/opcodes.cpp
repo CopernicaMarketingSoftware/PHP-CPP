@@ -136,8 +136,15 @@ Value Opcodes::execute() const
     // we're ready if there is no return value
     if (!retval_ptr) return nullptr;
     
+    // wrap the return value
+    Value result(retval_ptr);
+    
+    // destruct the zval (this function will decrement the reference counter,
+    // and only destruct if there are no other references left)
+    zval_ptr_dtor(&retval_ptr);
+    
     // copy the pointer into a value object, and return that
-    return retval_ptr;
+    return result;
 }
 
 /**

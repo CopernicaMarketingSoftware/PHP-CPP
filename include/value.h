@@ -405,7 +405,7 @@ public:
     char *reserve(size_t size);
     
     /**
-     *  Get access to the raw buffer for read operationrs.
+     *  Get access to the raw buffer for read operations.
      *  @return const char *
      */
     const char *rawValue() const;
