@@ -29,8 +29,11 @@ Value eval(const std::string &phpCode)
     // the current exception
     zval* oldException = EG(exception);
 
-    // the return zval
-    zval* retval = nullptr;
+    // the return va
+    zval *retval = nullptr;
+    MAKE_STD_ZVAL(retval);
+    
+    // evaluate the string
     if (zend_eval_stringl_ex((char *)phpCode.c_str(), (int32_t)phpCode.length(), retval, (char *)"", 1 TSRMLS_CC) != SUCCESS)
     {
         // Do we want to throw an exception here? The original author of this code
@@ -57,8 +60,17 @@ Value eval(const std::string &phpCode)
         // throw a C++ new exception to give the C++ code the chance to catch it
         if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
 
-        // no (additional) exception was thrown
-        return retval ? Value(retval) : nullptr;
+        // wrap the return value in a value object
+        Value result(retval);
+
+        // the retval should now have two references: the value object and the
+        // retval itselves, so we can remove one of it (the zval_ptr_dtor only
+        // decrements refcount and won't destruct anything because there still 
+        // is one reference left inside the Value object)
+        zval_ptr_dtor(&retval);
+        
+        // done
+        return result;
     }
 }
 
