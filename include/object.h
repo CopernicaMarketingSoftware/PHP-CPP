@@ -66,15 +66,22 @@ public:
 
     /**
      *  Constructor to create a new instance
+     *  @param  name        Name of the class to instantiate
+     */
+    Object(const char *name) : Value() { if (instantiate(name)) call("__construct"); }
+
+    /**
+     *  Constructor to create a new instance
      * 
-     *  This constructor comes in many different forms, to support all possible
-     *  number of parameters that are passed to the constructor
+     *  Note that it was not possible to create a constructor with signature
+     *  Object(const char *name, Args&&... args) because that overrides the
+     *  Object(const char *name, Base *base) constructor.
      *  
      *  @param  name        Name of the class to instantiate
      *  @param  args        Optional arguments
      */
     template <typename ...Args>
-    Object(const char *name, Args&&... args) : Value() { if (instantiate(name)) call("__construct", std::forward<Value>(args)...); }
+    Object(const char *name, Value arg0, Args&&... args) : Value() { if (instantiate(name)) call("__construct", arg0, std::forward<Value>(args)...); }
     
     /**
      *  Destructor

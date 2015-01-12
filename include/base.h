@@ -34,6 +34,18 @@ protected:
      */
     Base() {}
 
+    /**
+     *  Copy constructor
+     * 
+     *  This copy constructor is explicitly defined to make sure that the
+     *  copied object does not already have an implementation in the zend engine.
+     *  Otherwise the copied object has the same object handle as the original
+     *  object.
+     * 
+     *  @param  base
+     */
+    Base(const Base &base) : _impl(nullptr) {}
+    
 public:
     /**
      *  Virtual destructor
