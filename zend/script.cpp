@@ -32,12 +32,13 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
     // found there is full of zval manipulation, for which we can use the much
     // simpler Php::Value object
     Php::Value source(phpcode, size);
+
+    // we need the tsrm_ls variable
+    // @todo it would be better if this was passed as param to the compile() method
+    TSRMLS_FETCH();
     
     // remember the old compiler options, and set new compiler options
-    CompilerOptions options(ZEND_COMPILE_DEFAULT_FOR_EVAL);
-    
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
+    CompilerOptions options(ZEND_COMPILE_DEFAULT_FOR_EVAL TSRMLS_CC);
     
     // compile the string
     return zend_compile_string(source._val, (char *)name TSRMLS_CC);
@@ -49,10 +50,48 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
  *  @param  script      actual PHP code
  *  @param  size        length of the string
  */
-Script::Script(const char *name, const char *phpcode, size_t size) : _opcodes(compile(name, phpcode, size))
+Script::Script(const char *name, const char *phpcode, size_t size) 
 {
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // construct opcodes
+    _opcodes = new Opcodes(compile(name, phpcode, size) TSRMLS_CC);
 }
+
+/**
+ *  Destructor
+ */
+Script::~Script()
+{
+    // remove opcodes
+    delete _opcodes;
+}
+
+/**
+ *  Is the script a valid PHP script without syntax errors?
+ *  @return bool
+ */
+bool Script::valid() const
+{
+    // check opcodes
+    return _opcodes && _opcodes->valid();
+}
+
+/**
+ *  Execute the script
+ *  The return value of the script is returned
+ *  @return Value
+ */
+Value Script::execute() const
+{
+    // pass on to opcodes
+    if (!_opcodes) return nullptr;
     
+    // execute opcodes
+    return _opcodes->execute();
+}
+
 /**
  *  End of namespace
  */

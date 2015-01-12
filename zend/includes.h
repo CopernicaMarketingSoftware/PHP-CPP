@@ -80,7 +80,6 @@
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
-#include "../include/opcodes.h"
 #include "../include/script.h"
 #include "../include/file.h"
 
@@ -117,6 +116,8 @@
 #include "parametersimpl.h"
 #include "extensionimpl.h"
 #include "compileroptions.h"
+#include "executestate.h"
+#include "opcodes.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

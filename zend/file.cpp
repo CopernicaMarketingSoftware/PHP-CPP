@@ -69,6 +69,9 @@ bool File::compile()
     // we are going to open the file
     zend_file_handle fileHandle;
 
+    // we need the tsrm_ls variable (@todo would it be better if this was a member?)
+    TSRMLS_FETCH();
+
     // open the file
     if (zend_stream_open(_path, &fileHandle TSRMLS_CC) == FAILURE) return false;
 
@@ -76,13 +79,10 @@ bool File::compile()
     if (!fileHandle.opened_path) fileHandle.opened_path = estrdup(_path);
     
     // we need temporary compiler options
-    CompilerOptions options(ZEND_COMPILE_DEFAULT);
+    CompilerOptions options(ZEND_COMPILE_DEFAULT TSRMLS_CC);
     
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-   
     // create the opcodes
-    _opcodes = new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE TSRMLS_CC));
+    _opcodes = new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE TSRMLS_CC) TSRMLS_CC);
 
     // close the file handle
     zend_destroy_file_handle(&fileHandle TSRMLS_CC);
@@ -130,6 +130,9 @@ Value File::execute()
     // try compiling the file
     if (!compile()) return nullptr;
 
+    // we need the tsrm_ls variable (@todo would it be better if this was a member?)
+    TSRMLS_FETCH();
+
     // add the entry to the list of included files
     zend_hash_add_empty_element(&EG(included_files), _path, ::strlen(_path) + 1);
     
@@ -145,6 +148,9 @@ Value File::once()
 {
     // skip if the path is invalid
     if (!_path) return nullptr;
+
+    // we need the tsrm_ls variable (@todo would it be better if this was a member?)
+    TSRMLS_FETCH();
     
     // check if this file was already included
     if (zend_hash_exists(&EG(included_files), _path, ::strlen(_path) + 1)) return nullptr;

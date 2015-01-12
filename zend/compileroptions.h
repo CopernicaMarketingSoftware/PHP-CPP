@@ -25,19 +25,32 @@ private:
      *  @var int
      */
     zend_uint _original;
+    
+#ifdef ZTS
+    /**
+     *  When in thread safety mode, we also keep track of the TSRM_LS var
+     *  @var void***
+     */
+    void ***tsrm_ls;
+#endif
 
 public:
     /**
      *  Constructor
      *  @param  options
      */
-    CompilerOptions(zend_uint options)
+    CompilerOptions(zend_uint options TSRMLS_DC)
     {
         // remember the old compiler options before we set temporary compile options
         _original = CG(compiler_options);
         
         // we're going to evaluate only once
         CG(compiler_options) = options;
+        
+#ifdef ZTS
+        // copy tsrm_ls param
+        this->tsrm_ls = tsrm_ls;
+#endif
     }
     
     /**

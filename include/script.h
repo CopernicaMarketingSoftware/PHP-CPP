@@ -21,6 +21,11 @@ struct _zend_op_array;
 namespace Php {
 
 /**
+ *  Forward declarations
+ */
+class Opcodes;
+
+/**
  *  Class definition
  */
 class Script
@@ -62,33 +67,27 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Script() {}
+    virtual ~Script();
     
     /**
      *  Is the script a valid PHP script without syntax errors?
      *  @return bool
      */
-    bool valid() const
-    {
-        return _opcodes.valid();
-    }
+    bool valid() const;
     
     /**
      *  Execute the script
      *  The return value of the script is returned
      *  @return Value
      */
-    Value execute() const
-    {
-        return _opcodes.execute();
-    }
+    Value execute() const;
     
 private:
     /**
      *  The opcodes
      *  @var Opcodes
      */
-    Opcodes _opcodes;
+    Opcodes *_opcodes;
     
     /**
      *  Helper function to compile the source code
