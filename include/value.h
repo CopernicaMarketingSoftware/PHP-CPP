@@ -1144,7 +1144,7 @@ protected:
     void setRaw(const char *key, int size, const Value &value);
 
     /**
-     *  Internal helper method to create an iterator
+     *  Internal helper method to create an `
      *  @param  begin       Should the iterator start at the begin?
      *  @return iterator
      */
