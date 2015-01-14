@@ -65,6 +65,12 @@ public:
     Script(const char *source) noexcept : Script("Unknown", source, ::strlen(source)) {}
     
     /**
+     *  Constructor based on a std::string
+     *  @param  source      PHP source code to be evaluated
+     */
+    Script(const std::string &source) noexcept : Script("Unknown", source.c_str(), source.size()) {}
+    
+    /**
      *  Destructor
      */
     virtual ~Script();
