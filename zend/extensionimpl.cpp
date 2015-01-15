@@ -298,7 +298,7 @@ zend_module_entry *ExtensionImpl::module()
     int i = 0;
 
     // apply a function to each function
-    _data->functions([&i, entries](const std::string &prefix, Function &function) {
+    _data->functions([&i, entries](const std::string &prefix, NativeFunction &function) {
         
         // initialize the function
         function.initialize(prefix, &entries[i]);

@@ -82,6 +82,7 @@
 #include "../include/call.h"
 #include "../include/script.h"
 #include "../include/file.h"
+#include "../include/function.h"
 
 /**
  *  Common header files for internal use only
@@ -94,7 +95,7 @@
  */
 #include "init.h"
 #include "callable.h"
-#include "function.h"
+#include "nativefunction.h"
 #include "method.h"
 #include "member.h"
 #include "nullmember.h"
@@ -118,6 +119,7 @@
 #include "compileroptions.h"
 #include "executestate.h"
 #include "opcodes.h"
+#include "functor.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

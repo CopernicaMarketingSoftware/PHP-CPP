@@ -16,7 +16,7 @@ namespace Php {
 /**
  *  Forward declaration
  */
-class Function;
+class NativeFunction;
 
 /**
  *  Class definition
@@ -34,7 +34,7 @@ protected:
      *  Functions defined in the namespace
      *  @var    list
      */
-    std::list<std::shared_ptr<Function>> _functions;
+    std::list<std::shared_ptr<NativeFunction>> _functions;
 
     /**
      *  Classes defined in the namespace
@@ -220,7 +220,7 @@ public:
      * 
      *  @param  callback
      */
-    void functions(const std::function<void(const std::string &ns, Function &func)> &callback);
+    void functions(const std::function<void(const std::string &ns, NativeFunction &func)> &callback);
     
     /**
      *  Apply a callback to each registered class

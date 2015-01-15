@@ -1344,8 +1344,9 @@ const struct _zend_function_entry *ClassImpl::entries()
  *  @param  base        the c++ class object created in the extension
  *  @param  prefix      namespace prefix
  *  @param  tsrm_ls
+ *  @return zend_class_entry
  */
-void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
+zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
 {
     // store base pointer
     _base = base;
@@ -1442,6 +1443,9 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
 
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry TSRMLS_CC);
+    
+    // done
+    return _entry;
 }
 
 /**

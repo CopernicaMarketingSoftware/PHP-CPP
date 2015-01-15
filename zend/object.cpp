@@ -15,7 +15,7 @@ namespace Php {
  *  Constructor to create a new instance of a builtin class
  *  
  *  @param  name        Name of the class to instantiate
- *  @param  base        Implementation of the class
+ *  @param  base        The C++ object to wrap
  */
 Object::Object(const char *name, Base *base) : Value()
 {
@@ -38,6 +38,39 @@ Object::Object(const char *name, Base *base) : Value()
         // by the extension).
         auto *entry = zend_fetch_class(name, ::strlen(name), ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
         if (!entry) throw FatalError(std::string("Unknown class name ") + name);
+
+        // construct an implementation (this will also set the implementation
+        // member in the base object), this is a self-destructing object that
+        // will be destructed when the last reference to it has been removed,
+        // we already set the reference to zero
+        new ObjectImpl(entry, base, 0 TSRMLS_CC);
+
+        // now we can store it
+        operator=(Value(base));
+
+        // install the object handlers
+        Z_OBJVAL_P(_val).handlers = ClassImpl::objectHandlers(entry);
+    }
+}
+
+/**
+ *  Constructor in case the class entry is already known
+ * 
+ *  @param  entry       Class entry
+ *  @param  base        The C++ object to wrap
+ */
+Object::Object(zend_class_entry *entry, Base *base) : Value()
+{
+    // does the object already have a handle?
+    if (base->implementation())
+    {
+        // the object is already instantiated, we can assign it to this object
+        operator=(Value(base));
+    }
+    else
+    {
+        // we need the tsrm_ls variable
+        TSRMLS_FETCH();
 
         // construct an implementation (this will also set the implementation
         // member in the base object), this is a self-destructing object that

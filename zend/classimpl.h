@@ -140,6 +140,15 @@ public:
     }
 
     /**
+     *  The class-entry
+     *  @return zend_class_entry
+     */
+    struct _zend_class_entry *entry() const
+    {
+        return _entry;
+    }
+
+    /**
      *  Initialize the class, given its name
      * 
      *  The module functions are registered on module startup, but classes are
@@ -150,9 +159,10 @@ public:
      * 
      *  @param  base        The extension C++ class 
      *  @param  ns          Namespace name
-     *  @param  tsrm_ls
+     *  @param  tsrm_ls     
+     *  @return zend_class_entry
      */
-    void initialize(ClassBase *base, const std::string &ns TSRMLS_DC);
+    struct _zend_class_entry *initialize(ClassBase *base, const std::string &ns TSRMLS_DC);
 
     /**
      *  Static member functions to create or clone objects based on this class

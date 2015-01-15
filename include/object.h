@@ -54,9 +54,23 @@ public:
      *  }
      * 
      *  @param  name        Name of the class to instantiate
-     *  @param  base        Implementation of the class
+     *  @param  base        C++ object to wrap
      */
     Object(const char *name, Base *base);
+    
+    /**
+     *  If you already have the zend_class_entry, you can also pass the
+     *  class_entry structure instead of the class name. This constructor
+     *  works exactly like the Object(name, base) constructor mentioned
+     *  above.
+     * 
+     *  Note that if you normally use PHP-CPP, you do not have the class_entry,
+     *  so you probably need to pass the name anyway
+     * 
+     *  @param  entry       The PHP class entry
+     *  @param  base        C++ object to wrap
+     */
+    Object(struct _zend_class_entry *entry, Base *base);
 
     /**
      *  Wrap around an object implemented by us
