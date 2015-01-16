@@ -119,7 +119,7 @@ function my_array_map($array, $callback) {
     // done
     return $result;
 }
-&lt;?&gt;
+?&gt;
 </code></pre>
 </p>
 <p>
@@ -134,7 +134,7 @@ function my_array_map($array, $callback) {
 void run_test()
 {
     // create the anonymous function
-    Php::Function multiply_by_two([](Php::Parameters &amp;params) -> Php::Value) {
+    Php::Function multiply_by_two([](Php::Parameters &amp;params) -> Php::Value {
         
         // make sure the function was really called with at least one parameter
         if (params.size() == 0) return nullptr;
@@ -143,7 +143,7 @@ void run_test()
         Php::Value param = params[0];
         
         // multiple the parameter by two
-        return params * 2;
+        return param * 2;
     });
 
     // the function now is callable
