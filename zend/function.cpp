@@ -32,6 +32,9 @@ zend_class_entry *Function::entry()
     // construct functor object
     static std::unique_ptr<ClassBase> functor(new Class<Functor>("Functor"));
     
+    // we need the TSRMLS variable
+    TSRMLS_FETCH();
+
     // initialize the functor class
     return entry = functor->implementation()->initialize(functor.get(), "" TSRMLS_CC);
 }
