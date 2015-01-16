@@ -20,7 +20,7 @@ $f = function($a, $b) {
     
     // return the sum of the parameters
     return $a + $b;
-}
+};
 
 // pass the function to another function
 other_function($f);
@@ -41,7 +41,8 @@ other_function(function() {
     but to demonstrate how to do this with PHP-CPP we are going to
     build it with C++. Just like all the other functions that you've
     seen in the earlier examples, such a C++ function function receives 
-    a vector of Php::Value objects as its parameters.
+    a Php::Parmeters object as its parameter, which is a std::vector of 
+    Php::Value objects.
 </p>
 <p>
 <pre class="language-c++"><code>#include &lt;phpcpp.h&gt;
@@ -55,11 +56,12 @@ other_function(function() {
  */
 void other_function(Php::Parameters &amp;params)
 {
-    // first parameter is an anonymous function
+    // this function is called from PHP user space, and it is called
+    // with a anonymous function as its first parameter
     Php::Value func = params[0];
     
     // the Php::Value class has implemented the operator (), which allows
-    // us to use the object just as if it is a real function.
+    // us to use the object just as if it is a real function
     Php::Value result = func(3, 4);
     
     // @todo do something with the result
@@ -90,15 +92,16 @@ extern "C" {
 </p>
 <p>
     It is that simple. But the other way around is possible too. Imagine
-    we have a function in PHP user space code that accepts a function
-    as it's parameter:
+    we have a function in PHP user space code that accepts a callback 
+    function. The following function is a simple version of the 
+    PHP array_map() function:
 </p>
 <p>
 <pre class="language-php"><code>&lt;php
 // function that iterates over an array, and calls a function on every
 // element in that array, it returns a new array with every item
 // replaced by the result of the callback
-function my_iterate($array, $callback) {
+function my_array_map($array, $callback) {
     
     // initial result variable
     $result = array();
@@ -143,13 +146,12 @@ void run_test()
     // the function now is callable
     Php::Value four = multiply_by_two(2);
     
-    // a Php::Function object is a derived Php::Value, and can be used
-    // as a normal Php::Value object - it just happen to store a callback,
-    // it can also be stored in a Php::Value object, without losing
-    // anything
+    // a Php::Function object is a derived Php::Value, and its value can 
+    // also be stored in a normal Php::Value object, it will then still 
+    // be a callback function then
     Php::Value value = multiply_by_two;
     
-    // the value object now also holds a function
+    // the value object now also holds the function
     Php::Value six = value(3);
     
     // create an array
@@ -160,7 +162,7 @@ void run_test()
     array[3] = 4;
     
     // call the user-space function
-    Php::Value result = Php::call("my_iterate", array, multiply_by_two);
+    Php::Value result = Php::call("my_array_map", array, multiply_by_two);
     
     // @todo do something with the result variable (which now holds
     // an array with values 2, 4, 6 and 8).
@@ -193,11 +195,11 @@ extern "C" {
     In the example we assigned a C++ lambda function to a Php::Function
     object. The Php::Function class is derived from the Php::Value class.
     The only difference between a Php::Value and a Php::Function is
-    that the constructor of Php::Function accepts a function as its 
-    parameter. Despite that difference, both classes are completely 
-    identical. In fact, we would have preferred to make it possible to
-    assign C++ functions directly to Php::Value objects, but that was
-    impossible because of calling ambiguities.
+    that the constructor of Php::Function accepts a function. Despite 
+    that difference, both classes are completely identical. In fact, we 
+    would have preferred to make it possible to assign C++ functions 
+    directly to Php::Value objects, and skip the Php::Function 
+    constructor, but that is impossible because of calling ambiguities.
 </p>
 <p>
     The Php::Function class can be used as if it is a normal Php::Value
@@ -205,4 +207,21 @@ extern "C" {
     can use it as a parameter when you call user space PHP functions.
     In the above example we do exactly that: we call the user space
     my_iterate() function with our own 'multiply_by_two' C++ function.
+</p>
+<h2>Signature of the C++ function</h2>
+<p>
+    You can pass different sort of C++ functions to the Php::Function
+    constructor, as long as they are compatible with the following two
+    function signatures:
+</p>
+<p>
+<pre class="language-c++"><code>
+Php::Value function();
+Php::Value function(Php::Parameters &amp;params);
+</code></pre>
+</p>
+<p>
+    Internally, the Php::Function class uses a C++ std::function object 
+    to store the function, so anything that can be stored in such a 
+    std::function object, can be assigned to the Php::Function class.
 </p>
