@@ -91,12 +91,16 @@ public:
     /**
      *  Add a static method to a class
      * 
-     *  In C++ a static method is just a plain function, that only at compile
-     *  time has access to the private variables. You can therefore also supply
-     *  global functions as static method, and real static methods (that do not
-     *  even have to come from the same class.
+     *  In C++ a static method is in reality just a plain function, that at 
+     *  compile time has access to private properties of the class that it is a 
+     *  static member of. 
      * 
-     *  In PHP scripts, the function will only be callable as real static method
+     *  Because a C++ static method is not a real method with a 'this' pointer, 
+     *  it has the same signature as a normal C++ (non-method) function. Therefore,
+     *  you can register real static member functions (&MyClass::myMethod) as well
+     *  as normal functions (myFunction) as class methods.
+     * 
+     *  In PHP scripts, such functions will be callable as static class methods
      * 
      *  @param  name        Name of the method
      *  @param  method      The actual method

@@ -140,7 +140,7 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     zend_register_ini_entries(entries, module_number TSRMLS_CC);
 
     // initialize the extension
-    extension->initialize(TSRMLS_C);
+    extension->initialize(module_number TSRMLS_CC);
     
     // remember that we're initialized (when you use "apache reload" it is 
     // possible that the processStartup() method is called more than once)
@@ -322,11 +322,19 @@ zend_module_entry *ExtensionImpl::module()
 
 /**
  *  Initialize the extension after it was started
+ *  @param  module_number
  *  @param  tsrm_ls
  */
-void ExtensionImpl::initialize(TSRMLS_D)
+void ExtensionImpl::initialize(int module_number TSRMLS_DC)
 {
-    // we need to register each class, find out all classes
+    // the constants are registered after the module is ready
+    _data->constants([module_number TSRMLS_CC](const std::string &prefix, Constant &c) {
+        
+        // forward to implementation class
+        c.implementation()->initialize(prefix, module_number TSRMLS_CC);
+    });
+    
+    // we also need to register each class, find out all classes
     _data->classes([TSRMLS_C](const std::string &prefix, ClassBase &c) {
         
         // forward to implementation class

@@ -91,9 +91,10 @@ public:
 private:
     /**
      *  Initialize the namespace after it was registered
+     *  @param  module_number
      *  @param  tsrm_ls
      */
-    void initialize(TSRMLS_D);
+    void initialize(int module_number TSRMLS_DC);
 
     /**
      *  Function that is called when the extension initializes

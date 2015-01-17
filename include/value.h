@@ -1171,6 +1171,7 @@ protected:
     friend class HashMember<std::string>;
     friend class Callable;
     friend class Script;
+    friend class ConstantImpl;
 };
 
 /**

@@ -77,6 +77,7 @@
 #include "../include/classbase.h"
 #include "../include/interface.h"
 #include "../include/class.h"
+#include "../include/constant.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
@@ -120,6 +121,7 @@
 #include "executestate.h"
 #include "opcodes.h"
 #include "functor.h"
+#include "constantimpl.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \
