@@ -58,6 +58,7 @@
 #include <phpcpp/classbase.h>
 #include <phpcpp/interface.h>
 #include <phpcpp/class.h>
+#include <phpcpp/constant.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/call.h>
