@@ -126,24 +126,22 @@ public:
             // size of the name
             auto namelen = ::strlen(_name);
             
-            // include prefix in the full name
-            _constant.name_len = prefix.size() + 1 + namelen;
+            // include prefix in the full name (name_len should include '\0')
+            _constant.name_len = prefix.size() + 1 + namelen + 1;
             _constant.name = (char *)emalloc(_constant.name_len);
 
             // copy the entire namespace name, separator and constant name
             ::strncpy(_constant.name, prefix.c_str(), prefix.size());
             ::strncpy(_constant.name + prefix.size(), "\\", 1);
-            ::strncpy(_constant.name + prefix.size() + 1, _name, namelen);
+            ::strncpy(_constant.name + prefix.size() + 1, _name, namelen + 1);
         }
         else
         {
-            // no namespace, we simply copy the name
-            _constant.name_len = ::strlen(_name);
-            _constant.name = zend_strndup(_name, _constant.name_len);
+            // no namespace, we simply copy the name (name_len should include '\0')
+            _constant.name_len = ::strlen(_name) + 1;
+            _constant.name = zend_strndup(_name, _constant.name_len - 1);
         }
         
-        std::cout << "register constant " << std::string(_constant.name, _constant.name_len) << std::endl;
-
         // set all the other constant properties
         _constant.flags = CONST_CS | CONST_PERSISTENT;
         _constant.module_number = module_number;
