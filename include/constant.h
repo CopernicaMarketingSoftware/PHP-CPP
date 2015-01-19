@@ -32,8 +32,16 @@ public:
      *  Constructor
      *  @param  name            Constant name
      *  @param  value           Constant value
+     *  @param  size            Size of the value (in case of a string)
      */
-    Constant(const char *name, const Value &value);
+    Constant(const char *name, std::nullptr_t value = nullptr);
+    Constant(const char *name, bool value);
+    Constant(const char *name, int32_t value);
+    Constant(const char *name, int64_t value);
+    Constant(const char *name, double value);
+    Constant(const char *name, const char *value);
+    Constant(const char *name, const char *value, size_t size);
+    Constant(const char *name, const std::string &value);
     
     /**
      *  Destructor
