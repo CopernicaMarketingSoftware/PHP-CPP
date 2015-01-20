@@ -38,10 +38,19 @@ class Extension : public Namespace
 public:
     /**
      *  Constructor that defines a number of functions right away
+     *
+     *  The first two parameters should be filled by the extension programmer with the
+     *  name of the extension, and the version number of the extension (like "1.0").
+     *  The third parameter, apiversion, does not have to be supplied and is best kept
+     *  to the default value. This third parameter checks whether the PHP-CPP version
+     *  that is currently installed on the server is the same as the PHP-CPP version
+     *  that was used to compile the extension with.
+     *
      *  @param  name        Extension name
      *  @param  version     Extension version string
+     *  @param  apiversion  PHP API version (this should always be PHPCPP_API_VERSION, so you better not supply it)
      */
-    Extension(const char *name, const char *version = "1.0");
+    Extension(const char *name, const char *version = "1.0", int apiversion = PHPCPP_API_VERSION);
     
     /**
      *  No copy'ing and no moving

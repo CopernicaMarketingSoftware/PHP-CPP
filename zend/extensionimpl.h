@@ -37,15 +37,16 @@ protected:
      *  @var zend_ini_entry
      */
     zend_ini_entry *_ini = nullptr;
-        
+    
 public:
     /**
      *  Constructor
      *  @param  data        Extension object created by the extension programmer
      *  @param  name        Name of the extension
      *  @param  version     Version number
+     *  @param  apiversion  API version number
      */
-    ExtensionImpl(Extension *data, const char *name, const char *version);
+    ExtensionImpl(Extension *data, const char *name, const char *version, int apiversion);
     
     /**
      *  No copy'ing and no moving
@@ -57,6 +58,18 @@ public:
      *  Destructor
      */
     virtual ~ExtensionImpl();
+    
+    /**
+     *  The extension name
+     *  @return const char *
+     */
+    const char *name() const;
+    
+    /**
+     *  The extension version
+     *  @return const char *
+     */
+    const char *version() const;
     
     /** 
      *  Is the object locked (true) or is it still possible to add more functions,
@@ -131,6 +144,16 @@ private:
      *  @return int         0 on success
      */
     static int processIdle(int type, int module_number TSRMLS_DC);
+
+    /**
+     *  Function that is called when the PHP engine initializes with a different PHP-CPP
+     *  version for the libphpcpp.so file than the version the extension was compiled for
+     *  @param  type        Module type
+     *  @param  number      Module number
+     *  @param  tsrm_ls
+     *  @return int         0 on success
+     */
+    static int processMismatch(int type, int module_number TSRMLS_DC);
 };
 
 /**

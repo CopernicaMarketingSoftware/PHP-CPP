@@ -46,6 +46,7 @@
 /**
  *  Include other files from this library
  */
+#include "../include/version.h"
 #include "../include/inivalue.h"
 #include "../include/ini.h"
 #include "../include/exception.h"
