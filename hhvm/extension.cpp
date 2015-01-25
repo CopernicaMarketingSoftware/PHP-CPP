@@ -2,7 +2,7 @@
  *  Extension.cpp
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013, 2014 Copernica BV
+ *  @copyright 2013, 2014, 2015 Copernica BV
  */
 #include "includes.h"
 
@@ -15,9 +15,10 @@ namespace Php {
  *  Constructor that defines a number of functions right away
  *  @param  name        Extension name
  *  @param  version     Extension version string
+ *  @param  apiversion  The API version number
  */
-Extension::Extension(const char *name, const char *version) :
-    Namespace(""), _impl(new ExtensionImpl(this, name, version)) {}
+Extension::Extension(const char *name, const char *version, int apiversion) :
+    Namespace(""), _impl(new ExtensionImpl(this, name, version, apiversion)) {}
     
 /**
  *  Destructor

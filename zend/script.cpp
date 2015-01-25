@@ -50,7 +50,7 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
  *  @param  script      actual PHP code
  *  @param  size        length of the string
  */
-Script::Script(const char *name, const char *phpcode, size_t size) 
+Script::Script(const char *name, const char *phpcode, size_t size) noexcept
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
