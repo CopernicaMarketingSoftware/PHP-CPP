@@ -113,6 +113,52 @@ public:
     virtual ~ConstantImpl() {}
 
     /**
+     *  Add the constant to a class
+     *  @param  clss        The class to add it to
+     */
+    void addTo(ClassBase &clss)
+    {
+        // check the zval type
+        switch (Z_TYPE(_constant.value)) {
+
+        case IS_NULL:       
+            // set a null constant
+            clss.property(_name, nullptr, Php::Const);
+            break;
+        
+        case IS_LONG:
+            // set a long constant
+            clss.property(_name, Z_LVAL(_constant.value), Php::Const);
+            break;
+        
+        case IS_DOUBLE:
+            // set a double constant
+            clss.property(_name, Z_DVAL(_constant.value), Php::Const);
+            break;
+        
+        case IS_BOOL:
+            // set a boolean constant
+            clss.property(_name, Z_BVAL(_constant.value), Php::Const);
+            break;
+        
+        case IS_STRING:
+            // set a string constant
+            clss.property(_name, std::string(Z_STRVAL(_constant.value), Z_STRLEN(_constant.value)), Php::Const);
+            break;
+        
+        default:
+            // this should not happen, the constant can only be constructed as one
+            // of the above types, so it should be impossible to end up here. But
+            // for completeness, we convert the constant to a string, here
+            convert_to_string(&_constant.value);
+            
+            // set as string constant
+            clss.property(_name, std::string(Z_STRVAL(_constant.value), Z_STRLEN(_constant.value)), Php::Const);
+            break;
+        }
+    }
+    
+    /**
      *  Initialize the constant
      *  @param  prefix          Namespace prefix
      *  @param  module_number   The module number

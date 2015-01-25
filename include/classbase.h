@@ -273,6 +273,12 @@ private:
      *  @var    std::shared_ptr<ClassImpl>
      */
     std::shared_ptr<ClassImpl> _impl;
+    
+    /**
+     *  Constants can be used as class properties, and need access to private
+     *  and protected methods
+     */
+    friend class ConstantImpl;
 };
     
 /**

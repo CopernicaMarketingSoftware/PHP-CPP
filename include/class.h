@@ -142,7 +142,7 @@ public:
      *  hidden)
      * 
      *  @param  name        Name of the property
-     *  @param  value       Actual property value
+     *  @param  value       Actual default property value
      *  @param  flags       Optional flags
      *  @return Class       Same object to allow chaining
      */
@@ -155,6 +155,31 @@ public:
     Class<T> &property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+
+    /**
+     *  Create a class constant
+     * 
+     *  The class constant can be used in a php script as "ClassName::CONSTANT_NAME".
+     *  It is a good programming practive to only use uppercase characters for
+     *  constants.
+     * 
+     *  This is an alias for adding a class property with the "Php::Const" flag.
+     * 
+     *  @param  name        Name of the constant
+     *  @param  value       Constant value
+     *  @return Class       Same object to allow chaining
+     */
+    template <typename V>
+    Class<T> &constant(const char *name, V value) { return property(name, value, Const); }
+
+    /**
+     *  Add a Php::Constant to a class to use it as a class constant
+     *  
+     *  @param  constant    The constant to add
+     *  @return Class       Same object to allow chaining
+     */
+    Class<T> &constant(const Constant &constant) { constant.addTo(*this); return *this; }
+    Class<T> &add(const Constant &constant) { constant.addTo(*this); return *this; }
 
     /**
      *  Properties as methods

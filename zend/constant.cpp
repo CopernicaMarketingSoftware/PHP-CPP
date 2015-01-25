@@ -79,6 +79,32 @@ Constant::Constant(const char *name, const std::string &value) :
     _impl(new ConstantImpl(name, value)) {}
 
 /**
+ *  Add the constant to a class
+ * 
+ *  You normally do not have to call this method yourself. You can simply
+ *  do one of the following method calls to create class constants:
+ * 
+ *      myclass.property("MY_CONSTANT", "value", Php::Const);
+ *      myclass.constant("MY_CONSTANT", "value");
+ *      myclass.add(Php::Constant("MY_CONSTANT", "value"));
+ * 
+ *  All of the calls have the same result, it is up to you to decide which
+ *  one suits you most. If you use the last one - using a Php::Constant
+ *  class - the PHP-CPP library will call this "addTo()" method internally
+ *  to forward the call to one of the other methods.
+ * 
+ *  @param  clss        Class to which the constant is added
+ *  @internal
+ */
+void Constant::addTo(ClassBase &clss)
+{
+    // pass on to the implementation
+    _impl->addTo(clss);
+}
+
+
+
+/**
  *  End of namespace
  */
 }
