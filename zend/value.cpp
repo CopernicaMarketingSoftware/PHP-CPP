@@ -156,8 +156,7 @@ Value::Value(double value)
  *  @param  zval        Value to wrap
  *  @param  ref         Force this to be a reference
  */
-Value::Value(struct _zval_struct *val, bool ref)
-: _val(val)
+Value::Value(struct _zval_struct *val, bool ref) : _val(val)
 {
     // if the variable is not already a reference, and it has more than one
     // variable pointing to it, we should seperate it so that any changes

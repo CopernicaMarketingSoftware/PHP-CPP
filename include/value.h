@@ -1158,6 +1158,11 @@ protected:
     struct _zend_class_entry *classEntry(bool allowString = true) const;
     
     /**
+     *  Functions that need access to the privates
+     */
+    friend Value constant(const char *name, size_t size);
+    
+    /**
      *  The Globals and Member classes can access the zval directly
      */
     friend class Globals;

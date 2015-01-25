@@ -18,6 +18,12 @@ namespace Php {
 extern bool  class_exists(const char *classname, size_t size, bool autoload = true);
 inline bool  class_exists(const char *classname, bool autoload = true) { return class_exists(classname, strlen(classname), autoload); }
 inline bool  class_exists(const std::string &classname, bool autoload = true) { return class_exists(classname.c_str(), classname.size(), autoload); }
+extern Value constant(const char *constant);
+extern Value constant(const char *constant, size_t size);
+extern Value constant(const std::string &constant);
+extern bool  defined(const char *constant);
+extern bool  defined(const char *constant, size_t size);
+extern bool  defined(const std::string &constant);
 extern Value eval(const std::string &phpCode);
 extern Value include(const std::string &filename);
 extern Value include_once(const std::string &filename);

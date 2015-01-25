@@ -66,7 +66,7 @@ public:
      *  @param  clss        Class to which the constant is added
      *  @internal
      */
-    void addTo(ClassBase &clss);
+    void addTo(ClassBase &clss) const;
 
 private:
     /**

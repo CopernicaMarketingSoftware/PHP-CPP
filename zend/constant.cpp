@@ -96,13 +96,11 @@ Constant::Constant(const char *name, const std::string &value) :
  *  @param  clss        Class to which the constant is added
  *  @internal
  */
-void Constant::addTo(ClassBase &clss)
+void Constant::addTo(ClassBase &clss) const
 {
     // pass on to the implementation
     _impl->addTo(clss);
 }
-
-
 
 /**
  *  End of namespace
