@@ -378,6 +378,7 @@ public:
     bool isFloat()      const { return type() == Type::Float; }
     bool isObject()     const { return type() == Type::Object; }
     bool isArray()      const { return type() == Type::Array; }
+    bool isScalar()     const { return isNull() || isNumeric() || isBool() || isString() || isFloat(); }
     bool isCallable()   const;
 
     /**
@@ -1161,6 +1162,7 @@ protected:
      *  Functions that need access to the privates
      */
     friend Value constant(const char *name, size_t size);
+    friend bool  define(const char *name, size_t size, const Value &value);
     
     /**
      *  The Globals and Member classes can access the zval directly

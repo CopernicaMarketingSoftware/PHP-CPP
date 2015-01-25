@@ -21,6 +21,9 @@ inline bool  class_exists(const std::string &classname, bool autoload = true) { 
 extern Value constant(const char *constant);
 extern Value constant(const char *constant, size_t size);
 extern Value constant(const std::string &constant);
+extern bool  define(const char *name, size_t size, const Value &value);
+extern bool  define(const char *name, const Value &value);
+extern bool  define(const std::string &name, const Value &value);
 extern bool  defined(const char *constant);
 extern bool  defined(const char *constant, size_t size);
 extern bool  defined(const std::string &constant);
