@@ -116,7 +116,7 @@ public:
      *  Add the constant to a class
      *  @param  clss        The class to add it to
      */
-    void addTo(ClassBase &clss)
+    void addTo(ClassBase &clss) const
     {
         // check the zval type
         switch (Z_TYPE(_constant.value)) {
@@ -149,11 +149,18 @@ public:
         default:
             // this should not happen, the constant can only be constructed as one
             // of the above types, so it should be impossible to end up here. But
-            // for completeness, we convert the constant to a string, here
-            convert_to_string(&_constant.value);
+            // for completeness, we are going to make a copy of the zval, and convert
+            // that to a string
+            zval copy = _constant.value;
+            
+            // run the copy constructor to make sure zval is correctly copied
+            zval_copy_ctor(&copy);
+            
+            // convert the copy to a string
+            convert_to_string(&copy);
             
             // set as string constant
-            clss.property(_name, std::string(Z_STRVAL(_constant.value), Z_STRLEN(_constant.value)), Php::Const);
+            clss.property(_name, std::string(Z_STRVAL(copy), Z_STRLEN(copy)), Php::Const);
             break;
         }
     }
