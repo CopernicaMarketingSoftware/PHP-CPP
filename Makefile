@@ -169,12 +169,10 @@ all: phpcpp
 phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo
 	@echo "Build complete."
-	@echo "Don't forget to run 'make test'."
 
 hhvmcpp: ${HHVM_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo
 	@echo "Build complete."
-	@echo "Don't forget to run 'make test'."
 
 ${PHP_SHARED_LIBRARY}: shared_directories ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
 	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
