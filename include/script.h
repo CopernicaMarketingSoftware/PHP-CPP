@@ -42,33 +42,33 @@ public:
      *  @param  source      PHP source code to be evaluated 
      *  @param  size        Length of the source code
      */
-    Script(const char *name, const char *source, size_t size) noexcept;
+    Script(const char *name, const char *source, size_t size) _NOEXCEPT;
     
     /**
      *  Alternative constructor without a size
      *  @param  name        Name of the PHP script
      *  @param  source      PHP source code to be evaluated 
      */
-    Script(const char *name, const char *source) noexcept : Script(name, source, ::strlen(source)) {}
+    Script(const char *name, const char *source) _NOEXCEPT : Script(name, source, ::strlen(source)) {}
 
     /**
      *  Alternative constructor without a name
      *  @param  source      PHP source code to be evaluated
      *  @param  size        Length of the source code
      */
-    Script(const char *source, size_t size) noexcept : Script("Unknown", source, size) {}
+    Script(const char *source, size_t size) _NOEXCEPT : Script("Unknown", source, size) {}
 
     /**
      *  Alternative constructor without a name and without a size
      *  @param  source      PHP source code to be evaluated
      */
-    Script(const char *source) noexcept : Script("Unknown", source, ::strlen(source)) {}
+    Script(const char *source) _NOEXCEPT : Script("Unknown", source, ::strlen(source)) {}
     
     /**
      *  Constructor based on a std::string
      *  @param  source      PHP source code to be evaluated
      */
-    Script(const std::string &source) noexcept : Script("Unknown", source.c_str(), source.size()) {}
+    Script(const std::string &source) _NOEXCEPT : Script("Unknown", source.c_str(), source.size()) {}
     
     /**
      *  Destructor

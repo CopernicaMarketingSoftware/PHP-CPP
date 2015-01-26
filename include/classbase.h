@@ -85,7 +85,7 @@ public:
      *  Move constructor
      *  @param  that
      */
-    ClassBase(ClassBase &&that) noexcept : _impl(std::move(that._impl)) {}
+    ClassBase(ClassBase &&that) _NOEXCEPT : _impl(std::move(that._impl)) {}
 
     /**
      *  Destructor

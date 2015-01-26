@@ -285,7 +285,7 @@ Value::Value(const Value &that)
  *  Move constructor
  *  @param  value
  */
-Value::Value(Value &&that)  noexcept: _val(that._val)
+Value::Value(Value &&that)  _NOEXCEPT: _val(that._val)
 {
     // clear the other object
     that._val = nullptr;
@@ -396,7 +396,7 @@ int Value::refcount() const
  *  @param  value
  *  @return Value
  */
-Value &Value::operator=(Value &&value) noexcept
+Value &Value::operator=(Value &&value) _NOEXCEPT
 {
     // skip self assignment
     if (this == &value) return *this;
