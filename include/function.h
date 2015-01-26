@@ -39,17 +39,24 @@ public:
      *  @param  function        The C++ function to be wrapped
      */
     Function(const std::function<Value(Parameters&)> &function);
-    
+
     /**
      *  Constructor to wrap a function that does not accept parameters
+     * 
+     *  Old C++ compilers do not see a difference between std::function
+     *  objects based on the function signature, so these old compilers
+     *  do not see this method.
+     * 
      *  @param  function        The C++ function to be wrapped
      */
+#if __GNUC__ > 4 || (__GNUC__ == 4 && __GNUC_MINOR__ > 7) || __clang__
     Function(const std::function<Value()> &function) : Function([function](Parameters &params) -> Value {
         
         // call original function, forget about the parameters
         return function();
         
     }) {}
+#endif
     
     /**
      *  Destructor
