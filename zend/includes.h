@@ -44,6 +44,17 @@
 #define BOOL2SUCCESS(b) ((b) ? SUCCESS : FAILURE)
 
 /**
+ *  Macro to be able to support MSVC compiler
+ */
+#ifndef _NOEXCEPT
+# ifndef _MSC_VER
+#  define _NOEXCEPT noexecpt
+# else
+#  define _NOEXCEPT __declspec(nothrow)
+# endif
+#endif
+
+/**
  *  Include other files from this library
  */
 #include "../include/version.h"

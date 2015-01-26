@@ -129,7 +129,7 @@ public:
      *  Move constructor
      *  @param  value
      */
-    Value(Value &&that) noexcept;
+    Value(Value &&that) _NOEXCEPT;
     
     /**
      *  Destructor
@@ -141,7 +141,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value &operator=(Value &&value) noexcept;
+    Value &operator=(Value &&value) _NOEXCEPT;
     
     /**
      *  Assignment operator for various types

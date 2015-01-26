@@ -48,7 +48,7 @@ public:
      *  Move constructor
      *  @param  that
      */
-    Class(Class<T> &&that) noexcept : ClassBase(std::move(that)) {}
+    Class(Class<T> &&that) _NOEXCEPT : ClassBase(std::move(that)) {}
 
     /**
      *  Destructor
