@@ -3,7 +3,6 @@
  *  double -> string
  *
  */
-
 #include <sstream>
 #include <iomanip>
 std::string double2str(long double d)

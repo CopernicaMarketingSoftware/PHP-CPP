@@ -27,6 +27,7 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/noexcept.h>
 #include <phpcpp/version.h>
 #include <phpcpp/inivalue.h>
 #include <phpcpp/ini.h>

@@ -12,6 +12,6 @@
 /**
  *  Macro with version number (this is incremented with every release)
  */
-#define PHPCPP_API_VERSION  20150120
+#define PHPCPP_API_VERSION  20150126
 
 
