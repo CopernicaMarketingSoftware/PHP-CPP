@@ -124,6 +124,7 @@
 #include "opcodes.h"
 #include "functor.h"
 #include "constantimpl.h"
+#include "delayedfree.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

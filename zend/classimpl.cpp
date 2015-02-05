@@ -85,8 +85,9 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
     ClassBase *meta = data->self->_base;
     
     // the data structure was allocated by ourselves in the getMethod or 
-    // getStaticMethod functions, we no longer need it now
-    efree(data);
+    // getStaticMethod functions, we no longer need it when the function falls
+    // out of scope
+    DelayedFree df(data);
 
     // the function could throw an exception
     try
@@ -131,8 +132,9 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
     ClassBase *meta = data->self->_base;
 
     // the data structure was allocated by ourselves in the getMethod or 
-    // getStaticMethod functions, we no longer need it now
-    efree(data);
+    // getStaticMethod functions, we no longer need it when the function falls
+    // out of scope
+    DelayedFree df(data);
 
     // the function could throw an exception
     try
@@ -310,7 +312,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     data->self = self(entry);
     
     // assign this dynamically allocated variable to the func parameter
-    // the case is ok, because zend_internal_function is a member of the
+    // the cast is ok, because zend_internal_function is a member of the
     // zend_function union
     *func = (zend_function *)data;
  
