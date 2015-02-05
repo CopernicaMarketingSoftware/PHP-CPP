@@ -585,11 +585,11 @@ private:
 
     /**
      *  Namespaces and the function have access to the private base class, 
-     *  so that the classes can be registered (the function object needs
-     *  this to register the Functor class).
+     *  so that the classes can be registered, and the Functor object needs
+     *  this to register the PhpCpp::Functor class.
      */
     friend class Namespace;
-    friend class Function;
+    friend class Functor;
     
     /**
      *  All Php::Class<AnyThing> also need access to the base class to

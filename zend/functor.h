@@ -46,12 +46,41 @@ public:
         return _function(params);
     }
 
+    /**
+     *  Get the functor class entry
+     *  @return zend_class_entry
+     */
+    static zend_class_entry *entry()
+    {
+        // get the "member"
+        return _entry;
+    }
+
+    /**
+     *  Initialize the class
+     *  @param  tsrmls
+     */
+    static void initialize(TSRMLS_D);
+    
+    /**
+     *  Shutdown the class
+     *  @param  tsrmls
+     */
+    static void shutdown(TSRMLS_D);
+
 private:
     /**
      *  The std::function that is wrapped in PHP code
      *  @var std::function
      */
     const std::function<Value(Parameters &params)> _function;
+
+    /**
+     *  The classentry
+     *  @var zend_class_entry
+     */
+    static zend_class_entry *_entry;
+    
 };
 
 /**

@@ -114,43 +114,8 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
-    // array contains ini settings
-    auto *entries = extension->_ini = new zend_ini_entry[extension->_data->iniVariables()+1];
-
-    // the entry that we're filling
-    int i=0;
-
-    // Fill the php.ini entries
-    extension->_data->iniVariables([entries, &i, module_number](Ini &ini) {
-    
-        // initialize the function
-        zend_ini_entry *entry = &entries[i];
-        
-        // fill the property
-        ini.fill(entry, module_number);
-        
-        // move on to the next iteration
-        i++;
-    });
-
-    // last entry should be set to all zero's
-    memset(&entries[i], 0, sizeof(zend_ini_entry));
-
-    // register ini entries in Zend core
-    zend_register_ini_entries(entries, module_number TSRMLS_CC);
-
     // initialize the extension
-    extension->initialize(module_number TSRMLS_CC);
-    
-    // remember that we're initialized (when you use "apache reload" it is 
-    // possible that the processStartup() method is called more than once)
-    extension->_locked = true;
-    
-    // is the callback registered?
-    if (extension->_onStartup) extension->_onStartup();
-
-    // done
-    return BOOL2SUCCESS(true);
+    return BOOL2SUCCESS(extension->initialize(module_number TSRMLS_CC));
 }
 
 /**
@@ -165,20 +130,8 @@ int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
-    // unregister the ini entries
-    zend_unregister_ini_entries(module_number TSRMLS_CC);
-
-    // destruct the ini entries
-    if (extension->_ini) delete[] extension->_ini;
-
-    // forget the ini entries
-    extension->_ini = nullptr;
-
-    // is the callback registered?
-    if (extension->_onShutdown) extension->_onShutdown();
-    
     // done
-    return BOOL2SUCCESS(true);
+    return BOOL2SUCCESS(extension->shutdown(module_number TSRMLS_CC));
 }
 
 /**
@@ -381,9 +334,35 @@ zend_module_entry *ExtensionImpl::module()
  *  Initialize the extension after it was started
  *  @param  module_number
  *  @param  tsrm_ls
+ *  @return bool
  */
-void ExtensionImpl::initialize(int module_number TSRMLS_DC)
+bool ExtensionImpl::initialize(int module_number TSRMLS_DC)
 {
+    // array contains ini settings
+    _ini = new zend_ini_entry[_data->iniVariables()+1];
+
+    // the entry that we're filling
+    int i = 0;
+
+    // Fill the php.ini entries
+    _data->iniVariables([this, &i, module_number](Ini &ini) {
+    
+        // initialize the function
+        zend_ini_entry *entry = &_ini[i];
+        
+        // fill the property
+        ini.fill(entry, module_number);
+        
+        // move on to the next iteration
+        i++;
+    });
+
+    // last entry should be set to all zero's
+    memset(&_ini[i], 0, sizeof(zend_ini_entry));
+
+    // register ini entries in Zend core
+    zend_register_ini_entries(_ini, module_number TSRMLS_CC);
+
     // the constants are registered after the module is ready
     _data->constants([module_number TSRMLS_CC](const std::string &prefix, Constant &c) {
         
@@ -397,6 +376,46 @@ void ExtensionImpl::initialize(int module_number TSRMLS_DC)
         // forward to implementation class
         c.implementation()->initialize(&c, prefix TSRMLS_CC);
     });
+
+    // initialize the PhpCpp::Functor class
+    Functor::initialize(TSRMLS_C);
+
+    // remember that we're initialized (when you use "apache reload" it is 
+    // possible that the processStartup() method is called more than once)
+    _locked = true;
+    
+    // is the callback registered?
+    if (_onStartup) _onStartup();
+
+    // done
+    return true;
+}
+
+/**
+ *  Function that is called when the extension shuts down
+ *  @param  module_number
+ *  @param  tsrmls
+ *  @return bool
+ */
+bool ExtensionImpl::shutdown(int module_number TSRMLS_DC)
+{
+    // unregister the ini entries
+    zend_unregister_ini_entries(module_number TSRMLS_CC);
+
+    // destruct the ini entries
+    if (_ini) delete[] _ini;
+
+    // forget the ini entries
+    _ini = nullptr;
+
+    // shutdown the functor class
+    Functor::shutdown(TSRMLS_C);
+
+    // is the callback registered?
+    if (_onShutdown) _onShutdown();
+    
+    // done
+    return true;
 }
 
 /**

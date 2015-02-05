@@ -106,8 +106,17 @@ private:
      *  Initialize the namespace after it was registered
      *  @param  module_number
      *  @param  tsrm_ls
+     *  @return bool
      */
-    void initialize(int module_number TSRMLS_DC);
+    bool initialize(int module_number TSRMLS_DC);
+
+    /**
+     *  Shutdown the extension
+     *  @param  module_number
+     *  @param  tsrm_ls
+     *  @return bool
+     */
+    bool shutdown(int module_number TSRMLS_DC);
 
     /**
      *  Function that is called when the extension initializes
