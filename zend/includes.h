@@ -47,6 +47,7 @@
  *  Include other files from this library
  */
 #include "../include/noexcept.h"
+#include "../include/platform.h"
 #include "../include/version.h"
 #include "../include/inivalue.h"
 #include "../include/ini.h"

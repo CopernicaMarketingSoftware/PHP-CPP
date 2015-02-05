@@ -127,8 +127,13 @@ public:
             break;
         
         case IS_LONG:
+#ifdef PHPCPP_32BIT
+            // 32bit systems find this difficult
+            clss.property(_name, (int32_t)Z_LVAL(_constant.value), Php::Const);
+#else
             // set a long constant
             clss.property(_name, Z_LVAL(_constant.value), Php::Const);
+#endif
             break;
         
         case IS_DOUBLE:

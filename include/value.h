@@ -81,6 +81,9 @@ public:
         for (auto &elem : input) setRaw(i++, elem);
     }
 
+    // old visual c++ environments have no support for initializer lists
+#   if !defined(_MSC_VER) || _MSC_VER >= 1800
+
     /**
      *  Constructor from an initializer list
      *  @param  value
@@ -94,6 +97,9 @@ public:
         // set all elements
         for (auto &elem : value) setRaw(i++, elem);
     }
+
+    // end of visual c++ check
+#   endif
     
     /**
      *  Constructor from a map (this will create an associative array)
