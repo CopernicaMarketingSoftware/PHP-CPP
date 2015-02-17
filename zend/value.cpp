@@ -124,7 +124,7 @@ Value::Value(const std::string &value)
  */
 Value::Value(const char *value, int size)
 {
-	// allocate the zval
+    // allocate the zval
     MAKE_STD_ZVAL(_val);
 
     // is there a value?
