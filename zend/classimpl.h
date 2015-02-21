@@ -42,13 +42,13 @@ private:
      *  @var    zend_class_entry
      */
     zend_class_entry *_entry = nullptr;
-
+    
     /**
      *  Pointer to the entries
      *  @var    zend_function_entry[]
      */
     zend_function_entry *_entries = nullptr;
-    
+
     /**
      *  All class methods
      *  @var    std::list
@@ -91,6 +91,11 @@ private:
      */
     bool _initialized = false;
 
+    /**
+     *  Memory allocated by this object to hide a pointer
+     *  @var    char*
+     */
+    char *_self = nullptr;
 
     /**
      *  Retrieve an array of zend_function_entry objects that hold the 
