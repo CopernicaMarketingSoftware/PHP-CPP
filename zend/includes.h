@@ -126,6 +126,9 @@
 #include "functor.h"
 #include "constantimpl.h"
 #include "delayedfree.h"
+#include "extensionpath.h"
+#include "symbol.h"
+#include "module.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

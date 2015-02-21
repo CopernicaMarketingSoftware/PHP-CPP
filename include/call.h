@@ -27,17 +27,25 @@ extern bool  define(const std::string &name, const Value &value);
 extern bool  defined(const char *constant);
 extern bool  defined(const char *constant, size_t size);
 extern bool  defined(const std::string &constant);
-extern Value eval(const std::string &phpCode);
-extern Value include(const std::string &filename);
-extern Value include_once(const std::string &filename);
+extern bool  dl(const char *filename);
+inline bool  dl(const std::string &filename) { return dl(filename.c_str()); }
+inline bool  dl(const Value &filename) { return dl(filename.rawValue()); }
+extern Value eval(const char *phpCode);
+inline Value eval(const std::string &phpCode) { return eval(phpCode.c_str()); }
+extern Value include(const char *filename);
+inline Value include(const std::string &filename) { return include(filename.c_str()); }
+extern Value include_once(const char *filename);
+inline Value include_once(const std::string &filename) { return include_once(filename.c_str()); }
 inline bool  is_a(const Value &obj, const char *classname, size_t size, bool allow_string = false) { return obj.instanceOf(classname, size, allow_string); }
 inline bool  is_a(const Value &obj, const char *classname, bool allow_string = false) { return is_a(obj, classname, strlen(classname), allow_string); }
 inline bool  is_a(const Value &obj, const std::string &classname, bool allow_string = false) { return is_a(obj, classname.c_str(), classname.size(), allow_string); }
 inline bool  is_subclass_of(const Value &obj, const char *classname, size_t size, bool allow_string = true) { return obj.derivedFrom(classname, size, allow_string); }
 inline bool  is_subclass_of(const Value &obj, const char *classname, bool allow_string = true) { return is_subclass_of(obj, classname, strlen(classname), allow_string); }
 inline bool  is_subclass_of(const Value &obj, const std::string &classname, bool allow_string = true) { return is_subclass_of(obj, classname.c_str(), classname.size(), allow_string); }
-extern Value require(const std::string &filename);
-extern Value require_once(const std::string &filename);
+extern Value require(const char *filename);
+inline Value require(const std::string &filename) { return require(filename.c_str()); }
+extern Value require_once(const char *filename);
+inline Value require_once(const std::string &filename) { return require_once(filename.c_str()); }
 
 /**
  *  Call a function in PHP

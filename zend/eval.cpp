@@ -21,7 +21,7 @@ namespace Php {
  *  @param  phpCode     The PHP code to evaluate
  *  @return Value       The result of the evaluation
  */
-Value eval(const std::string &phpCode) 
+Value eval(const char *phpCode) 
 {
     // we have a script for this
     return Script(phpCode).execute();
@@ -32,7 +32,7 @@ Value eval(const std::string &phpCode)
  *  @param  filename
  *  @return Value
  */
-Value include(const std::string &filename)
+Value include(const char *filename)
 {
     // we can simply execute a file
     return File(filename).execute();
@@ -43,7 +43,7 @@ Value include(const std::string &filename)
  *  @param  filename
  *  @return Value
  */
-Value include_once(const std::string &filename)
+Value include_once(const char *filename)
 {
     // we can simply execute a file
     return File(filename).once();
@@ -55,7 +55,7 @@ Value include_once(const std::string &filename)
  *  @param  filename
  *  @return Value
  */
-Value require(const std::string &filename)
+Value require(const char *filename)
 {
     // create the file
     File file(filename);
@@ -76,7 +76,7 @@ Value require(const std::string &filename)
  *  @param  filename
  *  @return Value
  */
-Value require_once(const std::string &filename)
+Value require_once(const char *filename)
 {
     // create the file
     File file(filename);
@@ -91,6 +91,18 @@ Value require_once(const std::string &filename)
     return nullptr;
 }
 
+/**
+ *  Implementation of the dl() function - activate a different PHP extension
+ *  @param  filename
+ */
+bool dl(const char *filename)
+{
+    // create the module
+    Module module(filename);
+    
+    // start the module
+    return module.start();
+}
 
 /**
  *  End of namespace

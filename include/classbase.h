@@ -96,7 +96,7 @@ public:
      *  Construct a new instance of the object, or to clone the object
      *  @return Base
      */
-    virtual Base* construct()       const { return nullptr; }
+    virtual Base *construct()       const { return nullptr; }
     virtual Base *clone(Base *orig) const { return nullptr; }
 
     /**
