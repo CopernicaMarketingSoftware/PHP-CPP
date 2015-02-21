@@ -93,9 +93,6 @@ public:
         
         // and other stuff
         return strcmp(_entry->build_id, ZEND_MODULE_BUILD_ID) == 0;
-        
-        // all is ok
-        return true;
     }
     
     /**
