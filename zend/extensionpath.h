@@ -30,7 +30,7 @@ public:
      *  Constructor
      *  @param  path
      */
-    ExtensionPath(const char *path)
+    ExtensionPath(const char *path TSRMLS_DC)
     {
         // was an absole path given?
         if (path[0] && path[0] == '/')

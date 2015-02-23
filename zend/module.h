@@ -44,6 +44,14 @@ private:
      */
     zend_module_entry *_entry = nullptr;
 
+#ifdef ZTS
+    /**
+     *  When in thread safety mode, we also keep track of the TSRM_LS var
+     *  @var void***
+     */
+    void ***tsrm_ls;
+#endif
+
 public:
     /**
      *  Constructor
@@ -51,8 +59,16 @@ public:
      */
     Module(const char *module)
     {
+#ifdef ZTS
+        // fetch multi-threading thing
+        TSRMLS_FETCH();
+
+        // copy tsrm_ls param
+        this->tsrm_ls = tsrm_ls;
+#endif
+
         // the path we're going to load
-        ExtensionPath path(module);
+        ExtensionPath path(module TSRMLS_CC);
         
         // load the module
         _handle = DL_LOAD(module);
@@ -65,7 +81,7 @@ public:
         
         // was the get_module() function found
         if (!get_module) return;
-        
+
         // retrieve the module entry
         _entry = get_module();
     }
@@ -109,9 +125,7 @@ public:
         _entry->module_number = zend_next_free_module();
         _entry->handle = _handle;
         
-        // we need the tsrm_ls variable
         // @todo does loading an extension even work in a multi-threading setup?
-        TSRMLS_FETCH();
         
         // register the module, this apparently returns a copied entry pointer
         auto *entry = zend_register_module_ex(_entry TSRMLS_CC);
