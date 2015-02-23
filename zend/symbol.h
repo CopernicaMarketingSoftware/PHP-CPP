@@ -99,13 +99,7 @@ public:
      *  @param  name        Name of the function
      */
     Symbol(void *handle, const char *name) :
-        _method(dlsym(handle, name)) {}
-
-    /**
-     *  Move constructor
-     *  @param other
-     */
-    Symbol(Symbol &&other) = default;
+        _method(DL_FETCH_SYMBOL(handle, name)) {}
 
     /**
      *  Destructor
