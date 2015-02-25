@@ -1068,6 +1068,25 @@ public:
     bool derivedFrom(const std::string &classname, bool allowString = false) const { return derivedFrom(classname.c_str(), classname.size(), allowString); }
 
 
+    /**
+     *  Return a hash value for unordered_map.
+     *  @return size_t
+     */
+    size_t hash() const;
+
+    /**
+     *  Return the class name of the object.
+     *  Return empty string when the value is not an object.
+     *  @return std::string
+     */
+    std::string className() const;
+
+    /**
+     *  Return an id of the object. (It is like spl_object_hash)
+     *  Return empty string when the value is not an object.
+     *  @return std::string
+     */
+    std::string id() const;
 private:
     /**
      *  Iterate over key value pairs

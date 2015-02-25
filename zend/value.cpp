@@ -1776,7 +1776,53 @@ std::ostream &operator<<(std::ostream &stream, const Value &value)
 }
 
 /**
+ *  get a hash value for unordered_map.
+ *  @return bool
+ */ 
+size_t Value::hash() const {
+    static std::hash<std::string> stringhash;
+    switch (type()) {
+        case Type::Null:            return 0; break;
+        case Type::Numeric:         return Z_LVAL_P(_val); break;
+        case Type::Float:           return (size_t)Z_DVAL_P(_val); break;
+        case Type::Bool:            return (size_t)Z_BVAL_P(_val); break;
+        case Type::Array:           return (size_t)(intptr_t)Z_ARRVAL_P(_val); break;
+        case Type::Object:          return (size_t)((intptr_t)Z_OBJ_HANDLE_P(_val) ^ (intptr_t)Z_OBJ_HT_P(_val)); break;
+        case Type::String:          return stringhash(stringValue()); break;
+        case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
+        case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
+        case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    }
+    return 0;
+}
+
+/**
+ *  Return the class name of the object.
+ *  Return empty string when the value is not an object.
+ *  @return std::string
+ */
+std::string Value::className() const {
+    return Z_OBJ_CLASS_NAME_P(_val);
+}
+
+/**
+ *  Return an id of the object. (It is like spl_object_hash)
+ *  Return empty string when the value is not an object.
+ *  @return std::string
+ */
+std::string Value::id() const {
+    if (!isObject()) return "";
+    static intptr_t hash_mask_handle = rand();
+    static intptr_t hash_mask_handlers = rand();
+    char id[33];
+    intptr_t hash_handle, hash_handlers;
+    hash_handle = hash_mask_handle ^ (intptr_t)Z_OBJ_HANDLE_P(_val);
+    hash_handlers = hash_mask_handlers ^ (intptr_t)Z_OBJ_HT_P(_val);
+    sprintf(id, "%016lx%016lx", (long)hash_handle, (long)hash_handlers);
+    return id;
+}
+/**
  *  End of namespace
  */
 }
-
