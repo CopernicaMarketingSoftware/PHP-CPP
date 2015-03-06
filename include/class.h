@@ -387,7 +387,8 @@ private:
         typedef char one;
         typedef long two;
 
-        template <typename C> static one test( decltype(&C::__callStatic) ) ;
+        template <typename U, U> struct type_check;
+        template <typename C, typename Sign> static one test(type_check<Sign, &C::func >*);
         template <typename C> static two test(...);
 
     public:
