@@ -1,3 +1,5 @@
+#ifndef PHP_CPP_INCLUDES
+#define PHP_CPP_INCLUDES
 /**
  *  Includes.h
  *
@@ -32,7 +34,9 @@
 /**
  *  PHP includes
  */
+#if defined(__GNUC__)
 #pragma GCC system_header
+#endif
 #include <php.h>
 #include <zend_exceptions.h>
 #include <zend_interfaces.h>
@@ -146,3 +150,4 @@
     Z_UNSET_ISREF_P(z);        \
   } while (0)
 #endif
+#endif /* PHP_CPP_INCLUDES */
