@@ -44,7 +44,7 @@ public:
     Value operator[](const std::string &key)
     {
         // convert object to a value object, and retrieve the key
-        return value()[key];
+        return value().get(key);
     }
 
     /**
@@ -56,7 +56,7 @@ public:
     Value operator[](const char *key)
     {
         // convert object to a value object, and retrieve the key
-        return value()[key];
+        return value().get(key);
     }
 
     /**
