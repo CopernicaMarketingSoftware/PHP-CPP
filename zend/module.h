@@ -92,7 +92,7 @@ public:
     virtual ~Module()
     {
         // if the handle is still valid, we have to unload it
-        if (_handle) DL_UNLOAD(_handle);
+      if (_handle) DL_UNLOAD((DL_HANDLE)_handle);
     }
     
     /**
