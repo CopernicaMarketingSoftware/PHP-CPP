@@ -62,9 +62,10 @@ public:
      *
      *  @param  entry       Zend class entry
      *  @param  base        C++ object that already exists
+     *  @param  refcount    The initial refcount for the object
      *  @param  tsrm_ls     Optional threading data
      */
-    ObjectImpl(zend_class_entry *entry, Base *base TSRMLS_DC)
+    ObjectImpl(zend_class_entry *entry, Base *base, int refcount TSRMLS_DC)
     {
         // allocate a mixed object (for some reason this does not have to be deallocated)
         _mixed = (MixedObject *)emalloc(sizeof(MixedObject));
@@ -116,6 +117,9 @@ public:
         // the destructor and clone handlers are set to NULL. I dont know why, but they do not
         // seem to be necessary...
         _handle = zend_objects_store_put(php(), (zend_objects_store_dtor_t)destructMethod, (zend_objects_free_object_storage_t)freeMethod, NULL TSRMLS_CC);
+        
+        // set the initial refcount (if it is different than one, because one is the default)
+        if (refcount != 1) EG(objects_store).object_buckets[_handle].bucket.obj.refcount = refcount;
         
         // the object may remember that we are its implementation object
         base->_impl = this;

@@ -16,7 +16,7 @@ namespace Php {
 /**
  *  Forward declaration
  */
-class Function;
+class NativeFunction;
 
 /**
  *  Class definition
@@ -34,13 +34,19 @@ protected:
      *  Functions defined in the namespace
      *  @var    list
      */
-    std::list<std::shared_ptr<Function>> _functions;
+    std::list<std::shared_ptr<NativeFunction>> _functions;
 
     /**
      *  Classes defined in the namespace
      *  @var    list
      */
     std::list<std::shared_ptr<ClassBase>> _classes;
+    
+    /**
+     *  Constants defined in the namespace
+     *  @var    list
+     */
+    std::list<std::shared_ptr<Constant>> _constants;
     
     /**
      *  Namespaces defined inside the namespace
@@ -163,6 +169,40 @@ public:
     }
     
     /**
+     *  Add a constant to the namespace
+     *  @param  constant    The constant to add
+     *  @return Namespace   Same object to allow chaining
+     */
+    Namespace &add(Constant &&constant)
+    {
+        // skip when locked
+        if (locked()) return *this;
+
+        // and add it to the list of constants
+        _constants.push_back(std::unique_ptr<Constant>(new Constant(std::move(constant))));
+        
+        // allow chaining
+        return *this;
+    }
+    
+    /**
+     *  Add a constant to the namespace
+     *  @param  constant    The constant to add
+     *  @return Namespace   Same object to allow chaining
+     */
+    Namespace &add(const Constant &constant)
+    {
+        // skip when locked
+        if (locked()) return *this;
+
+        // and add it to the list of constants
+        _constants.push_back(std::unique_ptr<Constant>(new Constant(constant)));
+        
+        // allow chaining
+        return *this;
+    }
+    
+    /**
      *  Add a namespace to the namespace by moving it
      *  @param  ns          The namespace
      *  @return Namespace   Same object to allow chaining
@@ -220,7 +260,7 @@ public:
      * 
      *  @param  callback
      */
-    void functions(const std::function<void(const std::string &ns, Function &func)> &callback);
+    void functions(const std::function<void(const std::string &ns, NativeFunction &func)> &callback);
     
     /**
      *  Apply a callback to each registered class
@@ -231,6 +271,16 @@ public:
      *  @param  callback
      */
     void classes(const std::function<void(const std::string &ns, ClassBase &clss)> &callback);
+    
+    /**
+     *  Apply a callback to each registered constant
+     * 
+     *  The callback will be called with the name of the namespace, and
+     *  a reference to the registered constant
+     * 
+     *  @param  callback
+     */
+    void constants(const std::function<void(const std::string &ns, Constant &constant)> &callback);
 
 };
     

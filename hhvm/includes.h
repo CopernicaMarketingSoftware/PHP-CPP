@@ -17,6 +17,7 @@
 #include <map>
 #include <string.h>
 #include <iostream>
+#include <set>
 
 /**
  *  HHVM includes
@@ -26,8 +27,11 @@
 /**
  *  Public include files
  */
+#include "../include/version.h"
 #include "../include/type.h"
 #include "../include/hashparent.h"
+#include "../include/ini.h"
+#include "../include/inivalue.h"
 #include "../include/value.h"
 #include "../include/parameters.h"
 #include "../include/classtype.h"

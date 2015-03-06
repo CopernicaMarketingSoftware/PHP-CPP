@@ -46,6 +46,9 @@
 /**
  *  Include other files from this library
  */
+#include "../include/noexcept.h"
+#include "../include/platform.h"
+#include "../include/version.h"
 #include "../include/inivalue.h"
 #include "../include/ini.h"
 #include "../include/exception.h"
@@ -63,8 +66,8 @@
 #include "../include/byval.h"
 #include "../include/byref.h"
 #include "../include/global.h"
-#include "../include/super.h"
 #include "../include/hashmember.h"
+#include "../include/super.h"
 #include "../include/parameters.h"
 #include "../include/modifiers.h"
 #include "../include/base.h"
@@ -76,10 +79,14 @@
 #include "../include/classtype.h"
 #include "../include/classbase.h"
 #include "../include/interface.h"
+#include "../include/constant.h"
 #include "../include/class.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"
 #include "../include/call.h"
+#include "../include/script.h"
+#include "../include/file.h"
+#include "../include/function.h"
 
 /**
  *  Common header files for internal use only
@@ -92,7 +99,7 @@
  */
 #include "init.h"
 #include "callable.h"
-#include "function.h"
+#include "nativefunction.h"
 #include "method.h"
 #include "member.h"
 #include "nullmember.h"
@@ -113,6 +120,15 @@
 #include "objectimpl.h"
 #include "parametersimpl.h"
 #include "extensionimpl.h"
+#include "compileroptions.h"
+#include "executestate.h"
+#include "opcodes.h"
+#include "functor.h"
+#include "constantimpl.h"
+#include "delayedfree.h"
+#include "extensionpath.h"
+#include "symbol.h"
+#include "module.h"
 
 #ifndef ZVAL_COPY_VALUE
 #define ZVAL_COPY_VALUE(z, v)  \

@@ -51,14 +51,14 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
         {
             // get the result
             Value result(callable->invoke(params));
-            
-            // detach the zval (we don't want it to be destructed)
-            zval *val = result.detach();
-            
+
+            // we're ready if the return value is not even used
+            if (!return_value_used) return;
+
             // @todo php 5.6 has a RETVAL_ZVAL_FAST macro that can be used instead (and is faster)
-            
+
             // return a full copy of the zval, and do not destruct it
-            RETVAL_ZVAL(val, 1, 0);
+            RETVAL_ZVAL(result._val, 1, 0);
         }
         catch (Exception &exception)
         {

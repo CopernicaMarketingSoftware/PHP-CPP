@@ -23,33 +23,10 @@ Super FILES     (TRACK_VARS_FILES,   "_FILES");
 Super REQUEST   (TRACK_VARS_REQUEST, "_REQUEST");
 
 /**
- *  Array access operator
- *  This can be used for accessing associative arrays
- *  @param  key
+ *  Convert object to a value
  *  @return Value
  */
-Value Super::operator[](const std::string &key)
-{
-    // we need the tsrm_ls pointer
-    TSRMLS_FETCH();
-    
-    // call zend_is_auto_global to ensure that the just-in-time globals are loaded
-    if (_name) { zend_is_auto_global(_name, ::strlen(_name) TSRMLS_CC); _name = nullptr; }
-    
-    // create a value object that wraps around the actual zval
-    Value value(PG(http_globals)[_index]);
-    
-    // pass on the call
-    return value.get(key);
-}
-
-/**
- *  Array access operator
- *  This can be used for accessing associative arrays
- *  @param  key
- *  @return Value
- */
-Value Super::operator[](const char *key)
+Value Super::value()
 {
     // we need the tsrm_ls pointer
     TSRMLS_FETCH();
@@ -58,10 +35,7 @@ Value Super::operator[](const char *key)
     if (_name) { zend_is_auto_global(_name, ::strlen(_name) TSRMLS_CC); _name = nullptr; }
     
     // create a value object that wraps around the actual zval
-    Value value(PG(http_globals)[_index]);
-    
-    // pass on the call
-    return value.get(key);
+    return Value(PG(http_globals)[_index]);
 }
 
 /**

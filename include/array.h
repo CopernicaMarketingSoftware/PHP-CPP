@@ -38,7 +38,7 @@ public:
      *  Move constructor from a value object
      *  @param  value
      */
-    Array(Value &&value) : Value(std::move(value))
+    Array(Value &&value)  _NOEXCEPT : Value(std::move(value))
     {
         // type must be valid
         if (value.type() != Type::Array) throw FatalError("Moving a non-array to an array variable");
@@ -57,12 +57,18 @@ public:
      */
     template <typename T>
     Array(const std::map<std::string,T> &value) : Value(value) {}
-    
+
+// old visual c++ environments have no support for initializer lists
+#   if !defined(_MSC_VER) || _MSC_VER >= 1800
+
     /**
      *  Constructor from an initializer list
      *  @param  value
      */
     Array(const std::initializer_list<Value> &value) : Value(value) {}
+
+// end of visual c++ check
+#   endif  
     
     /**
      *  Destructor
@@ -107,7 +113,7 @@ public:
      *  @param  value
      *  @return Array
      */
-    Array &operator=(Value &&value)
+    Array &operator=(Value &&value) _NOEXCEPT
     {
         // skip self assignment
         if (this == &value) return *this;

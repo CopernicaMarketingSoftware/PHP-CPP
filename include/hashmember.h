@@ -579,7 +579,7 @@ protected:
      *  Move constructor
      *  @param  value   Other element
      */
-//    HashMember(HashMember<Type> &&member) : 
+//    HashMember(HashMember<Type> &&member) _NOEXCEPT : 
 //        _parent(std::move(member._parent)), _index(std::move(member._index)) {}
 
 private:

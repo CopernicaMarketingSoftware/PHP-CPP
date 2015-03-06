@@ -81,6 +81,9 @@ public:
         for (auto &elem : input) setRaw(i++, elem);
     }
 
+    // old visual c++ environments have no support for initializer lists
+#   if !defined(_MSC_VER) || _MSC_VER >= 1800
+
     /**
      *  Constructor from an initializer list
      *  @param  value
@@ -94,6 +97,9 @@ public:
         // set all elements
         for (auto &elem : value) setRaw(i++, elem);
     }
+
+    // end of visual c++ check
+#   endif
     
     /**
      *  Constructor from a map (this will create an associative array)
@@ -110,7 +116,6 @@ public:
      *  Wrap object around zval
      *  @param  zval        Zval to wrap
      *  @param  ref         Force this to be a reference
-     *  @param  tsrm_ls     Optional pointer to thread safe data
      */
     Value(struct _zval_struct *zval, bool ref=false);
     
@@ -130,7 +135,7 @@ public:
      *  Move constructor
      *  @param  value
      */
-    Value(Value &&that);
+    Value(Value &&that) _NOEXCEPT;
     
     /**
      *  Destructor
@@ -142,7 +147,7 @@ public:
      *  @param  value
      *  @return Value
      */
-    Value &operator=(Value &&value);
+    Value &operator=(Value &&value) _NOEXCEPT;
     
     /**
      *  Assignment operator for various types
@@ -379,6 +384,7 @@ public:
     bool isFloat()      const { return type() == Type::Float; }
     bool isObject()     const { return type() == Type::Object; }
     bool isArray()      const { return type() == Type::Array; }
+    bool isScalar()     const { return isNull() || isNumeric() || isBool() || isString() || isFloat(); }
     bool isCallable()   const;
 
     /**
@@ -406,7 +412,7 @@ public:
     char *reserve(size_t size);
     
     /**
-     *  Get access to the raw buffer for read operationrs.
+     *  Get access to the raw buffer for read operations.
      *  @return const char *
      */
     const char *rawValue() const;
@@ -457,28 +463,59 @@ public:
 
         // allocate a result
         std::vector<T> result;
-        
+
         // reserve enough space
         size_t count = size();
         result.reserve(count);
-        
+
         // and fill the result vector
-        for (size_t i = 0; i<count; i++) 
+        for (size_t i = 0; i<count; i++)
         {
             // check if the index exists
             if (!contains(i)) continue;
-            
-            // get the value object
-            Value value(get(i));
-            
-            // add it to the vector
-            result.push_back(value);
+
+            // get the value and add it to the vector
+            result.push_back(get(i));
         }
-        
+
         // done
         return result;
     }
-    
+
+    /**
+     *  Convert the object to a set
+     *
+     *  This only works for regular arrays that are indexed by a number, start
+     *  with position 0 and have no empty spaces.
+     *
+     *  return  std::vector
+     */
+    template <typename T>
+    std::set<T> setValue() const
+    {
+        // only works for arrays, other types return an empty set
+        if (!isArray()) return std::set<T>();
+
+        // allocate a result
+        std::set<T> result;
+
+        // how many elements are we inserting
+        size_t count = size();
+
+        // and fill the result set
+        for (size_t i = 0; i<count; i++)
+        {
+            // check if the index exists
+            if (!contains(i)) continue;
+
+            // get the value and add it to the vector
+            result.insert(get(i));
+        }
+
+        // done
+        return result;
+    }
+
     /**
      *  Convert the object to a map with string index and Php::Value value
      *  @return std::map
@@ -495,14 +532,19 @@ public:
         // must be an array or an object, otherwise the map is empty
         if (!isArray() && !isObject()) return std::map<std::string,T>();
         
-        // get the original map value
-        std::map<std::string,Php::Value> map(mapValue());
-        
         // result variable
         std::map<std::string,T> result;
-
-        // loop through the original map, and copy everything to the result
-        for (auto &iter : map) result[iter.first] = iter.second;
+        
+        // iterate over the values
+        iterate([&result](const Value &key, const Value &value) {
+            
+            // first convert the value to the appropriate type (otherwise
+            // compiler errors occur)
+            T val = value;
+            
+            // add the value to the array
+            result[key] = val;
+        });
         
         // done
         return result;
@@ -619,7 +661,7 @@ public:
 
     /**
      *  Cast to a number
-     *  @return uint64_t
+     *  @return int64_t
      */
     operator int64_t () const
     {
@@ -643,7 +685,7 @@ public:
     {
         return stringValue();
     }
-    
+
     /**
      *  Cast to byte array
      *  @return const char *
@@ -670,6 +712,16 @@ public:
     operator std::vector<T>() const
     {
         return vectorValue<T>();
+    }
+
+    /**
+     *  Convert the object to a set
+     *  @return std::set
+     */
+    template <typename T>
+    operator std::set<T>() const
+    {
+        return setValue<T>();
     }
 
     /**
@@ -899,24 +951,32 @@ public:
         return get(key.stringValue());
     }
     
-
     /**
      *  Call the function in PHP
-     *  We have ten variants of this function, depending on the number of parameters
      *  This call operator is only useful when the variable represents a callable
      *  @return Value
      */
     Value operator()() const;
-    Value operator()(Value p0) const;
-    Value operator()(Value p0, Value p1) const;
-    Value operator()(Value p0, Value p1, Value p2) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8) const;
-    Value operator()(Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9) const;
+
+    /**
+     *  Call the function - if the variable holds a callable thing
+     *  @param  args        Optional arguments
+     *  @return Value
+     */
+    template <typename ...Args>
+    Value operator()(Args&&... args) const
+    {
+        // store arguments
+        Value vargs[] = { static_cast<Value>(args)... };
+        //Value vargs[] = { std::forward<Value>(args)... };
+
+        // array of parameters
+        _zval_struct **params[sizeof...(Args)];
+        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
+
+        // call the function
+        return exec(sizeof...(Args), params);
+    }
 
     /**
      *  Call a method
@@ -926,16 +986,27 @@ public:
      *  @return Value
      */
     Value call(const char *name);
-    Value call(const char *name, Value p0);
-    Value call(const char *name, Value p0, Value p1);
-    Value call(const char *name, Value p0, Value p1, Value p2);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8);
-    Value call(const char *name, Value p0, Value p1, Value p2, Value p3, Value p4, Value p5, Value p6, Value p7, Value p8, Value p9);
+
+    /**
+     *
+     *  Call the method - if the variable holds an object with the given method
+     *  @param  name        name of the method to call
+     *  @param  p0          The first parameter
+     *  @return Value
+     */
+    template <typename ...Args>
+    Value call(const char *name, Args&&... args)
+    {
+        // store arguments
+        Value vargs[] = { static_cast<Value>(args)... };
+
+        // array of parameters
+        _zval_struct **params[sizeof...(Args)];
+        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
+
+        // call the function
+        return exec(name, sizeof...(Args), params);
+    }
 
     /**
      *  Retrieve the original implementation
@@ -999,6 +1070,12 @@ public:
 
 private:
     /**
+     *  Iterate over key value pairs
+     *  @param  callback
+     */
+    void iterate(const std::function<void(const Php::Value &,const Php::Value &)> &callback) const;
+
+    /**
      *  Call function with a number of parameters
      *  @param  argc        Number of parameters
      *  @param  argv        The parameters
@@ -1019,7 +1096,7 @@ private:
      *  Refcount - the number of references to the value
      *  @return int
      */
-    int refcount();
+    int refcount() const;
 
 protected:
     /**
@@ -1074,7 +1151,7 @@ protected:
     void setRaw(const char *key, int size, const Value &value);
 
     /**
-     *  Internal helper method to create an iterator
+     *  Internal helper method to create an `
      *  @param  begin       Should the iterator start at the begin?
      *  @return iterator
      */
@@ -1086,6 +1163,12 @@ protected:
      *  @return zend_class_entry
      */
     struct _zend_class_entry *classEntry(bool allowString = true) const;
+    
+    /**
+     *  Functions that need access to the privates
+     */
+    friend Value constant(const char *name, size_t size);
+    friend bool  define(const char *name, size_t size, const Value &value);
     
     /**
      *  The Globals and Member classes can access the zval directly
@@ -1100,6 +1183,8 @@ protected:
     friend class HashMember<int>;
     friend class HashMember<std::string>;
     friend class Callable;
+    friend class Script;
+    friend class ConstantImpl;
 };
 
 /**

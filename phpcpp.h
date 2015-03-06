@@ -27,6 +27,9 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/noexcept.h>
+#include <phpcpp/platform.h>
+#include <phpcpp/version.h>
 #include <phpcpp/inivalue.h>
 #include <phpcpp/ini.h>
 #include <phpcpp/exception.h>
@@ -44,8 +47,8 @@
 #include <phpcpp/byval.h>
 #include <phpcpp/byref.h>
 #include <phpcpp/global.h>
-#include <phpcpp/super.h>
 #include <phpcpp/hashmember.h>
+#include <phpcpp/super.h>
 #include <phpcpp/parameters.h>
 #include <phpcpp/modifiers.h>
 #include <phpcpp/base.h>
@@ -56,11 +59,15 @@
 #include <phpcpp/serializable.h>
 #include <phpcpp/classtype.h>
 #include <phpcpp/classbase.h>
+#include <phpcpp/constant.h>
 #include <phpcpp/interface.h>
 #include <phpcpp/class.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
 #include <phpcpp/call.h>
+#include <phpcpp/script.h>
+#include <phpcpp/file.h>
+#include <phpcpp/function.h>
 
 /**
  *  Macro to export a function

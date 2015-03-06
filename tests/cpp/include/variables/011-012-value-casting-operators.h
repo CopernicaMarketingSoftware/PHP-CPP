@@ -20,7 +20,7 @@ namespace TestVariables {
 	{
 		Php::Value value = params[0];
 
-		long value1 = value;
+		int64_t value1 = value;
 		std::string value2 = value;
 		bool value4 = value;
 

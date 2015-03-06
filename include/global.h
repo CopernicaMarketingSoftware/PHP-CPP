@@ -34,7 +34,7 @@ public:
      *  Move constructor
      *  @param  global
      */
-    Global(Global &&global) : Value(std::move(global)), _name(std::move(global._name)), _exists(global._exists) {}
+    Global(Global &&global) _NOEXCEPT : Value(std::move(global)), _name(std::move(global._name)), _exists(global._exists) {}
 
     /**
      *  Destructor
@@ -70,7 +70,7 @@ public:
      *  @return Global
      */
     /*
-    Global &operator=(Global &&global)
+    Global &operator=(Global &&global) _NOEXCEPT
     {
         // skip self assignment
         if (&global == this) return *this;

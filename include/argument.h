@@ -144,10 +144,31 @@ private:
 };
 
 /**
+ *  Old Visual C++ environments do not support initializer lists
+ */
+#if defined(_MSC_VER) && _MSC_VER < 1800
+
+/**
+ *  For old visual c++ compilers, arguments should be passed as vectors
+ */
+using Arguments = std::vector<Argument>;
+
+/**
+ *  Other compilers, and visual C++ 2013 do support initializer lists
+ */
+#else 
+
+/**
  *  A list of arguments can be supplied to methods
  *  @type   Arguments
  */
 using Arguments = std::initializer_list<Argument>;
+
+/**
+ *  End of visual C++ check
+ */
+#endif
+
     
 /**
  *  End of namespace

@@ -114,43 +114,8 @@ int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
-    // array contains ini settings
-    auto *entries = extension->_ini = new zend_ini_entry[extension->_data->iniVariables()+1];
-
-    // the entry that we're filling
-    int i=0;
-
-    // Fill the php.ini entries
-    extension->_data->iniVariables([entries, &i, module_number](Ini &ini) {
-    
-        // initialize the function
-        zend_ini_entry *entry = &entries[i];
-        
-        // fill the property
-        ini.fill(entry, module_number);
-        
-        // move on to the next iteration
-        i++;
-    });
-
-    // last entry should be set to all zero's
-    memset(&entries[i], 0, sizeof(zend_ini_entry));
-
-    // register ini entries in Zend core
-    zend_register_ini_entries(entries, module_number TSRMLS_CC);
-
     // initialize the extension
-    extension->initialize(TSRMLS_C);
-    
-    // remember that we're initialized (when you use "apache reload" it is 
-    // possible that the processStartup() method is called more than once)
-    extension->_locked = true;
-    
-    // is the callback registered?
-    if (extension->_onStartup) extension->_onStartup();
-
-    // done
-    return BOOL2SUCCESS(true);
+    return BOOL2SUCCESS(extension->initialize(module_number TSRMLS_CC));
 }
 
 /**
@@ -165,20 +130,8 @@ int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
-    // unregister the ini entries
-    zend_unregister_ini_entries(module_number TSRMLS_CC);
-
-    // destruct the ini entries
-    if (extension->_ini) delete[] extension->_ini;
-
-    // forget the ini entries
-    extension->_ini = nullptr;
-
-    // is the callback registered?
-    if (extension->_onShutdown) extension->_onShutdown();
-    
     // done
-    return BOOL2SUCCESS(true);
+    return BOOL2SUCCESS(extension->shutdown(module_number TSRMLS_CC));
 }
 
 /**
@@ -220,12 +173,34 @@ int ExtensionImpl::processIdle(int type, int module_number TSRMLS_DC)
 }
 
 /**
+ *  Function that is called when the PHP engine initializes with a different PHP-CPP
+ *  version for the libphpcpp.so file than the version the extension was compiled for
+ *  @param  type        Module type
+ *  @param  number      Module number
+ *  @param  tsrm_ls
+ *  @return int         0 on success
+ */
+int ExtensionImpl::processMismatch(int type, int module_number TSRMLS_DC)
+{
+    // get the extension
+    auto *extension = find(module_number TSRMLS_CC);
+    
+    // report a warning
+    warning << "Version mismatch between PHP-CPP and extension " << extension->name() << " " << extension->version() << " (recompile needed?)" << std::endl;
+    
+    // done
+    return BOOL2SUCCESS(true);
+}
+
+/**
  *  Constructor
  *  @param  data        Pointer to the extension object created by the extension programmer
  *  @param  name        Name of the extension
  *  @param  version     Version number
+ *  @param  apiversion  API version number
  */
-ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *version) : ExtensionBase(data)
+ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *version, int apiversion) : 
+    ExtensionBase(data)
 {
     // keep extension pointer based on the name
     name2extension[name] = this;
@@ -262,6 +237,17 @@ ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *vers
     _entry.globals_ptr = NULL;
 #endif
 
+    // everything is ok if the api versions match
+    if (apiversion == PHPCPP_API_VERSION) return;
+    
+    // mismatch between api versions, the extension is invalid, we use a 
+    // different startup function to report to the user
+    _entry.module_startup_func = &ExtensionImpl::processMismatch;
+
+    // the other callback functions are no longer necessary
+    _entry.module_shutdown_func = nullptr;
+    _entry.request_startup_func = nullptr;
+    _entry.request_shutdown_func = nullptr;
 }
 
 /**
@@ -277,6 +263,26 @@ ExtensionImpl::~ExtensionImpl()
 }
 
 /**
+ *  The extension name
+ *  @return const char *
+ */
+const char *ExtensionImpl::name() const
+{
+    // name is stored in the struct
+    return _entry.name;
+}
+
+/**
+ *  The extension version
+ *  @return const char *
+ */
+const char *ExtensionImpl::version() const
+{
+    // version is stored in the struct
+    return _entry.version;
+}
+
+/**
  *  Retrieve the module entry
  *  @return zend_module_entry
  */
@@ -284,6 +290,10 @@ zend_module_entry *ExtensionImpl::module()
 {
     // check if functions were already defined
     if (_entry.functions) return &_entry;
+
+    // if the 'processMismatch' function is installed, the API version is wrong,
+    // and nothing should be initialized
+    if (_entry.module_startup_func == &ExtensionImpl::processMismatch) return &_entry;
 
     // the number of functions
     int count = _data->functions();
@@ -298,7 +308,7 @@ zend_module_entry *ExtensionImpl::module()
     int i = 0;
 
     // apply a function to each function
-    _data->functions([&i, entries](const std::string &prefix, Function &function) {
+    _data->functions([&i, entries](const std::string &prefix, NativeFunction &function) {
         
         // initialize the function
         function.initialize(prefix, &entries[i]);
@@ -322,16 +332,90 @@ zend_module_entry *ExtensionImpl::module()
 
 /**
  *  Initialize the extension after it was started
+ *  @param  module_number
  *  @param  tsrm_ls
+ *  @return bool
  */
-void ExtensionImpl::initialize(TSRMLS_D)
+bool ExtensionImpl::initialize(int module_number TSRMLS_DC)
 {
-    // we need to register each class, find out all classes
+    // array contains ini settings
+    _ini = new zend_ini_entry[_data->iniVariables()+1];
+
+    // the entry that we're filling
+    int i = 0;
+
+    // Fill the php.ini entries
+    _data->iniVariables([this, &i, module_number](Ini &ini) {
+    
+        // initialize the function
+        zend_ini_entry *entry = &_ini[i];
+        
+        // fill the property
+        ini.fill(entry, module_number);
+        
+        // move on to the next iteration
+        i++;
+    });
+
+    // last entry should be set to all zero's
+    memset(&_ini[i], 0, sizeof(zend_ini_entry));
+
+    // register ini entries in Zend core
+    zend_register_ini_entries(_ini, module_number TSRMLS_CC);
+
+    // the constants are registered after the module is ready
+    _data->constants([module_number TSRMLS_CC](const std::string &prefix, Constant &c) {
+        
+        // forward to implementation class
+        c.implementation()->initialize(prefix, module_number TSRMLS_CC);
+    });
+    
+    // we also need to register each class, find out all classes
     _data->classes([TSRMLS_C](const std::string &prefix, ClassBase &c) {
         
         // forward to implementation class
         c.implementation()->initialize(&c, prefix TSRMLS_CC);
     });
+
+    // initialize the PhpCpp::Functor class
+    Functor::initialize(TSRMLS_C);
+
+    // remember that we're initialized (when you use "apache reload" it is 
+    // possible that the processStartup() method is called more than once)
+    _locked = true;
+    
+    // is the callback registered?
+    if (_onStartup) _onStartup();
+
+    // done
+    return true;
+}
+
+/**
+ *  Function that is called when the extension shuts down
+ *  @param  module_number
+ *  @param  tsrmls
+ *  @return bool
+ */
+bool ExtensionImpl::shutdown(int module_number TSRMLS_DC)
+{
+    // unregister the ini entries
+    zend_unregister_ini_entries(module_number TSRMLS_CC);
+
+    // destruct the ini entries
+    if (_ini) delete[] _ini;
+
+    // forget the ini entries
+    _ini = nullptr;
+
+    // shutdown the functor class
+    Functor::shutdown(TSRMLS_C);
+
+    // is the callback registered?
+    if (_onShutdown) _onShutdown();
+    
+    // done
+    return true;
 }
 
 /**

@@ -30,8 +30,9 @@ public:
      *  @param  data        Pointer to the extension object created by the extension programmer
      *  @param  name        Name of the extension
      *  @param  version     Version identifier of the extension
+     *  @param  apiversion  API version number
      */
-    ExtensionImpl(Extension *data, const char *name, const char *version) : ExtensionBase(data) {}
+    ExtensionImpl(Extension *data, const char *name, const char *version, int apiversion) : ExtensionBase(data) {}
     
     /**
      *  Destructor

@@ -84,7 +84,7 @@ public:
      *  Move constructor
      *  @param  that
      */
-    HiddenPointer(HiddenPointer<Type> &&that) : _allocated(that._allocated), _buffer(that._buffer)
+    HiddenPointer(HiddenPointer<Type> &&that) _NOEXCEPT : _allocated(that._allocated), _buffer(that._buffer)
     {
         // the other object is no longer allocated
         that._allocated = false;

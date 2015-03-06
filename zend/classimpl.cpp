@@ -20,6 +20,11 @@ ClassImpl::~ClassImpl()
 {
     // destruct the entries
     if (_entries) delete[] _entries;
+
+#if PHP_VERSION_ID >= 50400
+    // on newer php versions, we have allocated the command to hide a pointer in it
+    if (_self) free(_self);
+#endif
 }
 
 /**
@@ -85,8 +90,9 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
     ClassBase *meta = data->self->_base;
     
     // the data structure was allocated by ourselves in the getMethod or 
-    // getStaticMethod functions, we no longer need it now
-    efree(data);
+    // getStaticMethod functions, we no longer need it when the function falls
+    // out of scope
+    DelayedFree df(data);
 
     // the function could throw an exception
     try
@@ -131,8 +137,9 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
     ClassBase *meta = data->self->_base;
 
     // the data structure was allocated by ourselves in the getMethod or 
-    // getStaticMethod functions, we no longer need it now
-    efree(data);
+    // getStaticMethod functions, we no longer need it when the function falls
+    // out of scope
+    DelayedFree df(data);
 
     // the function could throw an exception
     try
@@ -310,7 +317,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     data->self = self(entry);
     
     // assign this dynamically allocated variable to the func parameter
-    // the case is ok, because zend_internal_function is a member of the
+    // the cast is ok, because zend_internal_function is a member of the
     // zend_function union
     *func = (zend_function *)data;
  
@@ -534,7 +541,7 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     result.handlers = impl->objectHandlers();
     
     // store the object
-    ObjectImpl *new_object = new ObjectImpl(entry, cpp TSRMLS_CC);
+    ObjectImpl *new_object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
 
     // store the object in the object cache
     result.handle = new_object->handle();
@@ -1195,7 +1202,7 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
     result.handlers = impl->objectHandlers();
     
     // create the object in the zend engine
-    ObjectImpl *object = new ObjectImpl(entry, cpp TSRMLS_CC);
+    ObjectImpl *object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
     
     // store the object in the object cache
     result.handle = object->handle();
@@ -1344,8 +1351,9 @@ const struct _zend_function_entry *ClassImpl::entries()
  *  @param  base        the c++ class object created in the extension
  *  @param  prefix      namespace prefix
  *  @param  tsrm_ls
+ *  @return zend_class_entry
  */
-void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
+zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
 {
     // store base pointer
     _base = base;
@@ -1416,16 +1424,16 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
 #if PHP_VERSION_ID >= 50400
 
     // allocate doc comment to contain an empty string + a hidden pointer
-    char *_comment = (char *)malloc(1 + sizeof(ClassImpl *));
+    _self = (char *)malloc(1 + sizeof(ClassImpl *));
 
     // empty string on first position
-    _comment[0] = '\0';
+    _self[0] = '\0';
 
     // copy the 'this' pointer to the doc-comment
-    memcpy(_comment+1, &impl, sizeof(ClassImpl *));
+    memcpy(_self+1, &impl, sizeof(ClassImpl *));
 
     // set our comment in the actual class entry
-    _entry->info.user.doc_comment = _comment;
+    _entry->info.user.doc_comment = _self;
 
 #else
 
@@ -1442,6 +1450,9 @@ void ClassImpl::initialize(ClassBase *base, const std::string &prefix TSRMLS_DC)
 
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry TSRMLS_CC);
+    
+    // done
+    return _entry;
 }
 
 /**

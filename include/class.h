@@ -48,7 +48,7 @@ public:
      *  Move constructor
      *  @param  that
      */
-    Class(Class<T> &&that) : ClassBase(std::move(that)) {}
+    Class(Class<T> &&that) _NOEXCEPT : ClassBase(std::move(that)) {}
 
     /**
      *  Destructor
@@ -91,12 +91,16 @@ public:
     /**
      *  Add a static method to a class
      * 
-     *  In C++ a static method is just a plain function, that only at compile
-     *  time has access to the private variables. You can therefore also supply
-     *  global functions as static method, and real static methods (that do not
-     *  even have to come from the same class.
+     *  In C++ a static method is in reality just a plain function, that at 
+     *  compile time has access to private properties of the class that it is a 
+     *  static member of. 
      * 
-     *  In PHP scripts, the function will only be callable as real static method
+     *  Because a C++ static method is not a real method with a 'this' pointer, 
+     *  it has the same signature as a normal C++ (non-method) function. Therefore,
+     *  you can register real static member functions (&MyClass::myMethod) as well
+     *  as normal functions (myFunction) as class methods.
+     * 
+     *  In PHP scripts, such functions will be callable as static class methods
      * 
      *  @param  name        Name of the method
      *  @param  method      The actual method
@@ -138,7 +142,7 @@ public:
      *  hidden)
      * 
      *  @param  name        Name of the property
-     *  @param  value       Actual property value
+     *  @param  value       Actual default property value
      *  @param  flags       Optional flags
      *  @return Class       Same object to allow chaining
      */
@@ -151,6 +155,31 @@ public:
     Class<T> &property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+
+    /**
+     *  Create a class constant
+     * 
+     *  The class constant can be used in a php script as "ClassName::CONSTANT_NAME".
+     *  It is a good programming practive to only use uppercase characters for
+     *  constants.
+     * 
+     *  This is an alias for adding a class property with the "Php::Const" flag.
+     * 
+     *  @param  name        Name of the constant
+     *  @param  value       Constant value
+     *  @return Class       Same object to allow chaining
+     */
+    template <typename V>
+    Class<T> &constant(const char *name, V value) { return property(name, value, Const); }
+
+    /**
+     *  Add a Php::Constant to a class to use it as a class constant
+     *  
+     *  @param  constant    The constant to add
+     *  @return Class       Same object to allow chaining
+     */
+    Class<T> &constant(const Constant &constant) { constant.addTo(*this); return *this; }
+    Class<T> &add(const Constant &constant) { constant.addTo(*this); return *this; }
 
     /**
      *  Properties as methods
@@ -555,10 +584,12 @@ private:
     }
 
     /**
-     *  Namespaces have access to the private base class, so that the classes
-     *  can be registered.
+     *  Namespaces and the function have access to the private base class, 
+     *  so that the classes can be registered, and the Functor object needs
+     *  this to register the PhpCpp::Functor class.
      */
     friend class Namespace;
+    friend class Functor;
     
     /**
      *  All Php::Class<AnyThing> also need access to the base class to

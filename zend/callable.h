@@ -144,7 +144,7 @@ protected:
     {
         // fill members
         info->name = arg.name();
-         info->name_len = ::strlen(arg.name());
+        info->name_len = ::strlen(arg.name());
 
 #if PHP_VERSION_ID >= 50400
 

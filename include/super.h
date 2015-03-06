@@ -41,7 +41,11 @@ public:
      *  @param  key
      *  @return Value
      */
-    Value operator[](const std::string &key);
+    Value operator[](const std::string &key)
+    {
+        // convert object to a value object, and retrieve the key
+        return value()[key];
+    }
 
     /**
      *  Array access operator
@@ -49,7 +53,41 @@ public:
      *  @param  key
      *  @return Value
      */
-    Value operator[](const char *key);
+    Value operator[](const char *key)
+    {
+        // convert object to a value object, and retrieve the key
+        return value()[key];
+    }
+
+    /**
+     *  Casting operator to cast to a value object
+     *  @return Value
+     */
+    operator Value ()
+    {
+        // we have a private function for this
+        return value();
+    }
+
+    /**
+     *  Return an iterator for iterating over the variables
+     *  @return iterator
+     */
+    ValueIterator begin()
+    {
+        // convert to value, and call begin on the value object
+        return value().begin();
+    }
+    
+    /**
+     *  Return an iterator for iterating over the variables
+     *  @return iterator
+     */
+    ValueIterator end()
+    {
+        // convert to value, and call end on that object
+        return value().end();
+    }
 
 private:
     /**
@@ -63,6 +101,13 @@ private:
      *  @var    name
      */
     const char *_name;
+    
+    /**
+     *  Turn the object into a value object
+     *  @return Value
+     */
+    Value value();
+    
 };
 
 /**

@@ -42,13 +42,13 @@ private:
      *  @var    zend_class_entry
      */
     zend_class_entry *_entry = nullptr;
-
+    
     /**
      *  Pointer to the entries
      *  @var    zend_function_entry[]
      */
     zend_function_entry *_entries = nullptr;
-    
+
     /**
      *  All class methods
      *  @var    std::list
@@ -91,6 +91,11 @@ private:
      */
     bool _initialized = false;
 
+    /**
+     *  Memory allocated by this object to hide a pointer
+     *  @var    char*
+     */
+    char *_self = nullptr;
 
     /**
      *  Retrieve an array of zend_function_entry objects that hold the 
@@ -140,6 +145,15 @@ public:
     }
 
     /**
+     *  The class-entry
+     *  @return zend_class_entry
+     */
+    struct _zend_class_entry *entry() const
+    {
+        return _entry;
+    }
+
+    /**
      *  Initialize the class, given its name
      * 
      *  The module functions are registered on module startup, but classes are
@@ -150,9 +164,10 @@ public:
      * 
      *  @param  base        The extension C++ class 
      *  @param  ns          Namespace name
-     *  @param  tsrm_ls
+     *  @param  tsrm_ls     
+     *  @return zend_class_entry
      */
-    void initialize(ClassBase *base, const std::string &ns TSRMLS_DC);
+    struct _zend_class_entry *initialize(ClassBase *base, const std::string &ns TSRMLS_DC);
 
     /**
      *  Static member functions to create or clone objects based on this class
