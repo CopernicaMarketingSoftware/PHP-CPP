@@ -99,7 +99,7 @@ public:
      *  @param  name        Name of the function
      */
     Symbol(void *handle, const char *name) :
-        _method(DL_FETCH_SYMBOL(handle, name)) {}
+        _method(DL_FETCH_SYMBOL((DL_HANDLE)handle, name)) {}
 
     /**
      *  Destructor
