@@ -119,7 +119,7 @@ public:
  *  @param  exception
  *  @param  tsrm_ls
  */
-inline void process(Exception &exception TSRMLS_DC)
+static inline void process(Exception &exception TSRMLS_DC)
 {
     // is this a native exception?
     if (exception.native())
