@@ -102,6 +102,8 @@ public:
         
         // and read current data
         read(TSRMLS_C);
+
+		return true;
     }
     
     /**
@@ -112,6 +114,7 @@ public:
     {
         // not possible with PHP iterators
         throw Exception("Impossible to iterate backwards");
+        return false;
     }
 
     /**
