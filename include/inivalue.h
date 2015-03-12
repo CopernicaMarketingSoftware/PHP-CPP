@@ -58,7 +58,7 @@ public:
      */
     operator bool () const
     {
-        return (bool)numericValue();
+        return boolValue();
     }
     
     /**
@@ -67,7 +67,7 @@ public:
      */
     operator std::string () const
     {
-        return rawValue();
+        return stringValue();
     }
     
     /**
@@ -84,9 +84,7 @@ public:
      *  @return double
      */
     operator double() const;
-    
-private:
-    
+
     /**
      *  Retrieve the value as number
      *
@@ -98,12 +96,34 @@ private:
      *  @return int64_t
      */
     int64_t numericValue() const;
+    
+    /**
+     *  Boolean value
+     *  @return bool
+     */
+    bool boolValue() const
+    {
+        return (bool)numericValue();
+    }
 
     /**
-     *  Get access to the raw buffer for read operationrs.
+     *  String value
+     *  @return std::string
+     */
+    std::string stringValue() const
+    {
+        return std::string(rawValue());
+    }
+
+    /**
+     *  Get access to the raw buffer for read operations.
      *  @return const char *
      */
     const char *rawValue() const;
+
+    
+private:
+    
     
     /**
      *  ini entry name
