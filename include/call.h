@@ -46,6 +46,7 @@ extern Value require(const char *filename);
 inline Value require(const std::string &filename) { return require(filename.c_str()); }
 extern Value require_once(const char *filename);
 inline Value require_once(const std::string &filename) { return require_once(filename.c_str()); }
+extern const char *sapi_name();
 
 /**
  *  Call a function in PHP
