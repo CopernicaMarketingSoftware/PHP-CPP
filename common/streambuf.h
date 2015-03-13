@@ -15,6 +15,14 @@
 namespace Php {
 
 /**
+ *  Issue reported by user on a Windows / Mingw32 platform: EOF was
+ *  not defined. Let's defined it ourselves
+ */
+#ifndef EOF
+# define EOF (-1)
+#endif
+
+/**
  *  Class definition
  */
 class StreamBuf : public std::streambuf
