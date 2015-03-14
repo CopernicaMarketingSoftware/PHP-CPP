@@ -22,6 +22,7 @@
  *  Forward definitions
  */
 struct _zval_struct;
+struct _php_stream;
 
 /**
  *  Set up namespace
@@ -384,7 +385,9 @@ public:
     bool isFloat()      const { return type() == Type::Float; }
     bool isObject()     const { return type() == Type::Object; }
     bool isArray()      const { return type() == Type::Array; }
+    bool isResource()   const { return type() == Type::Resource; }
     bool isScalar()     const { return isNull() || isNumeric() || isBool() || isString() || isFloat(); }
+    bool isStream()     const { return stream() != nullptr; }
     bool isCallable()   const;
 
     /**
@@ -1163,6 +1166,12 @@ protected:
      *  @return zend_class_entry
      */
     struct _zend_class_entry *classEntry(bool allowString = true) const;
+    
+    /**
+     *  Retrieve the stream structure
+     *  @return php_stream
+     */
+    struct _php_stream *stream() const;
     
     /**
      *  Functions that need access to the privates

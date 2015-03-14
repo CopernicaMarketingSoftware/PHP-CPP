@@ -1028,6 +1028,19 @@ bool Value::isCallable() const
 }
 
 /**
+ *  Check whether a value holds a stream resource
+ *  @return php_stream
+ */
+php_stream *Value::stream() const
+{
+    // must be a resource
+    if (!isResource()) return nullptr;
+    
+    // fetch the stream structure (we support regular streams and persistent streams)
+    return (php_stream *)zend_fetch_resource((zval **)&_val TSRMLS_CC, -1, "stream", NULL, 2, php_file_le_stream(), php_file_le_pstream());
+}
+
+/**
  *  Retrieve the class entry
  *  @param  allowString
  *  @return zend_class_entry
