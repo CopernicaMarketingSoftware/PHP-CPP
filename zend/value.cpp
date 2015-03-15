@@ -1074,7 +1074,10 @@ php_stream *Value::stream() const
 {
     // must be a resource
     if (!isResource()) return nullptr;
-    
+
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+        
     // fetch the stream structure (we support regular streams and persistent streams)
     return (php_stream *)zend_fetch_resource((zval **)&_val TSRMLS_CC, -1, "stream", NULL, 2, php_file_le_stream(), php_file_le_pstream());
 }

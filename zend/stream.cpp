@@ -18,6 +18,36 @@
 namespace Php {
 
 /**
+ *  Utility function to open a file
+ *  @param  fp
+ *  @param  mode
+ *  @return php_stream*
+ */
+static php_stream *open(FILE *fp, const char *mode)
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+    
+    // open the file
+    return php_stream_fopen_from_file(fp, mode);
+}
+
+/**
+ *  Utility function to open a file
+ *  @param  filename
+ *  @param  mode
+ *  @return php_stream*
+ */
+static php_stream *open(const char *filename, const char *mode)
+{
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+    
+    // open the file
+    return php_stream_open_wrapper((char *)filename, (char *)mode, IGNORE_PATH, nullptr);
+}
+
+/**
  *  Constructor to create a stream object from a Php::Value object that holds
  *  a stream. This only works if the value contains a valid stream, otherwise
  *  an exception is thrown
@@ -40,7 +70,7 @@ Stream::Stream(const Value &value) :
  *  @param  mode
  */
 Stream::Stream(FILE *fp, const char *mode) :
-    _stream(php_stream_fopen_from_file(fp, mode)),
+    _stream(open(fp, mode)),
     _value(_stream)
 {
     // stream should be valid
@@ -54,7 +84,7 @@ Stream::Stream(FILE *fp, const char *mode) :
  *  @param  mode
  */
 Stream::Stream(const char *filename, const char *mode) :
-    _stream(php_stream_open_wrapper((char *)filename, (char *)mode, IGNORE_PATH, nullptr)),
+    _stream(open(filename, mode)),
     _value(_stream)
 {
     // stream should be valid
@@ -81,8 +111,11 @@ Stream::Stream(StreamImpl *implementation) :
  */
 ssize_t Stream::write(const char *data, size_t size)
 {
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
     // pass on to the appropriate php function
-    return _php_stream_write(_stream, (const char *)data, size);
+    return _php_stream_write(_stream, (const char *)data, size TSRMLS_CC);
 }
 
 /**

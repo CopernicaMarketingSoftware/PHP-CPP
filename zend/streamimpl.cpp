@@ -105,6 +105,9 @@ static int custom_flush(php_stream *stream TSRMLS_DC)
  */
 StreamImpl::StreamImpl(const char *label)
 {
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
     // allocate the operations
     _operations = new php_stream_ops;
     
