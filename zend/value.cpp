@@ -215,6 +215,45 @@ Value::Value(const Base *object)
 }
 
 /**
+ *  Wrap object around internal php_stream
+ *  @param  stream      PHP stream to wrap
+ */
+Value::Value(php_stream *stream)
+{
+    // create a zval
+    MAKE_STD_ZVAL(_val);
+    
+    // store the stream in the zval
+    php_stream_to_zval(stream, _val);    
+}
+
+/**
+ *  Wrap around a stream object
+ *  @param  stream      Stream to be wrapped
+ */
+Value::Value(const Stream &stream)
+{
+    // create a zval
+    MAKE_STD_ZVAL(_val);
+
+    // store the stream in the zval
+    php_stream_to_zval(stream.stream(), _val);
+}
+
+/**
+ *  Wrap around a stream implementation
+ *  @param  stream      Stream to be wrapped
+ */
+Value::Value(const StreamImpl *stream)
+{
+    // create a zval
+    MAKE_STD_ZVAL(_val);
+    
+    // store the stream in the zval
+    php_stream_to_zval(stream->stream(), _val);
+}
+
+/**
  *  Wrap around a php.ini value
  *  @param  value
  */

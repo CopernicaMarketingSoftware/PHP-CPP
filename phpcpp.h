@@ -68,6 +68,8 @@
 #include <phpcpp/script.h>
 #include <phpcpp/file.h>
 #include <phpcpp/function.h>
+#include <phpcpp/streamimpl.h>
+#include <phpcpp/stream.h>
 
 /**
  *  Macro to export a function

@@ -34,6 +34,8 @@ namespace Php {
  */
 class Base;
 class ValueIterator;
+class Stream;
+class StreamImpl;
 template <class Type> class HashMember;
 
 /**
@@ -121,11 +123,29 @@ public:
     Value(struct _zval_struct *zval, bool ref=false);
     
     /**
+     *  Wrap object around internal php_stream
+     *  @param  stream      PHP stream to wrap
+     */
+    Value(struct _php_stream *stream);
+    
+    /**
      *  Wrap around an object implemented by us
      *  @param  object      Object to be wrapped
      */
     Value(const Base *base);
     
+    /**
+     *  Wrap around a stream object
+     *  @param  stream      Stream to be wrapped
+     */
+    Value(const Stream &stream);
+    
+    /**
+     *  Wrap around a stream implementation
+     *  @param  stream      Stream to be wrapped
+     */
+    Value(const StreamImpl *stream);
+
     /**
      *  Copy constructor
      *  @param  value
@@ -1194,6 +1214,7 @@ protected:
     friend class Callable;
     friend class Script;
     friend class ConstantImpl;
+    friend class Stream;
 };
 
 /**

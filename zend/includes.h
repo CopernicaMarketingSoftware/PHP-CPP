@@ -11,6 +11,7 @@
  *  Include standard C and C++ libraries
  */
 #include <stdlib.h>
+#include <stdio.h>
 #include <string>
 #include <initializer_list>
 #include <vector>
@@ -88,6 +89,8 @@
 #include "../include/script.h"
 #include "../include/file.h"
 #include "../include/function.h"
+#include "../include/streamimpl.h"
+#include "../include/stream.h"
 
 /**
  *  Common header files for internal use only
