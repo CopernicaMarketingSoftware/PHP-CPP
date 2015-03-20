@@ -228,26 +228,37 @@ Value::Value(const IniValue &value) : Value((const char *)value)
  */
 Value::Value(const Value &that)
 {
-    // is the other variable a reference?
-    if (Z_ISREF_P(that._val))
-    {
-        // because this is supposed to be a COPY, we can not add ourselves
-        // to the variable but have to allocate a new variable
-        ALLOC_ZVAL(_val);
-        INIT_PZVAL_COPY(_val, that._val);
-        
-        // we have to call the copy constructor to copy the entire other zval
-        zval_copy_ctor(_val);
-    }
-    else
-    {
-        // simply use the same zval
-        _val = that._val;
-    }
-    
+    _val = that._val;
+
     // that zval has one more reference
     Z_ADDREF_P(_val);
 
+//  Below the another old implementation - it does't work when we want to keep a
+//  reference in a container, such as std::vector, because it will copy a new
+//  value to the container, it's different between the old value when the old
+//  one is a reference. so the simple and right implementation is that we don't
+//  need to care about it's value or reference, keep up its original appearance.
+
+//    // is the other variable a reference?
+//    if (Z_ISREF_P(that._val))
+//    {
+//        // because this is supposed to be a COPY, we can not add ourselves
+//        // to the variable but have to allocate a new variable
+//        ALLOC_ZVAL(_val);
+//        INIT_PZVAL_COPY(_val, that._val);
+//        
+//        // we have to call the copy constructor to copy the entire other zval
+//        zval_copy_ctor(_val);
+//    }
+//    else
+//    {
+//        // simply use the same zval
+//        _val = that._val;
+//    }
+//    
+//    // that zval has one more reference
+//    Z_ADDREF_P(_val);
+//
 
 //  Below the old implementation - I thought really hard about it and I though
 //  it was a correct and very smart implementation. However, it does not work
@@ -302,7 +313,10 @@ Value::~Value()
     // if there were two references or less, we're going to remove a reference
     // and only one reference will remain, the object will then impossible be
     // a reference
-    if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
+    // but we don't have to manually do this step,
+    // because zval_ptr_dtor(&_val) has automatically done this.
+
+    // if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
 
     // destruct the zval (this function will decrement the reference counter,
     // and only destruct if there are no other references left)
@@ -401,64 +415,82 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
     // skip self assignment
     if (this == &value) return *this;
 
-    // is the object a reference?
-    if (_val && Z_ISREF_P(_val))
-    {
-        // @todo difference if the other object is a reference or not?
-        
-        // the current object is a reference, this means that we should
-        // keep the zval object, and copy the other value into it, get
-        // the current refcount
-        int refcount = Z_REFCOUNT_P(_val);
-        
-        // make the copy
-        *_val = *value._val;
-        
-        // restore reference and refcount setting
-        Z_SET_ISREF_TO_P(_val, true);
-        Z_SET_REFCOUNT_P(_val, refcount);
-        
-        // how many references did the old variable have?
-        if (Z_REFCOUNT_P(value._val) > 1)
-        {
-            // the other object already had multiple references, this
-            // implies that many other PHP variables are also referring 
-            // to it, and we still need to store its contents, with one 
-            // reference less
-            Z_DELREF_P(value._val);
-            
-            // and we need to run the copy constructor on the current
-            // value, because we're making a deep copy
-            zval_copy_ctor(_val);
-        }
-        else
-        {
-            // we need the tsrm_ls variable
-            TSRMLS_FETCH();
-            
-            // the last and only reference to the other object was
-            // removed, we no longer need it
-            FREE_ZVAL(value._val);
-            
-            // the other object is no longer valid
-            value._val = nullptr;
-        }
-    }
-    else
-    {
-        // destruct the zval (this function will decrement the reference counter,
-        // and only destruct if there are no other references left)
-        if (_val) zval_ptr_dtor(&_val);
+    // destruct the zval (this function will decrement the reference counter,
+    // and only destruct if there are no other references left)
+    if (_val) zval_ptr_dtor(&_val);
 
-        // just copy the zval completely
-        _val = value._val;
+    // just copy the zval completely
+    _val = value._val;
 
-        // the other object is no longer valid
-        value._val = nullptr;
-    }
-    
-    // done
-    return *this;
+    // the other object is no longer valid
+    value._val = nullptr;
+
+   // done
+   return *this;
+
+//  Below the old implementation - it will break the iterator when the array
+//  include the reference, the reference will be rewrite to null. so we don't
+//  need to care about the current is value or reference, keep up its original
+//  appearance. it will work correctly.
+//
+//    // is the object a reference?
+//    if (_val && Z_ISREF_P(_val))
+//    {
+//        // @todo difference if the other object is a reference or not?
+//        
+//        // the current object is a reference, this means that we should
+//        // keep the zval object, and copy the other value into it, get
+//        // the current refcount
+//        int refcount = Z_REFCOUNT_P(_val);
+//        
+//        // clean up the current zval (but keep the zval structure)
+//        zval_dtor(_val);
+//
+//        // make the copy
+//        *_val = *value._val;
+//        zval_copy_ctor(_val);
+//        
+//        // restore reference and refcount setting
+//        Z_SET_ISREF_TO_P(_val, true);
+//        Z_SET_REFCOUNT_P(_val, refcount);
+//        
+//        // how many references did the old variable have?
+//        if (Z_REFCOUNT_P(value._val) > 1)
+//        {
+//            // the other object already had multiple references, this
+//            // implies that many other PHP variables are also referring 
+//            // to it, and we still need to store its contents, with one 
+//            // reference less
+//            Z_DELREF_P(value._val);
+//        }
+//        else
+//        {
+//            // we need the tsrm_ls variable
+//            TSRMLS_FETCH();
+//            
+//            // the last and only reference to the other object was
+//            // removed, we no longer need it
+//            FREE_ZVAL(value._val);
+//            
+//            // the other object is no longer valid
+//            value._val = nullptr;
+//        }
+//    }
+//    else
+//    {
+//        // destruct the zval (this function will decrement the reference counter,
+//        // and only destruct if there are no other references left)
+//        if (_val) zval_ptr_dtor(&_val);
+//
+//        // just copy the zval completely
+//        _val = value._val;
+//
+//        // the other object is no longer valid
+//        value._val = nullptr;
+//    }
+//    
+//    // done
+//    return *this;
 }
 
 /**
