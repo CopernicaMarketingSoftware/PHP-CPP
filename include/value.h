@@ -5,10 +5,10 @@
  *  of the value class represents a variable that exists in user space in
  *  the PHP environment, for example as global variable, local variable
  *  inside a function or as a member of an object or an array.
- * 
+ *
  *  A value can be a scalar or a more complicated structure like an object
  *  or an array.
- * 
+ *
  *  Internally, the Zend engine works with "zval" objects for this. These "zval"
  *  object hold a reference counter and a reference setting. The PHP-CPP Value
  *  class takes care of doing this, so all you need to do is use objects of
@@ -66,7 +66,7 @@ public:
      *  @param  value
      */
     Value(Type type) : Value() { setType(type); }
-    
+
     /**
      *  Constructors from a vector (this will create an array)
      *  @param  value
@@ -76,7 +76,7 @@ public:
     {
         // index
         int i = 0;
-        
+
         // set all elements
         for (auto &elem : input) setRaw(i++, elem);
     }
@@ -89,7 +89,7 @@ public:
      *  @param  value
      */
     template <typename T>
-    Value(const std::initializer_list<T> &value) : Value(Type::Array) 
+    Value(const std::initializer_list<T> &value) : Value(Type::Array)
     {
         // index
         int i = 0;
@@ -100,7 +100,7 @@ public:
 
     // end of visual c++ check
 #   endif
-    
+
     /**
      *  Constructor from a map (this will create an associative array)
      *  @param  value
@@ -111,32 +111,32 @@ public:
         // set all elements
         for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
     }
-    
+
     /**
      *  Wrap object around zval
      *  @param  zval        Zval to wrap
      *  @param  ref         Force this to be a reference
      */
     Value(struct _zval_struct *zval, bool ref=false);
-    
+
     /**
      *  Wrap around an object implemented by us
      *  @param  object      Object to be wrapped
      */
     Value(const Base *base);
-    
+
     /**
      *  Copy constructor
      *  @param  value
      */
     Value(const Value &that);
-    
+
     /**
      *  Move constructor
      *  @param  value
      */
     Value(Value &&that) _NOEXCEPT;
-    
+
     /**
      *  Destructor
      */
@@ -148,7 +148,7 @@ public:
      *  @return Value
      */
     Value &operator=(Value &&value) _NOEXCEPT;
-    
+
     /**
      *  Assignment operator for various types
      *  @param  value
@@ -194,7 +194,7 @@ public:
     Value &operator-=(const std::string &value);
     Value &operator-=(const char *value);
     Value &operator-=(double value);
-    
+
     /**
      *  Multiply the object with a certain value
      *  @param  value
@@ -239,7 +239,7 @@ public:
     Value &operator%=(const std::string &value);
     Value &operator%=(const char *value);
     Value &operator%=(double value);
-    
+
     /**
      *  Assignment operator
      *  @param  value
@@ -314,7 +314,7 @@ public:
     Value operator%(const std::string &value);
     Value operator%(const char *value);
     Value operator%(double value);
-    
+
     /**
      *  Comparison operators for hardcoded strings
      *  @param  value
@@ -353,7 +353,7 @@ public:
      *  @return Type
      */
     Type type() const;
-    
+
     /**
      *  Change the internal type of the variable
      *  @param  Type
@@ -391,32 +391,32 @@ public:
      *  Get access to the raw buffer - you can use this for direct reading and
      *  writing to and from the buffer. Note that this only works for string
      *  variables - other variables return nullptr.
-     * 
+     *
      *  If you are going to write to the buffer, make sure that you first call
      *  the reserve() method to ensure that the buffer is big enough.
-     *  
+     *
      *  @return char *
      */
     char *buffer() const;
-    
+
     /**
-     *  Resize buffer space. If you want to write directly to the buffer (which 
-     *  is returned by the buffer() method), you should first reserve enough 
-     *  space in it. This can be done with this reserve() method. This will also 
-     *  turn the Value object into a string (if it was not already a string). 
+     *  Resize buffer space. If you want to write directly to the buffer (which
+     *  is returned by the buffer() method), you should first reserve enough
+     *  space in it. This can be done with this reserve() method. This will also
+     *  turn the Value object into a string (if it was not already a string).
      *  The writable buffer is returned.
-     * 
+     *
      *  @param  size
-     *  @return char* 
+     *  @return char*
      */
     char *reserve(size_t size);
-    
+
     /**
      *  Get access to the raw buffer for read operations.
      *  @return const char *
      */
     const char *rawValue() const;
-    
+
     /**
      *  Retrieve the value as number
      *
@@ -428,31 +428,31 @@ public:
      *  @return int64_t
      */
     int64_t numericValue() const;
-    
+
     /**
      *  Retrieve the value as boolean
      *  @return bool
      */
     bool boolValue() const;
-    
+
     /**
      *  Retrieve the value as a string
      *  @return string
      */
     std::string stringValue() const;
-    
+
     /**
      *  Retrieve the value as decimal
      *  @return double
      */
     double floatValue() const;
-    
+
     /**
      *  Convert the object to a vector
-     * 
+     *
      *  This only works for regular arrays that are indexed by a number, start
      *  with position 0 and have no empty spaces.
-     *  
+     *
      *  @return std::vector
      */
     template <typename T>
@@ -521,7 +521,7 @@ public:
      *  @return std::map
      */
     std::map<std::string,Php::Value> mapValue() const;
-    
+
     /**
      *  Convert the object to a map with string index and a specific type as value
      *  @return std::map
@@ -531,50 +531,50 @@ public:
     {
         // must be an array or an object, otherwise the map is empty
         if (!isArray() && !isObject()) return std::map<std::string,T>();
-        
+
         // result variable
         std::map<std::string,T> result;
-        
+
         // iterate over the values
         iterate([&result](const Value &key, const Value &value) {
-            
+
             // first convert the value to the appropriate type (otherwise
             // compiler errors occur)
             T val = value;
-            
+
             // add the value to the array
             result[key] = val;
         });
-        
+
         // done
         return result;
     }
-    
+
     /**
      *  Define the iterator type
      */
     typedef ValueIterator iterator;
-    
+
     /**
      *  Return an iterator for iterating over the values
      *  This is only meaningful for Value objects that hold an array or an object
      *  @return iterator
      */
     iterator begin() const;
-    
+
     /**
      *  Return an iterator for iterating over the values
      *  This is only meaningful for Value objects that hold an array or an object
      *  @return iterator
      */
     iterator end() const;
-    
+
     /**
      *  The number of members in case of an array or object
      *  @return int
      */
     int size() const;
-    
+
     /**
      *  The number of members in case of an array or object
      *  @return int
@@ -583,7 +583,7 @@ public:
     {
         return size();
     }
-    
+
     /**
      *  The number of members in case of an array or object
      *  @return int
@@ -592,7 +592,7 @@ public:
     {
         return size();
     }
-    
+
     /**
      *  Is a certain index set in the array
      *  @param  index
@@ -609,7 +609,7 @@ public:
     {
         return contains(key.c_str(), key.size());
     }
-    
+
     /**
      *  Is a certain key set in the array
      *  @param  key
@@ -628,7 +628,7 @@ public:
     {
         return contains(key, ::strlen(key));
     }
-    
+
     /**
      *  Is a certain key set in the array, when that key is stored as value object
      *  @param  key
@@ -640,7 +640,7 @@ public:
         if (value.isString()) return contains(value.rawValue(), value.size());
         return contains(value.stringValue());
     }
-    
+
     /**
      *  Cast to a number
      *  @return int32_t
@@ -667,7 +667,7 @@ public:
     {
         return numericValue();
     }
-    
+
     /**
      *  Cast to a boolean
      *  @return boolean
@@ -676,7 +676,7 @@ public:
     {
         return boolValue();
     }
-    
+
     /**
      *  Cast to a string
      *  @return string
@@ -694,7 +694,7 @@ public:
     {
         return rawValue();
     }
-    
+
     /**
      *  Cast to a floating point
      *  @return double
@@ -742,14 +742,14 @@ public:
     {
         return mapValue<T>();
     }
-    
+
     /**
      *  Get access to a certain array member
      *  @param  index
      *  @return Value
      */
     virtual Value get(int index) const override;
-    
+
     /**
      *  Get access to a certain assoc member
      *  @param  key
@@ -757,7 +757,7 @@ public:
      *  @return Value
      */
     Value get(const char *key, int size=-1) const;
-    
+
     /**
      *  Get access to a certain assoc member
      *  @param  key
@@ -767,7 +767,7 @@ public:
     {
         return get(key.c_str(), key.size());
     }
-    
+
     /**
      *  Get access to a certain variant member
      *  @param  key
@@ -779,7 +779,7 @@ public:
         if (key.isString()) return get(key.rawValue(), key.size());
         return get(key.stringValue());
     }
-    
+
     /**
      *  Set a certain property
      *  Calling this method will turn the value into an array
@@ -788,7 +788,7 @@ public:
      *  @return Value       The value that was set
      */
     virtual void set(int index, const Value &value) override;
-    
+
     /**
      *  Set a certain property
      *  Calling this method will turn the value into an array
@@ -808,7 +808,7 @@ public:
     {
         set(key, ::strlen(key), value);
     }
-    
+
     /**
      *  Set a certain property
      *  Calling this method will turn the object into an array
@@ -819,7 +819,7 @@ public:
     {
         return set(key.c_str(), key.size(), value);
     }
-    
+
     /**
      *  Overwrite the value at a certain variant index
      *  @param  key
@@ -837,14 +837,14 @@ public:
      *  @param  index
      */
     virtual void unset(int index) override;
-    
+
     /**
      *  Unset by key name and length of the key
      *  @param  key
      *  @param  size
      */
     void unset(const char *key, int size);
-    
+
     /**
      *  Unset by key name and length of the key
      *  @param  key
@@ -874,7 +874,7 @@ public:
         if (key.isString()) return unset(key.rawValue(), key.size());
         return unset(key.stringValue());
     }
-    
+
     /**
      *  Array access operator
      *  This can be used for accessing arrays
@@ -882,7 +882,7 @@ public:
      *  @return Member
      */
     HashMember<int> operator[](int index);
-    
+
     /**
      *  Array access operator
      *  This can be used for accessing arrays
@@ -893,7 +893,7 @@ public:
     {
         return get(index);
     }
-    
+
     /**
      *  Array access operator
      *  This can be used for accessing associative arrays
@@ -931,7 +931,7 @@ public:
     {
         return get(key);
     }
-    
+
     /**
      *  Index by other value object
      *  @param  key
@@ -950,7 +950,7 @@ public:
         if (key.isString()) return get(key.rawValue(), key.size());
         return get(key.stringValue());
     }
-    
+
     /**
      *  Call the function in PHP
      *  This call operator is only useful when the variable represents a callable
@@ -1010,20 +1010,20 @@ public:
 
     /**
      *  Retrieve the original implementation
-     * 
+     *
      *  This only works for classes that were implemented using PHP-CPP,
      *  it returns nullptr for all other classes
-     * 
+     *
      *  @return Base*
      */
     Base *implementation() const;
 
     /**
      *  Retrieve the original implementation
-     * 
+     *
      *  This only works for classes that were implemented using PHP-CPP,
      *  it returns nullptr for all other classes
-     * 
+     *
      *  @return mixed
      */
     template <typename T>
@@ -1032,17 +1032,17 @@ public:
         // retrieve the implementation
         Base *base = implementation();
         if (!base) return nullptr;
-        
+
         // try casting it
         return dynamic_cast<T*>(base);
     }
-    
+
     /**
      *  Check whether this object is an instance of a certain class
-     * 
+     *
      *  If you set the parameter 'allowString' to true, and the Value object
      *  holds a string, the string will be treated as class name.
-     * 
+     *
      *  @param  classname   The class of which this should be an instance
      *  @param  size        Length of the classname string
      *  @param  allowString Is it allowed for 'this' to be a string
@@ -1054,10 +1054,10 @@ public:
 
     /**
      *  Check whether this object is derived from a certain class.
-     * 
+     *
      *  If you set the parameter 'allowString' to true, and the Value object
      *  holds a string, the string will be treated as class name.
-     * 
+     *
      *  @param  classname   The class of which this should be an instance
      *  @param  size        Length of the classname string
      *  @param  allowString Is it allowed for 'this' to be a string
@@ -1104,46 +1104,46 @@ protected:
      *  @var struct zval
      */
     struct _zval_struct *_val;
-    
+
     /**
      *  Detach the zval
-     * 
+     *
      *  This will unlink the zval internal structure from the Value object,
      *  so that the destructor will not reduce the number of references and/or
      *  deallocate the zval structure. This is used for functions that have to
      *  return a zval pointer, that would otherwise be deallocated the moment
      *  the function returns.
-     * 
+     *
      *  @return zval
      */
     struct _zval_struct *detach();
-    
+
     /**
      *  Attach a different zval
-     * 
-     *  This will first detach the current zval, and link the Value object to 
+     *
+     *  This will first detach the current zval, and link the Value object to
      *  a different zval. Versions exist to attach to a zval and to an entire
      *  hash table
-     * 
+     *
      *  @param  val
      */
     void attach(struct _zval_struct *val);
     void attach(struct _hashtable *hashtable);
-    
+
     /**
      *  Set a certain property without running any checks (you must already know
      *  for sure that this is an array, and that the index is not yet in use)
-     * 
+     *
      *  @param  index       Index of the property to set
      *  @param  value       Value to set
      */
     void setRaw(int index, const Value &value);
-    
+
     /**
      *  Set a certain property without any checks (you must already know for
      *  sure that this is either an object or an array, and that the index is
      *  not yet in use)
-     * 
+     *
      *  @param  key         Key of the property to set
      *  @param  size        Size of the key
      *  @param  value       Value to set
@@ -1156,20 +1156,20 @@ protected:
      *  @return iterator
      */
     iterator createIterator(bool begin) const;
-    
+
     /**
      *  Retrieve the class entry
      *  @param  allowString Allow the 'this' object to be a string
      *  @return zend_class_entry
      */
     struct _zend_class_entry *classEntry(bool allowString = true) const;
-    
+
     /**
      *  Functions that need access to the privates
      */
     friend Value constant(const char *name, size_t size);
     friend bool  define(const char *name, size_t size, const Value &value);
-    
+
     /**
      *  The Globals and Member classes can access the zval directly
      */
@@ -1197,20 +1197,20 @@ std::ostream &operator<<(std::ostream &stream, const Value &value);
 
 /**
  *  Custom +=, -=, *=, /=, &= operators, to update integral types with a Php::Value
- * 
+ *
  *  This code looks complicated, it ensures that the operators are only
  *  overloaded for integral types (int, bool, etc) - and not for complex types
  *  (arrays, objects, etc)
  */
-template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr> 
+template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator+=(X &x, const Php::Value &value) { return x += (X)value; }
-template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr> 
+template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator-=(X &x, const Php::Value &value) { return x -= (X)value; }
-template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr> 
+template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator*=(X &x, const Php::Value &value) { return x *= (X)value; }
-template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr> 
+template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator/=(X &x, const Php::Value &value) { return x /= (X)value; }
-template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr> 
+template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator%=(X &x, const Php::Value &value) { return x %= (X)value; }
 
 /**
