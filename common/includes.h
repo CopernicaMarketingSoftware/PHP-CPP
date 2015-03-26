@@ -15,6 +15,7 @@
 /**
  *  Public include files
  */
+#include "../include/visibility.h"
 #include "../include/modifiers.h"
 
 /**

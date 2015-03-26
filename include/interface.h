@@ -13,7 +13,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class Interface : private ClassBase
+class PHPCPP_EXPORT Interface : private ClassBase
 {
 public:
     /**
@@ -21,12 +21,12 @@ public:
      *  @param  name
      */
     Interface(const char *name) : ClassBase(name, ClassType::Interface) {}
-    
+
     /**
      *  Destructor
      */
     virtual ~Interface() {}
-    
+
     /**
      *  Add a - of course abstract - method to the interface
      *  @param  name        Name of the method
@@ -37,7 +37,7 @@ public:
     {
         // call base
         ClassBase::method(name, Abstract | Public, arguments);
-        
+
         // return self
         return *this;
     }
@@ -58,7 +58,7 @@ public:
      *  class, to actually register the interface.
      */
     friend class Namespace;
-    
+
     /**
      *  All Php::Class<AnyThing> also need access to the base class to
      *  register an interface.
@@ -70,4 +70,3 @@ public:
  *  End namespace
  */
 }
-

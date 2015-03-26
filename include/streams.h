@@ -21,11 +21,11 @@ namespace Php {
 /**
  *  Define the out and err objects
  */
-extern std::ostream out;
-extern std::ostream error;
-extern std::ostream notice;
-extern std::ostream warning;
-extern std::ostream deprecated;
+extern PHPCPP_EXPORT std::ostream out;
+extern PHPCPP_EXPORT std::ostream error;
+extern PHPCPP_EXPORT std::ostream notice;
+extern PHPCPP_EXPORT std::ostream warning;
+extern PHPCPP_EXPORT std::ostream deprecated;
 
 /**
  *  End namespace

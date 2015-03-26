@@ -1,13 +1,13 @@
 /**
  *  Constant.h
- * 
+ *
  *  If you want to define global PHP constants, or class constants you can
  *  use this constant class for it. Wrap the constant you'd like to create
  *  in a Php::Constant object and add it to the extension or the class:
- * 
+ *
  *  extension.add(Php::Constant("CONSTANT_NAME", "value"));
  *  myclass.add(Php::Constant("CLASS_CONSTANT", "value"));
- * 
+ *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2015 Copernica BV
  */
@@ -25,7 +25,7 @@ class ConstantImpl;
 /**
  *  Class definition
  */
-class Constant
+class PHPCPP_EXPORT Constant
 {
 public:
     /**
@@ -42,27 +42,27 @@ public:
     Constant(const char *name, const char *value);
     Constant(const char *name, const char *value, size_t size);
     Constant(const char *name, const std::string &value);
-    
+
     /**
      *  Destructor
      */
     virtual ~Constant() {}
-    
+
     /**
      *  Add the constant to a class
-     * 
+     *
      *  You normally do not have to call this method yourself. You can simply
      *  do one of the following method calls to create class constants:
-     * 
+     *
      *      myclass.property("MY_CONSTANT", "value", Php::Const);
      *      myclass.constant("MY_CONSTANT", "value");
      *      myclass.add(Php::Constant("MY_CONSTANT", "value"));
-     * 
+     *
      *  All of the calls have the same result, it is up to you to decide which
      *  one suits you most. If you use the last one - using a Php::Constant
      *  class - the PHP-CPP library will call this "addTo()" method internally
      *  to forward the call to one of the other methods.
-     * 
+     *
      *  @param  clss        Class to which the constant is added
      *  @internal
      */
@@ -80,16 +80,15 @@ private:
      *  @return std::shared_ptr
      */
     const std::shared_ptr<ConstantImpl> &implementation() const { return _impl; }
-    
+
     /**
      *  The extension object has access to privates
      */
     friend class ExtensionImpl;
 
-};    
-    
+};
+
 /**
  *  End of namespace
  */
 }
-

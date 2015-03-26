@@ -4,14 +4,14 @@
  *  Wrapper object that gives access to all global variables. You
  *  can use it more or less the same as the $_GLOBALS object in
  *  PHP.
- * 
+ *
  *  The global PHP variables are acessible via the Php::globals["varname"]
  *  variables.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
- 
+
 /**
  *  Set up namespace
  */
@@ -25,7 +25,7 @@ class Global;
 /**
  *  Class definition
  */
-class Globals
+class PHPCPP_EXPORT Globals
 {
 public:
     /**
@@ -33,32 +33,32 @@ public:
      */
     Globals(const Globals &globals) = delete;
     Globals(Globals &&globals) = delete;
-    
+
     /**
      *  Destructor
      */
     virtual ~Globals() {}
-    
+
     /**
      *  Get access to a global variable
      *  @param  name
      *  @return Global
      */
     Global operator[](const char *name);
-    
+
     /**
      *  Get access to a global variable
      *  @param  name
      *  @return Global
      */
     Global operator[](const std::string &name);
-    
+
 private:
     /**
      *  Constructor
      */
     Globals() {}
-    
+
 public:
     /**
      *  Get the one and only instance
@@ -77,4 +77,3 @@ extern Globals &GLOBALS;
  *  End of namespace
  */
 }
-

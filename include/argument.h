@@ -6,7 +6,7 @@
  *
  *  The constructor of the argument is protected. Use the ByVal or ByRef
  *  classes instead.
- * 
+ *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
  */
@@ -19,14 +19,14 @@ namespace Php {
 /**
  *  Class definition
  */
-class Argument
+class PHPCPP_EXPORT Argument
 {
 public:
     /**
      *  Destructor
      */
     virtual ~Argument() {}
-    
+
 protected:
     /**
      *  Constructor
@@ -35,9 +35,9 @@ protected:
      *  @param  required    Is this argument required?
      *  @param  byref       Is this a reference argument
      */
-    Argument(const char *name, Type type, bool required = true, bool byref = false) : 
+    Argument(const char *name, Type type, bool required = true, bool byref = false) :
         _name(name), _type(type), _required(required), _byReference(byref) {}
-    
+
     /**
      *  Constructor
      *  @param  name        Name of the argument
@@ -48,7 +48,7 @@ protected:
      */
     Argument(const char *name, const char *classname, bool nullable = true, bool required = true, bool byref = false) :
         _name(name), _type(Type::Object), _classname(classname), _nullable(nullable), _required(required), _byReference(byref) {}
-    
+
 public:
     /**
      *  Is this a required argument?
@@ -59,7 +59,7 @@ public:
     {
         return _required;
     }
-    
+
     /**
      *  Name of the argument
      *  @return const char *
@@ -68,8 +68,8 @@ public:
     {
         return _name;
     }
-    
-    /** 
+
+    /**
      *  Type-hint for the argument
      *  @return Type
      */
@@ -77,7 +77,7 @@ public:
     {
         return _type;
     }
-    
+
     /**
      *  If the type is a class, the name of the class
      *  @return const char *
@@ -86,7 +86,7 @@ public:
     {
         return _classname;
     }
-    
+
     /**
      *  Is it allowed to pass parameter with a null value?
      *  @return bool
@@ -95,7 +95,7 @@ public:
     {
         return _nullable;
     }
-    
+
     /**
      *  Is this a parameter-by-reference?
      *  @return bool
@@ -104,14 +104,14 @@ public:
     {
         return _byReference;
     }
-    
+
 private:
     /**
      *  Name of the argument
      *  @var const char *
      */
     const char *_name = nullptr;
-    
+
     /**
      *  Type of argument
      *  @var Type
@@ -123,7 +123,7 @@ private:
      *  @var std::string
      */
     const char *_classname = nullptr;
-    
+
     /**
      *  May the parameter be null?
      *  @var bool
@@ -135,7 +135,7 @@ private:
      *  @var    bool
      */
     bool _required = true;
-    
+
     /**
      *  Is this a 'by-reference' parameter?
      *  @var    bool
@@ -156,7 +156,7 @@ using Arguments = std::vector<Argument>;
 /**
  *  Other compilers, and visual C++ 2013 do support initializer lists
  */
-#else 
+#else
 
 /**
  *  A list of arguments can be supplied to methods
@@ -169,9 +169,8 @@ using Arguments = std::initializer_list<Argument>;
  */
 #endif
 
-    
+
 /**
  *  End of namespace
  */
 }
-

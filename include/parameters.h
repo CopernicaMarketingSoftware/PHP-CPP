@@ -1,8 +1,8 @@
 /**
  *  Parameters.h
  *
- *  Wrapper around parameters that are passed to a 
- 
+ *  Wrapper around parameters that are passed to a
+
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
@@ -20,7 +20,7 @@ class Base;
 /**
  *  Class definition
  */
-class Parameters : public std::vector<Value>
+class PHPCPP_EXPORT Parameters : public std::vector<Value>
 {
 private:
     /**
@@ -32,14 +32,14 @@ private:
 protected:
     /**
      *  Protected constructor
-     * 
+     *
      *  The constructor is protected because extension programmers are not
      *  supposed to instantiate parameters objects themselves
-     * 
+     *
      *  @param  object      The 'this' object
      */
     Parameters(Base *object) : _object(object) {}
-    
+
 public:
     /**
      *  Destructor
@@ -60,4 +60,3 @@ public:
  *  End of namespace
  */
 }
-

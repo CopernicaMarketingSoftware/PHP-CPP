@@ -47,6 +47,7 @@
 /**
  *  Include other files from this library
  */
+#include "../include/visibility.h"
 #include "../include/noexcept.h"
 #include "../include/platform.h"
 #include "../include/version.h"
@@ -61,7 +62,6 @@
 #include "../include/valueiterator.h"
 #include "../include/array.h"
 #include "../include/object.h"
-#include "../include/hiddenpointer.h"
 #include "../include/globals.h"
 #include "../include/argument.h"
 #include "../include/byval.h"
@@ -98,6 +98,7 @@
 /**
  *  Specific zend implementation  files for internal use only
  */
+#include "hiddenpointer.h"
 #include "init.h"
 #include "callable.h"
 #include "nativefunction.h"

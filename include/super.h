@@ -12,29 +12,29 @@
  *  Set up namespace
  */
 namespace Php {
-    
+
 /**
  *  Class definition
  */
-class Super
+class PHPCPP_EXPORT Super
 {
 public:
     /**
      *  Constructor
-     * 
+     *
      *  Extension writers do not have to access the super-globals themselves.
      *  They are always accessible via Php::POST, Php::GET, et cetera.
-     * 
+     *
      *  @param  index   index number
      *  @param  name    name of the variable in PHP
      */
     Super(int index, const char *name) : _index(index), _name(name) {}
-    
+
     /**
      *  Destructor
      */
     virtual ~Super() {}
-    
+
     /**
      *  Array access operator
      *  This can be used for accessing associative arrays
@@ -78,7 +78,7 @@ public:
         // convert to value, and call begin on the value object
         return value().begin();
     }
-    
+
     /**
      *  Return an iterator for iterating over the variables
      *  @return iterator
@@ -95,19 +95,19 @@ private:
      *  @var    int
      */
     int _index;
-    
+
     /**
      *  Name of the variable in PHP
      *  @var    name
      */
     const char *_name;
-    
+
     /**
      *  Turn the object into a value object
      *  @return Value
      */
     Value value();
-    
+
 };
 
 /**
@@ -125,4 +125,3 @@ extern Super REQUEST;
  *  End namespace
  */
 }
-

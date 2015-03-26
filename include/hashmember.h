@@ -6,7 +6,7 @@
  *  keeps track of the array to which it belongs, and that will update
  *  the array when the member is modified
  *
- *  You are not supposed to instantiate this class. An instance of it is 
+ *  You are not supposed to instantiate this class. An instance of it is
  *  created when you call Value::operator[]
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -17,7 +17,7 @@
  *  Set up namespace
  */
 namespace Php {
-    
+
 /**
  *  Forward definitions
  */
@@ -27,7 +27,7 @@ class Value;
  *  Member class
  */
 template <typename Type>
-class HashMember : private HashParent
+class PHPCPP_EXPORT HashMember : private HashParent
 {
 public:
     /**
@@ -36,7 +36,7 @@ public:
      *  @param  index
      */
     HashMember(HashParent *parent, Type index) : _parent(parent), _index(index) {}
-    
+
     /**
      *  Destructor
      */
@@ -111,7 +111,7 @@ public:
     {
         return value().numericValue();
     }
-    
+
     /**
      *  Cast to a boolean
      *  @return boolean
@@ -120,7 +120,7 @@ public:
     {
         return value().boolValue();
     }
-    
+
     /**
      *  Cast to a string
      *  @return string
@@ -129,7 +129,7 @@ public:
     {
         return value().stringValue();
     }
-    
+
     /**
      *  Cast to byte array
      *  @return const char *
@@ -138,7 +138,7 @@ public:
     {
         return value().rawValue();
     }
-    
+
     /**
      *  Cast to a floating point
      *  @return double
@@ -147,7 +147,7 @@ public:
     {
         return value().floatValue();
     }
-    
+
     /**
      *  Array access operator
      *  This can be used for accessing arrays
@@ -210,7 +210,7 @@ public:
     HashMember &operator-=(const std::string &value)    { return operator=(this->value() - value); }
     HashMember &operator-=(const char *value)           { return operator=(this->value() - value); }
     HashMember &operator-=(double value)                { return operator=(this->value() - value); }
-    
+
     /**
      *  Multiply the object with a certain value
      *  @param  value
@@ -255,7 +255,7 @@ public:
     HashMember &operator%=(const std::string &value)    { return operator=(this->value() % value); }
     HashMember &operator%=(const char *value)           { return operator=(this->value() % value); }
     HashMember &operator%=(double value)                { return operator=(this->value() % value); }
-    
+
     /**
      *  Assignment operator
      *  @param  value
@@ -330,7 +330,7 @@ public:
     Value operator%(const std::string &value)   { return this->value() % value; }
     Value operator%(const char *value)          { return this->value() % value; }
     Value operator%(double value)               { return this->value() % value; }
-    
+
     /**
      *  Comparison operators
      *  @param  value
@@ -378,7 +378,7 @@ public:
         // object must exist, and the value must contain the key
         return exists() && value().contains(key);
     }
-    
+
     /**
      *  Check if a certain index exists in the array/object
      *  @param  index
@@ -400,7 +400,7 @@ public:
         // object must exist, and the value must contain the key
         return exists() && value().contains(key);
     }
-    
+
     /**
      *  Retrieve the value at a string index
      *  @param  key
@@ -410,11 +410,11 @@ public:
     {
         // return null if it does not exist
         if (!exists()) return nullptr;
-        
+
         // ask the value
         return value().get(key);
     }
-    
+
     /**
      *  Retrieve the value at a numeric index
      *  @param  index
@@ -424,7 +424,7 @@ public:
     {
         // return null if it does not exist
         if (!exists()) return nullptr;
-        
+
         // ask the value
         return value().get(index);
     }
@@ -438,11 +438,11 @@ public:
     {
         // return null if it does not exist
         if (!exists()) return nullptr;
-        
+
         // ask the value
         return value().get(key);
     }
-    
+
     /**
      *  Overwrite the value at a certain string index
      *  @param  key
@@ -452,14 +452,14 @@ public:
     {
         // get the current value
         Value current(this->value());
-        
+
         // add the value
         current[key] = value;
-        
+
         // pass this to the base
         _parent->set(_index, current);
     }
-    
+
     /**
      *  Overwrite the value at a certain numeric index
      *  @param  index
@@ -469,10 +469,10 @@ public:
     {
         // get the current value
         Value current(this->value());
-        
+
         // add the value
         current[index] = value;
-        
+
         // pass this to the base
         _parent->set(_index, current);
     }
@@ -486,10 +486,10 @@ public:
     {
         // get the current value
         Value current(this->value());
-        
+
         // add the value
         current[key] = value;
-        
+
         // pass this to the base
         _parent->set(_index, current);
     }
@@ -510,20 +510,20 @@ public:
     {
         // if the current property does not even exist, we do not have to add anything
         if (!exists()) return;
-        
+
         // get the current value
         Value current(this->value());
-        
+
         // skip if the property does not exist
         if (!current.contains(index)) return;
-        
+
         // remove the index
         current.unset(index);
-        
+
         // pass the new value to the base
         _parent->set(_index, current);
     }
-    
+
     /**
      *  Unset a member by its key
      *  @param  key
@@ -532,16 +532,16 @@ public:
     {
         // if the current property does not even exist, we do not have to add anything
         if (!exists()) return;
-        
+
         // get the current value
         Value current(this->value());
-        
+
         // skip if the property does not exist
         if (!current.contains(key)) return;
-        
+
         // remove the index
         current.unset(key);
-        
+
         // pass the new value to the base
         _parent->set(_index, current);
     }
@@ -554,16 +554,16 @@ public:
     {
         // if the current property does not even exist, we do not have to add anything
         if (!exists()) return;
-        
+
         // get the current value
         Value current(this->value());
-        
+
         // skip if the property does not exist
         if (!current.contains(key)) return;
-        
+
         // remove the index
         current.unset(key);
-        
+
         // pass the new value to the base
         _parent->set(_index, current);
     }
@@ -579,22 +579,22 @@ protected:
      *  Move constructor
      *  @param  value   Other element
      */
-//    HashMember(HashMember<Type> &&member) _NOEXCEPT : 
+//    HashMember(HashMember<Type> &&member) _NOEXCEPT :
 //        _parent(std::move(member._parent)), _index(std::move(member._index)) {}
 
 private:
     /**
      *  Base value
-     *  @var 
+     *  @var
      */
     HashParent *_parent;
-    
+
     /**
      *  The original index
      *  @var Type
      */
     Type _index;
-    
+
     /**
      *  Friend classes
      */
@@ -614,9 +614,8 @@ private:
 std::ostream &operator<<(std::ostream &stream, const HashMember<int> &value);
 std::ostream &operator<<(std::ostream &stream, const HashMember<std::string> &value);
 
-    
+
 /**
  *  End of namespace
  */
 }
-

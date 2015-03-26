@@ -24,7 +24,7 @@ class ValueIteratorImpl;
 /**
  *  Class definition
  */
-class ValueIterator
+class PHPCPP_EXPORT ValueIterator
 {
 public:
     /**
@@ -32,13 +32,13 @@ public:
      *  @param  impl        Implementation iterator
      */
     ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
-    
+
     /**
      *  Copy constructor
      *  @param  that
      */
     ValueIterator(const ValueIterator &that);
-    
+
     /**
      *  Destructor
      */
@@ -49,7 +49,7 @@ public:
      *  @return ValueIterator
      */
     ValueIterator &operator++();
-    
+
     /**
      *  Increment position (post-increment)
      *  @return ValueIterator
@@ -58,14 +58,14 @@ public:
     {
         // make a copy
         ValueIterator copy(*this);
-        
+
         // increment current object
         ++(*this);
-        
+
         // and return the unchanged original
         return copy;
     }
-    
+
     /**
      *  Decrement position (pre-decrement)
      *  @return ValueIterator
@@ -80,14 +80,14 @@ public:
     {
         // make a copy
         ValueIterator copy(*this);
-        
+
         // decrement current object
         --(*this);
-        
+
         // and return the unchanged original
         return copy;
     }
-    
+
     /**
      *  Compare with other iterator
      *  @param  that
@@ -107,7 +107,7 @@ public:
      *  @return std::pair
      */
     const std::pair<Value,Value> &operator*() const;
-    
+
     /**
      *  Dereference, this returns a std::pair with the current key and value
      *  @return std::pair
@@ -127,4 +127,3 @@ private:
  *  End namespace
  */
 }
-

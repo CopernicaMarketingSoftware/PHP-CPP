@@ -1,7 +1,7 @@
 /**
  *  Exception.h
  *  Implementation of Php Exceptions.
- * 
+ *
  *  @author Jasper van Eck <jasper.vaneck@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
  */
@@ -12,10 +12,10 @@
  */
 namespace Php {
 
-/** 
+/**
  *  Class definition
  */
-class Exception : public std::exception
+class PHPCPP_EXPORT Exception : public std::exception
 {
 private:
     /**
@@ -23,31 +23,31 @@ private:
      *  @var    char*
      */
     std::string _message;
-    
+
     /**
      *  The PHP exception code
      *  @var    int
      */
     int _code;
-    
+
     /**
      *  Has this exception been processed by native C++ code?
      *  @var    bool
      */
     bool _processed = false;
-    
+
 public:
     /**
      *  Constructor
      *  @param  &string
      */
     Exception(const std::string &message, int code = 0) : std::exception(), _message(message), _code(code) {}
-    
+
     /**
      *  Destructor
      */
     virtual ~Exception() throw() {}
-    
+
     /**
      *  Overridden what method
      *  @return const char *
@@ -56,7 +56,7 @@ public:
     {
         return _message.c_str();
     }
-    
+
     /**
      *  Returns the message of the exception.
      *  @return &string
@@ -75,7 +75,7 @@ public:
         // yes, it is native
         return true;
     }
-    
+
     /**
      *  Report this error as a fatal error
      *  @return bool
@@ -91,5 +91,3 @@ public:
  *  End of namespace
  */
 }
-
- 

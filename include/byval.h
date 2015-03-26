@@ -15,7 +15,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class ByVal : public Argument
+class PHPCPP_EXPORT ByVal : public Argument
 {
 public:
     /**
@@ -57,4 +57,3 @@ public:
  *  End of namespace
  */
 }
-

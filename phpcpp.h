@@ -27,6 +27,7 @@
 /**
  *  Include all headers files that are related to this library
  */
+#include <phpcpp/visibility.h>
 #include <phpcpp/noexcept.h>
 #include <phpcpp/platform.h>
 #include <phpcpp/version.h>
@@ -41,7 +42,6 @@
 #include <phpcpp/valueiterator.h>
 #include <phpcpp/array.h>
 #include <phpcpp/object.h>
-#include <phpcpp/hiddenpointer.h>
 #include <phpcpp/globals.h>
 #include <phpcpp/argument.h>
 #include <phpcpp/byval.h>
@@ -68,14 +68,5 @@
 #include <phpcpp/script.h>
 #include <phpcpp/file.h>
 #include <phpcpp/function.h>
-
-/**
- *  Macro to export a function
- */
-#if defined(__GNUC__) && __GNUC__ >= 4
-#   define PHPCPP_EXPORT __attribute__ ((visibility("default")))
-#else
-#   define PHPCPP_EXPORT
-#endif
 
 #endif /* phpcpp.h */

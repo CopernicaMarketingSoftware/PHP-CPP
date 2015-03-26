@@ -16,19 +16,19 @@ namespace Php {
 /**
  *  The modifiers are constants
  */
-extern const int Static;
-extern const int Abstract;
-extern const int Final;
-extern const int Public;
-extern const int Protected;
-extern const int Private;
-extern const int Const;
+extern PHPCPP_EXPORT const int Static;
+extern PHPCPP_EXPORT const int Abstract;
+extern PHPCPP_EXPORT const int Final;
+extern PHPCPP_EXPORT const int Public;
+extern PHPCPP_EXPORT const int Protected;
+extern PHPCPP_EXPORT const int Private;
+extern PHPCPP_EXPORT const int Const;
 
 /**
  *  Modifiers that are supported for methods and properties
  */
-extern const int MethodModifiers;
-extern const int PropertyModifiers;
+extern PHPCPP_EXPORT const int MethodModifiers;
+extern PHPCPP_EXPORT const int PropertyModifiers;
 
 /**
  *  End namespace

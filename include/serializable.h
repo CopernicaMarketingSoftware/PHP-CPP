@@ -16,22 +16,22 @@ namespace Php {
 /**
  *  Class definition
  */
-class Serializable
+class PHPCPP_EXPORT Serializable
 {
 public:
     /**
      *  Method to serialize the object
      *
-     *  This method should return a string representation of the object that 
+     *  This method should return a string representation of the object that
      *  can be passed to the serialize() method and that will revive the object
      *
      *  @return std::string
      */
     virtual std::string serialize() = 0;
-    
+
     /**
      *  Unserialize the object
-     *  
+     *
      *  This method is called as an alternative __construct() method to initialize
      *  the object. The passed in string parameter in in the format earlier returned
      *  by a call to serialize()
@@ -46,6 +46,3 @@ public:
  *  End namespace
  */
 }
-
-
- 

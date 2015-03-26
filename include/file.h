@@ -7,7 +7,7 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV
  */
- 
+
 /**
  *  Set up namespace
  */
@@ -16,23 +16,23 @@ namespace Php {
 /**
  *  Class definition
  */
-class File
+class PHPCPP_EXPORT File
 {
 public:
     /**
      *  Constructor
-     * 
+     *
      *  The constructor receives a filename as parameter. It uses the normal
-     *  PHP include path resolve algorithms to find the location of the file. 
-     * 
+     *  PHP include path resolve algorithms to find the location of the file.
+     *
      *  @param  name        the filename
      *  @param  size        size of the filename
      */
     File(const char *name, size_t size);
-    
+
     /**
      *  Alternative constructor with just a filename
-     * 
+     *
      *  @param  name        the filename
      */
     File(const char *name) : File(name, ::strlen(name)) {}
@@ -42,7 +42,7 @@ public:
      *  @param  name        the filename
      */
     File(const std::string &name) : File(name.c_str(), name.size()) {}
-    
+
     /**
      *  Alternative constructor with a Value object
      *  @param  name        the filename
@@ -53,13 +53,13 @@ public:
      *  Destructor
      */
     virtual ~File();
-    
+
     /**
      *  Does the file exist?
      *  @return boolean
      */
     bool exists();
-    
+
     /**
      *  Is this a valid file?
      *  @return boolean
@@ -71,20 +71,20 @@ public:
      *  @return Php::Value
      */
     Value once();
-    
+
     /**
      *  Execute the file
      *  @return Php::Value
      */
     Value execute();
-    
+
 private:
     /**
      *  The full resolved path name
      *  @var const char *
      */
     char *_path = nullptr;
-    
+
     /**
      *  The opcodes of this file
      *  @var Opcodes
@@ -96,11 +96,10 @@ private:
      *  @return bool
      */
     bool compile();
-    
+
 };
-    
+
 /**
  *  End of namespace
  */
 }
-

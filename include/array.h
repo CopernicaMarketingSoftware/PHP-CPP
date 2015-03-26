@@ -1,7 +1,7 @@
 /**
  *  Array.h
  *
- *  The Array is a wrapper around the value class that ensures that a 
+ *  The Array is a wrapper around the value class that ensures that a
  *  certain property always is an array
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -16,19 +16,19 @@ namespace Php {
 /**
  *  Class definition
  */
-class Array : public Value
+class PHPCPP_EXPORT Array : public Value
 {
 public:
     /**
      *  Constructor
      */
     Array() : Value(Type::Array) {}
-    
+
     /**
      *  Copy constructor from a value object
      *  @param  value
      */
-    Array(const Value &value) : Value(value) 
+    Array(const Value &value) : Value(value)
     {
         // type must be valid
         if (value.type() != Type::Array) throw FatalError("Assigning a non-array to an array variable");
@@ -50,7 +50,7 @@ public:
      */
     template <typename T>
     Array(const std::vector<T> &input) : Value(input) {}
-    
+
     /**
      *  Constructor from a map (this will create an associative array)
      *  @param  value
@@ -68,8 +68,8 @@ public:
     Array(const std::initializer_list<Value> &value) : Value(value) {}
 
 // end of visual c++ check
-#   endif  
-    
+#   endif
+
     /**
      *  Destructor
      */
@@ -83,11 +83,11 @@ public:
     {
         // throw exception if things are going wrong
         if (type != Type::Array) throw FatalError("Changing type of a fixed array variable");
-        
+
         // call base
         return Value::setType(Type::Array);
     }
-    
+
     /**
      *  Assignment operator
      *  @param  value
@@ -97,17 +97,17 @@ public:
     {
         // skip self assignment
         if (this == &value) return *this;
-        
+
         // type must be valid
         if (value.type() != Type::Array) throw FatalError("Assigning a non-array to a fixed array variable");
-        
+
         // call base
         Value::operator=(value);
 
         // done
         return *this;
     }
-    
+
     /**
      *  Move assignment operator
      *  @param  value
@@ -117,13 +117,13 @@ public:
     {
         // skip self assignment
         if (this == &value) return *this;
-        
+
         // type must be valid
         if (value.type() != Type::Array) throw FatalError("Moving a non-array to a fixed array variable");
-        
+
         // call base
         Value::operator=(std::move(value));
-        
+
         // done
         return *this;
     }
@@ -133,4 +133,3 @@ public:
  *  End of namespace
  */
 }
-

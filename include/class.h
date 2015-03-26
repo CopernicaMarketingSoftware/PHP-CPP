@@ -24,26 +24,26 @@ namespace Php {
  *  Class definition of the class
  */
 template <typename T>
-class Class : private ClassBase
+class PHPCPP_EXPORT Class : private ClassBase
 {
 public:
     /**
      *  Constructor
-     * 
+     *
      *  The flags can be a combination of Php::Final and Php::Abstract.
      *  If no flags are set, a regular public class will be formed.
-     * 
+     *
      *  @param  name        Name of the class
      *  @param  flags       Accessibility flags
      */
     Class(const char *name, int flags = 0) : ClassBase(name, flags) {}
-    
+
     /**
      *  Copy constructor
      *  @param  that
      */
     Class(const Class<T> &that) : ClassBase(that) {}
-    
+
     /**
      *  Move constructor
      *  @param  that
@@ -54,17 +54,17 @@ public:
      *  Destructor
      */
     virtual ~Class() {}
-    
+
     /**
      *  Add a regular method to the class
-     *  
+     *
      *  The method will be accessible as one of the class methods in your PHP
      *  code. When the method is called, it will automatically be forwarded
      *  to the C++ implementation. The flags can be Php::Public, Php::Protected
      *  or Php::Private (using private methods can be useful if you for example
      *  want to make the __construct() function private). The access-modified
      *  flag can be bitwise combined with the flag Php::Final or Php::Abstract).
-     *  
+     *
      *  @param  name        Name of the method
      *  @param  method      The actual method
      *  @param  flags       Optional flags
@@ -90,18 +90,18 @@ public:
 
     /**
      *  Add a static method to a class
-     * 
-     *  In C++ a static method is in reality just a plain function, that at 
-     *  compile time has access to private properties of the class that it is a 
-     *  static member of. 
-     * 
-     *  Because a C++ static method is not a real method with a 'this' pointer, 
+     *
+     *  In C++ a static method is in reality just a plain function, that at
+     *  compile time has access to private properties of the class that it is a
+     *  static member of.
+     *
+     *  Because a C++ static method is not a real method with a 'this' pointer,
      *  it has the same signature as a normal C++ (non-method) function. Therefore,
      *  you can register real static member functions (&MyClass::myMethod) as well
      *  as normal functions (myFunction) as class methods.
-     * 
+     *
      *  In PHP scripts, such functions will be callable as static class methods
-     * 
+     *
      *  @param  name        Name of the method
      *  @param  method      The actual method
      *  @param  flags       Optional flags
@@ -119,11 +119,11 @@ public:
 
     /**
      *  Add an abstract method to the class
-     * 
-     *  This is only meaningful for classes that can be extended. Because the 
+     *
+     *  This is only meaningful for classes that can be extended. Because the
      *  method is abstract, you will not have to pass an implementation. You
      *  can pass in flags to mark the method as protected
-     * 
+     *
      *  @param  name        Name of the method
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
@@ -134,13 +134,13 @@ public:
 
     /**
      *  Add a property to the class
-     * 
+     *
      *  Every instance of this class will have this property. The property
      *  can be Php::Public, Php::Protected or Php::Private (altough setting
      *  private properties is odd as the implementation of the class is in CPP,
      *  so why use private properties while the whole implementation is already
      *  hidden)
-     * 
+     *
      *  @param  name        Name of the property
      *  @param  value       Actual default property value
      *  @param  flags       Optional flags
@@ -158,13 +158,13 @@ public:
 
     /**
      *  Create a class constant
-     * 
+     *
      *  The class constant can be used in a php script as "ClassName::CONSTANT_NAME".
      *  It is a good programming practive to only use uppercase characters for
      *  constants.
-     * 
+     *
      *  This is an alias for adding a class property with the "Php::Const" flag.
-     * 
+     *
      *  @param  name        Name of the constant
      *  @param  value       Constant value
      *  @return Class       Same object to allow chaining
@@ -174,7 +174,7 @@ public:
 
     /**
      *  Add a Php::Constant to a class to use it as a class constant
-     *  
+     *
      *  @param  constant    The constant to add
      *  @return Class       Same object to allow chaining
      */
@@ -183,13 +183,13 @@ public:
 
     /**
      *  Properties as methods
-     * 
+     *
      *  This is a smarter way for adding properties to a class. You can define
      *  a property and a method that gets called every time the property is
      *  set or unset.
-     * 
+     *
      *  If you do not set a setter method, your property will be read-only.
-     * 
+     *
      *  @param  name        Name of the property
      *  @param  getter      The getter method
      *  @param  setter      The setter method
@@ -203,32 +203,32 @@ public:
 
     /**
      *  Add a PHP interface to the class
-     * 
+     *
      *  Note that the interface that you supply must already exist! Therefore
      *  you can only supply interfaces that you created in your own extension.
-     * 
+     *
      *  @param  interface   Interface object
      *  @return Class       Same object to allow chaining
      */
     Class<T> &implements(const Interface &interface) { ClassBase::implements(interface); return *this; }
-    
+
     /**
      *  Add a base class
-     * 
+     *
      *  Because PHP does not allow multiple inheritance, you can only add one
      *  base class. If you call this method more than once, the earlier base
      *  class is overridden.
-     * 
+     *
      *  The base class that you supply must already be registered. And because
      *  your extension is most likely registered before any user space PHP scripts
      *  run, you can only specify classes that you created in your own extension.
-     * 
+     *
      *  @param  base        Php::Class object
      *  @return Class       Same object to allow chaining
      */
     template<typename CLASS>
     Class<T> &extends(const Class<CLASS> &base) { ClassBase::extends(base); return *this; }
-    
+
 private:
     /**
      *  Method to create the object if it is default constructable
@@ -265,7 +265,7 @@ private:
         // construct an instance
         return maybeConstruct<T>();
     }
-    
+
     /**
      *  Method to clone the object if it is copy constructable
      *  @param  orig
@@ -296,11 +296,11 @@ private:
      *  Is this a clonable class?
      *  @return bool
      */
-    virtual bool clonable() const 
+    virtual bool clonable() const
     {
         return std::is_copy_constructible<T>::value;
     }
-    
+
     /**
      *  Construct a clone
      *  @param  orig
@@ -311,7 +311,7 @@ private:
         // maybe clone it (if the class has a copy constructor)
         return maybeClone<T>((T*)orig);
     }
-    
+
     /**
      *  Is this class traversable?
      *  @return bool
@@ -336,11 +336,11 @@ private:
      *  Call the __clone method
      *  @param  base
      */
-    virtual void callClone(Base *base) const 
+    virtual void callClone(Base *base) const
     {
         // cast to the user object
         T *object = (T *)base;
-        
+
         // call the method on the base object
         return object->__clone();
     }
@@ -353,7 +353,7 @@ private:
     {
         // cast to the user object
         T *object = (T *)base;
-        
+
         // call the method on the base object
         return object->__destruct();
     }
@@ -369,16 +369,16 @@ private:
     {
         // cast to the user object
         T *object = (T *)base;
-        
+
         // call the method on the base object
         return object->__call(name, params);
     }
 
     /**
      *  SFINAE test to check if the __callStatic method is defined
-     * 
+     *
      *  This type trait checks if the __callStatic method is defined in class T
-     * 
+     *
      *  @see http://stackoverflow.com/questions/257288/is-it-possible-to-write-a-c-template-to-check-for-a-functions-existence
      */
     template <typename X>
@@ -420,7 +420,7 @@ private:
     {
         // this is not implemented
         notImplemented();
-        
+
         // unreachable
         return nullptr;
     }
@@ -446,7 +446,7 @@ private:
     {
         // cast to actual object
         T *obj = (T *)object;
-        
+
         // pass on
         return obj->__invoke(params);
     }
@@ -460,11 +460,11 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         return Value(obj->__toString()).setType(Type::String);
     }
-    
+
     /**
      *  Cast to integer function
      *  @param  base
@@ -474,21 +474,21 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         return Value(obj->__toInteger()).setType(Type::Numeric);
     }
-    
+
     /**
      *  Cast to float function
      *  @param  base
      *  @return Value
      */
-    virtual Value callToFloat(Base *base) const override 
+    virtual Value callToFloat(Base *base) const override
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         return Value(obj->__toFloat()).setType(Type::Float);
     }
@@ -502,7 +502,7 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         return Value(obj->__toBool()).setType(Type::Bool);
     }
@@ -518,11 +518,11 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         return obj->__get(name);
     }
-    
+
     /**
      *  Function to set/overwrite a property
      *  @param  base
@@ -533,11 +533,11 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         obj->__set(name, value);
     }
-        
+
     /**
      *  Function to remove a property
      *  @param  base
@@ -547,7 +547,7 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         obj->__unset(name);
     }
@@ -562,7 +562,7 @@ private:
     {
         // cast to actual object
         T *obj = (T *)base;
-        
+
         // pass on
         return obj->__isset(name);
     }
@@ -578,29 +578,28 @@ private:
         // cast to the actual implementation type
         T *t1 = (T *)object1;
         T *t2 = (T *)object2;
-        
+
         // compare the two objects
         return t1->__compare(*t2);
     }
 
     /**
-     *  Namespaces and the function have access to the private base class, 
+     *  Namespaces and the function have access to the private base class,
      *  so that the classes can be registered, and the Functor object needs
      *  this to register the PhpCpp::Functor class.
      */
     friend class Namespace;
     friend class Functor;
-    
+
     /**
      *  All Php::Class<AnyThing> also need access to the base class to
      *  register this class as base class.
      */
     template<typename ANYTHING> friend class Class;
-    
+
 };
 
 /**
  *  End of namespace
  */
 }
-

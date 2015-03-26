@@ -38,7 +38,7 @@ template <class Type> class HashMember;
 /**
  *  Class definition
  */
-class Value : private HashParent
+class PHPCPP_EXPORT Value : private HashParent
 {
 public:
     /**
@@ -1228,5 +1228,3 @@ X &operator%=(X &x, const Php::Value &value) { return x %= (X)value; }
  *  End of namespace
  */
 }
-
-

@@ -3,7 +3,7 @@
  *
  *  Class that can be instantiated in the get_module() startup function to
  *  define settings from the php.ini file that are supported.
- *  
+ *
  *  @copyright 2014 Copernica BV
  */
 
@@ -21,18 +21,18 @@ namespace Php {
 /**
  *  Class definition
  */
-class Ini
+class PHPCPP_EXPORT Ini
 {
 public:
     /**
      *  Supported place-types for ini setting
-     * 
+     *
      *  The possible settings for where the configuration can be changed are:
      *  PHP_INI_USER, PHP_INI_PERDIR, PHP_INI_SYSTEM and PHP_INI_ALL
-     * 
-     *  Usually you would choose where the setting can be changed based on how 
-     *  it is used. For example if you want to access the setting during RINIT 
-     *  stage then you would want PHP_INI_PERDIR because the setting would have 
+     *
+     *  Usually you would choose where the setting can be changed based on how
+     *  it is used. For example if you want to access the setting during RINIT
+     *  stage then you would want PHP_INI_PERDIR because the setting would have
      *  no use after RINIT.
      */
     enum Place : int {
@@ -44,7 +44,7 @@ public:
 
     /**
      *  Constructors for string values
-     * 
+     *
      *  @param  name        Name of the php.ini variable
      *  @param  value       Default value
      *  @param  orig        Original value (if the user resets the variable, it is set back to this value)
@@ -58,7 +58,7 @@ public:
 
     /**
      *  Constructors for bool values
-     * 
+     *
      *  @param  name        Name of the php.ini variable
      *  @param  value       Default value
      *  @param  orig        Original value (if the user resets the variable, it is set back to this value)
@@ -72,7 +72,7 @@ public:
 
     /**
      *  Constructors for integer values
-     * 
+     *
      *  @param  name        Name of the php.ini variable
      *  @param  value       Default value
      *  @param  orig        Original value (if the user resets the variable, it is set back to this value)
@@ -98,7 +98,7 @@ public:
 
     /**
      *  Constructors for floating point values
-     * 
+     *
      *  @param  name        Name of the php.ini variable
      *  @param  value       Default value
      *  @param  orig        Original value (if the user resets the variable, it is set back to this value)
@@ -134,7 +134,7 @@ private:
         // cast to a string
         return (  static_cast<bool>(value) ? "On" : "Off");
     }
-    
+
     /**
      *  ini entry name
      *  @var    std::string
@@ -158,7 +158,7 @@ private:
      *  @var    bool
      */
     bool _orig_empty = false;
-    
+
     /**
      *  Place where the configuration can be changed
      *  @var    Place
@@ -172,4 +172,3 @@ private:
  *  End of namespace
  */
 }
-

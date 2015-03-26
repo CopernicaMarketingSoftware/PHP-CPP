@@ -2,7 +2,7 @@
  *  IniValue.h
  *
  *  Class IniValue designed for extracting values from ini entries
- *  
+ *
  *  @copyright 2014 Copernica BV
  */
 
@@ -14,12 +14,12 @@ namespace Php {
 /**
  *  Class IniValue designed for extracting values from ini entries.
  */
-class IniValue
+class PHPCPP_EXPORT IniValue
 {
 public:
     /**
      *  Constructors
-     * 
+     *
      *  @param  name        Name of the php.ini variable
      *  @param  isorig      Is the original value
      */
@@ -51,7 +51,7 @@ public:
     {
         return numericValue();
     }
-    
+
     /**
      *  Cast to a boolean
      *  @return boolean
@@ -60,7 +60,7 @@ public:
     {
         return boolValue();
     }
-    
+
     /**
      *  Cast to a string
      *  @return string
@@ -69,7 +69,7 @@ public:
     {
         return stringValue();
     }
-    
+
     /**
      *  Cast to byte array
      *  @return const char *
@@ -78,7 +78,7 @@ public:
     {
         return rawValue();
     }
-    
+
     /**
      *  Cast to a floating point
      *  @return double
@@ -96,7 +96,7 @@ public:
      *  @return int64_t
      */
     int64_t numericValue() const;
-    
+
     /**
      *  Boolean value
      *  @return bool
@@ -121,10 +121,10 @@ public:
      */
     const char *rawValue() const;
 
-    
+
 private:
-    
-    
+
+
     /**
      *  ini entry name
      *  @var    std::string
@@ -151,4 +151,3 @@ std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val);
  *  End of namespace
  */
 }
-

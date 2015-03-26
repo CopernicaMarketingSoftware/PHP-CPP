@@ -21,7 +21,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class Global : public Value
+class PHPCPP_EXPORT Global : public Value
 {
 public:
     /**
@@ -40,7 +40,7 @@ public:
      *  Destructor
      */
     virtual ~Global() {}
-    
+
     /**
      *  Assignment operator
      *  @param  global
@@ -51,14 +51,14 @@ public:
     {
         // skip self assignment
         if (&global == this) return *this;
-        
+
         // call base
         Value::operator=(global);
-        
+
         // copy name and exists setting
         _name = global._name;
         _exists = global._exists;
-        
+
         // done
         return *this;
     }
@@ -74,19 +74,19 @@ public:
     {
         // skip self assignment
         if (&global == this) return *this;
-        
+
         // call base
         Value::operator=(std::move(global));
-        
+
         // copy name and exists setting
         _name = std::move(global._name);
         _exists = global._exists;
-        
+
         // done
         return *this;
     }
     */
-    
+
     /**
      *  Assignment operator
      *  @param  value
@@ -110,11 +110,11 @@ public:
     {
         // update current object
         update();
-        
+
         // call base
         Value::set(index, value);
     }
-    
+
     /**
      *  Set a certain property
      *  Calling this method will turn the value into an array
@@ -127,7 +127,7 @@ public:
     {
         // update current object
         update();
-        
+
         // call base
         Value::set(key, size, value);
     }
@@ -139,14 +139,14 @@ protected:
      *  @return Value
      */
     Global &update();
-    
+
 private:
     /**
      *  Constructor for non-existing var
      *  @param  name
      */
     Global(const char *name) : Value(), _name(name), _exists(false) {}
-    
+
     /**
      *  Alternative constructor for non-existing var
      *  @param  name
@@ -159,7 +159,7 @@ private:
      *  @param  val
      */
     Global(const char *name, struct _zval_struct *val) : Value(val, true), _name(name), _exists(true) {}
-    
+
     /**
      *  Alternative constructor to wrap zval
      *  @param  name
@@ -172,13 +172,13 @@ private:
      *  @var string
      */
     std::string _name;
-    
+
     /**
      *  Does it already exist?
      *  @var bool
      */
     bool _exists;
-    
+
     /**
      *  The globals can access the private method from this class
      */
@@ -189,5 +189,3 @@ private:
  *  End of namespace
  */
 }
-
-

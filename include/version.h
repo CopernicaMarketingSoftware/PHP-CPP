@@ -1,7 +1,7 @@
 /**
  *  Version.h
  *
- *  Macro with API version. The API version number prevents that 
+ *  Macro with API version. The API version number prevents that
  *  extensions are loaded that are incompatible with the libphpcpp.so
  *  library
  *
@@ -13,5 +13,3 @@
  *  Macro with version number (this is incremented with every release)
  */
 #define PHPCPP_API_VERSION  20150126
-
-

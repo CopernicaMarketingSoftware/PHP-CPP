@@ -17,7 +17,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class Traversable
+class PHPCPP_EXPORT Traversable
 {
 public:
     /**
