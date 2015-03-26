@@ -979,9 +979,20 @@ public:
     }
 
     /**
+     *  Is a method with the given name callable?
+     *
+     *  This is only applicable when the Value contains a PHP object
+     *
+     *  @param  name        Name of the function
+     *  @return boolean
+     */
+    bool isCallable(const char *name);
+
+    /**
      *  Call a method
-     *  We have ten variants of this function, depending on the number of parameters
-     *  This is only applicable when the Value contains PHP object
+     *
+     *  This is only applicable when the Value contains a PHP object
+     *
      *  @param  name        Name of the function
      *  @return Value
      */

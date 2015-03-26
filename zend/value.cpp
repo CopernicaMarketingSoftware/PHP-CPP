@@ -853,6 +853,26 @@ Value Value::operator()() const
 }
 
 /**
+ *  Is a method with the given name callable?
+ *
+ *  This is only applicable when the Value contains a PHP object
+ *
+ *  @param  name        Name of the function
+ *  @return boolean
+ */
+bool Value::isCallable(const char *name)
+{
+    // wrap the name in a Php::Value object to get a zval
+    Value method(name);
+
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // ask zend nicely whether the function is callable
+    return zend_is_callable_ex(method._val, _val, IS_CALLABLE_CHECK_NO_ACCESS, nullptr, nullptr, nullptr, nullptr TSRMLS_CC);
+}
+
+/**
  *  Call the method - if the variable holds an object with the given method
  *  @param  name        name of the method to call
  *  @return Value
@@ -1445,19 +1465,19 @@ bool Value::contains(int index) const
  *  Does the array contain a certain key
  *  @param  key
  *  @param  size
- *  @return boolean
+ *  @return 
  */
 bool Value::contains(const char *key, int size) const
 {
     // calculate size
     if (size < 0) size = ::strlen(key);
 
+    // unused variable
+    zval **result;
+
     // deal with arrays
     if (isArray())
     {
-        // unused variable
-        zval **result;
-
         // check if index is already in the array
         return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
     }
@@ -1469,11 +1489,8 @@ bool Value::contains(const char *key, int size) const
         // retrieve the object pointer and check whether the property we are trying to retrieve is marked as private/protected
         if (zend_check_property_access(zend_objects_get_address(_val TSRMLS_CC), key, size TSRMLS_CC) == FAILURE) return false;
 
-        // read the property (cast necessary for php 5.3)
-        zval *property = zend_read_property(nullptr, _val, (char *)key, size, 1 TSRMLS_CC);
-
-        // check if valid
-        return property != nullptr;
+        // check if the property is set inside the hashtable of the object
+        return zend_hash_find(Z_OBJPROP_P(_val), key, size+1, (void **)&result) != FAILURE;
     }
     else
     {
