@@ -1489,8 +1489,18 @@ bool Value::contains(const char *key, int size) const
         // retrieve the object pointer and check whether the property we are trying to retrieve is marked as private/protected
         if (zend_check_property_access(zend_objects_get_address(_val TSRMLS_CC), key, size TSRMLS_CC) == FAILURE) return false;
 
-        // check if the property is set inside the hashtable of the object
-        return zend_hash_find(Z_OBJPROP_P(_val), key, size+1, (void **)&result) != FAILURE;
+        // check if the 'has_property' method is available for this object
+        auto *has_property = Z_OBJ_HT_P(_val)->has_property;
+        
+        // leap out if no 'has_property' function is not set (which should normally not occur)
+        if (!has_property) return false;
+
+        // the property must be a zval, turn the key into a value
+        Value property(key, size);
+        
+        // call the has_property() method (0 means: check whether property exists and is not NULL, 
+        // this is not really what we want, but the closest to the possible values of that parameter)
+        return has_property(_val, property._val, 0, nullptr TSRMLS_CC);
     }
     else
     {

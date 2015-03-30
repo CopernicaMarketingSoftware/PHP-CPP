@@ -1204,7 +1204,7 @@ protected:
  *  @param  value
  *  @return ostream
  */
-std::ostream &operator<<(std::ostream &stream, const Value &value);
+PHPCPP_EXPORT std::ostream &operator<<(std::ostream &stream, const Value &value);
 
 /**
  *  Custom +=, -=, *=, /=, &= operators, to update integral types with a Php::Value

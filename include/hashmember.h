@@ -611,8 +611,8 @@ private:
  *  @param  value
  *  @return ostream
  */
-std::ostream &operator<<(std::ostream &stream, const HashMember<int> &value);
-std::ostream &operator<<(std::ostream &stream, const HashMember<std::string> &value);
+PHPCPP_EXPORT std::ostream &operator<<(std::ostream &stream, const HashMember<int> &value);
+PHPCPP_EXPORT std::ostream &operator<<(std::ostream &stream, const HashMember<std::string> &value);
 
 
 /**
