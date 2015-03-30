@@ -1486,8 +1486,9 @@ bool Value::contains(const char *key, int size) const
         // we need the tsrmls_cc variable
         TSRMLS_FETCH();
 
-        // retrieve the object pointer and check whether the property we are trying to retrieve is marked as private/protected
-        if (zend_check_property_access(zend_objects_get_address(_val TSRMLS_CC), key, size TSRMLS_CC) == FAILURE) return false;
+        // retrieve the object pointer and check whether the property we are trying to retrieve
+        // is marked as private/protected (cast necessary for php 5.3)
+        if (zend_check_property_access(zend_objects_get_address(_val TSRMLS_CC), const_cast<char *>(key), size TSRMLS_CC) == FAILURE) return false;
 
         // check if the property is set inside the hashtable of the object
         return zend_hash_find(Z_OBJPROP_P(_val), key, size+1, (void **)&result) != FAILURE;
@@ -1553,8 +1554,8 @@ Value Value::get(const char *key, int size) const
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
 
-        // read the property (case necessary for php 5.3)
-        zval *property = zend_read_property(nullptr, _val, (char *)key, size, 0 TSRMLS_CC);
+        // read the property (cast necessary for php 5.3)
+        zval *property = zend_read_property(nullptr, _val, const_cast<char *>(key), size, 0 TSRMLS_CC);
 
         // wrap in value
         return Value(property);
@@ -1626,7 +1627,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
         TSRMLS_FETCH();
 
         // update the property (cast necessary for php 5.3)
-        zend_update_property(nullptr, _val, (char *)key, size, value._val TSRMLS_CC);
+        zend_update_property(nullptr, _val, const_cast<char *>(key), size, value._val TSRMLS_CC);
     }
     else
     {
