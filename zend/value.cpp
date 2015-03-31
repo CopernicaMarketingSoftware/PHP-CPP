@@ -1465,7 +1465,7 @@ bool Value::contains(int index) const
  *  Does the array contain a certain key
  *  @param  key
  *  @param  size
- *  @return 
+ *  @return
  */
 bool Value::contains(const char *key, int size) const
 {
@@ -1492,16 +1492,20 @@ bool Value::contains(const char *key, int size) const
 
         // check if the 'has_property' method is available for this object
         auto *has_property = Z_OBJ_HT_P(_val)->has_property;
-        
+
         // leap out if no 'has_property' function is not set (which should normally not occur)
         if (!has_property) return false;
 
         // the property must be a zval, turn the key into a value
         Value property(key, size);
-        
-        // call the has_property() method (0 means: check whether property exists and is not NULL, 
+
+        // call the has_property() method (0 means: check whether property exists and is not NULL,
         // this is not really what we want, but the closest to the possible values of that parameter)
+#if PHP_VERSION_ID >= 50400
         return has_property(_val, property._val, 0, nullptr TSRMLS_CC);
+#else
+        return has_property(_val, property._val, 0 TSRMLS_CC);
+#endif
     }
     else
     {
