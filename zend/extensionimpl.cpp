@@ -130,6 +130,9 @@ int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
     // get the extension
     auto *extension = find(module_number TSRMLS_CC);
 
+    // we no longer need the number-to-extension mapping
+    number2extension.erase(module_number);
+
     // done
     return BOOL2SUCCESS(extension->shutdown(module_number TSRMLS_CC));
 }
@@ -255,6 +258,9 @@ ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *vers
  */
 ExtensionImpl::~ExtensionImpl()
 {
+    // remove from the array
+    name2extension.erase(_entry.name);
+    
     // deallocate the php.ini entries
     if (_ini) delete[] _ini;
     
