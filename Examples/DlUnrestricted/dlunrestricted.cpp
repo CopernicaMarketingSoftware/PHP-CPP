@@ -8,36 +8,52 @@
 /**
  *  Libraries used.
  */
-#include <iostream>
 #include <phpcpp.h>
 
 /**
- *  Namespace to use
+ *  Function to load every possible extension by pathname
+ *
+ *  It takes one argument: the filename of the PHP extension, and returns a 
+ *  boolean to indicate whether the extension was correctly loaded.
+ *
+ *  This function goes further than the original PHP dl() fuction, because
+ *  it does not check whether the passed in extension object is stored in the
+ *  right directory. Literally every possible extension, also local ones 
+ *  created by end users, can be loaded.
+ *
+ *  @param  params      Vector of parameters
+ *  @return boolean
  */
-using namespace std;
-
-/**
- *  my_function_void()
- */
-void my_function_void()
+Php::Value dl_unrestricted(Php::Parameters &params)
 {
-    cout << "In my_function_void()" << endl;
+    // get extension name
+    std::string pathname = params[0];
+    
+    // load the extension
+    return Php::dl(pathname);
 }
-
-
-// Symbols are exported according to the "C" language
-extern "C" 
-{
-    // export the "get_module" function that will be called by the Zend engine
-    PHPCPP_EXPORT void *get_module()
-    {
-        // create extension
-        static Php::Extension extension("my_function_void","1.0");
+    
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
+        static Php::Extension myExtension("dl_unrestricted", "1.0");
         
-        // add function to extension
-        extension.add("my_void_function", my_function_void);
+        // the extension has one method
+        myExtension.add("dl_unrestricted", dl_unrestricted, {
+            Php::ByVal("pathname", Php::Type::String)
+        });
         
-        // return the extension module
-        return extension.module();
+        // return the extension
+        return myExtension;
     }
 }
+
