@@ -133,7 +133,7 @@ extern "C" {
 <h2 id="apache-prefork-module">Forked engines (like Apache)</h2>
 <p>
     If you run PHP on a pre-fork web server (like Apache), your extension is 
-    loaded and initialized <i>before</i> the various worker threads are
+    loaded and initialized <i>before</i> the various worker processes are
     forked off. The consequence of this is that the get_module() function
     and your optional onStartup() callback function are called by the parent
     process, and all other callbacks and the actual page handling by the
