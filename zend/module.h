@@ -71,7 +71,7 @@ public:
         ExtensionPath path(module TSRMLS_CC);
         
         // load the module
-        _handle = DL_LOAD(module);
+        _handle = DL_LOAD(path);
         
         // handle should be valid
         if (!_handle) return;
