@@ -267,14 +267,15 @@ $object->methodFromMyExtension();
     or only for that specific pageview.
 </p>
 <p>
-    Notice that the only thing that persists is the data <i>in</i> an extension.
-    In subsequent pageviews you must also load the extension to activate these 
-    functions and classes, even if you had already loaded the extension persistently 
-    in an earlier call. But because the extension was already loaded before, the 
-    static data (like the database connection or the thread) are preserved.
+    Notice that if you set this parameter to true, the only thing that persists is 
+    the data <i>in</i> an extension. In subsequent pageviews you will still have to 
+    load the extension to activate the functions and classes in it, even if you had 
+    already loaded the extension persistently in an earlier pageview. But because 
+    the extension was already loaded before, the static data in it (like the database 
+    connection or the thread) is preserved.
 </p>
 <p>
-    The dl_unrestricted() function that we used above can be modified to include
+    The dl_unrestricted() function that we demonstrated above can be modified to include
     this persistent parameter:
 </p>
 <p>
