@@ -74,7 +74,7 @@ public:
         // the zend engine is probably already busy processing opcodes, so we store
         // the current execute state before we're going to switch the runtime to
         // our own set of opcodes
-        ExecuteState oldstate(TSRMLS_C);
+        ExecuteState execState(0 TSRMLS_CC);
         
         // old execute state has been saved (and will automatically be restured when
         // the oldstate is destructed), so we can now safely overwrite all the settings

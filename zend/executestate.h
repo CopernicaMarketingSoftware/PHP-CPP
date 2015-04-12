@@ -26,11 +26,18 @@ class ExecuteState
 private:
     /**
      *  All the original settings
+     *  @var mixed
      */
     zend_op_array *_active_op_array;
     zval **_return_value_ptr_ptr;
     zend_op **_opline_ptr;
     int _interactive;
+    
+    /**
+     *  The new value for 'no-extensions'
+     *  @var int
+     */
+    int _no_extensions;
 
 #ifdef ZTS
     /**
@@ -42,15 +49,22 @@ private:
     
 public:
     /**
-     *  Constructor
+     *  No trivial constructor
      */
-    ExecuteState(TSRMLS_D)
+    ExecuteState() = delete;
+
+    /**
+     *  Constructor
+     *  @param  no_extensions
+     */
+    ExecuteState(int no_extensions TSRMLS_DC)
     {
         // store all the original stuff
         _active_op_array = EG(active_op_array);
         _return_value_ptr_ptr = EG(return_value_ptr_ptr);
         _opline_ptr = EG(opline_ptr);
         _interactive = CG(interactive);
+        _no_extensions = no_extensions;
 
 #ifdef ZTS
         // copy tsrm_ls param
@@ -65,7 +79,7 @@ public:
     {
         // restore all settings
         CG(interactive) = _interactive;
-        EG(no_extensions) = 0;
+        EG(no_extensions) = _no_extensions;
         EG(opline_ptr) = _opline_ptr;
         EG(active_op_array) = _active_op_array;
         EG(return_value_ptr_ptr) = _return_value_ptr_ptr;
