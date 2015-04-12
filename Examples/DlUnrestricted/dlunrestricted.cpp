@@ -29,8 +29,11 @@ Php::Value dl_unrestricted(Php::Parameters &params)
     // get extension name
     std::string pathname = params[0];
     
+    // should it be opened persistently?
+    bool persistent = params.size() > 1 ? params[1].boolValue() : false;
+    
     // load the extension
-    return Php::dl(pathname);
+    return Php::dl(pathname, persistent);
 }
     
 /**

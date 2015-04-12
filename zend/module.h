@@ -43,7 +43,7 @@ private:
      *  @var zend_module_entry
      */
     zend_module_entry *_entry = nullptr;
-
+    
 #ifdef ZTS
     /**
      *  When in thread safety mode, we also keep track of the TSRM_LS var
@@ -52,12 +52,82 @@ private:
     void ***tsrm_ls;
 #endif
 
+    /**
+     *  Internal helper class with persistent modules
+     */
+    class Persistent
+    {
+    private:
+        /**
+         *  The set of handles
+         *  @var std::set
+         */
+        std::set<void*> _handles;
+        
+    public:
+        /**
+         *  Constructor
+         */
+        Persistent() {}
+        
+        /**
+         *  Destructor
+         */
+        virtual ~Persistent() 
+        {
+            // remove all handles
+            while (!_handles.empty())
+            {
+                // get first handle
+                auto iter = _handles.begin();
+                
+                // remove the handle
+                DL_UNLOAD(*iter);
+                
+                // remove from set
+                _handles.erase(iter);
+            }
+        }
+        
+        /**
+         *  Check whether a handle is already persistently opened
+         *  @param  handle
+         *  @return bool
+         */
+        bool contains(void *handle) const
+        {
+            return _handles.find(handle) != _handles.end();
+        }
+        
+        /**
+         *  Add a library persistently
+         *  @param  module
+         */
+        void add(const char *module)
+        {
+            // insert the handle
+            _handles.insert(DL_LOAD(module));
+        }
+    };
+
+    /**
+     *  All persistent modules
+     *  @var Persistent
+     */
+    static Persistent _persistent;
+
 public:
     /**
      *  Constructor
+     * 
+     *  A module can be loaded persistently. This means that the variables in
+     *  the module will keep in scope for as long as Apache runs, even though
+     *  the extension is not active in other page views
+     * 
      *  @param  module          Name of the module
+     *  @param  persistent      Should it be loaded persistently
      */
-    Module(const char *module)
+    Module(const char *module, bool persistent)
     {
 #ifdef ZTS
         // fetch multi-threading thing
@@ -75,6 +145,10 @@ public:
         
         // handle should be valid
         if (!_handle) return;
+        
+        // if we have to open it persistently, we open it for a second time so that
+        // the refcounter always stays 1 or higher
+        if (persistent && !_persistent.contains(_handle)) _persistent.add(module);
         
         // we have to call the get_module() function
         Symbol<zend_module_entry*()> get_module(_handle, "get_module");
