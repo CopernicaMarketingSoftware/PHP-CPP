@@ -64,6 +64,15 @@ public:
     {
         return _path;
     }
+    
+    /**
+     *  Cast to const-char*
+     *  @return const char *
+     */
+    operator const char * () const
+    {
+        return _path.c_str();
+    }
 };
 
 /**
