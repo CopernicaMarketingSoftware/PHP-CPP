@@ -195,8 +195,10 @@ public:
         if (!valid()) return false;
         
         // the Zend engine sets a number of properties in the entry class, we do that here too
+        // note that it would be better to call zend_next_free_module() to find the next module
+        // number, but some users complain that this function is not always available
         _entry->type = MODULE_TEMPORARY;
-        _entry->module_number = zend_next_free_module();
+        _entry->module_number = zend_hash_num_elements(&module_registry) + 1;
         _entry->handle = _handle;
         
         // @todo does loading an extension even work in a multi-threading setup?

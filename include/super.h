@@ -113,13 +113,13 @@ private:
 /**
  *  A number of super-globals are always accessible
  */
-extern Super POST;
-extern Super GET;
-extern Super COOKIE;
-extern Super SERVER;
-extern Super ENV;
-extern Super FILES;
-extern Super REQUEST;
+extern PHPCPP_EXPORT Super POST;
+extern PHPCPP_EXPORT Super GET;
+extern PHPCPP_EXPORT Super COOKIE;
+extern PHPCPP_EXPORT Super SERVER;
+extern PHPCPP_EXPORT Super ENV;
+extern PHPCPP_EXPORT Super FILES;
+extern PHPCPP_EXPORT Super REQUEST;
 
 /**
  *  End namespace

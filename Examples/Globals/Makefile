@@ -3,7 +3,7 @@ RM              = rm -f
 CPP_FLAGS       = -Wall -c -I. -O2 -std=c++11
 
 PREFIX			= /usr
-#Edit these lines to correspond with your own directories
+PHP_CONFIG      = php-config
 LIBRARY_DIR		= $(shell ${PHP_CONFIG} --extension-dir)
 PHP_CONFIG_DIR	= /etc/php5/cli/conf.d
 
