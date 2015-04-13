@@ -93,12 +93,17 @@ Value require_once(const char *filename)
 
 /**
  *  Implementation of the dl() function - activate a different PHP extension
+ * 
+ *  If you open an extension persistently, the static variables inside it are
+ *  kept open for as long as apache runs.
+ * 
  *  @param  filename
+ *  @param  persistent
  */
-bool dl(const char *filename)
+bool dl(const char *filename, bool persistent)
 {
     // create the module
-    Module module(filename);
+    Module module(filename, persistent);
     
     // start the module
     return module.start();

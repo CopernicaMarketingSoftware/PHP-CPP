@@ -251,3 +251,105 @@ $object->methodFromMyExtension();
     if you're the administrator of a shared hosting platform, you definitely
     do not want to install it!
 </p>
+<h2 id="persistent">Persistent extensions</h2>
+<p>
+    A dynamically loaded extension is automatically unloaded at the end of the
+    page view. If a subsequent pageview also dynamically loads the same extension,
+    it will start with a completely new and fresh environment. If you want to 
+    write an extension that uses static data or static resources (think of a persistent 
+    database connection, or a worker thread that processes tasks) this may not
+    always be the desired behavior. You want to keep the database connection active,
+    or the thread running, also after the extension is unloaded.
+</p>
+<p>
+    To overcome this, the Php::dl() function comes with a second boolean parameter
+    that you can use to specify whether you want to load the extension persistently,
+    or only for that specific pageview.
+</p>
+<p>
+    Notice that if you set this parameter to true, the only thing that persists is 
+    the data <i>in</i> an extension. In subsequent pageviews you will still have to 
+    load the extension to activate the functions and classes in it, even if you had 
+    already loaded the extension persistently in an earlier pageview. But because 
+    the extension was already loaded before, the static data in it (like the database 
+    connection or the thread) is preserved.
+</p>
+<p>
+    The dl_unrestricted() function that we demonstrated above can be modified to include
+    this persistent parameter:
+</p>
+<p>
+<pre class="language-c++"><code>
+/**
+ *  Function to load every possible extension by pathname
+ *
+ *  It takes two arguments: the filename of the PHP extension, and a boolean to
+ *  specify whether the extension data should be kept in memory. It returns a 
+ *  boolean to indicate whether the extension was correctly loaded.
+ *
+ *  This function goes further than the original PHP dl() fuction, because
+ *  it does not check whether the passed in extension object is stored in the
+ *  right directory, and because it allows persistent loading of extensions. 
+ *  Literally every possible extension, also local ones created by end users, 
+ *  can be loaded.
+ *
+ *  @param  params      Vector of parameters
+ *  @return boolean
+ */
+Php::Value dl_unrestricted(Php::Parameters &amp;params)
+{
+    // get extension name
+    std::string pathname = params[0];
+    
+    // persistent setting
+    bool persistent = params.size() > 1 ? params[1].boolValue() : false;
+    
+    // load the extension
+    return Php::dl(pathname, persistent);
+}
+    
+/**
+ *  Switch to C context to ensure that the get_module() function
+ *  is callable by C programs (which the Zend engine is)
+ */
+extern "C" {
+    /**
+     *  Startup function that is called by the Zend engine 
+     *  to retrieve all information about the extension
+     *  @return void*
+     */
+    PHPCPP_EXPORT void *get_module() {
+        // create static instance of the extension object
+        static Php::Extension myExtension("load_extension", "1.0");
+        
+        // the extension has one method
+        myExtension.add("dl_unrestricted", dl_unrestricted, {
+            Php::ByVal("pathname", Php::Type::String),
+            Php::ByVal("persistent", Php::Type::Bool, false)
+        });
+        
+        // return the extension
+        return myExtension;
+    }
+}
+</code></pre>
+</p>
+<p>
+    And this extension allows us to dynamically load extensions, while preserving
+    persistent data <i>inside</i> the extension:
+</p>
+<p>
+<pre class="language-php"><code>
+&lt;?php
+// load the C++ extension stored in the same directory as this file, the
+// extension is persistently loaded, so it may use persistent data like
+// database connections and so on.
+if (!dl_unrestricted(__DIR__.'/MyExtension.so', true)) die("Extension could not be loaded");
+
+// from now on we can use classes and functions from the extension
+$object = new ClassFromMyExtension();
+$object->methodFromMyExtension();
+
+?&gt;
+</code></pre>
+</p>

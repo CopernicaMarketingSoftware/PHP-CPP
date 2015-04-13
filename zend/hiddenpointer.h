@@ -38,8 +38,14 @@ public:
         // copy pointer into the buffer
         memcpy(buffer, &pointer, sizeof(Type *));
         
-        // copy the name into the buffer
-        memcpy(buffer + sizeof(Type *), text, size + 1);
+        // copy the name into the buffer, making it lower case at the same time
+        // (php function names are case insensitive, and must even be lowercase
+        // because all the lookups are done in lowercase)
+        for (int i = 0; i < size + 1; i++)
+        {
+            // convert char the lower case
+            buffer[sizeof(Type *) + i] = tolower(text[i]);
+        }
         
         // store in member
         _buffer = buffer;

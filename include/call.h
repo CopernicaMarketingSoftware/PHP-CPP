@@ -27,9 +27,9 @@ extern PHPCPP_EXPORT    bool  define(const std::string &name, const Value &value
 extern PHPCPP_EXPORT    bool  defined(const char *constant);
 extern PHPCPP_EXPORT    bool  defined(const char *constant, size_t size);
 extern PHPCPP_EXPORT    bool  defined(const std::string &constant);
-extern PHPCPP_EXPORT    bool  dl(const char *filename);
-inline PHPCPP_EXPORT    bool  dl(const std::string &filename) { return dl(filename.c_str()); }
-inline PHPCPP_EXPORT    bool  dl(const Value &filename) { return dl(filename.rawValue()); }
+extern PHPCPP_EXPORT    bool  dl(const char *filename, bool persistent = false);
+inline PHPCPP_EXPORT    bool  dl(const std::string &filename, bool persistent = false) { return dl(filename.c_str(), persistent); }
+inline PHPCPP_EXPORT    bool  dl(const Value &filename, bool persistent = false) { return dl(filename.rawValue(), persistent); }
 extern PHPCPP_EXPORT    Value eval(const char *phpCode);
 inline PHPCPP_EXPORT    Value eval(const std::string &phpCode) { return eval(phpCode.c_str()); }
 extern PHPCPP_EXPORT    Value include(const char *filename);
