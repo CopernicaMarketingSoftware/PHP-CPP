@@ -5,6 +5,21 @@ The PHP-CPP library is a C++ library for developing PHP extensions. It offers a 
 of well documented and easy-to-use classes that can be used and extended to build native
 extensions for PHP. The full documentation can be found on http://www.php-cpp.com.
 
+ABOUT
+=====
+
+PHP-CPP is created and maintained by Copernica (www.copernica.com). We write 
+our code mostly in PHP and C++ and needed an effective way 
+to combine these two languages. That's where PHP-CPP comes in.
+Do you appreciate our work and are you looking for other high quality solutions? 
+
+Then check out our other solutions:
+
+* PHP-JS (www.php-js.com)
+* Copernica Marketing Suite (www.copernica.com)
+* MailerQ MTA (www.mailerq.com)
+* Responsive Email web service (www.responsiveemail.com)
+
 Unlike regular PHP extensions - which are really hard to implement and require a deep
 knowledge of the Zend engine and pointer manipulation - extensions built with PHP-CPP
 are not difficult to develop at all. In fact, the only thing you need to do is write a function in
