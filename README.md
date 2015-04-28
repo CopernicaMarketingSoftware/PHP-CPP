@@ -20,6 +20,9 @@ Then check out our other solutions:
 * MailerQ MTA (www.mailerq.com)
 * Responsive Email web service (www.responsiveemail.com)
 
+The power of PHP-CPP
+====================
+
 Unlike regular PHP extensions - which are really hard to implement and require a deep
 knowledge of the Zend engine and pointer manipulation - extensions built with PHP-CPP
 are not difficult to develop at all. In fact, the only thing you need to do is write a function in
