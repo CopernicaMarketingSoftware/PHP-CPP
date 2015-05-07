@@ -412,7 +412,9 @@ public:
     char *reserve(size_t size);
 
     /**
-     *  Get access to the raw buffer for read operations.
+     *  Get access to the raw buffer for read operations. Note that this
+     *  only works for string variables - other variables return nullptr.
+     *
      *  @return const char *
      */
     const char *rawValue() const;
@@ -688,6 +690,10 @@ public:
 
     /**
      *  Cast to byte array
+     *
+     *  Note that this only works for string values, other
+     *  variables return a nullptr.
+     *
      *  @return const char *
      */
     operator const char * () const

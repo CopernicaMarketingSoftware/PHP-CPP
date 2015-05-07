@@ -1282,7 +1282,9 @@ char *Value::reserve(size_t size)
 }
 
 /**
- *  Access to the raw buffer
+ *  Get access to the raw buffer for read operations. Note that this
+ *  only works for string variables - other variables return nullptr.
+ *
  *  @return const char *
  */
 const char *Value::rawValue() const
@@ -1290,8 +1292,8 @@ const char *Value::rawValue() const
     // must be a string
     if (isString()) return Z_STRVAL_P(_val);
 
-    // make a clone and return that buffer
-    return clone(Type::String).rawValue();
+    // there is no raw value
+    return nullptr;
 }
 
 /**
