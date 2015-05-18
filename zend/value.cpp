@@ -884,6 +884,17 @@ Value Value::call(const char *name) const
 }
 
 /**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @return Value
+ */
+Value Value::call(const char *name)
+{
+    // call with zero parameters
+    return exec(name, 0, NULL);
+}
+
+/**
  *  Helper function that runs the actual call
  *  @param  object      The object to call it on
  *  @param  method      The function or method to call
@@ -944,6 +955,22 @@ Value Value::exec(int argc, zval ***params) const
  *  @return Value
  */
 Value Value::exec(const char *name, int argc, struct _zval_struct ***params) const
+{
+    // wrap the name in a Php::Value object to get a zval
+    Value method(name);
+
+    // call helper function
+    return do_exec(&_val, method._val, argc, params);
+}
+
+/**
+ *  Call method with a number of parameters
+ *  @param  name        Name of method to call
+ *  @param  argc        Number of parameters
+ *  @param  argv        The parameters
+ *  @return Value
+ */
+Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
 {
     // wrap the name in a Php::Value object to get a zval
     Value method(name);

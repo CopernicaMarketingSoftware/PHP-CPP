@@ -1003,6 +1003,7 @@ public:
      *  @return Value
      */
     Value call(const char *name) const;
+    Value call(const char *name);
 
     /**
      *
@@ -1013,6 +1014,20 @@ public:
      */
     template <typename ...Args>
     Value call(const char *name, Args&&... args) const
+    {
+        // store arguments
+        Value vargs[] = { static_cast<Value>(args)... };
+
+        // array of parameters
+        _zval_struct **params[sizeof...(Args)];
+        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
+
+        // call the function
+        return exec(name, sizeof...(Args), params);
+    }
+
+    template <typename ...Args>
+    Value call(const char *name, Args&&... args)
     {
         // store arguments
         Value vargs[] = { static_cast<Value>(args)... };
@@ -1108,6 +1123,7 @@ private:
      *  @return Value
      */
     Value exec(const char *name, int argc, struct _zval_struct ***params) const;
+    Value exec(const char *name, int argc, struct _zval_struct ***params);
 
     /**
      *  Refcount - the number of references to the value
