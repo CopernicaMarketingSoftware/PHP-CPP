@@ -1002,7 +1002,7 @@ public:
      *  @param  name        Name of the function
      *  @return Value
      */
-    Value call(const char *name);
+    Value call(const char *name) const;
 
     /**
      *
@@ -1012,7 +1012,7 @@ public:
      *  @return Value
      */
     template <typename ...Args>
-    Value call(const char *name, Args&&... args)
+    Value call(const char *name, Args&&... args) const
     {
         // store arguments
         Value vargs[] = { static_cast<Value>(args)... };
@@ -1107,7 +1107,7 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(const char *name, int argc, struct _zval_struct ***params);
+    Value exec(const char *name, int argc, struct _zval_struct ***params) const;
 
     /**
      *  Refcount - the number of references to the value

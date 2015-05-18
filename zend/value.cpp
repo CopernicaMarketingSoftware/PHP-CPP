@@ -877,7 +877,7 @@ bool Value::isCallable(const char *name)
  *  @param  name        name of the method to call
  *  @return Value
  */
-Value Value::call(const char *name)
+Value Value::call(const char *name) const
 {
     // call with zero parameters
     return exec(name, 0, NULL);
@@ -891,7 +891,7 @@ Value Value::call(const char *name)
  *  @param  params      The parameters
  *  @return Value
  */
-static Value do_exec(zval **object, zval *method, int argc, zval ***params)
+static Value do_exec(zval *const *object, zval *method, int argc, zval ***params)
 {
     // the return zval
     zval *retval = nullptr;
@@ -903,7 +903,9 @@ static Value do_exec(zval **object, zval *method, int argc, zval ***params)
     zval *oldException = EG(exception);
 
     // call the function
-    if (call_user_function_ex(CG(function_table), object, method, &retval, argc, params, 1, NULL TSRMLS_CC) != SUCCESS)
+    // we're casting the const away here, object is only const so we can call this method
+    // from const methods after all..
+    if (call_user_function_ex(CG(function_table), (zval**) object, method, &retval, argc, params, 1, NULL TSRMLS_CC) != SUCCESS)
     {
         // throw an exception, the function does not exist
         throw Exception("Invalid call to "+Value(method).stringValue());
@@ -941,7 +943,7 @@ Value Value::exec(int argc, zval ***params) const
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
+Value Value::exec(const char *name, int argc, struct _zval_struct ***params) const
 {
     // wrap the name in a Php::Value object to get a zval
     Value method(name);
@@ -1523,17 +1525,22 @@ bool Value::contains(const char *key, int size) const
  */
 Value Value::get(int index) const
 {
-    // must be an array
-    if (!isArray()) return Value();
+    // if we're an actual normal array we just use the zend_hash_index_find method
+    if (isArray())
+    {
+        // zval to retrieve
+        zval **result;
 
-    // zval to retrieve
-    zval **result;
+        // check if index is in the array
+        if (zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&result) == FAILURE) return Value();
 
-    // check if index is in the array
-    if (zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&result) == FAILURE) return Value();
-
-    // wrap the value
-    return Value(*result);
+        // wrap the value
+        return Value(*result);
+    }
+    // if we're an object implementing ArrayAccess it makes sense for this method to work as well, so we call offsetGet
+    else if (isObject() && instanceOf("ArrayAccess")) return call("offsetGet", index);
+    // if we're neither we return an empty value
+    else return Value();
 }
 
 /**
