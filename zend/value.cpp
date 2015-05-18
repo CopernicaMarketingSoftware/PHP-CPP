@@ -1455,8 +1455,10 @@ void Value::iterate(const std::function<void(const Php::Value &,const Php::Value
  */
 bool Value::contains(int index) const
 {
+    // if we're an object implementing ArrayAccess it makes sense for this method to work as well, so we call offsetExists
+    if (isObject() && instanceOf("ArrayAccess")) return call("offsetExists", index).boolValue();
     // must be an array
-    if (!isArray()) return false;
+    else if (!isArray()) return false;
 
     // unused variable
     zval **result;
