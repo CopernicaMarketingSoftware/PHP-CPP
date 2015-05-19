@@ -48,6 +48,17 @@ INSTALL_LIB				=	${INSTALL_PREFIX}/lib
 
 
 #
+#   SONAME and version
+#
+#   When ABI changes, soname and minor version of the library should be raised.
+#   Otherwise only release verions changes. (version is MAJOR.MINOR.RELEASE)
+#
+
+SONAME					=	1.4
+VERSION					=	1.4.0
+
+
+#
 #   Name of the target library name and config-generator
 #
 #   The PHP-CPP library will be installed on your system as libphpcpp.so.
@@ -55,10 +66,10 @@ INSTALL_LIB				=	${INSTALL_PREFIX}/lib
 #   you can change that here.
 #
 
-PHP_SHARED_LIBRARY		=	libphpcpp.so
-PHP_STATIC_LIBRARY		=	libphpcpp.a
-HHVM_SHARED_LIBRARY		=	libhhvmcpp.so
-HHVM_STATIC_LIBRARY		=	libhhvmcpp.a
+PHP_SHARED_LIBRARY		=	libphpcpp.so.$(VERSION)
+PHP_STATIC_LIBRARY		=	libphpcpp.a.$(VERSION)
+HHVM_SHARED_LIBRARY		=	libhhvmcpp.so.$(VERSION)
+HHVM_STATIC_LIBRARY		=	libhhvmcpp.a.$(VERSION)
 
 
 #
@@ -97,7 +108,7 @@ endif
 #   you want to leave that flag out on production servers).
 #
 
-COMPILER_FLAGS			=	-Wall -c -g -std=c++11 -fvisibility=hidden -DBUILDING_PHPCPP
+COMPILER_FLAGS			=	-Wall -c -std=c++11 -fvisibility=hidden -DBUILDING_PHPCPP
 SHARED_COMPILER_FLAGS	=	-fpic
 STATIC_COMPILER_FLAGS	=
 PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
@@ -119,7 +130,7 @@ HHVM_LINKER_FLAGS		=	${LINKER_FLAGS}
 
 
 #
-#   Command to remove files, copy files and create directories.
+#   Command to remove files, copy files, link files and create directories.
 #
 #   I've never encountered a *nix environment in which these commands do not work.
 #   So you can probably leave this as it is
@@ -127,6 +138,7 @@ HHVM_LINKER_FLAGS		=	${LINKER_FLAGS}
 
 RM						=	rm -fr
 CP						=	cp -f
+LN						=	ln -f -s
 MKDIR					=	mkdir -p
 
 
@@ -164,7 +176,13 @@ HHVM_STATIC_OBJECTS		=	$(HHVM_SOURCES:%.cpp=static/%.o)
 #   dependencies that are used by the compiler.
 #
 
+all: COMPILER_FLAGS 	+=	-g
+all: LINKER_FLAGS		+=  -g
 all: phpcpp
+
+release: COMPILER_FLAGS +=	-O2
+release: LINKER_FLAGS	+=  -O2
+release: phpcpp
 
 phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo
@@ -175,13 +193,13 @@ hhvmcpp: ${HHVM_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo "Build complete."
 
 ${PHP_SHARED_LIBRARY}: shared_directories ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
+	${LINKER} ${PHP_LINKER_FLAGS} -Wl,-soname,libphpcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
 
 ${PHP_STATIC_LIBRARY}: static_directories ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
 	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
 
 ${HHVM_SHARED_LIBRARY}: shared_directories ${COMMON_SHARED_OBJECTS} ${HHVM_SHARED_OBJECTS}
-	${LINKER} ${HHVM_LINKER_FLAGS} -o $@ ${COMMON_SHARED_OBJECTS} ${HHVM_SHARED_OBJECTS}
+	${LINKER} ${HHVM_LINKER_FLAGS} -Wl,-soname,libhhvmcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${HHVM_SHARED_OBJECTS}
 
 ${HHVM_STATIC_LIBRARY}: static_directories ${COMMON_STATIC_OBJECTS} ${HHVM_STATIC_OBJECTS}
 	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${HHVM_STATIC_OBJECTS}
@@ -219,16 +237,31 @@ ${HHVM_SHARED_OBJECTS}:
 ${HHVM_STATIC_OBJECTS}:
 	${COMPILER} ${HHVM_COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
 
+# The if statements below must be seen as single line by make
+
 install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	if [ -e ${PHP_SHARED_LIBRARY} ]; then ${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}; fi
-	if [ -e ${PHP_STATIC_LIBRARY} ]; then ${CP} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}; fi
-	if [ -e ${HHVM_SHARED_LIBRARY} ]; then ${CP} ${HHVM_SHARED_LIBRARY} ${INSTALL_LIB}; fi
-	if [ -e ${HHVM_STATIC_LIBRARY} ]; then ${CP} ${HHVM_STATIC_LIBRARY} ${INSTALL_LIB}; fi
+	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
+		${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
+		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
+		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
+	fi
+	if [ -e ${PHP_STATIC_LIBRARY} ]; then ${CP} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/; \
+		${LN} ${INSTALL_LIB}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
+	fi
+	if [ -e ${HHVM_SHARED_LIBRARY} ]; then \
+		${CP} ${HHVM_SHARED_LIBRARY} ${INSTALL_LIB}/; \
+		${LN} ${INSTALL_LIB}/${HHVM_SHARED_LIBRARY} ${INSTALL_LIB}/libhhvmcpp.so.$(SONAME);\
+		${LN} ${INSTALL_LIB}/${HHVM_SHARED_LIBRARY} ${INSTALL_LIB}/libhhvmcpp.so; \
+	fi
+	if [ -e ${HHVM_STATIC_LIBRARY} ]; then \
+		${CP} ${HHVM_STATIC_LIBRARY} ${INSTALL_LIB}/; \
+		${LN} ${INSTALL_LIB}/${HHVM_STATIC_LIBRARY} ${INSTALL_LIB}/libhhvmcpp.a; \
+	fi
 
 test:
-	mkdir -p ./tests/include/zts/phpcpp
+	mkdir -p tests/include/zts/phpcpp
 	cd tests && ./test.sh -p "${PHP_BIN}"
 
