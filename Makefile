@@ -48,8 +48,7 @@ INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
 MACHINE := $(shell uname -m)
 ifeq ($(MACHINE), x86_64)
 INSTALL_LIB				=	${INSTALL_PREFIX}/lib64
-endif
-ifeq ($(MACHINE), i686)
+else
 INSTALL_LIB				=	${INSTALL_PREFIX}/lib
 endif
 
