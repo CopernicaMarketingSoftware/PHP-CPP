@@ -44,7 +44,14 @@ PHP_BIN					=	$(shell ${PHP_CONFIG} --php-binary)
 
 INSTALL_PREFIX			=	/usr
 INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
+
+MACHINE := $(shell uname -m)
+ifeq ($(MACHINE), x86_64)
+INSTALL_LIB				=	${INSTALL_PREFIX}/lib64
+endif
+ifeq ($(MACHINE), i686)
 INSTALL_LIB				=	${INSTALL_PREFIX}/lib
+endif
 
 
 #
