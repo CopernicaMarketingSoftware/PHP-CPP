@@ -241,7 +241,7 @@ public:
     Value &operator%=(double value);
 
     /**
-     *  Assignment operator
+     *  Addition operator
      *  @param  value
      *  @return Value
      */
