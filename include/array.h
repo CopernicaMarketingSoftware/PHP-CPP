@@ -116,14 +116,15 @@ public:
      */
     Array &operator=(Value &&value) _NOEXCEPT
     {
-        // skip self assignment
-        if (this == &value) return *this;
+        // verify valid assignment
+        if (this != &value)
+        {
+            // type must be valid
+            if (value.type() != Type::Array) throw FatalError("Moving a non-array to a fixed array variable");
         
-        // type must be valid
-        if (value.type() != Type::Array) throw FatalError("Moving a non-array to a fixed array variable");
-        
-        // call base
-        Value::operator=(std::move(value));
+            // call base
+            Value::operator=(std::move(value));
+        }
         
         // done
         return *this;
