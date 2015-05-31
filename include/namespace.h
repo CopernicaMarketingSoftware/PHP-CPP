@@ -233,11 +233,12 @@ public:
      */
     Namespace &add(const Namespace &ns)
     {
-        // skip when locked
-        if (locked()) return *this;
-
-        // make a copy and add it to the list of namespaces
-        _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(ns)));
+        // add only if unlocked
+        if (locked())
+        {
+            // make a copy and add it to the list of namespaces
+            _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(ns)));
+        }
         
         // allow chaining
         return *this;
