@@ -143,11 +143,12 @@ public:
      */
     Namespace &add(Interface &&interface)
     {
-        // skip when locked
-        if (locked()) return *this;
-
-        // make a copy and add it to the list of classes
-        _classes.push_back(std::unique_ptr<ClassBase>(new Interface(std::move(interface))));
+        // add only if unlocked
+        if (!locked())
+        {
+            // make a copy and add it to the list of classes
+            _classes.push_back(std::unique_ptr<ClassBase>(new Interface(std::move(interface))));
+        }
         
         // allow chaining
         return *this;
