@@ -197,11 +197,12 @@ public:
      */
     Namespace &add(const Constant &constant)
     {
-        // skip when locked
-        if (locked()) return *this;
-
-        // and add it to the list of constants
-        _constants.push_back(std::unique_ptr<Constant>(new Constant(constant)));
+        // add only if unlocked
+        if (!locked())
+        {
+            // and add it to the list of constants
+            _constants.push_back(std::unique_ptr<Constant>(new Constant(constant)));
+        }
         
         // allow chaining
         return *this;
