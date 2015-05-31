@@ -215,11 +215,12 @@ public:
      */
     Namespace &add(Namespace &&ns)
     {
-        // skip when locked
-        if (locked()) return *this;
-
-        // add it to the list of namespaces
-        _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(std::move(ns))));
+        // add only if unlocked
+        if (locked())
+        {
+            // add it to the list of namespaces
+            _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(std::move(ns))));
+        }
         
         // allow chaining
         return *this;
