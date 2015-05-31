@@ -39,7 +39,7 @@ public:
         User      = (1<<0),                         // ZEND_INI_USER   (1<<0)
         Perdir    = (1<<1),                         // ZEND_INI_PERDIR (1<<1)
         System    = (1<<2),                         // ZEND_INI_SYSTEM (1<<2)
-        All       = (1<<0) | (1<<1) | (1<<2)        // ZEND_INI_ALL  (ZEND_INI_USER|ZEND_INI_PERDIR|ZEND_INI_SYSTEM)
+        All       = (User|Perdir|System)            // ZEND_INI_ALL  (ZEND_INI_USER|ZEND_INI_PERDIR|ZEND_INI_SYSTEM)
     };
 
     /**

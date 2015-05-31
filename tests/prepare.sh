@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  do not run this script manualy.
+#  do not run this script manually.
 #  This script is intended to be run from a script test.sh
 #  Create a local copy of the directory with the extension for run tests without installation
 #
