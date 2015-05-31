@@ -1,7 +1,7 @@
 /**
  *  Namespace.h
  * 
- *  Class that can be used to group  various functions and classes into one
+ *  Class that can be used to group various functions and classes into one
  *  namespace.
  * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -58,7 +58,7 @@ protected:
      *  Is the object locked?
      * 
      *  After the object is locked, no more elements can be added to it.
-     *  This happens after the call to get_module - it the no longer makes
+     *  This happens after the call to get_module - it no longer makes
      *  sense to add more objects. When 'apache reload' is executed, the
      *  get_module() function is called for a second (or third, or fourth)
      *  time, but the classes, functions and namespaces will then not be
@@ -106,11 +106,12 @@ public:
     template<typename T>
     Namespace &add(Class<T> &&type)
     {
-        // skip when locked
-        if (locked()) return *this;
-        
-        // make a copy of the object, and add it to the list of classes
-        _classes.push_back(std::unique_ptr<ClassBase>(new Class<T>(std::move(type))));
+        // add only if unlocked
+        if (!locked())
+        {
+            // make a copy of the object, and add it to the list of classes
+            _classes.push_back(std::unique_ptr<ClassBase>(new Class<T>(std::move(type))));
+        }
         
         // allow chaining
         return *this;
