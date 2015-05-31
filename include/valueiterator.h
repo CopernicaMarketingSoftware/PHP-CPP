@@ -103,7 +103,7 @@ public:
     bool operator!=(const ValueIterator &that) const;
 
     /**
-     *  Derefecence, this returns a std::pair with the current key and value
+     *  Dereference, this returns a std::pair with the current key and value
      *  @return std::pair
      */
     const std::pair<Value,Value> &operator*() const;
