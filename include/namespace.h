@@ -180,7 +180,7 @@ public:
     Namespace &add(Constant &&constant)
     {
         // add only if unlocked
-        if (locked())
+        if (!locked())
         {
             // and add it to the list of constants
             _constants.push_back(std::unique_ptr<Constant>(new Constant(std::move(constant))));
