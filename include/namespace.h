@@ -234,7 +234,7 @@ public:
     Namespace &add(const Namespace &ns)
     {
         // add only if unlocked
-        if (locked())
+        if (!locked())
         {
             // make a copy and add it to the list of namespaces
             _namespaces.push_back(std::unique_ptr<Namespace>(new Namespace(ns)));
