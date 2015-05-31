@@ -95,15 +95,16 @@ public:
      */
     Array &operator=(const Value &value)
     {
-        // skip self assignment
-        if (this == &value) return *this;
+        // verify valid assignment
+        if (this != &value)
+        {
+            // type must be valid
+            if (value.type() != Type::Array) throw FatalError("Assigning a non-array to a fixed array variable");
+            
+            // call base
+            Value::operator=(value);
+        }
         
-        // type must be valid
-        if (value.type() != Type::Array) throw FatalError("Assigning a non-array to a fixed array variable");
-        
-        // call base
-        Value::operator=(value);
-
         // done
         return *this;
     }
