@@ -125,11 +125,12 @@ public:
     template<typename T>
     Namespace &add(const Class<T> &type)
     {
-        // skip when locked
-        if (locked()) return *this;
-
-        // and add it to the list of classes
-        _classes.push_back(std::unique_ptr<ClassBase>(new Class<T>(type)));
+        // add only if unlocked
+        if (!locked())
+        {
+            // and add it to the list of classes
+            _classes.push_back(std::unique_ptr<ClassBase>(new Class<T>(type)));
+        }
         
         // allow chaining
         return *this;
