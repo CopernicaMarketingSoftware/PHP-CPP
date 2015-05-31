@@ -6,7 +6,7 @@
  * 
  *  However, this will trigger a longjmp(), which will cause objects
  *  constructed in the extension not to be destructed. We use therefore
- *  this FatalError class, which is a normally exception that _does_
+ *  this FatalError class, which is a normal exception that _does_
  *  cause objects to be destructed.
  * 
  *  When it is caught, right before control is handed back to the Zend
