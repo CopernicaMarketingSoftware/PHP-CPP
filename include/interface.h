@@ -43,6 +43,22 @@ public:
     }
 
     /**
+     *  Add a - of course abstract - method to the interface
+     *  @param  name        Name of the method
+     *  @param  flags       Optional flags
+     *  @param  arguments   Optional description of the arguments
+     *  @return Interface   Same object to allow chaining
+     */
+    Interface &method(const char *name, int flags, const Arguments &arguments = {})
+    {
+        // call base
+        ClassBase::method(name, flags, arguments);
+
+        // return self
+        return *this;
+    }
+
+    /**
      *  Extends exisiting PHP interface
      *
      *  Note that the interface that you supply must already exist! Therefore

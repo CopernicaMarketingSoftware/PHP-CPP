@@ -414,7 +414,7 @@ public:
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static)) | Abstract , args)); }
+    void method(const char *name, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static | Abstract)) , args)); }
 
     /**
      *  Add a property to the class
