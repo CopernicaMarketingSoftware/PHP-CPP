@@ -53,16 +53,6 @@
 <p>
     This will start the compiler and build the library.
 </p>
-
-<h2 id="osx">Compiling on OSX?</h2>
-<p>
-    If you compile the software on OSX, you may run into linking and "unresolved
-    symbol" errors. In that case you will have to make a change to the Makefile.
-    Somewhere in this Makefile there is an option "LINKER_FLAGS". This option
-    should be extended, and the extra flag "-undefined dynamic_lookup" should
-    be added to it.
-</p>
-
 <p>
     After you ran 'make', and the PHP-CPP library was built, all that is left to do is 
     install it on your system. You can use the "make install" command for it.
@@ -73,7 +63,26 @@
     <pre><code>sudo make install</code></pre>
 </p>
 <p>
+    We've heard reports from some users that when they try to run their first extension,
+    an error is reported that the "libphpcpp.so" can not be located on their system.
+    To fix this, you should update the shared library cache on your system. This 
+    can be done with the "ldconfig" command.
+</p>
+<p>
+    <pre><code>sudo make install</code></pre>
+</p>
+<p>
     That was it! After these steps you are now the happy owner of a system with 
     PHP-CPP installed and nothing can stop you from building your first fast 
     native PHP extension.
 </p>
+
+<h2 id="osx">Compiling on OSX?</h2>
+<p>
+    If you try to compile the software on OSX, you may run into linking and "unresolved
+    symbol" errors. In that case you should make a change to the Makefile.
+    Somewhere in the Makefile there is an option "LINKER_FLAGS". This option
+    should be modified, the flag "-undefined dynamic_lookup" should
+    be added to it.
+</p>
+
