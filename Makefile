@@ -260,6 +260,7 @@ install:
 		${CP} ${HHVM_STATIC_LIBRARY} ${INSTALL_LIB}/; \
 		${LN} ${INSTALL_LIB}/${HHVM_STATIC_LIBRARY} ${INSTALL_LIB}/libhhvmcpp.a; \
 	fi
+	sudo ldconfig
 
 test:
 	mkdir -p tests/include/zts/phpcpp
