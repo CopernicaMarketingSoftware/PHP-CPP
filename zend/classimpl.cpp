@@ -65,10 +65,10 @@ static ClassImpl *self(zend_class_entry *entry)
 struct CallData
 {
     // the internal function is the first member, so
-    // that it is possible to cast an instance of this 
+    // that it is possible to cast an instance of this
     // struct to a zend_internal_function
     zend_internal_function func;
-    
+
     // and a pointer to the ClassImpl object
     ClassImpl *self;
 };
@@ -88,8 +88,8 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
     // retrieve the function name
     const char *name = func->function_name;
     ClassBase *meta = data->self->_base;
-    
-    // the data structure was allocated by ourselves in the getMethod or 
+
+    // the data structure was allocated by ourselves in the getMethod or
     // getStaticMethod functions, we no longer need it when the function falls
     // out of scope
     DelayedFree df(data);
@@ -105,7 +105,7 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
 
         // retrieve the base object
         Base *base = params.object();
-        
+
         // is this a static, or a non-static call?
         if (base) result = meta->callCall(base, name, params);
         else result = meta->callCallStatic(name, params);
@@ -136,7 +136,7 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
     // get self reference
     ClassBase *meta = data->self->_base;
 
-    // the data structure was allocated by ourselves in the getMethod or 
+    // the data structure was allocated by ourselves in the getMethod or
     // getStaticMethod functions, we no longer need it when the function falls
     // out of scope
     DelayedFree df(data);
@@ -188,7 +188,7 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
     // about the method (like the handler that should be called to execute it),
     // after that, this returned handler is also called. The call_method property
     // of the object_handlers structure however, never gets called. Typical.
-    
+
     // first we'll check if the default handler does not have an implementation,
     // in that case the method is probably already implemented as a regular method
 #if PHP_VERSION_ID < 50399
@@ -199,11 +199,11 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
 
     // did the default implementation do anything?
     if (defaultFunction) return defaultFunction;
-    
+
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(*object_ptr TSRMLS_CC);
 
-    // this is peculiar behavior of the zend engine, we first are going to dynamically 
+    // this is peculiar behavior of the zend engine, we first are going to dynamically
     // allocate memory holding all the properties of the __call method (we initially
     // had an implementation here that used a static variable, and that worked too,
     // but we'll follow thread safe implementation of the Zend engine here, although
@@ -211,7 +211,7 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
     // call happens in call_method())
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
-    
+
     // we're going to set all properties
     function->type = ZEND_INTERNAL_FUNCTION;
     function->module = nullptr;
@@ -222,10 +222,10 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = method_name;
-    
+
     // store pointer to ourselves
     data->self = self(entry);
-    
+
     // done (cast to zend_function* is allowed, because a zend_function is a union
     // that has one member being a zend_internal_function)
     return (zend_function *)data;
@@ -256,7 +256,7 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, char* method,
     // allocate data holding information about the function
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
-    
+
     // we're going to set all properties
     function->type = ZEND_INTERNAL_FUNCTION;
     function->module = nullptr;
@@ -267,10 +267,10 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, char* method,
     function->scope = nullptr;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = method;
-    
+
     // store pointer to ourselves
     data->self = self(entry);
-    
+
     // done (cast to zend_function* is allowed, because a zend_function is a union
     // that has one member being a zend_internal_function)
     return (zend_function *)data;
@@ -293,7 +293,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     // both have a completely different API. This getClosure method is supposed
     // to fill the function parameter with all information about the invoke()
     // method that is going to get called
-    
+
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
@@ -301,7 +301,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     // with all information about the function
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
-    
+
     // we're going to set all properties
     function->type = ZEND_INTERNAL_FUNCTION;
     function->module = nullptr;
@@ -312,19 +312,19 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = nullptr;
-    
+
     // store pointer to ourselves
     data->self = self(entry);
-    
+
     // assign this dynamically allocated variable to the func parameter
     // the cast is ok, because zend_internal_function is a member of the
     // zend_function union
     *func = (zend_function *)data;
- 
-    // the object_ptr should be filled with the object on which the method is 
+
+    // the object_ptr should be filled with the object on which the method is
     // called (otherwise the Zend engine tries to call the method statically)
     *object_ptr = object;
-    
+
     // done
     return SUCCESS;
 };
@@ -337,42 +337,42 @@ zend_object_handlers *ClassImpl::objectHandlers()
 {
     // already initialized?
     if (_initialized) return &_handlers;
-    
+
     // initialize the handlers
     memcpy(&_handlers, &std_object_handlers, sizeof(zend_object_handlers));
-    
+
     // install custom clone function
     if (!_base->clonable()) _handlers.clone_obj = nullptr;
     else _handlers.clone_obj = &ClassImpl::cloneObject;
-    
+
     // functions for the Countable interface
     _handlers.count_elements = &ClassImpl::countElements;
-    
+
     // functions for the ArrayAccess interface
     _handlers.write_dimension = &ClassImpl::writeDimension;
     _handlers.read_dimension = &ClassImpl::readDimension;
     _handlers.has_dimension = &ClassImpl::hasDimension;
     _handlers.unset_dimension = &ClassImpl::unsetDimension;
-    
+
     // functions for the magic properties handlers (__get, __set, __isset and __unset)
     _handlers.write_property = &ClassImpl::writeProperty;
     _handlers.read_property = &ClassImpl::readProperty;
     _handlers.has_property = &ClassImpl::hasProperty;
     _handlers.unset_property = &ClassImpl::unsetProperty;
-    
+
     // when a method is called (__call and __invoke)
     _handlers.get_method = &ClassImpl::getMethod;
     _handlers.get_closure = &ClassImpl::getClosure;
-    
+
     // handler to cast to a different type
     _handlers.cast_object = &ClassImpl::cast;
-    
+
     // method to compare two objects
     _handlers.compare_objects = &ClassImpl::compare;
-    
+
     // remember that object is now initialized
     _initialized = true;
-    
+
     // done
     return &_handlers;
 }
@@ -407,11 +407,11 @@ int ClassImpl::compare(zval *val1, zval *val2 TSRMLS_DC)
 
         // we need the C++ class meta-information object
         ClassBase *meta = self(entry)->_base;
-        
+
         // get the base objects
         Base *object1 = ObjectImpl::find(val1 TSRMLS_CC)->object();
         Base *object2 = ObjectImpl::find(val2 TSRMLS_CC)->object();
-        
+
         // run the compare method
         return meta->callCompare(object1, object2);
     }
@@ -419,16 +419,16 @@ int ClassImpl::compare(zval *val1, zval *val2 TSRMLS_DC)
     {
         // it was not implemented, do we have a default?
         if (!std_object_handlers.compare_objects) return 1;
-        
+
         // call default
         return std_object_handlers.compare_objects(val1, val2 TSRMLS_CC);
     }
     catch (Exception &exception)
     {
-        // a Php::Exception was thrown by the extension __compare function, 
+        // a Php::Exception was thrown by the extension __compare function,
         // pass this on to user space
         process(exception TSRMLS_CC);
-        
+
         // what shall we return here...
         return 1;
     }
@@ -446,46 +446,43 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
 {
     // get the base c++ object
     Base *object = ObjectImpl::find(val TSRMLS_CC)->object();
-    
+
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(val TSRMLS_CC);
 
     // we need the C++ class meta-information object
     ClassBase *meta = self(entry)->_base;
-    
-    // retval it not yet initialized --- and again feelings of disbelief,
+
+    // retval is not yet initialized --- and again feelings of disbelief,
     // frustration, wonder and anger come up when you see that there are not two
     // functions in the Zend engine that have a comparable API
     INIT_PZVAL(retval);
-    
-    // wrap zval in value object
-    Value result(retval, true);
-    
+
     // when the magic function it not implemented, an exception will be thrown,
     // and the extension may throw a Php::Exception
     try
     {
         // the result zval
         zval *result = nullptr;
-        
+
         // check type
         switch ((Type)type) {
-        case Type::Numeric:     result = meta->callToInteger(object).detach();  break;
-        case Type::Float:       result = meta->callToFloat(object).detach();    break;
-        case Type::Bool:        result = meta->callToBool(object).detach();     break;
-        case Type::String:      result = meta->callToString(object).detach();   break;
-        default:                throw NotImplemented();                         break;
+            case Type::Numeric:     result = meta->callToInteger(object).detach();  break;
+            case Type::Float:       result = meta->callToFloat(object).detach();    break;
+            case Type::Bool:        result = meta->callToBool(object).detach();     break;
+            case Type::String:      result = meta->callToString(object).detach();   break;
+            default:                throw NotImplemented();                         break;
         }
-        
+
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
         // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
-        
+
         // is the original parameter overwritten?
         if (val == retval) zval_dtor(val);
-        
+
         // overwrite the result
         ZVAL_ZVAL(retval, result, 1, 1);
-    
+
         // done
         return SUCCESS;
     }
@@ -493,7 +490,7 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
     {
         // is there a default?
         if (!std_object_handlers.cast_object) return FAILURE;
-        
+
         // call default
         return std_object_handlers.cast_object(val, retval, type TSRMLS_CC);
     }
@@ -501,12 +498,12 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
     {
         // pass on the exception to php userspace
         process(exception TSRMLS_CC);
-        
+
         // done
         return FAILURE;
     }
 }
-    
+
 /**
  *  Function that is called to create space for a cloned object
  *  @param  val                     The object to be cloned
@@ -526,7 +523,7 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
 
     // create a new base c++ object
     auto *cpp = meta->clone(old_object->object());
-    
+
     // report error on failure (this does not occur because the cloneObject()
     // method is only installed as handler when we have seen that there is indeed
     // a copy constructor). Because this function is directly called from the
@@ -536,33 +533,33 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
 
     // the thing we're going to return
     zend_object_value result;
-    
+
     // set the handlers
     result.handlers = impl->objectHandlers();
-    
+
     // store the object
     ObjectImpl *new_object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
 
     // store the object in the object cache
     result.handle = new_object->handle();
-    
+
     // clone the members (this will also call the __clone() function if the user
     // had registered that as a visible method)
     zend_objects_clone_members(new_object->php(), result, old_object->php(), Z_OBJ_HANDLE_P(val) TSRMLS_CC);
-    
+
     // was a custom clone method installed? If not we call the magic c++ __clone method
     if (!entry->clone) meta->callClone(cpp);
-    
+
     // done
     return result;
 }
 
 /**
  *  Function that is used to count the number of elements in the object
- * 
- *  If the user has implemented the Countable interface, this method will 
+ *
+ *  If the user has implemented the Countable interface, this method will
  *  call the count() method
- * 
+ *
  *  @param  val
  *  @param  count
  *  @return int
@@ -573,14 +570,14 @@ int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
     Countable *countable = dynamic_cast<Countable*>(ObjectImpl::find(object TSRMLS_CC)->object());
 
     // if it does not implement the Countable interface, we rely on the default implementation
-    if (countable) 
+    if (countable)
     {
         // the user function may throw an exception that needs to be processed
         try
         {
             // call the count function
             *count = countable->count();
-            
+
             // done
             return SUCCESS;
         }
@@ -588,7 +585,7 @@ int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
         {
             // process the exception
             process(exception TSRMLS_CC);
-            
+
             // unreachable
             return FAILURE;
         }
@@ -597,7 +594,7 @@ int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
     {
         // Countable interface was not implemented, check if there is a default
         if (!std_object_handlers.count_elements) return FAILURE;
-        
+
         // call default
         return std_object_handlers.count_elements(object, count TSRMLS_CC);
     }
@@ -605,10 +602,10 @@ int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
 
 /**
  *  Function that is called when the object is used as an array in PHP
- * 
- *  This is the [] operator in PHP, and mapped to the offsetGet() method 
+ *
+ *  This is the [] operator in PHP, and mapped to the offsetGet() method
  *  of the ArrayAccess interface
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  offset          The name of the property
  *  @param  type            The type of the variable???
@@ -620,11 +617,11 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
     // what to do with the type?
     //
     // the type parameter tells us whether the dimension was read in READ
-    // mode, WRITE mode, READWRITE mode or UNSET mode. 
-    // 
-    // In 99 out of 100 situations, it is called in regular READ mode (value 0), 
-    // only when it is called from a PHP script that has statements like 
-    // $x =& $object["x"], $object["x"]["y"] = "something" or unset($object["x"]["y"]), 
+    // mode, WRITE mode, READWRITE mode or UNSET mode.
+    //
+    // In 99 out of 100 situations, it is called in regular READ mode (value 0),
+    // only when it is called from a PHP script that has statements like
+    // $x =& $object["x"], $object["x"]["y"] = "something" or unset($object["x"]["y"]),
     // the type parameter is set to a different value.
     //
     // But we must ask ourselves the question what we should be doing with such
@@ -633,13 +630,13 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
     // other value, that is temporary WRAPPED into a zval to make it accessible
     // from PHP. If someone wants to get a reference to such an internal variable,
     // that is in most cases simply impossible.
-    
-     
+
+
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
-    
+
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
-    if (arrayaccess) 
+    if (arrayaccess)
     {
         // the C++ code may throw an exception
         try
@@ -651,7 +648,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
         {
             // process the exception (send it to user space)
             process(exception TSRMLS_CC);
-            
+
             // unreachable
             return Value(nullptr).detach();
         }
@@ -660,7 +657,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
     {
         // ArrayAccess not implemented, check if there is a default handler
         if (!std_object_handlers.read_dimension) return nullptr;
-        
+
         // call default
         return std_object_handlers.read_dimension(object, offset, type TSRMLS_CC);
     }
@@ -668,10 +665,10 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
 
 /**
  *  Function that is called when the object is used as an array in PHP
- * 
- *  This is the [] operator in PHP, and mapped to the offsetSet() method 
+ *
+ *  This is the [] operator in PHP, and mapped to the offsetSet() method
  *  of the ArrayAccess interface
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  offset          The name of the property
  *  @param  value           The new value
@@ -682,9 +679,9 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC
 {
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
-    
+
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
-    if (arrayaccess) 
+    if (arrayaccess)
     {
         // method may throw an exception
         try
@@ -702,7 +699,7 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC
     {
         // ArrayAccess not interface, check if there is a default handler
         if (!std_object_handlers.write_dimension) return;
-        
+
         // call the default
         std_object_handlers.write_dimension(object, offset, value TSRMLS_CC);
     }
@@ -710,10 +707,10 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC
 
 /**
  *  Function that is called when the object is used as an array in PHP
- * 
+ *
  *  This is the [] operator in PHP, and mapped to the offsetExists() method
  *  of the ArrayAccess interface
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  member          The member to check
  *  @param  check_empty     Was this an isset() call, or an empty() call?
@@ -724,16 +721,16 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_D
 {
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
-    
+
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
-    if (arrayaccess) 
+    if (arrayaccess)
     {
         // user implemented callbacks could throw an exception
         try
         {
             // check if the member exists
             if (!arrayaccess->offsetExists(member)) return false;
-            
+
             // we know for certain that the offset exists, but should we check
             // more, like whether the value is empty or not?
             if (!check_empty) return true;
@@ -745,7 +742,7 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_D
         {
             // process the exception (send it to user space)
             process(exception TSRMLS_CC);
-            
+
             // unreachable
             return false;
         }
@@ -762,10 +759,10 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_D
 
 /**
  *  Function that is called when the object is used as an array in PHP
- * 
+ *
  *  This is the [] operator in PHP, and mapped to the offsetUnset() method
  *  of the ArrayAccess interface
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
  *  @param  tsrm_ls
@@ -774,9 +771,9 @@ void ClassImpl::unsetDimension(zval *object, zval *member TSRMLS_DC)
 {
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object TSRMLS_CC)->object());
-    
+
     // if it does not implement the ArrayAccess interface, we rely on the default implementation
-    if (arrayaccess) 
+    if (arrayaccess)
     {
         // user implemented code could throw an exception
         try
@@ -794,7 +791,7 @@ void ClassImpl::unsetDimension(zval *object, zval *member TSRMLS_DC)
     {
         // ArrayAccess is not implemented, is a default handler available?
         if (!std_object_handlers.unset_dimension) return;
-        
+
         // call the default
         std_object_handlers.unset_dimension(object, member TSRMLS_CC);
     }
@@ -818,7 +815,7 @@ zval *ClassImpl::toZval(Value &&value, int type)
     // if the value has more than once reference (if it has a refcount of one,
     // the value object that we have here is the only instance of the zval,
     // and it is simply impossible to return a reference or so
-    if (value.refcount() <= 1) return value.detach(); 
+    if (value.refcount() <= 1) return value.detach();
 
     // we're dealing with an editable zval, return a reference variable
     return Value(value.detach(), true).detach();
@@ -842,10 +839,10 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
     // what to do with the type?
     //
     // the type parameter tells us whether the property was read in READ
-    // mode, WRITE mode, READWRITE mode or UNSET mode. 
-    // 
-    // In 99 out of 100 situations, it is called in regular READ mode (value 0), 
-    // only when it is called from a PHP script that has statements like 
+    // mode, WRITE mode, READWRITE mode or UNSET mode.
+    //
+    // In 99 out of 100 situations, it is called in regular READ mode (value 0),
+    // only when it is called from a PHP script that has statements like
     // $x =& $object->x, $object->x->y = "something" or unset($object->x->y)
     // the type parameter is set to a different value.
     //
@@ -858,24 +855,24 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
 
     // retrieve the object and class
     Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
-    
+
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
     // we need the C++ class meta-information object
     ClassImpl *impl = self(entry);
     ClassBase *meta = impl->_base;
-    
-    // the default implementation throws an exception, so by catching 
+
+    // the default implementation throws an exception, so by catching
     // the exception we know if the object was implemented by the user or not
     try
     {
         // convert name to a Value object
         Value key(name);
-        
+
         // is it a property with a callback?
         auto iter = impl->_properties.find(key);
-        
+
         // was it found?
         if (iter == impl->_properties.end())
         {
@@ -892,7 +889,7 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
     {
         // __get() function was not overridden by the user
         if (!std_object_handlers.read_property) return nullptr;
-        
+
         // call default
 #if PHP_VERSION_ID < 50399
         return std_object_handlers.read_property(object, name, type TSRMLS_CC);
@@ -902,10 +899,10 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
     }
     catch (Exception &exception)
     {
-        // user threw an exception in its magic method 
+        // user threw an exception in its magic method
         // implementation, send it to user space
         process(exception TSRMLS_CC);
-        
+
         // unreachable
         return Value(nullptr).detach();
     }
@@ -913,10 +910,10 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
 
 /**
  *  Function that is called when a property is set / updated
- * 
+ *
  *  This is the handler for the __set() function, and is called when a property
  *  is updated.
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  name            The name of the property
  *  @param  value           The new value
@@ -932,7 +929,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
 {
     // retrieve the object and class
     Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
-    
+
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
@@ -946,10 +943,10 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
     {
         // wrap the name
         Value key(name);
-        
+
         // check if the property has a callback
         auto iter = impl->_properties.find(key);
-        
+
         // is it set?
         if (iter == impl->_properties.end())
         {
@@ -960,7 +957,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
         {
             // check if it could be set
             if (iter->second->set(base, value)) return;
-            
+
             // read-only property
             zend_error(E_ERROR, "Unable to write to read-only property %s", (const char *)key);
         }
@@ -969,7 +966,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
     {
         // __set() function was not overridden by user, check if there is a default
         if (!std_object_handlers.write_property) return;
-        
+
         // call the default
 #if PHP_VERSION_ID < 50399
         std_object_handlers.write_property(object, name, value TSRMLS_CC);
@@ -979,7 +976,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
     }
     catch (Exception &exception)
     {
-        // user threw an exception in its magic method 
+        // user threw an exception in its magic method
         // implementation, send it to user space
         process(exception TSRMLS_CC);
     }
@@ -988,16 +985,16 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
 /**
  *  Function that is called to check whether a certain property is set
  *  for an object
- * 
+ *
  *  This is the handler for the __isset() function, and is called when a PHP
  *  script checks if a certain property is set.
- * 
+ *
  *  The has_set_exists parameter can have the following values:
  *
  *      0 (has) whether property exists and is not NULL
  *      1 (set) whether property exists and is true
  *      2 (exists) whether property exists
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  name            The name of the property to check
  *  @param  has_set_exists  See above
@@ -1017,14 +1014,14 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
     {
         // get the cpp object
         Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
-        
+
         // retrieve the class entry linked to this object
         auto *entry = zend_get_class_entry(object TSRMLS_CC);
 
         // we need the C++ class meta-information object
         ClassImpl *impl = self(entry);
         ClassBase *meta = impl->_base;
-        
+
         // convert the name to a Value object
         Value key(name);
 
@@ -1033,13 +1030,13 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
 
         // call the C++ object
         if (!meta->callIsset(base, key)) return false;
-        
+
         // property exists, but what does the user want to know
         if (has_set_exists == 2) return true;
-        
+
         // we have to retrieve the property
         Value value = meta->callGet(base, key);
-        
+
         // should we check on NULL?
         switch (has_set_exists) {
         case 0:     return value.type() != Type::Null;
@@ -1060,10 +1057,10 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
     }
     catch (Exception &exception)
     {
-        // user threw an exception in its magic method 
+        // user threw an exception in its magic method
         // implementation, send it to user space
         process(exception TSRMLS_CC);
-        
+
         // unreachable
         return false;
     }
@@ -1071,9 +1068,9 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
 
 /**
  *  Function that is called when a property is removed from the project
- * 
+ *
  *  This is the handler for the __unset() method
- * 
+ *
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
  *  @param  key
@@ -1094,16 +1091,16 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
 
         // we need the C++ class meta-information object
         ClassImpl *impl = self(entry);
-        
+
         // property name
         Value name(member);
-        
+
         // is this a callback property?
         auto iter = impl->_properties.find(name);
-        
+
         // if the property does not exist, we forward to the __unset
         if (iter == impl->_properties.end()) impl->_base->callUnset(ObjectImpl::find(object TSRMLS_CC)->object(), member);
-        
+
         // callback properties cannot be unset
         zend_error(E_ERROR, "Property %s can not be unset", (const char *)name);
     }
@@ -1111,7 +1108,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
     {
         // __unset was not implemented, do we have a default?
         if (!std_object_handlers.unset_property) return;
-        
+
         // call the default
 #if PHP_VERSION_ID < 50399
         std_object_handlers.unset_property(object, member TSRMLS_CC);
@@ -1121,7 +1118,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
     }
     catch (Exception &exception)
     {
-        // user threw an exception in its magic method 
+        // user threw an exception in its magic method
         // implementation, send it to user space
         process(exception TSRMLS_CC);
     }
@@ -1138,10 +1135,10 @@ void ClassImpl::destructObject(zend_object *object, zend_object_handle handle TS
 {
     // find object
     ObjectImpl *obj = ObjectImpl::find(object);
-    
+
     // get meta info
     ClassImpl *impl = self(object->ce);
-    
+
     // prevent exceptions
     try
     {
@@ -1170,7 +1167,7 @@ void ClassImpl::freeObject(zend_object *object TSRMLS_DC)
 {
     // allocate memory for the object
     ObjectImpl *obj = ObjectImpl::find(object);
-    
+
     // no longer need it
     obj->destruct(TSRMLS_C);
 }
@@ -1197,16 +1194,16 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
 
     // the thing we're going to return
     zend_object_value result;
-    
+
     // set the handlers
     result.handlers = impl->objectHandlers();
-    
+
     // create the object in the zend engine
     ObjectImpl *object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
-    
+
     // store the object in the object cache
     result.handle = object->handle();
-    
+
     // done
     return result;
 }
@@ -1222,28 +1219,28 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
 zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *object, int by_ref TSRMLS_DC)
 {
     // by-ref is not possible (copied from SPL), this function is called directly
-    // from the Zend engine, so we can use zend_error() to longjmp() back to the 
+    // from the Zend engine, so we can use zend_error() to longjmp() back to the
     // Zend engine)
     if (by_ref) zend_error(E_ERROR, "Foreach by ref is not possible");
-    
+
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object TSRMLS_CC)->object());
-    
+
     // user may throw an exception in the getIterator() function
     try
     {
         // create an iterator
         auto *iterator = new IteratorImpl(traversable->getIterator());
-        
+
         // return the implementation
         return iterator->implementation();
     }
     catch (Exception &exception)
     {
-        // user threw an exception in its method 
+        // user threw an exception in its method
         // implementation, send it to user space
         process(exception TSRMLS_CC);
-        
+
         // unreachable
         return nullptr;
     }
@@ -1262,11 +1259,11 @@ int ClassImpl::serialize(zval *object, unsigned char **buffer, zend_uint *buf_le
 {
     // get the serializable object
     Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(object TSRMLS_CC)->object());
-    
+
     // call the serialize method on the object
     auto value = serializable->serialize();
 
-    // allocate the buffer, and copy the data into it (the zend engine will 
+    // allocate the buffer, and copy the data into it (the zend engine will
     // (hopefully) clean up the data for us - the default serialize method does
     // it like this too)
     *buffer = (unsigned char*)estrndup(value.c_str(), value.size());
@@ -1289,22 +1286,22 @@ int ClassImpl::unserialize(zval **object, zend_class_entry *entry, const unsigne
 {
     // create the PHP object
     object_init_ex(*object, entry);
-    
+
     // turn this into a serializale
     Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(*object TSRMLS_CC)->object());
-    
+
     // call the unserialize method on it
     serializable->unserialize((const char *)buffer, buf_len);
-    
+
     // done
     return SUCCESS;
 }
 
 /**
- *  Retrieve an array of zend_function_entry objects that hold the 
+ *  Retrieve an array of zend_function_entry objects that hold the
  *  properties for each method. This method is called at extension
  *  startup time to register all methods.
- * 
+ *
  *  @param  classname       The class name
  *  @return zend_function_entry[]
  */
@@ -1312,10 +1309,10 @@ const struct _zend_function_entry *ClassImpl::entries()
 {
     // already initialized?
     if (_entries) return _entries;
-    
+
     // allocate memory for the functions
     _entries = new zend_function_entry[_methods.size() + 1];
-    
+
     // keep iterator counter
     int i = 0;
 
@@ -1341,13 +1338,13 @@ const struct _zend_function_entry *ClassImpl::entries()
 
 /**
  *  Initialize the class, given its name
- * 
+ *
  *  The module functions are registered on module startup, but classes are
  *  initialized afterwards. The Zend engine is a strange thing. Nevertheless,
  *  this means that this method is called after the module is already available.
  *  This function will inform the Zend engine about the existence of the
  *  class.
- * 
+ *
  *  @param  base        the c++ class object created in the extension
  *  @param  prefix      namespace prefix
  *  @param  tsrm_ls
@@ -1357,7 +1354,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
 {
     // store base pointer
     _base = base;
-    
+
     // the class entry
     zend_class_entry entry;
 
@@ -1369,13 +1366,13 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
 
     // we need a special constructor
     entry.create_object = &ClassImpl::createObject;
-    
+
     // register function that is called for static method calls
     entry.get_static_method = &ClassImpl::getStaticMethod;
-    
+
     // for traversable classes we install a special method to get the iterator
     if (_base->traversable()) entry.get_iterator = &ClassImpl::getIterator;
-    
+
     // for serializable classes, we install callbacks for serializing and unserializing
     if (_base->serializable())
     {
@@ -1383,9 +1380,9 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         entry.serialize = &ClassImpl::serialize;
         entry.unserialize = &ClassImpl::unserialize;
     }
-    
+
     // do we have a base class?
-    if (_parent) 
+    if (_parent)
     {
         // check if the base class was already defined
         if (_parent->_entry)
@@ -1397,7 +1394,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         {
             // report an error - the extension programmer probably made an error
             std::cerr << "Derived class " << name() << " is initialized before base class " << _parent->name() << ": base class is ignored" << std::endl;
-            
+
             // register the class, but without the base class
             _entry = zend_register_internal_class(&entry TSRMLS_CC);
         }
@@ -1407,13 +1404,13 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // register the class
         _entry = zend_register_internal_class(&entry TSRMLS_CC);
     }
-    
+
     // register the classes
     for (auto &interface : _interfaces)
     {
         // register this interface
         if (interface->_entry) zend_class_implements(_entry TSRMLS_CC, 1, interface->_entry);
-        
+
         // otherwise report an error
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
@@ -1450,7 +1447,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
 
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry TSRMLS_CC);
-    
+
     // done
     return _entry;
 }
