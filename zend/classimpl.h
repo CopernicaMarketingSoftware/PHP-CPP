@@ -408,13 +408,13 @@ public:
     void method(const char *name, const native_callback_3 &method, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, method, (flags & MethodModifiers) | Static, args)); }
 
     /**
-     *  Add an abstract method to the class
+     *  Add an abstract method or static method to the class
      * 
      *  @param  name        Name of the method
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static)) | Abstract , args)); }
+    void method(const char *name, int flags=0, const Arguments &args = {}) { if (flags & Static !=  flags) { _methods.push_back(std::make_shared<Method>(name, (flags & MethodModifiers) | Abstract, args)); } else { _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static)), args)); } }
 
     /**
      *  Add a property to the class
