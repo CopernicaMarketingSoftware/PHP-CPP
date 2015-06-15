@@ -414,7 +414,15 @@ public:
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, int flags=0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static)) | Abstract , args)); }
+    void method(const char *name, int flags=0, const Arguments &args = {}) 
+    { 
+        // the "MethodModifiers" holds all the valid modifiers for a method: Final + Public + Protected + Private.
+        // The "Static" and "Abstract" properties are also valid modifiers in this context (in fact, you would
+        // expect that we could even force adding "Abstract" here, because we're adding an abstract method -- but
+        // in a PHP interface the "Abstract" modifier is not allowed - even though it is of course abstract. 
+        // So we only _allow_ abstract here, and expect the caller to _set_ it.
+        _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static | Abstract)), args));
+    }
 
     /**
      *  Add a property to the class

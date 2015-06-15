@@ -51,13 +51,15 @@ public:
      */
     Interface &method(const char *name, int flags, const Arguments &arguments = {})
     {
-        // call base
-        ClassBase::method(name, flags, arguments);
+        // call base (an interface method is always public, so we add these flags,
+        // and although it is always abstract, PHP does not allow this flag, so we
+        // remove it in case the extension programmer had set it)
+        ClassBase::method(name, (Public | flags) & ~Abstract, arguments);
 
         // return self
         return *this;
     }
-
+    
     /**
      *  Extends exisiting PHP interface
      *
