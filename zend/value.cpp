@@ -208,7 +208,7 @@ Value::Value(const Base *object)
     obj_bucket->bucket.obj.refcount += 1;
 
     // this is copy-pasted from zend_objects.c - and it is necessary too!
-    if (!obj_bucket->bucket.obj.handlers) obj_bucket->bucket.obj.handlers = &std_object_handlers;
+    if (!obj_bucket->bucket.obj.handlers) obj_bucket->bucket.obj.handlers = ClassImpl::objectHandlers(impl->php()->ce);
 
     // store the handlers in the zval too (cast is necessary for php 5.3)
     Z_OBJ_HT_P(_val) = (zend_object_handlers*)obj_bucket->bucket.obj.handlers;
