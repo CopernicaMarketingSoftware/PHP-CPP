@@ -31,7 +31,7 @@ public:
      */
     operator int16_t () const
     {
-        return (int16_t)numericValue();
+        return static_cast<int16_t>(numericValue());
     }
 
     /**
