@@ -40,7 +40,7 @@ public:
      */
     operator int32_t () const
     {
-        return (int32_t)numericValue();
+        return static_cast<int32_t>(numericValue());
     }
 
     /**
