@@ -35,7 +35,7 @@ public:
     }
 
     /**
-     *  Cast to a number
+     *  Cast to a 32-bit number
      *  @return int32_t
      */
     operator int32_t () const
