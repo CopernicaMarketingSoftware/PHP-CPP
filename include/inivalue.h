@@ -26,8 +26,8 @@ public:
     IniValue(const char *name, const bool isorig) : _name(name), _isorig(isorig) {}
 
     /**
-     *  Cast to a number
-     *  @return int32_t
+     *  Cast to a 16-bit number
+     *  @return int16_t
      */
     operator int16_t () const
     {
