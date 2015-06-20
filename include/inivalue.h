@@ -44,7 +44,7 @@ public:
     }
 
     /**
-     *  Cast to a number
+     *  Cast to a 64-bit number
      *  @return uint64_t
      */
     operator int64_t () const
