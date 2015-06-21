@@ -1240,7 +1240,7 @@ X &operator+=(X &x, const Php::Value &value) { return x += static_cast<X>(value)
 template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator-=(X &x, const Php::Value &value) { return x -= static_cast<X>(value); }
 template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
-X &operator*=(X &x, const Php::Value &value) { return x *= (X)value; }
+X &operator*=(X &x, const Php::Value &value) { return x *= static_cast<X>(value); }
 template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
 X &operator/=(X &x, const Php::Value &value) { return x /= (X)value; }
 template <typename X, typename std::enable_if<std::is_integral<X>::value>::type* = nullptr>
