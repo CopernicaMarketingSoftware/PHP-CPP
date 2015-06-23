@@ -18,7 +18,7 @@
 #	are automatically generated
 #
 
-NAME				=	yourextension
+NAME				=	returnobject
 
 
 #
