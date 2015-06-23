@@ -26,25 +26,25 @@ public:
     IniValue(const char *name, const bool isorig) : _name(name), _isorig(isorig) {}
 
     /**
-     *  Cast to a number
-     *  @return int32_t
+     *  Cast to a 16-bit number
+     *  @return int16_t
      */
     operator int16_t () const
     {
-        return (int16_t)numericValue();
+        return static_cast<int16_t>(numericValue());
     }
 
     /**
-     *  Cast to a number
+     *  Cast to a 32-bit number
      *  @return int32_t
      */
     operator int32_t () const
     {
-        return (int32_t)numericValue();
+        return static_cast<int32_t>(numericValue());
     }
 
     /**
-     *  Cast to a number
+     *  Cast to a 64-bit number
      *  @return uint64_t
      */
     operator int64_t () const
@@ -103,7 +103,7 @@ public:
      */
     bool boolValue() const
     {
-        return (bool)numericValue();
+        return static_cast<bool>(numericValue());
     }
 
     /**
