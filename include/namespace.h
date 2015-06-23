@@ -64,7 +64,7 @@ protected:
      *  time, but the classes, functions and namespaces will then not be
      *  filled.
      *
-     *  @var bool
+     *  @return bool
      */
     virtual bool locked() const
     {
