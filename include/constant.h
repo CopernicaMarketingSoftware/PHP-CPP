@@ -136,7 +136,8 @@ private:
 	 *
 	 *  @return std::shared_ptr Pointer to the constant implementation
 	 */
-	const std::shared_ptr<ConstantImpl> &implementation() const {return _impl;}
+	const std::shared_ptr<ConstantImpl> &implementation() const
+	{ return _impl; }
 
 	/**
 	 *  The extension object has access to privates
