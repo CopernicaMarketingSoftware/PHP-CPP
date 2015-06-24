@@ -87,6 +87,14 @@ public:
 	 * @param size  Length of the string value
 	 */
 	Constant(const char *name, const char *value, size_t size);
+
+	/**
+	 * Constructor to create a constant for a string literal
+	 * using a std::string
+	 *
+	 * @param name  Constant's name
+	 * @param value Constant's value
+	 */
 	Constant(const char *name, const std::string &value);
 
 	/**
