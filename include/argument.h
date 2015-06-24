@@ -76,7 +76,8 @@ public:
 
     /**
      *  Name of the argument
-     *  @return const char *
+     *
+     *  @return const char * C-String containing the name of the argument
      */
     const char *name() const
     {
