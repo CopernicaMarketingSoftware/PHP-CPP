@@ -86,7 +86,8 @@ public:
 
     /**
      *  Type-hint for the argument
-     *  @return Type
+     *
+     *  @return Type The type this argument is mapped to
      */
     Type type() const
     {
