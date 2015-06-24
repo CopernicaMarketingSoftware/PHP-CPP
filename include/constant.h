@@ -113,11 +113,11 @@ public:
 	 *      myclass.add(Php::Constant("MY_CONSTANT", "value"));
 	 *
 	 *  All of the calls have the same result, it is up to you to decide which
-	 *  one suits you most. If you use the last one - using a Php::Constant
+	 *  one suits you best. If you use the last one - using a Php::Constant
 	 *  class - the PHP-CPP library will call this "addTo()" method internally
 	 *  to forward the call to one of the other methods.
 	 *
-	 *  @param  clss        Class to which the constant is added
+	 *  @param clss Class to which the constant is added
 	 *  @internal
 	 */
 	void addTo(ClassBase &clss) const;
