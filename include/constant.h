@@ -1,12 +1,13 @@
 /**
- *  Constant.h
+ *  @file constant.h
  *
  *  If you want to define global PHP constants, or class constants you can
  *  use this constant class for it. Wrap the constant you'd like to create
- *  in a Php::Constant object and add it to the extension or the class:
+ *  in a Php::Constant object and add it to the extension or the class.
  *
- *  extension.add(Php::Constant("CONSTANT_NAME", "value"));
- *  myclass.add(Php::Constant("CLASS_CONSTANT", "value"));
+ *  Examples:
+ *      extension.add(Php::Constant("CONSTANT_NAME", "value"));
+ *      myclass.add(Php::Constant("CLASS_CONSTANT", "value"));
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2015 Copernica BV
