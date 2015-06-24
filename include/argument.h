@@ -50,8 +50,15 @@ protected:
      *  @param  required    Is this argument required?
      *  @param  byref       Is this a reference argument?
      */
-    Argument(const char *name, const char *classname, bool nullable = true, bool required = true, bool byref = false) :
-        _name(name), _type(Type::Object), _classname(classname), _nullable(nullable), _required(required), _byReference(byref) {}
+    Argument(const char *name, const char *classname, bool nullable = true,
+             bool required = true, bool byref = false)
+        : _name{name}
+        , _type{Type::Object}
+        , _classname{classname}
+        , _nullable{nullable}
+        , _required{required}
+        , _byReference{byref}
+    {}
 
 public:
     /**
