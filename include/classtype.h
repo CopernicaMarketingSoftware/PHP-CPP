@@ -1,5 +1,5 @@
 /**
- *  ClassType.h
+ *  @file classtype.h
  *
  *  Internal class types enumeration.
  *
