@@ -135,7 +135,8 @@ private:
 
     /**
      *  Type of argument
-     *  @var Type
+     *
+     *  @var Type The type this argument is mapped to
      */
     Type _type = Type::Null;
 
