@@ -35,8 +35,12 @@ protected:
      *  @param  required    Is this argument required?
      *  @param  byref       Is this a reference argument
      */
-    Argument(const char *name, Type type, bool required = true, bool byref = false) :
-        _name(name), _type(type), _required(required), _byReference(byref) {}
+    Argument(const char *name, Type type, bool required = true, bool byref = false)
+        : _name{name}
+        , _type{type}
+        , _required{required}
+        , _byReference{byref}
+    {}
 
     /**
      *  Constructor
