@@ -140,7 +140,7 @@ private:
      *
      *  @var Type The type this argument is mapped to
      */
-    Type _type = Type::Null;
+    Type _type;
 
     /**
      *  The name of the class if this is a parameter that is supposed to be
