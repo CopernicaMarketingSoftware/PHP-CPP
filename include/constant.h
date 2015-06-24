@@ -36,6 +36,13 @@ public:
      *  @param  size            Size of the value (in case of a string)
      */
     Constant(const char *name, std::nullptr_t value = nullptr);
+
+    /**
+     * Constructor to create a constant for a boolean value
+     *
+     * @param name  Constant's name
+     * @param value Constant's value
+     */
     Constant(const char *name, bool value);
     Constant(const char *name, int32_t value);
     Constant(const char *name, int64_t value);
