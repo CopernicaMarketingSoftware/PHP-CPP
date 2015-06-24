@@ -30,10 +30,10 @@ class PHPCPP_EXPORT Constant
 {
 public:
 	/**
-	 *  Constructor
-	 *  @param  name            Constant name
-	 *  @param  value           Constant value
-	 *  @param  size            Size of the value (in case of a string)
+	 *  Constructor to create a constant for a null value
+	 *
+	 *  @param  name  Constant's name
+	 *  @param  value Constant's value
 	 */
 	Constant(const char *name, std::nullptr_t value = nullptr);
 
