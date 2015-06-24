@@ -117,7 +117,8 @@ public:
 
     /**
      *  Is this a parameter-by-reference?
-     *  @return bool
+     *
+     *  @return bool true if its a reference, false otherwise
      */
     bool byReference() const
     {
