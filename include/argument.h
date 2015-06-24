@@ -151,7 +151,8 @@ private:
 
     /**
      *  May the parameter be null?
-     *  @var bool
+     *
+     *  @var bool true if can be nullable, false otherwise
      */
     bool _nullable = false;
 
