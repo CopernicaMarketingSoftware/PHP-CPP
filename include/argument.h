@@ -96,7 +96,9 @@ public:
 
     /**
      *  If the type is a class, the name of the class
-     *  @return const char *
+     *
+     *  @return const char * C-String containing the name of the class if the
+     *                       argument's type is that of a class
      */
     const char *classname() const
     {
