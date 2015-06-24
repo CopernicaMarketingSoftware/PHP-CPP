@@ -157,8 +157,9 @@ private:
     bool _nullable = false;
 
     /**
-     *  Is this a required argument
-     *  @var    bool
+     *  Is this a required argument?
+     *
+     *  @var bool true if the argument is required, false otherwise
      */
     bool _required = true;
 
