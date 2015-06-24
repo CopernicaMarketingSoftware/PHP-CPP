@@ -52,6 +52,13 @@ public:
 	 * @param value Constant's value
 	 */
     Constant(const char *name, int32_t value);
+
+    /**
+	 * Constructor to create a constant for a 64-bit integer
+	 *
+	 * @param name  Constant's name
+	 * @param value Constant's value
+	 */
     Constant(const char *name, int64_t value);
     Constant(const char *name, double value);
     Constant(const char *name, const char *value);
