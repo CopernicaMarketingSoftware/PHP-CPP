@@ -29,11 +29,12 @@ public:
 
 protected:
     /**
-     *  Constructor
-     *  @param  name        Name of the argument
-     *  @param  type        Argument type
-     *  @param  required    Is this argument required?
-     *  @param  byref       Is this a reference argument
+     *  Constructor to create an argument specifying the following
+     *
+     *  @param name     Name of the argument
+     *  @param type     Argument type
+     *  @param required Is this argument required?
+     *  @param byref    Is this a reference argument
      */
     Argument(const char *name, Type type, bool required = true, bool byref = false)
         : _name{name}
