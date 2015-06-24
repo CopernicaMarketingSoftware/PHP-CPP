@@ -25,7 +25,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Argument() {}
+    virtual ~Argument() = default;
 
 protected:
     /**
