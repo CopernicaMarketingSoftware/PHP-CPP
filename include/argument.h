@@ -1,5 +1,5 @@
 /**
- *  Argument.h
+ *  @file argument.h
  *
  *  Class holds information about an argument that is passed to a function.
  *  You'll need this class when you're defining your own functions.
@@ -25,7 +25,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Argument() {}
+    virtual ~Argument() = default;
 
 protected:
     /**
