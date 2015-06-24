@@ -190,7 +190,8 @@ using Arguments = std::vector<Argument>;
 
 /**
  *  A list of arguments can be supplied to methods
- *  @type   Arguments
+ *
+ *  @type Arguments A list of arguments
  */
 using Arguments = std::initializer_list<Argument>;
 
