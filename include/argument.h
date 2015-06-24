@@ -165,7 +165,8 @@ private:
 
     /**
      *  Is this a 'by-reference' parameter?
-     *  @var    bool
+     *
+     *  @var bool true if its a reference, false otherwise
      */
     bool _byReference = false;
 };
