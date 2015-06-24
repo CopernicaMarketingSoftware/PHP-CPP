@@ -131,7 +131,7 @@ private:
      *
      *  @var const char * C-String containing the name of the argument
      */
-    const char *_name = nullptr;
+    const char *_name;
 
     /**
      *  Type of argument
@@ -147,28 +147,28 @@ private:
      *  @var const char * C-String containing the name of the class if the
      *                    argument's type is that of a class
      */
-    const char *_classname = nullptr;
+    const char *_classname;
 
     /**
      *  May the parameter be null?
      *
      *  @var bool true if can be nullable, false otherwise
      */
-    bool _nullable = false;
+    bool _nullable;
 
     /**
      *  Is this a required argument?
      *
      *  @var bool true if the argument is required, false otherwise
      */
-    bool _required = true;
+    bool _required;
 
     /**
      *  Is this a 'by-reference' parameter?
      *
      *  @var bool true if its a reference, false otherwise
      */
-    bool _byReference = false;
+    bool _byReference;
 };
 
 /**
