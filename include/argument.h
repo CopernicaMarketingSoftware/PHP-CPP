@@ -141,8 +141,11 @@ private:
     Type _type = Type::Null;
 
     /**
-     *  Classname, if this is a parameter that is supposed to be an instance of a class
-     *  @var std::string
+     *  The name of the class if this is a parameter that is supposed to be
+     *  an instance of a class
+     *
+     *  @var const char * C-String containing the name of the class if the
+     *                    argument's type is that of a class
      */
     const char *_classname = nullptr;
 
