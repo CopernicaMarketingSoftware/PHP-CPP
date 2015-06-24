@@ -200,7 +200,6 @@ using Arguments = std::initializer_list<Argument>;
  */
 #endif
 
-
 /**
  *  End of namespace
  */
