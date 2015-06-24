@@ -44,12 +44,13 @@ protected:
     {}
 
     /**
-     *  Constructor
-     *  @param  name        Name of the argument
-     *  @param  classname   Name of the class
-     *  @param  nullable    Can it be null?
-     *  @param  required    Is this argument required?
-     *  @param  byref       Is this a reference argument?
+     *  Constructor to create an argument specifying the following
+     *
+     *  @param name      Name of the argument
+     *  @param classname Name of the class
+     *  @param nullable  Can it be null?
+     *  @param required  Is this argument required?
+     *  @param byref     Is this a reference argument?
      */
     Argument(const char *name, const char *classname, bool nullable = true,
              bool required = true, bool byref = false)
