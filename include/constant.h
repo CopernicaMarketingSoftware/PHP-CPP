@@ -60,6 +60,14 @@ public:
 	 * @param value Constant's value
 	 */
     Constant(const char *name, int64_t value);
+
+    /**
+	 * Constructor to create a constant for a double precision
+	 * floating point number
+	 *
+	 * @param name  Constant's name
+	 * @param value Constant's value
+	 */
     Constant(const char *name, double value);
     Constant(const char *name, const char *value);
     Constant(const char *name, const char *value, size_t size);
