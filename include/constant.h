@@ -143,7 +143,6 @@ private:
 	 *  The extension object has access to privates
 	 */
 	friend class ExtensionImpl;
-
 };
 
 /**
