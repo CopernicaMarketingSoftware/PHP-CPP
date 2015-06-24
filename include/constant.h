@@ -125,7 +125,9 @@ public:
 private:
 	/**
 	 *  Pointer to the actual implementation of the constant
-	 *  @var    std::shared_ptr
+	 *
+	 *  @var std::shared_ptr Pointer to the constant implementation containing
+	 *                       distributed ownership properties
 	 */
 	std::shared_ptr<ConstantImpl> _impl;
 
