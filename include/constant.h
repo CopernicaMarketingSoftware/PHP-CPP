@@ -133,7 +133,8 @@ private:
 
 	/**
 	 *  Get access to the implementation object
-	 *  @return std::shared_ptr
+	 *
+	 *  @return std::shared_ptr Pointer to the constant implementation
 	 */
 	const std::shared_ptr<ConstantImpl> &implementation() const {return _impl;}
 
