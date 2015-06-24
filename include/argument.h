@@ -39,6 +39,8 @@ protected:
     Argument(const char *name, Type type, bool required = true, bool byref = false)
         : _name{name}
         , _type{type}
+        , _classname{nullptr}
+        , _nullable{false}
         , _required{required}
         , _byReference{byref}
     {}
