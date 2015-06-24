@@ -128,7 +128,8 @@ public:
 private:
     /**
      *  Name of the argument
-     *  @var const char *
+     *
+     *  @var const char * C-String containing the name of the argument
      */
     const char *_name = nullptr;
 
