@@ -107,7 +107,8 @@ public:
 
     /**
      *  Is it allowed to pass parameter with a null value?
-     *  @return bool
+     *
+     *  @return bool true if can be nullable, false otherwise
      */
     bool allowNull() const
     {
