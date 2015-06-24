@@ -65,7 +65,8 @@ protected:
 public:
     /**
      *  Is this a required argument?
-     *  @return bool
+     *
+     *  @return bool true if the argument is required, false otherwise
      *  @internal
      */
     bool required() const
