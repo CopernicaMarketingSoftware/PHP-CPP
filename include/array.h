@@ -73,8 +73,10 @@ public:
 #   if !defined(_MSC_VER) || _MSC_VER >= 1800
 
     /**
-     *  Constructor from an initializer list
-     *  @param  value
+     *  Constructor that creates an array from a std::initializer_list of
+     *  Php::Value elements
+     *
+     *  @param input A std::initializer_list of Php::Value elements
      */
     Array(const std::initializer_list<Value> &value) : Value(value) {}
 
