@@ -61,8 +61,10 @@ public:
     Array(const std::vector<T> &input) : Value(input) {}
 
     /**
-     *  Constructor from a map (this will create an associative array)
-     *  @param  value
+     *  Constructor that creates an associative array from a std::map of
+     *  key-value pairs
+     *
+     *  @param input A std::map of key-value pairs
      */
     template <typename T>
     Array(const std::map<std::string,T> &value) : Value(value) {}
