@@ -1,8 +1,8 @@
 /**
- *  Array.h
+ *  @file array.h
  *
- *  The Array is a wrapper around the value class that ensures that a
- *  certain property always is an array
+ *  Array is a value that defaults itself to model an array and upholds this
+ *  invariant throughout its lifetime
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
