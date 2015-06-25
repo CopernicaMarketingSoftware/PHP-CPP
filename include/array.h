@@ -27,6 +27,9 @@ public:
     /**
      *  Copy constructor from a value object
      *
+     *  If value object's type is not that of an array an exception of type
+     *  FatalError is thrown
+     *
      *  @param value Must be a value that models an array
      */
     Array(const Value &value) : Value(value)
