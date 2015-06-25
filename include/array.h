@@ -26,7 +26,8 @@ public:
 
     /**
      *  Copy constructor from a value object
-     *  @param  value
+     *
+     *  @param value Must be a value that models an array
      */
     Array(const Value &value) : Value(value)
     {
