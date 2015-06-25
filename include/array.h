@@ -20,7 +20,7 @@ class PHPCPP_EXPORT Array : public Value
 {
 public:
     /**
-     *  Constructor
+     *  Constructor that defaults itself to model an array
      */
     Array() : Value(Type::Array) {}
 
