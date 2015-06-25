@@ -67,7 +67,7 @@ public:
      *  @param input A std::map of key-value pairs
      */
     template <typename T>
-    Array(const std::map<std::string,T> &value) : Value(value) {}
+    Array(const std::map<std::string,T> &input) : Value(input) {}
 
 // old visual c++ environments have no support for initializer lists
 #   if !defined(_MSC_VER) || _MSC_VER >= 1800
