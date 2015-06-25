@@ -37,7 +37,8 @@ public:
 
     /**
      *  Move constructor from a value object
-     *  @param  value
+     *
+     *  @param value Must be a value that models an array
      */
     Array(Value &&value)  _NOEXCEPT : Value(std::move(value))
     {
