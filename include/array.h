@@ -84,7 +84,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Array() {}
+    virtual ~Array() = default;
 
     /**
      *  Change the internal type of the variable
