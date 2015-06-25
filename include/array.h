@@ -133,8 +133,14 @@ public:
 
     /**
      *  Move assignment operator
-     *  @param  value
-     *  @return Array
+     *
+     *  If the incoming Value object is not that of Type::Array an exception of
+     *  FatalError is thrown
+     *
+     *  @param  value  A Value object with a type of Type::Array
+     *
+     *  @return Array& This object containing new values corresponding to the
+     *                 input argument
      */
     Array &operator=(Value &&value) _NOEXCEPT
     {
