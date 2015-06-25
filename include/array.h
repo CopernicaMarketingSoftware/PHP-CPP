@@ -53,8 +53,9 @@ public:
     }
 
     /**
-     *  Constructors from a vector (this will create an array)
-     *  @param  value
+     *  Constructor that creates an array from a std::vector of elements
+     *
+     *  @param input A std::vector of elements
      */
     template <typename T>
     Array(const std::vector<T> &input) : Value(input) {}
