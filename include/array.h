@@ -89,8 +89,12 @@ public:
     virtual ~Array() = default;
 
     /**
-     *  Change the internal type of the variable
-     *  @param  Type
+     *  This method should not be called within the context of this type as its
+     *  only here due to this type's dependency on its parent an only acts as a
+     *  guard to uphold an invariant
+     *
+     *  @param type Must be that of Type::Array else an exception of FatalError
+     *              is thrown
      */
     virtual Value &setType(Type type) override
     {
