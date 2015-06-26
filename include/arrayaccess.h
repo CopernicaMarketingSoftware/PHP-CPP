@@ -53,6 +53,11 @@ public:
      *  @param key Key to find the associated element
      */
     virtual void offsetUnset(const Php::Value &key) = 0;
+
+    /**
+     * Destructor
+     */
+    virtual ~ArrayAccess() = default;
 };
 
 /**
