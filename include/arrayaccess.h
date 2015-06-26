@@ -1,5 +1,5 @@
 /**
- *  ArrayAccess.h
+ *  @file arrayaccess.h
  *
  *  "Interface" that can be "implemented" by your class. If you do, you
  *  create your class like this:
