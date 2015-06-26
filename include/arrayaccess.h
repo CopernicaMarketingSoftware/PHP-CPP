@@ -30,9 +30,10 @@ public:
     virtual bool offsetExists(const Php::Value &key) = 0;
 
     /**
-     *  Set a member
-     *  @param  key
-     *  @param  value
+     *  Set a slot within the array with the specified key-value pair
+     *
+     *  @param  key   Key to find the associated element
+     *  @param  value The element to associate with the key
      */
     virtual void offsetSet(const Php::Value &key, const Php::Value &value) = 0;
 
