@@ -22,9 +22,10 @@ class PHPCPP_EXPORT ArrayAccess
 {
 public:
     /**
-     *  Check if a member is set
-     *  @param  key
-     *  @return bool
+     *  Check if an element exists by supplying its key to find it
+     *
+     *  @param  key  Key to find the associated element
+     *  @return bool true if the element exist, false otherwise
      */
     virtual bool offsetExists(const Php::Value &key) = 0;
 
