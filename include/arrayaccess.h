@@ -48,8 +48,9 @@ public:
     virtual Php::Value offsetGet(const Php::Value &key) = 0;
 
     /**
-     *  Remove a member
-     *  @param key
+     *  Remove an element from the array associated with the specified key
+     *
+     *  @param key Key to find the associated element
      */
     virtual void offsetUnset(const Php::Value &key) = 0;
 };
