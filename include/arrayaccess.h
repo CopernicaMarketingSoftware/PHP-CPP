@@ -38,9 +38,11 @@ public:
     virtual void offsetSet(const Php::Value &key, const Php::Value &value) = 0;
 
     /**
-     *  Retrieve a member
-     *  @param  key
-     *  @return value
+     *  Retrieve a copy of the element associated with the specified key
+     *
+     *  @param  key   Key to find the associated element
+     *
+     *  @return value The element to associate with the key
      */
     virtual Php::Value offsetGet(const Php::Value &key) = 0;
 
