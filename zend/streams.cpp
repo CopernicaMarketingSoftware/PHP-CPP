@@ -1,5 +1,5 @@
 /**
- *  Streams.cpp
+ *  @file streams.cpp
  *
  *  Implementation of the streams
  *
