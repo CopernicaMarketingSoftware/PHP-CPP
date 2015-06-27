@@ -30,11 +30,12 @@ public:
     {}
 
     /**
-     *  Constructor
-     *  @param  name        Name of the argument
-     *  @param  classname   Name of the class
-     *  @param  nullable    Can it be null?
-     *  @param  required    Is this argument required?
+     *  Constructor to create an argument by reference specifying the following
+     *
+     *  @param name      Name of the argument
+     *  @param classname Name of the class
+     *  @param nullable  Can it be null?
+     *  @param required  Is this argument required?
      */
     ByRef(const char *name, const char *classname, bool nullable = false, bool required = true)
         : Argument{name, classname, nullable, required, true}
