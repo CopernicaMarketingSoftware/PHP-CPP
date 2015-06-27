@@ -19,10 +19,11 @@ class PHPCPP_EXPORT ByRef : public Argument
 {
 public:
     /**
-     *  Constructor
-     *  @param  name        Name of the argument
-     *  @param  type        Argument type
-     *  @param  required    Is this argument required?
+     *  Constructor to create an argument by reference specifying the following
+     *
+     *  @param name     Name of the argument
+     *  @param type     The argument's type
+     *  @param required Is this argument required?
      */
     ByRef(const char *name, Type type = Type::Null, bool required = true)
         : Argument{name, type, required, true}
