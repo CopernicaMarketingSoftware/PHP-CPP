@@ -1,7 +1,7 @@
 /**
- *  ByRef.h
+ *  @file byref.h
  *
- *  Overridden Argument class to specify by-reference function arguments
+ *  This class models the semantic meaning of accepting an argument by reference
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
