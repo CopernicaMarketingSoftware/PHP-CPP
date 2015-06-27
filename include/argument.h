@@ -46,7 +46,7 @@ protected:
     {}
 
     /**
-     *  Constructor to create an argument specifying the following
+     *  Constructor to create an argument by specifying the following
      *
      *  @param name      Name of the argument
      *  @param classname Name of the class
