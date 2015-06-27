@@ -24,7 +24,9 @@ public:
      *  @param  type        Argument type
      *  @param  required    Is this argument required?
      */
-    ByRef(const char *name, Type type = Type::Null, bool required = true) : Argument(name, type, required, true) {}
+    ByRef(const char *name, Type type = Type::Null, bool required = true)
+        : Argument{name, type, required, true}
+    {}
 
     /**
      *  Constructor
