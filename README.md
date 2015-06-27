@@ -56,8 +56,8 @@ The method call to export the above C++ function:
 
 ```c
 extension.add("my_plus", my_plus, {
-	Php::ByVal("a", Php::numericType),
-	Php::ByVal("b", Php::numericType)
+    Php::ByVal("a", Php::numericType),
+    Php::ByVal("b", Php::numericType)
 });
 ```
 
@@ -71,7 +71,7 @@ features from the C++11 language. It does not matter if your functions accept st
 integers, booleans or other native parameters: PHP-CPP takes care of the conversion. 
 The return value of your function is also transformed by PHP-CPP into PHP.
 
-More complicated structured can be handled by PHP-CPP as well. If you would like to return
+More complicated structures can be handled by PHP-CPP as well. If you would like to return
 a nested associative array from your function, you can do so too:
 
 ```c
