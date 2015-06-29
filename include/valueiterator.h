@@ -35,8 +35,9 @@ public:
     ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
 
     /**
-     *  Copy constructor
-     *  @param  that
+     *  Copy constructor to create a ValueIterator object by specifying the following
+     *
+     *  @param that ValueIterator object to get the implementation iterator from
      */
     ValueIterator(const ValueIterator &that);
 
