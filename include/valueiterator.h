@@ -1,8 +1,8 @@
 /**
- *  ValueIterator.h
+ *  @file valueiterator.h
  *
  *  This is an internal helper class that is used when iterating over a
- *  Php::Value object - stl style.
+ *  Php::Value object - STL style.
  *
  *  Thus, when you do c++ things like "for (auto &iter : value)", internally
  *  a ValueIterator object is being used.
@@ -28,8 +28,9 @@ class PHPCPP_EXPORT ValueIterator
 {
 public:
     /**
-     *  Constructor
-     *  @param  impl        Implementation iterator
+     *  Constructor to create a ValueIterator object by specifying the following
+     *
+     *  @param impl Implementation iterator
      */
     ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
 
