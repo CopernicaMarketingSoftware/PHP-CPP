@@ -1099,6 +1099,13 @@ public:
     bool derivedFrom(const char *classname, bool allowString = false) const { return derivedFrom(classname, strlen(classname), allowString); }
     bool derivedFrom(const std::string &classname, bool allowString = false) const { return derivedFrom(classname.c_str(), classname.size(), allowString); }
 
+    /**
+     * Returns a pointer to the internal zval structure
+     * To use this you need to include the php header files in your extension and cast this back to _zval_struct*
+     */
+    void* getInternalZVal() {
+        return _val;
+    }
 
 private:
     /**
