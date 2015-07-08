@@ -20,7 +20,7 @@ extern "C" {
         // for the entire duration of the process (that's why it's static)
         static Php::Extension extension("returnobject", "1.0");
         
-        // we have to class - master and child
+        // we have two classes - master and child
         Php::Class<Master> master("master");
         Php::Class<Child> child("child");
         
