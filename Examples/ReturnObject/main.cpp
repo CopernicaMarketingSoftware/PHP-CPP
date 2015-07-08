@@ -18,7 +18,7 @@ extern "C" {
     {
         // static(!) Php::Extension object that should stay in memory
         // for the entire duration of the process (that's why it's static)
-        static Php::Extension extension("returnobjecy", "1.0");
+        static Php::Extension extension("returnobject", "1.0");
         
         // we have to class - master and child
         Php::Class<Master> master("master");
