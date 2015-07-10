@@ -37,7 +37,8 @@ protected:
     
     /**
      *  Callback that is called in front of each request
-     *  @var    Callback
+     *
+     *  @var Callback A function that's called for every service request
      */
     Callback _onRequest;
     
