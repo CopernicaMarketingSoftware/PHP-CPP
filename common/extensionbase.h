@@ -29,8 +29,9 @@ protected:
 
     /**
      *  Callback that is called after the engine is initialized and before the
-     *  pageviews are going to be handled
-     *  @var    Callback
+     *  page-views are handled
+     *
+     *  @var Callback A function that's called after engine startup
      */
     Callback _onStartup;
     
