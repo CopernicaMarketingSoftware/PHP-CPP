@@ -51,7 +51,8 @@ protected:
     
     /**
      *  Callback that is called right before the engine is closing down
-     *  @var    Callback
+     *
+     *  @var Callback A function that's called on engine shutdown
      */
     Callback _onShutdown;
     
