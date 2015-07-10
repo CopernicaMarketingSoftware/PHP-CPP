@@ -22,7 +22,8 @@ class ExtensionBase
 protected:
     /**
      *  Pointer to the extension object that is filled by the extension programmer
-     *  @var    Extension
+     *
+     *  @var Extension * The address of the extension
      */
     Extension *_data;
 
