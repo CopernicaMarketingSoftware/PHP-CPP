@@ -58,8 +58,9 @@ protected:
     
 public:
     /**
-     *  Constructor
-     *  @param  data        Extension object created by the extension programmer
+     *  Constructor to create an object of this type by supplying the following
+     *
+     *  @param data Address of Extension object created by the extension programmer
      */
     ExtensionBase(Extension *data) : _data(data) {}
     
