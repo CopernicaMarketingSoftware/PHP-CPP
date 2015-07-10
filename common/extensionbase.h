@@ -1,8 +1,9 @@
 /**
- *  ExtensionBase.h
+ *  @file extensionbase.h
  *
- *  Base class for ExtensionImpl objects. Common code used by both the Zend
- *  and HHVM engine.
+ *  Base class for ExtensionImpl objects.
+ *
+ *  Common code used by the Zend engine.
  * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
