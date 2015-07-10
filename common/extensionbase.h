@@ -44,7 +44,8 @@ protected:
     
     /**
      *  Callback that is called right after each request
-     *  @var    Callback
+     *
+     *  @var Callback A function that's called after every service request
      */
     Callback _onIdle;
     
