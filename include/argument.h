@@ -119,12 +119,12 @@ protected:
      */
     Argument(const char *name, const char *classname, bool nullable = true,
              bool required = true, bool byref = false)
-        : m_name       { name         }
-        , m_type       { Type::Object }
-        , m_classname  { classname    }
-        , m_nullable   { nullable     }
-        , m_required   { required     }
-        , m_byReference{ byref        }
+        : m_name        { name         }
+        , m_type        { Type::Object }
+        , m_classname   { classname    }
+        , m_nullable    { nullable     }
+        , m_required    { required     }
+        , m_byReference { byref        }
     {}
 
 private:
