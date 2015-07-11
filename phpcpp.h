@@ -1,7 +1,8 @@
 /**
- *  phpcpp.h
+ *  @file phpcpp.h
  *
- *  Library to build PHP extensions with CPP
+ *  This file provides the list of ingredients for building the final product
+ *  which is the bridge between PHP and C++ (PHP-CPP)
  *
  *  @copyright 2013 CopernicA BV
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -11,21 +12,21 @@
 #define PHPCPP_H
 
 /**
- *  Other C and C++ libraries that PhpCpp depends on
+ *  Platform dependencies
  */
-#include <string.h>
+#include <set>
+#include <map>
+#include <list>
 #include <string>
-#include <initializer_list>
 #include <vector>
 #include <memory>
-#include <list>
+#include <cstring>
 #include <exception>
-#include <map>
-#include <set>
 #include <functional>
+#include <initializer_list>
 
 /**
- *  Include all headers files that are related to this library
+ *  Local library dependencies
  */
 #include <phpcpp/visibility.h>
 #include <phpcpp/noexcept.h>
@@ -69,4 +70,4 @@
 #include <phpcpp/file.h>
 #include <phpcpp/function.h>
 
-#endif /* phpcpp.h */
+#endif /* PHPCPP_H */
