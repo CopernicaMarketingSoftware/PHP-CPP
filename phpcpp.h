@@ -1,7 +1,7 @@
 /**
  *  @file phpcpp.h
  *
- *  This file provides the list of ingredients for building the final product
+ *  This file provides the list of materials for building the final product
  *  which is the bridge between PHP and C++ (PHP-CPP)
  *
  *  @copyright 2013 CopernicA BV
