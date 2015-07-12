@@ -1,7 +1,7 @@
 /**
  *  @file byref.h
  *
- *  This class models the semantic meaning of accepting an argument by reference
+ *  This file provides a class that models the semantic meaning of accepting an argument by reference
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -19,44 +19,54 @@ class PHPCPP_EXPORT ByRef : public Argument
 {
 public:
     /**
-     *  Constructor to create an argument by reference specifying the following
+     *  Constructor to create an object of this type by specifying the following
      *
-     *  @param name     Name of the argument
-     *  @param type     The argument's type
-     *  @param required Is this argument required?
+     *  @param name     - Argument name
+     *  @param type     - Argument type
+     *  @param required - Is this argument required?
      */
-    ByRef(const char *name, Type type = Type::Null, bool required = true)
-        : Argument{name, type, required, true}
+    constexpr
+    ByRef(const char * name, Type type = Type::Null, bool required = true) _NOEXCEPT
+        : Argument{ name, type, required, true }
     {}
 
     /**
-     *  Constructor to create an argument by reference specifying the following
+     *  Constructor to create an object of this type by specifying the following
      *
-     *  @param name      Name of the argument
-     *  @param classname Name of the class
-     *  @param nullable  Can it be null?
-     *  @param required  Is this argument required?
+     *  @param name      - Argument name
+     *  @param classname - Class name
+     *  @param nullable  - Can it be null?
+     *  @param required  - Is this argument required?
      */
-    ByRef(const char *name, const char *classname, bool nullable = false, bool required = true)
-        : Argument{name, classname, nullable, required, true}
+    constexpr
+    ByRef(const char * name, const char * classname, bool nullable = false, bool required = true) _NOEXCEPT
+        : Argument{ name, classname, nullable, required, true }
     {}
 
     /**
-     *  Copy constructor
-     *  @param  argument
+     *  Copy constructor to create an object of this type by specifying the following
+     *
+     *  @param argument - An object of this type
      */
-    ByRef(const ByRef &argument) : Argument(argument) {}
+    constexpr
+    ByRef(const ByRef &argument) _NOEXCEPT
+        : Argument{ argument }
+    {}
 
     /**
-     *  Move constructor
-     *  @param  argument
+     *  Move constructor to create an object of this type by specifying the following
+     *
+     *  @param argument - An object of this type
      */
-    ByRef(ByRef &&argument) _NOEXCEPT : Argument(argument) {}
+    constexpr
+    ByRef(ByRef &&argument) _NOEXCEPT
+        : Argument{ argument }
+    {}
 
     /**
-     *  Destructor
+     *  Default destructor
      */
-    virtual ~ByRef() {}
+    virtual ~ByRef() _NOEXCEPT =default;
 };
 
 /**
