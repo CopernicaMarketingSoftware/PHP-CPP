@@ -1,7 +1,7 @@
 /**
  *  @file version.h
  *
- *  Macro with API version number.
+ *  This file provides a macro with an API version number.
  *
  *  The API version number prevents extensions from loading with an incompatible
  *  library file "libphpcpp.so"
