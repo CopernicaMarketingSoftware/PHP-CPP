@@ -5,7 +5,7 @@
  *
  *  You'll need this class when you're defining your own functions.
  *
- *  The constructor of the class is protected so clients are directed to use the Php::ByVal or
+ *  The constructors of the class is protected so clients are directed to use the Php::ByVal or
  *  Php::ByRef classes instead.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -26,7 +26,7 @@ public:
     /**
      *  Default Destructor
      */
-    virtual ~Argument() =default;
+    virtual ~Argument() _NOEXCEPT =default;
 
     /**
      *  Method stating whether this is a required argument or not
@@ -161,8 +161,8 @@ private:
 };
 
 /**
- *  Old Visual C++ environments do not support initializer lists,
- *  therefore arguments should be passed as vectors
+ *  Old Visual C++ environments do not support std::initializer_list,
+ *  therefore arguments should be passed as a std::vector
  */
 #if defined(_MSC_VER) && (_MSC_VER < 1800)
 
@@ -174,7 +174,7 @@ private:
 using Arguments = std::vector<Argument>;
 
 /**
- *  Other compilers, and visual C++ 2013 do support initializer lists
+ *  Other compilers, and Visual C++ 2013 do support std::initializer_list
  */
 #else
 
@@ -186,7 +186,7 @@ using Arguments = std::vector<Argument>;
 using Arguments = std::initializer_list<Argument>;
 
 /**
- *  End of visual C++ check
+ *  End of Visual C++ check
  */
 #endif
 
