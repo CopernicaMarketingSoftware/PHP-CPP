@@ -44,7 +44,7 @@ public:
      *
      *  @return const char * - C-String containing the name of the argument
      */
-    const char *name() const _NOEXCEPT
+    const char * name() const _NOEXCEPT
     {
         return m_name;
     }
@@ -65,7 +65,7 @@ public:
      *  @return const char * - C-String containing the name of the class if the
      *                         argument's type is that of a class
      */
-    const char *classname() const _NOEXCEPT
+    const char * classname() const _NOEXCEPT
     {
         return m_classname;
     }
@@ -99,7 +99,8 @@ protected:
      *  @param required - Is this argument required?
      *  @param byref    - Is this a reference argument?
      */
-    Argument(const char *name, Type type, bool required = true, bool byref = false)
+    constexpr
+    Argument(const char * name, Type type, bool required = true, bool byref = false) _NOEXCEPT
         : m_name        { name     }
         , m_type        { type     }
         , m_classname   { nullptr  }
@@ -117,8 +118,9 @@ protected:
      *  @param required  - Is this argument required?
      *  @param byref     - Is this a reference argument?
      */
-    Argument(const char *name, const char *classname, bool nullable = true,
-             bool required = true, bool byref = false)
+    constexpr
+    Argument(const char * name, const char * classname, bool nullable = true,
+             bool required = true, bool byref = false) _NOEXCEPT
         : m_name        { name         }
         , m_type        { Type::Object }
         , m_classname   { classname    }
