@@ -1,7 +1,7 @@
 /**
- *  ByVal.h
+ *  @file byval.h
  *
- *  Overridden Argument class to specify by-value function arguments
+ *  This file provides a class that models the semantic meaning of accepting an argument by value
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -19,38 +19,52 @@ class PHPCPP_EXPORT ByVal : public Argument
 {
 public:
     /**
-     *  Constructor
-     *  @param  name        Name of the argument
-     *  @param  type        Argument type
-     *  @param  required    Is this argument required?
+     *  Constructor to create an argument by reference specifying the following
+     *
+     *  @param name     - Argument name
+     *  @param type     - Argument type
+     *  @param required - Is this argument required?
      */
-    ByVal(const char *name, Type type = Type::Null, bool required = true) : Argument(name, type, required, false) {}
+    ByVal(const char * name, Type type = Type::Null, bool required = true) _NOEXCEPT
+        : Argument{ name, type, required, false }
+    {}
 
     /**
-     *  Constructor
-     *  @param  name        Name of the argument
-     *  @param  classname   Name of the class
-     *  @param  nullable    Can it be null?
-     *  @param  required    Is this argument required?
+     *  Constructor to create an argument by reference specifying the following
+     *
+     *  @param name      - Argument name
+     *  @param classname - Class name
+     *  @param nullable  - Can it be null?
+     *  @param required  - Is this argument required?
      */
-    ByVal(const char *name, const char *classname, bool nullable = false, bool required = true) : Argument(name, classname, nullable, required, false) {}
+    ByVal(const char *name, const char *classname, bool nullable = false, bool required = true) _NOEXCEPT
+        : Argument{ name, classname, nullable, required, false }
+    {}
 
     /**
-     *  Copy constructor
-     *  @param  argument
+     *  Copy constructor to create an object of this type by specifying the following
+     *
+     *  @param argument - An object of this type
      */
-    ByVal(const ByVal &argument) : Argument(argument) {}
+    constexpr
+    ByVal(const ByVal &argument) _NOEXCEPT
+        : Argument{ argument }
+    {}
 
     /**
-     *  Move constructor
-     *  @param  argument
+     *  Move constructor to create an object of this type by specifying the following
+     *
+     *  @param argument - An object of this type
      */
-    ByVal(ByVal &&argument) _NOEXCEPT : Argument(argument) {}
+    constexpr
+    ByVal(ByVal &&argument) _NOEXCEPT
+        : Argument{ argument }
+    {}
 
     /**
-     *  Destructor
+     *  Default destructor
      */
-    virtual ~ByVal() {}
+    virtual ~ByVal() _NOEXCEPT =default;
 };
 
 /**
