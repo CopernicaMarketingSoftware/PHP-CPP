@@ -24,7 +24,7 @@ class PHPCPP_EXPORT Argument
 {
 public:
     /**
-     *  Default Destructor
+     *  Default destructor
      */
     virtual ~Argument() _NOEXCEPT =default;
 
