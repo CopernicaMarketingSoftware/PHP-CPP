@@ -55,6 +55,12 @@ public:
     virtual void offsetUnset(const Php::Value &key) = 0;
 
     /**
+     * Default constructor
+     */
+     constexpr
+     explicit ArrayAccess() _NOEXCEPT =default;
+
+    /**
      * Default destructor
      */
     virtual ~ArrayAccess() _NOEXCEPT =default;
