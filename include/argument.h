@@ -38,7 +38,7 @@ public:
      */
     bool required() const _NOEXCEPT
     {
-        return m_required;
+        return _required;
     }
 
     /**
@@ -48,7 +48,7 @@ public:
      */
     const char * name() const _NOEXCEPT
     {
-        return m_name;
+        return _name;
     }
 
     /**
@@ -58,7 +58,7 @@ public:
      */
     Type type() const _NOEXCEPT
     {
-        return m_type;
+        return _type;
     }
 
     /**
@@ -69,7 +69,7 @@ public:
      */
     const char * classname() const _NOEXCEPT
     {
-        return m_classname;
+        return _classname;
     }
 
     /**
@@ -79,7 +79,7 @@ public:
      */
     bool allowNull() const _NOEXCEPT
     {
-        return m_nullable;
+        return _nullable;
     }
 
     /**
@@ -89,7 +89,7 @@ public:
      */
     bool byReference() const _NOEXCEPT
     {
-        return m_byReference;
+        return _byReference;
     }
 
 protected:
@@ -102,12 +102,12 @@ protected:
      *  @param byref    - Is this a reference argument?
      */
     Argument(const char * name, Type type, bool required = true, bool byref = false) _NOEXCEPT
-        : m_name        { name     }
-        , m_type        { type     }
-        , m_classname   { nullptr  }
-        , m_nullable    { false    }
-        , m_required    { required }
-        , m_byReference { byref    }
+        : _name        { name     }
+        , _type        { type     }
+        , _classname   { nullptr  }
+        , _nullable    { false    }
+        , _required    { required }
+        , _byReference { byref    }
     {}
 
     /**
@@ -120,12 +120,12 @@ protected:
      *  @param byref     - Is this a reference argument?
      */
     Argument(const char * name, const char * classname, bool nullable = true, bool required = true, bool byref = false) _NOEXCEPT
-        : m_name        { name         }
-        , m_type        { Type::Object }
-        , m_classname   { classname    }
-        , m_nullable    { nullable     }
-        , m_required    { required     }
-        , m_byReference { byref        }
+        : _name        { name         }
+        , _type        { Type::Object }
+        , _classname   { classname    }
+        , _nullable    { nullable     }
+        , _required    { required     }
+        , _byReference { byref        }
     {}
 
     /**
@@ -146,33 +146,33 @@ private:
     /**
      *  The argument's name
      */
-    const char * m_name;
+    const char * _name;
 
     /**
      *  The type of argument
      */
-    Type m_type;
+    Type _type;
 
     /**
      *  The name of the class if this is an argument that is supposed to be
      *  an instance of a class
      */
-    const char * m_classname;
+    const char * _classname;
 
     /**
      *  The answer to whether the argument can be null
      */
-    bool m_nullable;
+    bool _nullable;
 
     /**
      *  The answer to whether this argument is required
      */
-    bool m_required;
+    bool _required;
 
     /**
      *  The answer to whether this is a 'by-reference' argument
      */
-    bool m_byReference;
+    bool _byReference;
 };
 
 /**
