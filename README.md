@@ -8,10 +8,10 @@ extensions for PHP. The full documentation can be found on http://www.php-cpp.co
 ABOUT
 =====
 
-PHP-CPP is created and maintained by Copernica (www.copernica.com). We write 
-our code mostly in PHP and C++ and needed an effective way 
-to combine these two languages. That's where PHP-CPP comes in.
-Do you appreciate our work and are you looking for other high quality solutions? 
+PHP-CPP is created and maintained by Copernica (www.copernica.com). We write our code
+mostly in PHP and C++ and needed an effective way to combine these two languages.
+That's where PHP-CPP comes in. Do you appreciate our work and are you looking
+for other high quality solutions? 
 
 Then check out our other solutions:
 
@@ -23,10 +23,10 @@ Then check out our other solutions:
 The power of PHP-CPP
 ====================
 
-Unlike regular PHP extensions - which are really hard to implement and require a deep
-knowledge of the Zend engine and pointer manipulation - extensions built with PHP-CPP
-are not difficult to develop at all. In fact, the only thing you need to do is write a function in
-C++, and the PHP-CPP library uses all the power offered by C++11 to convert the parameters and return
+Unlike regular PHP extensions - which are really hard to implement and require a deep knowledge of
+the Zend engine and pointer manipulation - extensions built with PHP-CPP are not difficult to 
+develop at all. In fact, the only thing you need to do is write a function in C++, and the 
+PHP-CPP library uses all the power offered by C++11 to convert the parameters and return
 values from your functions to/and from PHP:
 
 ```c
@@ -36,8 +36,8 @@ Php::Value hello_world()
 }
 ```
 
-The function above is a native C++ function. With PHP-CPP you can export this function
-to PHP with only one single C++ method call:
+The function above is a native C++ function. With PHP-CPP you can export this function to PHP
+with only one single C++ method call:
 
 ```c
 extension.add("hello_world", hello_world);
@@ -56,23 +56,23 @@ The method call to export the above C++ function:
 
 ```c
 extension.add("my_plus", my_plus, {
-	Php::ByVal("a", Php::numericType),
-	Php::ByVal("b", Php::numericType)
+    Php::ByVal("a", Php::numericType),
+    Php::ByVal("b", Php::numericType)
 });
 ```
 
-The PHP-CPP library ensures that the variables
-from PHP (which internally are complicated C structures), are automatically converted into 
-integers, passed to your function, and that the return value of your "my_plus" function is 
-also converted back into a PHP variable.
+The PHP-CPP library ensures that the variables from PHP (which internally are complicated C structures),
+are automatically converted into integers, passed to your function, and that the return value of your
+"my_plus" function is also converted back into a PHP variable.
 
-Type conversion between native C/C++ types and PHP variables is handled by PHP-CPP, using
-features from the C++11 language. It does not matter if your functions accept strings,
-integers, booleans or other native parameters: PHP-CPP takes care of the conversion. 
-The return value of your function is also transformed by PHP-CPP into PHP.
 
-More complicated structured can be handled by PHP-CPP as well. If you would like to return
-a nested associative array from your function, you can do so too:
+Type conversion between native C/C++ types and PHP variables is handled by PHP-CPP, using features
+from the C++11 language. It does not matter if your functions accept strings, integers, booleans
+or other native parameters: PHP-CPP takes care of the conversion. The return value of your
+function is also transformed by PHP-CPP into PHP.
+
+More complicated structures can be handled by PHP-CPP as well. If you would like to return a
+nested associative array from your function, you can do so too:
 
 ```c
 Php::Value get_complex_array()
@@ -99,5 +99,5 @@ function get_complex_array()
 }
 ```
 
-More information and more examples are available on the official website:
+More information and examples are available on the official website:
 http://www.php-cpp.com.
