@@ -164,6 +164,8 @@ public:
     Value &operator=(const std::string &value);
     Value &operator=(const char *value);
     Value &operator=(double value);
+    Value &operator=(const HashMember<std::string> &value);
+    Value &operator=(const HashMember<int> &value);
 
     /**
      *  Add a value to the object

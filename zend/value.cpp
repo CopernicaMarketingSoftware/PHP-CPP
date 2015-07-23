@@ -689,6 +689,28 @@ Value &Value::operator=(double value)
 }
 
 /**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(const HashMember<std::string> &value)
+{
+    // assign value object
+    return operator=(value.value());
+}
+
+/**
+ *  Assignment operator
+ *  @param  value
+ *  @return Value
+ */
+Value &Value::operator=(const HashMember<int> &value)
+{
+    // assign value object
+    return operator=(value.value());
+}
+
+/**
  *  Add a value to the object
  *  @param  value
  *  @return Value
