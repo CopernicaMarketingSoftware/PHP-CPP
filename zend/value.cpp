@@ -951,9 +951,19 @@ static Value do_exec(zval *const *object, zval *method, int argc, zval ***params
         // was an exception thrown inside the function? In that case we throw a C++ new exception
         // to give the C++ code the chance to catch it
         if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
+        
+        // leap out if nothing was returned
+        if (!retval) return nullptr;
+        
+        // wrap the retval in a value
+        Php::Value result(retval);
+        
+        // destruct the retval (this just decrements the refcounter, which is ok, because
+        // it is already wrapped in a Php::Value so still has 1 reference)
+        zval_ptr_dtor(&retval);
 
-        // no (additional) exception was thrown
-        return retval ? Value(retval) : nullptr;
+        // done
+        return result;
     }
 }
 
