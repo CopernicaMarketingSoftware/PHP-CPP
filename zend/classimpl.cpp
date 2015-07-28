@@ -476,6 +476,9 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
 
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
         // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
+        
+        // increment refcount for "result" (we keep a reference here)
+        Z_ADDREF_P(result);
 
         // is the original parameter overwritten?
         if (val == retval) zval_dtor(val);
