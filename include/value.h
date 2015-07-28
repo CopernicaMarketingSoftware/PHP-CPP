@@ -1154,18 +1154,6 @@ protected:
     struct _zval_struct *detach();
 
     /**
-     *  Attach a different zval
-     *
-     *  This will first detach the current zval, and link the Value object to
-     *  a different zval. Versions exist to attach to a zval and to an entire
-     *  hash table
-     *
-     *  @param  val
-     */
-    void attach(struct _zval_struct *val);
-    void attach(struct _hashtable *hashtable);
-
-    /**
      *  Set a certain property without running any checks (you must already know
      *  for sure that this is an array, and that the index is not yet in use)
      *
