@@ -317,10 +317,11 @@ Value::~Value()
  *  deallocate the zval structure. This is used for functions that have to
  *  return a zval pointer, that would otherwise be deallocated the moment
  *  the function returns.
- *
+ * 
+ *  @param  keeprefcount
  *  @return zval
  */
-zval *Value::detach()
+zval *Value::detach(bool keeprefcount)
 {
     // leap out if already detached
     if (!_val) return nullptr;
@@ -328,11 +329,14 @@ zval *Value::detach()
     // copy return value
     zval *result = _val;
 
-    // decrement reference counter
-    Z_DELREF_P(_val);
-
     // reset internal object
     _val = nullptr;
+    
+    // we're ready if we should keep the refcounter
+    if (keeprefcount) return result;
+
+    // decrement reference counter
+    Z_DELREF_P(result);
 
     // done
     return result;

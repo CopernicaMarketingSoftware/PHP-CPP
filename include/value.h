@@ -1149,9 +1149,10 @@ protected:
      *  return a zval pointer, that would otherwise be deallocated the moment
      *  the function returns.
      *
+     *  @param  keeprefcount    Keep the same refcount
      *  @return zval
      */
-    struct _zval_struct *detach();
+    struct _zval_struct *detach(bool keeprefcount = true);
 
     /**
      *  Set a certain property without running any checks (you must already know

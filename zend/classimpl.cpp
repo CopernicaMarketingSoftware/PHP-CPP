@@ -467,19 +467,16 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
 
         // check type
         switch ((Type)type) {
-            case Type::Numeric:     result = meta->callToInteger(object).detach();  break;
-            case Type::Float:       result = meta->callToFloat(object).detach();    break;
-            case Type::Bool:        result = meta->callToBool(object).detach();     break;
-            case Type::String:      result = meta->callToString(object).detach();   break;
-            default:                throw NotImplemented();                         break;
+            case Type::Numeric:     result = meta->callToInteger(object).detach(true);  break;
+            case Type::Float:       result = meta->callToFloat(object).detach(true);    break;
+            case Type::Bool:        result = meta->callToBool(object).detach(true);     break;
+            case Type::String:      result = meta->callToString(object).detach(true);   break;
+            default:                throw NotImplemented();                             break;
         }
 
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
         // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
         
-        // increment refcount for "result" (we keep a reference here)
-        Z_ADDREF_P(result);
-
         // is the original parameter overwritten?
         if (val == retval) zval_dtor(val);
 
@@ -653,7 +650,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type TSRMLS_DC)
             process(exception TSRMLS_CC);
 
             // unreachable
-            return Value(nullptr).detach();
+            return Value(nullptr).detach(false);
         }
     }
     else
@@ -811,17 +808,17 @@ zval *ClassImpl::toZval(Value &&value, int type)
     // because we do not want the value object to destruct the zval when
     // it falls out of scope, we detach the zval from it, if this is a regular
     // read operation we can do this right away
-    if (type == 0) return value.detach();
+    if (type == 0) return value.detach(false);
 
     // this is a more complicated read operation, the scripts wants to get
     // deeper access to the returned value. This, however, is only possible
     // if the value has more than once reference (if it has a refcount of one,
     // the value object that we have here is the only instance of the zval,
     // and it is simply impossible to return a reference or so
-    if (value.refcount() <= 1) return value.detach();
+    if (value.refcount() <= 1) return value.detach(false);
 
     // we're dealing with an editable zval, return a reference variable
-    return Value(value.detach(), true).detach();
+    return Value(value.detach(false), true).detach(false);
 }
 
 /**
@@ -907,7 +904,7 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
         process(exception TSRMLS_CC);
 
         // unreachable
-        return Value(nullptr).detach();
+        return Value(nullptr).detach(false);
     }
 }
 
