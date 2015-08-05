@@ -23,7 +23,7 @@ public:
      *  Method to serialize the object
      *
      *  This method should return a string representation of the object that
-     *  can be passed to the serialize() method and that will revive the object
+     *  can be passed to the unserialize() method and that will revive the object
      *
      *  @return std::string
      */
