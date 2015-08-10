@@ -57,7 +57,7 @@ other_function(function() {
 void other_function(Php::Parameters &amp;params)
 {
     // make sure the function was really called with at least one parameter
-    if (params.size() == 0) return nullptr;
+    if (params.size() == 0) return;
 
     // this function is called from PHP user space, and it is called
     // with a anonymous function as its first parameter
