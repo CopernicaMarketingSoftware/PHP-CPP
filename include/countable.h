@@ -27,8 +27,9 @@ class PHPCPP_EXPORT Countable
 {
 public:
     /**
-     *  Retrieve the number of items in the class
-     *  @return long
+     *  Method to retrieve the number of items in the class
+     *
+     *  @return long - The number of items in the class
      */
     virtual long count() = 0;
 
