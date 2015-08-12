@@ -33,6 +33,9 @@ public:
      */
     virtual long count() = 0;
 
+    /**
+     *  Default destructor
+     */
     virtual ~Countable() = default;
 
 };
