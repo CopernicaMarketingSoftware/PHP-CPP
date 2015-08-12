@@ -38,8 +38,10 @@ public:
     virtual ~Exception() _NOEXCEPT = default;
 
     /**
-     *  Overridden what method
-     *  @return const char *
+     *  Overriden method to retrieve the exception message
+     *
+     *  @return const char * - C-String containing the message associated
+     *                         with this exception
      */
     virtual const char *what() const _NOEXCEPT override
     {
