@@ -33,6 +33,8 @@ public:
      */
     virtual long count() = 0;
 
+    virtual ~Countable() = default;
+
 };
 
 /**
