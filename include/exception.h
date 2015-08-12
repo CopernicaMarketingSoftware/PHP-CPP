@@ -19,25 +19,6 @@ namespace Php {
  */
 class PHPCPP_EXPORT Exception : public std::exception
 {
-private:
-    /**
-     *  The exception message
-     *  @var    char*
-     */
-    std::string _message;
-
-    /**
-     *  The PHP exception code
-     *  @var    int
-     */
-    int _code;
-
-    /**
-     *  Has this exception been processed by native C++ code?
-     *  @var    bool
-     */
-    bool _processed = false;
-
 public:
     /**
      *  Constructor
@@ -87,6 +68,23 @@ public:
         // this is not done here
         return false;
     }
+
+private:
+    /**
+     *  The exception message
+     */
+    std::string _message;
+
+    /**
+     *  The PHP exception code
+     */
+    int _code;
+
+    /**
+     *  State field tracking whether this exception has been
+     *  processed by native C++ code
+     */
+    bool _processed { false };
 };
 
 /**
