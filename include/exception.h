@@ -49,8 +49,10 @@ public:
     }
 
     /**
-     *  Returns the message of the exception.
-     *  @return &string
+     *  Method to retrieve the exception message
+     *
+     *  @return const string & - std::string object containing the message
+     *                           associated with this exception
      */
     const std::string &message() const throw()
     {
