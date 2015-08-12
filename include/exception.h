@@ -43,7 +43,7 @@ public:
      *  @return const char * - C-String containing the message associated
      *                         with this exception
      */
-    virtual const char *what() const _NOEXCEPT override
+    virtual const char * what() const _NOEXCEPT override
     {
         return _message.c_str();
     }
@@ -54,7 +54,7 @@ public:
      *  @return const string & - std::string object containing the message
      *                           associated with this exception
      */
-    const std::string &message() const throw()
+    const std::string & message() const _NOEXCEPT
     {
         return _message;
     }
