@@ -37,7 +37,6 @@ public:
      *  Default destructor
      */
     virtual ~Countable() = default;
-
 };
 
 /**
