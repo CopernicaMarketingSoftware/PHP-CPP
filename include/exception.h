@@ -1,9 +1,11 @@
 /**
- *  Exception.h
- *  Implementation of Php Exceptions.
+ *  @file exception.h
+ *
+ *  This file provides a class to represent Php Exceptions
  *
  *  @author Jasper van Eck <jasper.vaneck@copernica.com>
- *  @copyright 2013, 2014 Copernica BV
+ *
+ *  @copyright 2013-2015 Copernica BV
  */
 #include <exception>
 
