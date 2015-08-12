@@ -1,16 +1,18 @@
 /**
- *  Countable.h
+ *  @file countable.h
  *
- *  "Interface" that can be "implemented" by your class. If you do, you
- *  create your class like this:
+ *  This file provides an "Interface" that can be "implemented" by your class.
  *
- *  class MyClass : public Php::Base, public Php::Countable { ... }
+ *  If you do, you create your class as follows:
  *
- *  You will have to implement the count() method, which should return the
- *  number of elements in the object
+ *      class MyClass : public Php::Base, public Php::Countable { ... }
+ *
+ *  You will have to implement the Php::Countable::count() method, which should
+ *  return the number of elements in the object
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *
+ *  @copyright 2014-2015 Copernica BV
  */
 
 /**
