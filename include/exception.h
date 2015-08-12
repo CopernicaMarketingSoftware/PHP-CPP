@@ -33,9 +33,9 @@ public:
     {}
 
     /**
-     *  Destructor
+     *  Default destructor
      */
-    virtual ~Exception() throw() {}
+    virtual ~Exception() _NOEXCEPT = default;
 
     /**
      *  Overridden what method
