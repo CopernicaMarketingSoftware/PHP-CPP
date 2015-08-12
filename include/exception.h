@@ -21,10 +21,16 @@ class PHPCPP_EXPORT Exception : public std::exception
 {
 public:
     /**
-     *  Constructor
-     *  @param  &string
+     *  Constructor to create an object of this type by specifying the following
+     *
+     *  @param message - The message to convey
+     *  @param code    - A Php exception code
      */
-    Exception(const std::string &message, int code = 0) : std::exception(), _message(message), _code(code) {}
+    explicit Exception(const std::string & message, int code = 0)
+        : std::exception {         }
+        , _message       { message }
+        , _code          { code    }
+    {}
 
     /**
      *  Destructor
