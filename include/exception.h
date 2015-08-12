@@ -60,8 +60,10 @@ public:
     }
 
     /**
-     *  Is this a native exception (one that was thrown from C++ code)
-     *  @return bool
+     *  Method stating whether this is a native exception
+     *  (one that was thrown from C++ code)
+     *
+     *  @return bool - true if the exception is native, false otherwise
      */
     virtual bool native() const
     {
