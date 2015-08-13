@@ -53,8 +53,10 @@ public:
      *  Move constructor
      *  @param  exception
      */
-    OrigException(OrigException &&exception) :
-        Value(std::move(exception)), Exception("OrigException"), _handled(exception._handled) 
+    OrigException(OrigException && exception)
+        : Value     { std::move(exception) }
+        , Exception { "OrigException"      }
+        , _handled  { exception._handled   } 
     {
         // set other exception to handled so that it wont do anything on destruction
         exception._handled = true;
