@@ -36,7 +36,7 @@ public:
     /**
      *  Default destructor
      */
-    virtual ~Countable() = default;
+    virtual ~Countable() _NOEXCEPT = default;
 };
 
 /**
