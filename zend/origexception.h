@@ -24,8 +24,9 @@ public:
      *  Constructor
      *  @param  val
      */
-    OrigException(zval *val TSRMLS_DC) : 
-        Value(val), Exception("OrigException") 
+    OrigException(zval * val TSRMLS_DC) 
+        : Value     { val             }
+        , Exception { "OrigException" } 
     {
 #ifdef ZTS
         // copy tsrm_ls
