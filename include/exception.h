@@ -65,7 +65,7 @@ public:
      *
      *  @return bool - true if the exception is native, false otherwise
      */
-    virtual bool native() const
+    virtual bool native() const _NOEXCEPT
     {
         // yes, it is native
         return true;
