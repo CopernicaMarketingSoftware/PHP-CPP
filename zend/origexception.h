@@ -92,7 +92,7 @@ public:
     /**
      *  Reactivate the exception
      */
-    void reactivate()
+    void reactivate() _NOEXCEPT
     {
         // it was not handled by extension C++ code
         _handled = false;
