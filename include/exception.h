@@ -76,7 +76,7 @@ public:
      *
      *  @return bool - true if its a fatal error, false otherwise
      */
-    virtual bool report() const
+    virtual bool report() const _NOEXCEPT
     {
         // this is not done here
         return false;
