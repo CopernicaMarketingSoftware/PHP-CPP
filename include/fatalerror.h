@@ -46,13 +46,15 @@ public:
     virtual ~FatalError() _NOEXCEPT =default;
 
     /**
-     *  Is this a native exception (one that was thrown from C++ code)
-     *  @return bool
+     *  Method stating whether this is native exception
+     *  (one that was thrown from C++ code)
+     *
+     *  @return bool - true if the exception is native, false otherwise
      */
-    virtual bool native() const
+    virtual bool native() const _NOEXCEPT override
     {
-        // although it is native, we return 0 because it should not persist
-        // as exception, but it should live on as zend_error() in stead
+        // although it is native, we return false because it should not persist
+        // as an exception but should live on as zend_error() instead
         return false;
     }
 
