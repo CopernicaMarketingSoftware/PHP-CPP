@@ -1,11 +1,13 @@
 /**
- *  FatalError.h
+ *  @file fatalerror.h
  *
+ *  This file provides a representation of a fatal error that occured within the
+ *  Php environment which is mapped to a call of zend_error()
  *
  *  Normally, fatal errors are reported with a call to zend_error().
  *
  *  However, this will trigger a longjmp(), which will cause objects
- *  constructed in the extension not to be destructed. We use therefore
+ *  constructed in the extension not to be destructed. Therefore we use 
  *  this FatalError class, which is a normal exception that _does_
  *  cause objects to be destructed.
  *
@@ -14,7 +16,8 @@
  *  thus a longjmp.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *
+ *  @copyright 2014-2015 Copernica BV
  */
 
 /**
