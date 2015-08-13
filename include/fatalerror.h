@@ -59,10 +59,11 @@ public:
     }
 
     /**
-     *  Report this error as a fatal error
-     *  @return bool
+     *  Method stating whether this is a fatal error
+     *
+     *  @return bool - true if its a fatal error, false otherwise
      */
-    virtual bool report() const override;
+    virtual bool report() const _NOEXCEPT override;
 };
 
 /**
