@@ -70,7 +70,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~OrigException() throw()
+    virtual ~OrigException() _NOEXCEPT
     {
         // if the exception was not handled by C++ code, we're not going to do anything
         // and the exception stays active
