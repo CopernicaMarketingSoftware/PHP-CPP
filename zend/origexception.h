@@ -19,27 +19,6 @@ namespace Php {
  */
 class OrigException : public Value, public Exception
 {
-private:
-    /**
-     *  Is this a an exception that was caught by extension C++ code.
-     * 
-     *  When the object is initially created, we assume that it will be caught
-     *  by C++ code. If it later turns out that the PHP-CPP can catch this
-     *  exception after the extension C++ code ran, the variable is set back
-     *  to false.
-     * 
-     *  @var bool
-     */
-    bool _handled = true;
-
-#ifdef ZTS
-    /**
-     *  When we run in multi-thread mode, we store the thread handle
-     *  @var void***
-     */
-    TSRMLS_D;
-#endif
-    
 public:
     /**
      *  Constructor
@@ -113,6 +92,26 @@ public:
         // it was not handled by extension C++ code
         _handled = false;
     }
+
+private:
+    /**
+     *  Is this a an exception that was caught by C++ extension code.
+     * 
+     *  When the object is initially created, we assume that it will be caught
+     *  by C++ code. If it later turns out that PHP-CPP can catch this
+     *  exception after the C++ extension code ran, the variable is set back
+     *  to false.
+     */
+    bool _handled { true };
+
+#ifdef ZTS
+    /**
+     *  When we run in multi-thread mode, we store the thread handle
+     *
+     *  @var void***
+     */
+    TSRMLS_D;
+#endif
 };
 
 /**
