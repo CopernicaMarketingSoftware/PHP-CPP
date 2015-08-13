@@ -1,11 +1,12 @@
 /**
- *  OrigException.h
+ *  @file origexception.h
  *
- *  Class that wraps around an exception that was thrown by PHP code,
- *  and that could - but not necessarily has to - be caught by C++
+ *  This file provides a class that wraps around an exception that was thrown
+ *  by PHP code, and that could - but not necessarily has to - be caught by C++
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *
+ *  @copyright 2013-2015 Copernica BV
  */
 
 /**
