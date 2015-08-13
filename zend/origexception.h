@@ -37,8 +37,10 @@ public:
      *  Copy constructor
      *  @param  exception
      */
-    OrigException(const OrigException &exception) : 
-        Value(exception), Exception("OrigException"), _handled(exception._handled) 
+    OrigException(const OrigException & exception) 
+        : Value     { exception          }
+        , Exception { "OrigException"    }
+        , _handled  { exception._handled } 
     {
 #ifdef ZTS
         // copy tsrm_ls
