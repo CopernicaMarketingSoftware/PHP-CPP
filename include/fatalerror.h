@@ -32,10 +32,13 @@ class PHPCPP_EXPORT FatalError : public Exception
 {
 public:
     /**
-     *  Constructor
-     *  @param  message
+     *  Constructor to create an object of this type by specifying the following
+     *
+     *  @param message - The message to convey
      */
-    FatalError(const std::string &message) : Exception(message) {}
+    explicit FatalError(const std::string & message)
+        : Exception { message }
+    {}
 
     /**
      *  Destructor
