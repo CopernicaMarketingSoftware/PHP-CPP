@@ -84,7 +84,7 @@ public:
      *  This is _not_ a native exception, it was thrown by a PHP script
      *  @return bool
      */
-    virtual bool native() const override
+    virtual bool native() const _NOEXCEPT override
     {
         return false;
     }
