@@ -10,17 +10,17 @@ extern "C" {
     /**
      *  Function that is called by PHP right after the PHP process
      *  has started, and that returns an address of an internal PHP
-     *  strucure with all the details and features of your extension
+     *  structure with all the details and features of your extension
      *
-     *  @return void*   a pointer to an address that is understood by PHP
+     *  @return void* Address of the extension object in memory
      */
     PHPCPP_EXPORT void *get_module() 
     {
         // static(!) Php::Extension object that should stay in memory
         // for the entire duration of the process (that's why it's static)
-        static Php::Extension extension("returnobjecy", "1.0");
+        static Php::Extension extension("returnobject", "1.0");
         
-        // we have to class - master and child
+        // we have two classes - master and child
         Php::Class<Master> master("master");
         Php::Class<Child> child("child");
         

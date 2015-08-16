@@ -1,8 +1,9 @@
 /**
- *  ExtensionBase.h
+ *  @file extensionbase.h
  *
- *  Base class for ExtensionImpl objects. Common code used by both the Zend
- *  and HHVM engine.
+ *  Base class for ExtensionImpl objects.
+ *
+ *  Common code used by the Zend engine.
  * 
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013, 2014 Copernica BV
@@ -21,39 +22,45 @@ class ExtensionBase
 protected:
     /**
      *  Pointer to the extension object that is filled by the extension programmer
-     *  @var    Extension
+     *
+     *  @var Extension * The address of the extension
      */
     Extension *_data;
 
     /**
      *  Callback that is called after the engine is initialized and before the
-     *  pageviews are going to be handled
-     *  @var    Callback
+     *  page-views are handled
+     *
+     *  @var Callback A function that's called after engine startup
      */
     Callback _onStartup;
     
     /**
      *  Callback that is called in front of each request
-     *  @var    Callback
+     *
+     *  @var Callback A function that's called for every service request
      */
     Callback _onRequest;
     
     /**
      *  Callback that is called right after each request
-     *  @var    Callback
+     *
+     *  @var Callback A function that's called after every service request
      */
     Callback _onIdle;
     
     /**
      *  Callback that is called right before the engine is closing down
-     *  @var    Callback
+     *
+     *  @var Callback A function that's called on engine shutdown
      */
     Callback _onShutdown;
     
 public:
     /**
-     *  Constructor
-     *  @param  data        Extension object created by the extension programmer
+     *  Constructor to create an object of this type by supplying the following
+     *
+     *  @param data Address of Extension object created by the extension programmer
      */
     ExtensionBase(Extension *data) : _data(data) {}
     

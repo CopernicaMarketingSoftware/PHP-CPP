@@ -1,8 +1,10 @@
 /**
- *  Type.h
+ *  @file type.h
  *
- *  In this file an enumeration type is defined with all supported variable
- *  types.
+ *  This file provides symbols denoting the supported types within the Php
+ *  environment
+ *
+ *  The symbols are scoped to prevent misuse and namespace pollution
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
@@ -15,6 +17,7 @@ namespace Php {
 
 /**
  *  Supported types for variables
+ *
  *  The values are the same as the ones used internally in Zend
  */
 enum class PHPCPP_EXPORT Type : unsigned char {

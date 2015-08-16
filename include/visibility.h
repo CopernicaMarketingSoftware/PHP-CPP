@@ -1,12 +1,10 @@
 /**
- *  visibility.h
+ *  @file visibility.h
  *
- *  This file defines macros used to define whether a symbol
- *  should be exported. It is only used for classes and
- *  functions that are defined in the public API to reduce
- *  the size of the symbol table, make linking and loading
- *  of the PHP-CPP library faster and generate more
- *  optimized code as a result.
+ *  This file defines macros used to define whether a symbol should be exported.
+ *  It is only used for classes and functions that are defined in the public API
+ *  to reduce the size of the symbol table, make linking and loading of the
+ *  PHP-CPP library faster and generate more optimized code as a result.
  *
  *  @copyright 2015 Copernica B.V.
  */

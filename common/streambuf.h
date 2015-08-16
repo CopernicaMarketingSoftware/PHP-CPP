@@ -1,9 +1,9 @@
 /**
- *  StreamBuf.h
+ *  @file streambuf.h
  *
  *  PHP output stream buffer which is used by the Php::out object to
  *  have an output stream just like the regular std::ostream buffers, 
- *  but that sends all output to PHP output
+ *  but directs all output to PHP
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2014 Copernica BV

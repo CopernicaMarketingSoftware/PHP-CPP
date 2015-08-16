@@ -99,5 +99,5 @@ function get_complex_array()
 }
 ```
 
-More information and more examples are available on the official website:
+More information and examples are available on the official website:
 http://www.php-cpp.com.
