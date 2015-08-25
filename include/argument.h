@@ -113,7 +113,6 @@ private:
 
     /**
      *  Type of argument
-     *  @var Type
      */
     Type _type = Type::Null;
 
