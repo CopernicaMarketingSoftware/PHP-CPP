@@ -123,7 +123,6 @@ private:
 
     /**
      *  May the parameter be null?
-     *  @var bool
      */
     bool _nullable = false;
 
