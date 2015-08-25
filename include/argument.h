@@ -108,7 +108,6 @@ public:
 private:
     /**
      *  Name of the argument
-     *  @var const char *
      */
     const char *_name = nullptr;
 
