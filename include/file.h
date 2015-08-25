@@ -81,7 +81,6 @@ public:
 private:
     /**
      *  The full resolved path name
-     *  @var const char *
      */
     char *_path = nullptr;
 
