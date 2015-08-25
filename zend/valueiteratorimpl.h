@@ -23,7 +23,7 @@ public:
     /**
      *  Constructor
      */
-    ValueIteratorImpl() {}
+    ValueIteratorImpl() = default;
     
     /**
      *  Destructor
