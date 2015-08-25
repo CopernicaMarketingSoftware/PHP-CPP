@@ -28,7 +28,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ValueIteratorImpl() {}
+    virtual ~ValueIteratorImpl() = default;
 
     /**
      *  Clone the object
