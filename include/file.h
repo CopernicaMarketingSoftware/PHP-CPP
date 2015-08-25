@@ -86,7 +86,6 @@ private:
 
     /**
      *  The opcodes of this file
-     *  @var Opcodes
      */
     Opcodes *_opcodes = nullptr;
 
