@@ -118,7 +118,6 @@ private:
 
     /**
      *  Classname, if this is a parameter that is supposed to be an instance of a class
-     *  @var std::string
      */
     const char *_classname = nullptr;
 
