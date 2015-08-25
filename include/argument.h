@@ -133,7 +133,6 @@ private:
 
     /**
      *  Is this a 'by-reference' parameter?
-     *  @var    bool
      */
     bool _byReference = false;
 };
