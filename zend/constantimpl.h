@@ -110,7 +110,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ConstantImpl() {}
+    virtual ~ConstantImpl() = default;
 
     /**
      *  Add the constant to a class
