@@ -212,7 +212,6 @@ private:
 
     /**
      *  The zend_constant structure
-     *  @var    zend_constant
      */
     zend_constant _constant;
 };
