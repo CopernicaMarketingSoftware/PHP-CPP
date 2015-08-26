@@ -207,7 +207,6 @@ public:
 private:
     /**
      *  Name of the constant
-     *  @var    const char *
      */
     const char *_name;
 
