@@ -61,7 +61,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Function() {}
+    virtual ~Function() = default;
 
 private:
     /**
