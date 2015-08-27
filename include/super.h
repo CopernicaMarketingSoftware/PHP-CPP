@@ -108,7 +108,7 @@ private:
 };
 
 /**
- *  A number of super-globals are always accessible
+ *  Superglobals that's always accessible
  */
 extern PHPCPP_EXPORT Super POST;
 extern PHPCPP_EXPORT Super GET;
