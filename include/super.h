@@ -33,7 +33,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Super() {}
+    virtual ~Super() = default;
 
     /**
      *  Array access operator
