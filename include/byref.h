@@ -50,7 +50,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ByRef() {}
+    virtual ~ByRef() = default;
 };
 
 /**
