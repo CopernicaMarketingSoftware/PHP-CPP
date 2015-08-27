@@ -69,8 +69,6 @@ private:
      *  @return _zend_class_entry
      */
     static struct _zend_class_entry *entry();
-
-
 };
 
 /**
