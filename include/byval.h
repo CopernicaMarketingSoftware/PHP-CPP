@@ -1,5 +1,5 @@
 /**
- *  ByVal.h
+ *  @file byval.h
  *
  *  Overridden Argument class to specify by-value function arguments
  *
