@@ -97,7 +97,6 @@ private:
 
     /**
      *  Name of the variable in PHP
-     *  @var    name
      */
     const char *_name;
 
