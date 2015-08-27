@@ -25,7 +25,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Interface() {}
+    virtual ~Interface() = default;
 
     /**
      *  Add a - of course abstract - method to the interface
