@@ -50,7 +50,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ByVal() {}
+    virtual ~ByVal() = default;
 };
 
 /**
