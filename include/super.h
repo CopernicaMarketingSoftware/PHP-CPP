@@ -92,7 +92,6 @@ public:
 private:
     /**
      *  Index number
-     *  @var    int
      */
     int _index;
 
