@@ -105,7 +105,6 @@ private:
      *  @return Value
      */
     Value value();
-
 };
 
 /**
