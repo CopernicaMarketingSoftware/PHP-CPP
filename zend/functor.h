@@ -33,7 +33,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Functor() {}
+    virtual ~Functor() = default;
     
     /**
      *  Invoke the functor
