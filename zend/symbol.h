@@ -104,7 +104,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Symbol() {}
+    virtual ~Symbol() = default;
 
     /**
      *  Is this a valid function or not?
