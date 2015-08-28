@@ -140,7 +140,7 @@ public:
      *  @param  value
      *  @return ForcedValue
      */
-    Object &operator=(Value &&value) _NOEXCEPT
+    Object &operator=(Value &&value)
     {
         // skip self assignment
         if (this == &value) return *this;
