@@ -28,7 +28,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Arithmetic() {}
+    virtual ~Arithmetic() = default;
     
     /**
      *  Apply a number, and return a new value object after running the arithmetic function
