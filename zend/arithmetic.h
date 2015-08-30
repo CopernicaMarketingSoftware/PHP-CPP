@@ -1,10 +1,13 @@
 /**
- *  Arithmethic.h
+ *  @file arithmethic.h
  *
- *  Helper class that takes care of arithmetic operations on PHP variables
+ *  This file defines a class that takes care of arithmetic operations on
+ *  PHP variables
  *
- *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @author Emiel Bruijntjes   <emiel.bruijntjes@copernica.com>
+ *  @author Rico Antonio Felix <ricoantoniofelix@yahoo.com>
+ *
+ *  @copyright 2013-2015 Copernica BV
  */
 
 /**
@@ -15,15 +18,16 @@ namespace Php {
 /**
  *  Class definition
  */
-template < template<typename T> class F>
+template < template <typename T> class F>
 class Arithmetic
 {
 public:
     /**
      *  Constructor
-     *  @param  value       The original object
+     *
+     *  @param value - Pointer to the original Value object
      */
-    Arithmetic(Value *value) : _value(value) {}
+    constexpr Arithmetic(Value *value) : _value(value) {}
     
     /**
      *  Destructor
@@ -31,256 +35,339 @@ public:
     virtual ~Arithmetic() = default;
     
     /**
-     *  Apply a number, and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
+     *  Method to apply a Value object to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  @param  value - The Value object to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
      */
     Value apply(const Value &value)
     {
-        // is this a type a floating point type?
+        // Does the argument represent a floating-point value?
+        // If true apply a floating point operation
         if (value.isFloat()) return apply(value.floatValue());
         
-        // we are going to treat it as a numeric (non floating) type
-        return apply(value.numericValue());
+        // At this point treat the argument as a 64 bit integer
+        // and apply an integral operation
+        return resultFromIntegralOperation(value.numericValue());
     }
-    
+
     /**
-     *  Apply a number, and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
+     *  Method to apply a 16 bit number to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  @param  value - A 16 bit number to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
      */
     Value apply(int16_t value)
     {
-        // check if the current object is a floating point number
-        if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
-        
-        // apply to natural numbers
-        return Value(F<int64_t>()(_value->numericValue(), value));
+        return resultFromIntegralOperation(value);
     }
     
     /**
-     *  Apply a number, and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
+     *  Method to apply a 32 bit number to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  @param  value - A 32 bit number to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
      */
     Value apply(int32_t value)
     {
-        // check if the current object is a floating point number
-        if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
-        
-        // apply to natural numbers
-        return Value(F<int64_t>()(_value->numericValue(), value));
+        return resultFromIntegralOperation(value);
     }
 
     /**
-     *  Apply a number, and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
+     *  Method to apply a 64 bit number to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  @param  value - A 64 bit number to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
      */
     Value apply(int64_t value)
     {
-        // check if the current object is a floating point number
-        if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value));
-        
-        // apply to natural numbers
-        return Value(F<int64_t>()(_value->numericValue(), value));
+        return resultFromIntegralOperation(value);
     }
-        
+    
     /**
-     *  Apply a boolean (treat is as 0 or 1), and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
+     *  Method to apply a boolean value to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  @param  value - A boolean value to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
+     */    
     Value apply(bool value)
     {
-        // check if the current object is a floating point number
-        if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), value?1:0));
+        // Does the referenced object represent a floating-point value?
+        // If true apply a floating point operation
+        if (_value->isFloat()) return apply(static_cast<double>(value? 1 : 0));
         
-        // apply to natural numbers
-        return Value(F<int64_t>()(_value->numericValue(), value?1:0));
+        // At this point apply an integral operation
+        return resultFromIntegralOperation(value? 1 : 0);
     }
-    
+
     /**
-     *  Apply a character (value between '0' and '9'), and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
+     *  Method to apply character to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  @param  value - A character to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
+     */  
     Value apply(char value)
     {
-        // convert to an integer
-        int v = value < '0' || value > '9' ? 0 : value - '0';
+        // Convert argument to a 64 bit integer
+        int64_t v = ((value < '0') || (value > '9'))? 0 : (value - '0');
 
-        // check if the current object is a floating point number
-        if (_value->isFloat()) return Value(F<double>()(_value->floatValue(), v));
+        // Does the referenced object represent a floating-point value?
+        // If true apply a floating point operation
+        if (_value->isFloat()) return apply(static_cast<double>(v));
         
-        // apply to natural numbers
-        return Value(F<int64_t>()(_value->numericValue(), v));
+        // At this point apply an integral operation
+        return resultFromIntegralOperation(v);
     }
     
     /**
-     *  Apply a string (representing a number), and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
+     *  Method to apply a string to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  Note:
+     *     The string must represent a numeric value
+     *
+     *  @param  value - A string to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
+     */  
     Value apply(const std::string &value)
     {
-        // convert string to integer
-        return apply(atoi(value.c_str()));
+        // Convert the argument to integer
+        return resultFromIntegralOperation(atoi(value.c_str()));
     }
 
     /**
-     *  Apply a string (representing a number), and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
+     *  Method to apply a string to the referenced Value object and return a
+     *  new Value object containing the result of the application
+     *
+     *  Note:
+     *     The string must represent a numeric value
+     *
+     *  @param  value - A string to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
+     */  
     Value apply(const char *value)
     {
-        // convert string to integer
-        return apply(atoi(value));
+        // Convert the argument to integer
+        return resultFromIntegralOperation(atoi(value));
     }
 
     /**
-     *  Apply a string (representing a number), and return a new value object after running the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
-    Value apply(double value)
+     *  Method to apply a floating point value to the referenced Value object
+     *  and return a new Value object containing the result of the application
+     *
+     *  @param  value - A floating point value to apply to the referenced Value object
+     *
+     *  @return Value - A new Value object containing the result of the application
+     */ 
+    Value apply(const double value)
     {
-        return Value(F<double>()(_value->floatValue(), value));
+        // Perform a floating point operation
+        return Value{F<double>{}(_value->floatValue(), value)};
     }
     
     /**
-     *  Assign a different value object, applying the arithmetic operation
-     *  @param  value
-     *  @return Value
+     *  Method to assign a Value object to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  @param  value - The Value object to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
      */
     Value &assign(const Value &value)
     {
-        // is this a type a floating point type?
+
+        // Does the argument represent a floating-point value?
+        // If true apply a floating point assignment operation
         if (value.isFloat()) return assign(value.floatValue());
         
-        // we are going to treat it as a numeric (non floating) type
-        return assign(value.numericValue());
+        // At this point treat the argument as a 64 bit integer
+        // and apply an integral assignment operation
+        return manipulatedReferencedValueObject(value.numericValue());
     }
 
     /**
-     *  Assign a 16bit number, applying the arithmetic operation
-     *  @param  value
-     *  @return Value
+     *  Method to assign a 16 bit number to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  @param  value - A 16 bit number to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
      */
     Value &assign(int16_t value)
     {
-        // is the current object a floating point type?
-        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
-        
-        // do a numeric operation
-        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
+        return manipulatedReferencedValueObject(value);
     }
     
     /**
-     *  Assign 32bit integer, applying the arithmetic operation
-     *  @param  value
-     *  @return Value
+     *  Method to assign a 32 bit number to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  @param  value - A 32 bit number to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
      */
     Value &assign(int32_t value)
     {
-        // is the current object a floating point type?
-        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
-        
-        // do a numeric operation
-        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
+        return manipulatedReferencedValueObject(value);
     }
 
     /**
-     *  Assign 64bit integer, applying the arithmetic operation
-     *  @param  value
-     *  @return Value
+     *  Method to assign a 64 bit number to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  @param  value - A 64 bit number to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
      */
     Value &assign(int64_t value)
     {
-        // is the current object a floating point type?
-        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value));
-        
-        // do a numeric operation
-        return _value->operator=(F<int64_t>()(_value->numericValue(), value));
+        return manipulatedReferencedValueObject(value);
     }
 
     /**
-     *  Assign 64bit integer - which is treated as 1 or 0 - applying the arithmetic operation
-     *  @param  value
-     *  @return Value
+     *  Method to assign a boolean value to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  @param  value - A boolean value to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
      */
     Value &assign(bool value)
     {
-        // is the current object a floating point type?
-        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), value?1:0));
+        // Does the referenced object represent a floating-point value?
+        // If true apply a floating point assignment operation
+        if (_value->isFloat()) return assign(static_cast<double>(value? 1 : 0));
         
-        // do a numeric operation
-        return _value->operator=(F<int64_t>()(_value->numericValue(), value?1:0));
+        // At this point treat the argument as a 64 bit integer
+        // and apply an integral assignment operation
+        return manipulatedReferencedValueObject(value? 1 : 0);
     }
     
     /**
-     *  Assign a single character - which is treated as an int, and applying the arithmetic function
-     *  @param  value
-     *  @return Value
+     *  Method to assign a character to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  @param  value - A character to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
      */
     Value &assign(char value)
     {
-        // convert to an integer
-        int v = value < '0' || value > '9' ? 0 : value - '0';
+        // Convert argument to a 64 bit integer
+        int64_t v = ((value < '0') || (value > '9'))? 0 : (value - '0');
         
-        // is the current object a floating point type?
-        if (_value->isFloat()) return _value->operator=(F<double>()(_value->floatValue(), v));
+        // Does the referenced object represent a floating-point value?
+        // If true apply a floating point assignment operation
+        if (_value->isFloat()) return assign(static_cast<double>(v));
         
-        // do a numeric operation
-        return _value->operator=(F<int64_t>()(_value->numericValue(), v));
+        // At this point treat the argument as a 64 bit integer
+        // and apply an integral assignment operation
+        return manipulatedReferencedValueObject(v);
     }
 
     /**
-     *  Assign a a string - treating it as an integer, and applying the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
+     *  Method to assign a string to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  Note:
+     *     The string must represent a numeric value
+     *
+     *  @param  value - A string to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
+     */ 
     Value &assign(const std::string &value)
     {
-        // assign integer
-        return assign(atoi(value.c_str()));
+        // Assign an integer
+        return manipulatedReferencedValueObject(atoi(value.c_str()));
     }
     
     /**
-     *  Assign a string - treating it as an integer, and applying the arithmetic function
-     *  @param  value
-     *  @return Value
-     */
+     *  Method to assign a string to the referenced Value object and return 
+     *  the referenced Value object
+     *
+     *  Note:
+     *     The string must represent a numeric value
+     *
+     *  @param  value - A string to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
+     */ 
     Value &assign(const char *value)
     {
-        // assign integer
-        return assign(atoi(value));
+        // Assign an integer
+        return manipulatedReferencedValueObject(atoi(value));
     }
     
     /**
-     *  Assign a double, applying the arithmetic operation
-     *  @param  value
-     *  @return Value
-     */
-    Value &assign(double value)
+     *  Method to assign floating point value to the referenced Value object
+     *  and return the referenced Value object
+     *
+     *  @param  value - A floating point value to assign to the referenced Value object
+     *
+     *  @return Value - The referenced Value object
+     */ 
+    Value &assign(const double value)
     {
-        // do float operation
-        return _value->operator=(F<double>()(_value->floatValue(), value));
+        // Perform a floating point operation and assignment
+        return _value->operator=(F<double>{}(_value->floatValue(), value));
     }
     
 private:
     /**
      *  Pointer to the original value object
-     *  @var    Value
      */
     Value *_value;
-    
 
+    /**
+     *  Implementation detail method to help reduce duplication
+     *
+     *  Performs an integral operation with the 64 bit argument
+     *  and the referenced Value object producing a new Value
+     *  object containing the result from the operation
+     */
+    Value resultFromIntegralOperation(const int64_t value)
+    {
+        // Does the referenced object represent a floating-point value?
+        // If true apply a floating point operation
+        if (_value->isFloat()) return apply(static_cast<double>(value));
+        
+        // At this point perform a 64 bit integral operation
+        return Value{F<int64_t>{}(_value->numericValue(), value)};
+    }
+
+    /**
+     *  Implementation detail method to help reduce duplication
+     *
+     *  Assigns the 64 bit argument to the referenced Value object
+     *  and returns a referened to the Value object
+     */
+    Value &manipulatedReferencedValueObject(const int64_t value)
+    {
+        // Does the referenced object represent a floating-point value?
+        // If true apply a floating point assignment operation
+        if (_value->isFloat()) return assign(static_cast<double>(value));
+        
+        // At this point perform a 64 bit integral operation and assignment
+        return _value->operator=(F<int64_t>{}(_value->numericValue(), value));
+    }
 };
 
 /**
  *  End of namespace
  */
 }
-
