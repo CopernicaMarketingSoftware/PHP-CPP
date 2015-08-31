@@ -113,7 +113,7 @@ public:
      *  @param  value
      *  @return Array
      */
-    Array &operator=(Value &&value) _NOEXCEPT
+    Array &operator=(Value &&value)
     {
         // skip self assignment
         if (this == &value) return *this;
