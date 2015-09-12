@@ -124,7 +124,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Property() {}
+    virtual ~Property() = default;
     
     /**
      *  Get the property

@@ -81,13 +81,11 @@ public:
 private:
     /**
      *  The full resolved path name
-     *  @var const char *
      */
     char *_path = nullptr;
 
     /**
      *  The opcodes of this file
-     *  @var Opcodes
      */
     Opcodes *_opcodes = nullptr;
 

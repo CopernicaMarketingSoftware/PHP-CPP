@@ -1,10 +1,10 @@
 /**
- *  Function.h
+ *  @file function.h
  *
  *  Small extension to the Value class that allows a value to be
  *  constructed with a std::function.
  *
- *  If you want to assign a std::function to a value, the following
+ *  If you want to assign a std::function to a Value, the following
  *  piece of code won't work:
  *
  *      Php::Value value([]() { .... });
@@ -13,7 +13,7 @@
  *  Value constructors. For that reason we have created a small and
  *  simple Function class that can be used instead:
  *
- *      Php::Function valu([]() { .... });
+ *      Php::Function value([]() { .... });
  *
  *  A Php::Function is an extended Php::Value object, so can be used
  *  in place of Php::Values all the time. The only difference is that
@@ -61,7 +61,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Function() {}
+    virtual ~Function() = default;
 
 private:
     /**
@@ -69,8 +69,6 @@ private:
      *  @return _zend_class_entry
      */
     static struct _zend_class_entry *entry();
-
-
 };
 
 /**

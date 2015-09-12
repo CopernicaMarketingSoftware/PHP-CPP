@@ -110,7 +110,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ConstantImpl() {}
+    virtual ~ConstantImpl() = default;
 
     /**
      *  Add the constant to a class
@@ -207,13 +207,11 @@ public:
 private:
     /**
      *  Name of the constant
-     *  @var    const char *
      */
     const char *_name;
 
     /**
      *  The zend_constant structure
-     *  @var    zend_constant
      */
     zend_constant _constant;
 };

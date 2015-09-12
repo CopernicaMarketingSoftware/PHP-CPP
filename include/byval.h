@@ -1,5 +1,5 @@
 /**
- *  ByVal.h
+ *  @file byval.h
  *
  *  Overridden Argument class to specify by-value function arguments
  *
@@ -50,7 +50,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ByVal() {}
+    virtual ~ByVal() = default;
 };
 
 /**

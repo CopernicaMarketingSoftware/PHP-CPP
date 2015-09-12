@@ -108,37 +108,31 @@ public:
 private:
     /**
      *  Name of the argument
-     *  @var const char *
      */
     const char *_name = nullptr;
 
     /**
      *  Type of argument
-     *  @var Type
      */
     Type _type = Type::Null;
 
     /**
      *  Classname, if this is a parameter that is supposed to be an instance of a class
-     *  @var std::string
      */
     const char *_classname = nullptr;
 
     /**
      *  May the parameter be null?
-     *  @var bool
      */
     bool _nullable = false;
 
     /**
-     *  Is this a required argument
-     *  @var    bool
+     *  Is this a required argument?
      */
     bool _required = true;
 
     /**
      *  Is this a 'by-reference' parameter?
-     *  @var    bool
      */
     bool _byReference = false;
 };

@@ -22,7 +22,7 @@ void myFunction()
 }
 
 /**
- *  Switch to C contect so that the get_module() function can be
+ *  Switch to C context so that the get_module() function can be
  *  called by the Zend engine
  */
 extern "C" {

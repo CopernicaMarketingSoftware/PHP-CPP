@@ -1,5 +1,5 @@
 /**
- *  ByRef.h
+ *  @file byref.h
  *
  *  Overridden Argument class to specify by-reference function arguments
  *
@@ -50,7 +50,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ByRef() {}
+    virtual ~ByRef() = default;
 };
 
 /**
