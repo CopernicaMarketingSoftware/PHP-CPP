@@ -211,6 +211,7 @@ ${PHP_STATIC_OBJECTS}:
 
 install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
+	${MKDIR} ${INSTALL_LIB}
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
 	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
@@ -224,4 +225,8 @@ install:
 	if `which ldconfig`; then \
 		sudo ldconfig; \
 	fi
+
+uninstall:
+	${RM} ${INSTALL_HEADERS}/phpcpp*
+	${RM} ${INSTALL_LIB}/libphpcpp.*
 
