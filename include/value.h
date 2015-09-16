@@ -1215,6 +1215,7 @@ protected:
      *  Friend functions which have to access that zval directly
      */
     friend Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
+    friend Value set_error_handler(const std::function<Value(Parameters &params)> &handler);
 };
 
 /**
