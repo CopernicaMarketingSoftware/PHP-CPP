@@ -33,6 +33,7 @@ namespace Php {
  */
 class Base;
 class ValueIterator;
+class Parameters;
 template <class Type> class HashMember;
 
 /**
@@ -1209,6 +1210,11 @@ protected:
     friend class Callable;
     friend class Script;
     friend class ConstantImpl;
+
+    /**
+     *  Friend functions which have to access that zval directly
+     */
+    friend Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
 };
 
 /**

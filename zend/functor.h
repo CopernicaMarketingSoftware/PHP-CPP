@@ -29,12 +29,12 @@ public:
      *  @param  function    The function to wrap
      */
     Functor(const std::function<Value(Parameters &params)> &function) : _function(function) {}
-    
+
     /**
      *  Destructor
      */
     virtual ~Functor() {}
-    
+
     /**
      *  Invoke the functor
      *  @param  params
@@ -61,7 +61,7 @@ public:
      *  @param  tsrmls
      */
     static void initialize(TSRMLS_D);
-    
+
     /**
      *  Shutdown the class
      *  @param  tsrmls
@@ -80,7 +80,7 @@ private:
      *  @var zend_class_entry
      */
     static zend_class_entry *_entry;
-    
+
 };
 
 /**
