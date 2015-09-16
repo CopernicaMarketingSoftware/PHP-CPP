@@ -144,7 +144,7 @@ private:
  *  @param  ini_val
  *  @return ostream
  */
-std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val);
+PHPCPP_EXPORT std::ostream &operator<<(std::ostream &stream, const IniValue &ini_val);
 
 
 /**
