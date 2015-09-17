@@ -43,7 +43,10 @@ Value set_exception_handler(const std::function<Value(Parameters &params)> &hand
     return output;
 }
 
-Value set_error_handler(const std::function<Value(Parameters &params)> &handler)
+/**
+ *  Set a std::function as a php error handler
+ */
+Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Error error)
 {
     // create the functor which wraps our callback
     Function functor(handler);
@@ -62,7 +65,7 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler)
 
     // copy our zval into the user_error_handler
     MAKE_COPY_ZVAL(&value, EG(user_error_handler));
-    EG(user_error_handler_error_reporting) = (int) (E_ALL | E_STRICT);
+    EG(user_error_handler_error_reporting) = (int) error;
 
     // return the original handler
     return output;

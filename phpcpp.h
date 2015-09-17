@@ -36,6 +36,7 @@
 #include <phpcpp/exception.h>
 #include <phpcpp/fatalerror.h>
 #include <phpcpp/streams.h>
+#include <phpcpp/errors.h>
 #include <phpcpp/type.h>
 #include <phpcpp/hashparent.h>
 #include <phpcpp/value.h>
