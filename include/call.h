@@ -48,6 +48,7 @@ extern PHPCPP_EXPORT    Value require_once(const char *filename);
 inline PHPCPP_EXPORT    Value require_once(const std::string &filename) { return require_once(filename.c_str()); }
 extern PHPCPP_EXPORT    Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
 extern PHPCPP_EXPORT    Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Error error = Error::All);
+extern PHPCPP_EXPORT    Value error_reporting(Error error);
 extern PHPCPP_EXPORT    const char *sapi_name();
 
 /**

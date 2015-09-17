@@ -72,6 +72,30 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
 }
 
 /**
+ *  Modify the error reporting level, will return the old error reporting level.
+ */
+Value error_reporting(Error error)
+{
+    // store the old error reporting value
+    Value output(EG(error_reporting));
+
+    // create a small temporary buffer
+    char str[21];
+
+    // write the level into this buffer
+    int size = sprintf(str, "%d", (int) error);
+
+    // if we failed for some reason we bail out
+    if (size < 0) return false;
+
+    // alter the ini on the fly
+    zend_alter_ini_entry("error_reporting", sizeof("error_reporting"), str, size, ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
+
+    // return the output
+    return output;
+}
+
+/**
  *  End of namespace
  */
 }
