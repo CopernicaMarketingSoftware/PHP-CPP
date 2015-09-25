@@ -1,11 +1,13 @@
 /**
- *  FatalError.h
+ *  @file fatalerror.h
  *
+ *  This file provides a representation of a fatal error that occured within the
+ *  Php environment which is mapped to a call of zend_error()
  *
  *  Normally, fatal errors are reported with a call to zend_error().
  *
  *  However, this will trigger a longjmp(), which will cause objects
- *  constructed in the extension not to be destructed. We use therefore
+ *  constructed in the extension not to be destructed. Therefore we use 
  *  this FatalError class, which is a normal exception that _does_
  *  cause objects to be destructed.
  *
@@ -14,7 +16,8 @@
  *  thus a longjmp.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *
+ *  @copyright 2014-2015 Copernica BV
  */
 
 /**
@@ -29,34 +32,38 @@ class PHPCPP_EXPORT FatalError : public Exception
 {
 public:
     /**
-     *  Constructor
-     *  @param  message
+     *  Constructor to create an object of this type by specifying the following
+     *
+     *  @param message - The message to convey
      */
-    FatalError(const std::string &message) : Exception(message) {}
+    explicit FatalError(const std::string & message)
+        : Exception { message }
+    {}
 
     /**
-     *  Destructor
+     *  Default destructor
      */
-    virtual ~FatalError() throw()
-    {
-    }
+    virtual ~FatalError() _NOEXCEPT =default;
 
     /**
-     *  Is this a native exception (one that was thrown from C++ code)
-     *  @return bool
+     *  Method stating whether this is native exception
+     *  (one that was thrown from C++ code)
+     *
+     *  @return bool - true if the exception is native, false otherwise
      */
-    virtual bool native() const
+    virtual bool native() const _NOEXCEPT override
     {
-        // although it is native, we return 0 because it should not persist
-        // as exception, but it should live on as zend_error() in stead
+        // although it is native, we return false because it should not persist
+        // as an exception but should live on as zend_error() instead
         return false;
     }
 
     /**
-     *  Report this error as a fatal error
-     *  @return bool
+     *  Method stating whether this is a fatal error
+     *
+     *  @return bool - true if its a fatal error, false otherwise
      */
-    virtual bool report() const override;
+    virtual bool report() const _NOEXCEPT override;
 };
 
 /**
