@@ -1303,8 +1303,22 @@ int ClassImpl::unserialize(zval **object, zend_class_entry *entry, const unsigne
     // turn this into a serializale
     Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(*object TSRMLS_CC)->object());
 
-    // call the unserialize method on it
-    serializable->unserialize((const char *)buffer, buf_len);
+    // user may throw an exception in the serialize() function
+    try
+    {
+        // call the unserialize method on it
+        serializable->unserialize((const char *)buffer, buf_len);
+    }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its method
+        // implementation, send it to user space
+        //process(exception TSRMLS_CC);
+        php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Error while unserializing");
+
+        // unreachable
+        return FAILURE;
+    }
 
     // done
     return SUCCESS;
