@@ -38,11 +38,27 @@ ClassImpl::~ClassImpl()
  */
 static ClassImpl *self(zend_class_entry *entry)
 {
-    // we need the base class (in user space the class may have been overridden,
-    // but we are not interested in these user space classes)
-    while (entry->parent) entry = entry->parent;
-
 #if PHP_VERSION_ID >= 50400
+
+    /**
+     *  somebody could have extended this class from PHP userland, in which
+     *  case trying to dereference the doc_comment would result in a disaster
+     *  because it does not point to a class implemented by PHP-CPP at all!
+     *
+     *  if this happens we need to keep going until we find the object that
+     *  was implemented by us. For this we are going to make the assumption
+     *  that we are the only ones misusing the doc_comment the way we do.
+     *
+     *  Usually the doc_comment is not set (it equals the nullptr) and if it
+     *  is set, the accompanying doc_comment_len should be non-zero to
+     *  indicate the number of characters in it.
+     */
+    while (entry->parent && entry->info.user.doc_comment == nullptr && entry->info.user.doc_comment_len == 0)
+    {
+        // we did not create this class entry, but luckily we have a parent
+        entry = entry->parent;
+    }
+
     // retrieve the comment (it has a pointer hidden in it to the ClassBase object)
     const char *comment = entry->info.user.doc_comment;
 
@@ -50,6 +66,18 @@ static ClassImpl *self(zend_class_entry *entry)
     // the next bytes contain a pointer to the ClassBase class
     return *((ClassImpl **)(comment + 1));
 #else
+
+    /**
+     *  This is likely not correct: If the class was extended using PHP-CPP
+     *  itself, we should retrieve the ClassImpl directly, however there is
+     *  no sane way to check this here, unlike in PHP 5.4.
+     *
+     *  We therefore always go to the very base, of which we are sure that
+     *  we are the implementers. This way - at least - we don't cause any
+     *  segfaults.
+     */
+    while (entry->parent) entry = entry->parent;
+
     // on php 5.3 we store the pointer to impl after the name in the entry
     ClassImpl** impl = (ClassImpl**)(entry->name + 1 + entry->name_length);
 
@@ -476,7 +504,7 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
 
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
         // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
-        
+
         // is the original parameter overwritten?
         if (val == retval) zval_dtor(val);
 
