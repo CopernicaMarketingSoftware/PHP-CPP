@@ -52,8 +52,13 @@ static ClassImpl *self(zend_class_entry *entry)
      *  Usually the doc_comment is not set (it equals the nullptr) and if it
      *  is set, the accompanying doc_comment_len should be non-zero to
      *  indicate the number of characters in it.
+     *
+     *  When, however, we use the doc_comment from inside PHP-CPP to store
+     *  the classimpl, we store a null-character (to immediately terminate
+     *  the string, in case PHP tries to read it) and after that the pointer
+     *  and we leave the doc_comment_len at 0.
      */
-    while (entry->parent && entry->info.user.doc_comment == nullptr && entry->info.user.doc_comment_len == 0)
+    while (entry->parent && (entry->info.user.doc_comment == nullptr || entry->info.user.doc_comment_len > 0))
     {
         // we did not create this class entry, but luckily we have a parent
         entry = entry->parent;
