@@ -1260,14 +1260,27 @@ int ClassImpl::serialize(zval *object, unsigned char **buffer, zend_uint *buf_le
     // get the serializable object
     Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(object TSRMLS_CC)->object());
 
-    // call the serialize method on the object
-    auto value = serializable->serialize();
+    // user may throw an exception in the serialize() function
+    try
+    {
+        // call the serialize method on the object
+        auto value = serializable->serialize();
 
-    // allocate the buffer, and copy the data into it (the zend engine will
-    // (hopefully) clean up the data for us - the default serialize method does
-    // it like this too)
-    *buffer = (unsigned char*)estrndup(value.c_str(), value.size());
-    *buf_len = value.size();
+        // allocate the buffer, and copy the data into it (the zend engine will
+        // (hopefully) clean up the data for us - the default serialize method does
+        // it like this too)
+        *buffer = (unsigned char*)estrndup(value.c_str(), value.size());
+        *buf_len = value.size();
+    }
+    catch (Exception &exception)
+    {
+        // user threw an exception in its method
+        // implementation, send it to user space
+        process(exception TSRMLS_CC);
+
+        // unreachable
+        return FAILURE;
+    }
 
     // done
     return SUCCESS;
