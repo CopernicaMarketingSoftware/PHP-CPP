@@ -1,7 +1,0 @@
-In this directory cpp extension is designed to conduct tests.
-When creating a test, do not use extension requiring the installation.
-In the directory php are the tests themselves.
-
-You can run test.sh with additional options.
-The full list of available options see ./test.sh -h
-
