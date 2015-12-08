@@ -112,7 +112,8 @@ public:
      */
     std::string stringValue() const
     {
-        return std::string(rawValue());
+        auto value = rawValue();
+        return std::string(value ? value : "");
     }
 
     /**
