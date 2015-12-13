@@ -86,7 +86,7 @@ public:
         zval *tmp;
 
         // initialize the properties, php 5.3 way
-        zend_hash_copy(_mixed->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_property_ctor, &tmp, sizeof(zval*));
+        zend_hash_copy(_mixed->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_add_ref, &tmp, sizeof(zval*));
 
 #else
 
