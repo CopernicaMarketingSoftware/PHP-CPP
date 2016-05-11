@@ -2,7 +2,7 @@
  *  ParametersImpl.h
  *
  *  Extended parameters class that can be instantiated
- * 
+ *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 Copernica BV
  */
@@ -28,22 +28,33 @@ public:
     {
         // reserve plenty of space
         reserve(argc);
-        
+
+        // array to store all the arguments in
+        zval arguments[argc];
+
+        // retrieve the arguments
+        zend_get_parameters_array_ex(argc, arguments);
+
         // loop through the arguments
         for (int i=0; i<argc; i++)
         {
-            // get the argument
-            zval **arg = (zval **) (zend_vm_stack_top(TSRMLS_C) - 1 - (argc-i));
-            
             // append value
-            emplace_back(*arg);
+            emplace_back(&arguments[i]);
         }
     }
-    
+
     /**
-     *  Destructor
+     *  Do _not_ add a virtual destructor here.
+     *
+     *  We are extending a vector, which does not itself
+     *  have a virtual destructor, so destructing through
+     *  a pointer to this vector has no effect.
+     *
+     *  By adding a virtual destructor we create a vtable,
+     *  which makes the class bigger, causing slicing and
+     *  then we are actually introducing the problem that
+     *  we are trying to avoid!
      */
-    virtual ~ParametersImpl() {}
 };
 
 /**

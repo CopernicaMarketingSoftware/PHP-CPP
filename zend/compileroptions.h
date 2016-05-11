@@ -2,7 +2,7 @@
  *  CompilerOptions.h
  *
  *  Helper class to temporarily set compiler options
- * 
+ *
  *  When an object is destructed, it automatically restored the previous compiler settings
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
@@ -22,10 +22,10 @@ class CompilerOptions
 private:
     /**
      *  The original compiler options
-     *  @var int
+     *  @var uint32_t
      */
-    zend_uint _original;
-    
+    uint32_t _original;
+
 #ifdef ZTS
     /**
      *  When in thread safety mode, we also keep track of the TSRM_LS var
@@ -39,20 +39,20 @@ public:
      *  Constructor
      *  @param  options
      */
-    CompilerOptions(zend_uint options TSRMLS_DC)
+    CompilerOptions(uint32_t options TSRMLS_DC)
     {
         // remember the old compiler options before we set temporary compile options
         _original = CG(compiler_options);
-        
+
         // we're going to evaluate only once
         CG(compiler_options) = options;
-        
+
 #ifdef ZTS
         // copy tsrm_ls param
         this->tsrm_ls = tsrm_ls;
 #endif
     }
-    
+
     /**
      *  Destructor
      */

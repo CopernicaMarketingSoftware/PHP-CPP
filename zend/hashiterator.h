@@ -32,14 +32,17 @@ public:
     HashIterator(HashTable *hashtable, bool first, bool is_array = false) : _table(hashtable), _is_array(is_array)
     {
         // reset the hash pointer to the internal position
-        if (hashtable && first) 
+        if (hashtable && first)
         {
+            // we should be valid (this is undone later if necessary)
+            _valid = true;
+
             // move to first position
             zend_hash_internal_pointer_reset_ex(_table, &_position);
-            
+
             // read current data
             if (read()) return;
-            
+
             // data was private, move on
             increment();
         }
@@ -49,7 +52,7 @@ public:
             invalidate();
         }
     }
-    
+
     /**
      *  Copy constructor
      *  @param  that
@@ -61,12 +64,12 @@ public:
         // read current position
         read();
     }
-    
+
     /**
      *  Destructor
      */
-    virtual ~HashIterator() {}
-    
+    virtual ~HashIterator() = default;
+
     /**
      *  Clone the object
      *  @param  tsrm_ls
@@ -84,15 +87,18 @@ public:
      */
     virtual bool increment() override
     {
+        // leap out if we're not even iterating over a hash table
+        if (!_table) return false;
+
         // leap out if already on an invalid pos (behind the last pos)
-        if (!_position) return false;
-        
+        if (!_valid) return false;
+
         // move the iterator forward
         if (zend_hash_move_forward_ex(_table, &_position) == SUCCESS)
         {
             // read current key and value
             if (read()) return true;
-            
+
             // data was private or invalid, move further
             return increment();
         }
@@ -102,7 +108,7 @@ public:
             return invalidate();
         }
     }
-    
+
     /**
      *  Decrement position (pre-decrement)
      *  @return bool
@@ -111,9 +117,9 @@ public:
     {
         // leap out if we're not even iterating over a hash table
         if (!_table) return false;
-        
+
         // if position is invalid, it is one position behind the last position
-        if (!_position)
+        if (!_valid)
         {
             // move to last position
             zend_hash_internal_pointer_end_ex(_table, &_position);
@@ -126,7 +132,7 @@ public:
 
         // read current key and value
         if (read()) return true;
-        
+
         // data was private, move on
         return decrement();
     }
@@ -140,9 +146,9 @@ public:
     {
         // this always is a hash iterator
         HashIterator *other = (HashIterator *)that;
-        
-        // compare the positions
-        return _position == other->_position;
+
+        // compare the tables and positions
+        return _table == other->_table && _position == other->_position;
     }
 
     /**
@@ -156,6 +162,12 @@ public:
 
 private:
     /**
+     *  Are we at a possibly valid position?
+     *  @var    bool
+     */
+    bool _valid = false;
+
+    /**
      *  The hash table over which is being iterated
      *  @var    HashTable
      */
@@ -165,7 +177,7 @@ private:
      *  The position in the hash table
      *  @var    HashPosition
      */
-    Bucket *_position = nullptr;
+    HashPosition _position;
 
     /**
      * Is a hash interator in array
@@ -188,44 +200,17 @@ private:
         // zval to read the current key in
         Value key;
 
-#if PHP_VERSION_ID >= 50500
-
         // read in the current key
         zend_hash_get_current_key_zval_ex(_table, key._val, &_position);
-        
+
         // if the key is set to NULL, it means that the object is not at a valid position
         if (key.isNull()) return invalidate();
-        
-#else
-
-        // php 5.3 and php 5.4 need a different implementation because the function
-        // zend_hash_get_current_key_zval_ex is missing in php 5.3, declare variables
-        // we need for storing the key in
-        char *string_key;
-        unsigned int str_len;
-        unsigned long num_key;
-        
-        // get the current key
-        int type = zend_hash_get_current_key_ex(_table, &string_key, &str_len, &num_key, 0, &_position);
-        
-        // if key is not found, the iterator is at an invalid position
-        if (type == HASH_KEY_NON_EXISTANT) return invalidate();
-
-        // numeric keys are the easiest ones
-        if (type == HASH_KEY_IS_LONG) key = (int64_t)num_key;
-        else key = std::string(string_key, str_len - 1);
-
-#endif
 
         // iterator is at a valid position, go fetch the data
-        // this is the variable we need for fetching the data
-        zval **value;
-                
-        // retrieve data
-        zend_hash_get_current_data_ex(_table, (void **) &value, &_position);
-        
+        auto *value = zend_hash_get_current_data_ex(_table, &_position);
+
         // we can now update the current data
-        _current = std::make_pair<Value,Value>(std::move(key), *value);
+        _current = std::make_pair<Value,Value>(std::move(key), value);
 
         // if the key is private (it starts with a null character) we should return
         // false to report that the object is not in a completely valid state
@@ -238,12 +223,12 @@ private:
      */
     bool invalidate()
     {
-        // forget current position
-        _position = nullptr;
-        
+        // no longer valid
+        _valid = false;
+
         // make the data a pair of null ptrs
         _current = std::make_pair<Value,Value>(nullptr,nullptr);
-        
+
         // done
         return false;
     }

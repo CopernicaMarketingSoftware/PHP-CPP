@@ -16,7 +16,7 @@ namespace Php {
 
 /**
  *  Helper class to store and restore the current opcode state
- * 
+ *
  *  When we're going to execute a set of instructions, we need to store the
  *  current state of the Zend engine. After the instructions have been processed,
  *  we can switch back to the original instructions
@@ -29,10 +29,9 @@ private:
      *  @var mixed
      */
     zend_op_array *_active_op_array;
-    zval **_return_value_ptr_ptr;
-    zend_op **_opline_ptr;
-    int _interactive;
-    
+    zval *_return_value;
+    const zend_op *_opline;
+
     /**
      *  The new value for 'no-extensions'
      *  @var int
@@ -46,7 +45,7 @@ private:
      */
     void ***tsrm_ls;
 #endif
-    
+
 public:
     /**
      *  No trivial constructor
@@ -60,10 +59,9 @@ public:
     ExecuteState(int no_extensions TSRMLS_DC)
     {
         // store all the original stuff
-        _active_op_array = EG(active_op_array);
-        _return_value_ptr_ptr = EG(return_value_ptr_ptr);
-        _opline_ptr = EG(opline_ptr);
-        _interactive = CG(interactive);
+        _active_op_array = CG(active_op_array);
+        _return_value  = EG(current_execute_data)->return_value;
+        _opline = EG(current_execute_data)->opline;
         _no_extensions = no_extensions;
 
 #ifdef ZTS
@@ -78,11 +76,10 @@ public:
     virtual ~ExecuteState()
     {
         // restore all settings
-        CG(interactive) = _interactive;
         EG(no_extensions) = _no_extensions;
-        EG(opline_ptr) = _opline_ptr;
-        EG(active_op_array) = _active_op_array;
-        EG(return_value_ptr_ptr) = _return_value_ptr_ptr;
+        EG(current_execute_data)->opline = _opline;
+        CG(active_op_array) = _active_op_array;
+        EG(current_execute_data)->return_value = _return_value;
     }
 };
 

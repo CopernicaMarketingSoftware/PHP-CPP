@@ -20,7 +20,7 @@ namespace Php {
  */
 static IteratorImpl *self(zend_object_iterator *iter)
 {
-    return (IteratorImpl *)iter->data;
+    return (IteratorImpl *)Z_PTR(iter->data);
 }
 
 /**
@@ -100,14 +100,14 @@ int IteratorImpl::key(zend_object_iterator *iter, char **str_key, uint *str_key_
 {
     // retrieve the key
     Value retval(self(iter)->key());
-    
+
     // is this a numeric string?
     if (retval.isString())
     {
         // copy the key and the from the value
         *str_key = estrndup(retval.rawValue(), retval.size());
         *str_key_len = retval.size() + 1;
-        
+
         // done
         return HASH_KEY_IS_STRING;
     }
@@ -115,7 +115,7 @@ int IteratorImpl::key(zend_object_iterator *iter, char **str_key, uint *str_key_
     {
         // convert to a numeric
         *int_key = retval.numericValue();
-        
+
         // done
         return HASH_KEY_IS_LONG;
     }
@@ -151,13 +151,13 @@ zend_object_iterator_funcs *IteratorImpl::functions()
 {
     // static variable with all functions
     static zend_object_iterator_funcs funcs;
-    
+
     // static variable that knows if the funcs are already initialized
     static bool initialized = false;
-    
+
     // no need to set anything if already initialized
     if (initialized) return &funcs;
-    
+
     // set the members
     funcs.dtor = &IteratorImpl::destructor;
     funcs.valid = &IteratorImpl::valid;
@@ -165,13 +165,13 @@ zend_object_iterator_funcs *IteratorImpl::functions()
     funcs.get_current_key = &IteratorImpl::key;
     funcs.move_forward = &IteratorImpl::next;
     funcs.rewind = &IteratorImpl::rewind;
-    
+
     // invalidate is not yet supported
     funcs.invalidate_current = nullptr;
-    
+
     // remember that functions are initialized
     initialized = true;
-    
+
     // done
     return &funcs;
 }

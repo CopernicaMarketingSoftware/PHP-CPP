@@ -29,14 +29,14 @@ public:
      *  Constructor
      *  @param  opcodes
      */
-    Opcodes(struct _zend_op_array *opcodes TSRMLS_DC) : _opcodes(opcodes) 
+    Opcodes(struct _zend_op_array *opcodes TSRMLS_DC) : _opcodes(opcodes)
     {
 #ifdef ZTS
         // copy tsrm_ls param
         this->tsrm_ls = tsrm_ls;
 #endif
     }
-    
+
     /**
      *  Destructor
      */
@@ -44,12 +44,12 @@ public:
     {
         // leap out if opcodes were not valid
         if (!_opcodes) return;
-        
+
         // clean up opcodes
         destroy_op_array(_opcodes TSRMLS_CC);
         efree(_opcodes);
     }
-    
+
     /**
      *  Are the opcodes valid?
      *  @return bool
@@ -58,7 +58,7 @@ public:
     {
         return _opcodes != nullptr;
     }
-    
+
     /**
      *  Execute the opcodes
      *  @return Value
@@ -69,41 +69,39 @@ public:
         if (!_opcodes) return nullptr;
 
         // pointer that is going to hold the return value of the script
-        zval *retval_ptr = nullptr;
-        
+        zval retval;
+
+        // initialize to null
+        ZVAL_NULL(&retval);
+
         // the zend engine is probably already busy processing opcodes, so we store
         // the current execute state before we're going to switch the runtime to
         // our own set of opcodes
         ExecuteState execState(0 TSRMLS_CC);
-        
-        // old execute state has been saved (and will automatically be restured when
+
+        // old execute state has been saved (and will automatically be restored when
         // the oldstate is destructed), so we can now safely overwrite all the settings
-        EG(return_value_ptr_ptr) = &retval_ptr;
-        EG(active_op_array) = _opcodes;
+        CG(active_op_array) = _opcodes;
         EG(no_extensions) = 1;
-        if (!EG(active_symbol_table)) zend_rebuild_symbol_table(TSRMLS_C);
-        CG(interactive) = 0;
-        
+        if (!EG(current_execute_data)->symbol_table) zend_rebuild_symbol_table(TSRMLS_C);
+
         // the current exception
-        zval* oldException = EG(exception);
+        auto *oldException = EG(exception);
 
         // execute the code
-        zend_execute(_opcodes TSRMLS_CC);
+        zend_execute(_opcodes, &retval TSRMLS_CC);
 
-        // was an exception thrown inside the eval()'ed code? In that case we 
+        // was an exception thrown inside the eval()'ed code? In that case we
         // throw a C++ new exception to give the C++ code the chance to catch it
-        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
+        // todo: OrigException with constructor for zend_object
+        // if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
 
         // we're ready if there is no return value
-        if (!retval_ptr) return nullptr;
-        
+        if (ZVAL_IS_NULL(&retval)) return nullptr;
+
         // wrap the return value
-        Value result(retval_ptr);
-        
-        // destruct the zval (this function will decrement the reference counter,
-        // and only destruct if there are no other references left)
-        zval_ptr_dtor(&retval_ptr);
-        
+        Value result(&retval);
+
         // copy the pointer into a value object, and return that
         return result;
     }
@@ -124,7 +122,7 @@ private:
 #endif
 
 };
-    
+
 /**
  *  End of namespace
  */

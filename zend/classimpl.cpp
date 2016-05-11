@@ -21,10 +21,8 @@ ClassImpl::~ClassImpl()
     // destruct the entries
     if (_entries) delete[] _entries;
 
-#if PHP_VERSION_ID >= 50400
-    // on newer php versions, we have allocated the command to hide a pointer in it
-    if (_self) free(_self);
-#endif
+    // free the stored pointer
+    free(_self);
 }
 
 /**
@@ -38,8 +36,6 @@ ClassImpl::~ClassImpl()
  */
 static ClassImpl *self(zend_class_entry *entry)
 {
-#if PHP_VERSION_ID >= 50400
-
     /**
      *  somebody could have extended this class from PHP userland, in which
      *  case trying to dereference the doc_comment would result in a disaster
@@ -70,25 +66,6 @@ static ClassImpl *self(zend_class_entry *entry)
     // the first byte of the comment is an empty string (null character), but
     // the next bytes contain a pointer to the ClassBase class
     return *((ClassImpl **)(comment + 1));
-#else
-
-    /**
-     *  This is likely not correct: If the class was extended using PHP-CPP
-     *  itself, we should retrieve the ClassImpl directly, however there is
-     *  no sane way to check this here, unlike in PHP 5.4.
-     *
-     *  We therefore always go to the very base, of which we are sure that
-     *  we are the implementers. This way - at least - we don't cause any
-     *  segfaults.
-     */
-    while (entry->parent) entry = entry->parent;
-
-    // on php 5.3 we store the pointer to impl after the name in the entry
-    ClassImpl** impl = (ClassImpl**)(entry->name + 1 + entry->name_length);
-
-    // return the actual implementation
-    return *impl;
-#endif
 }
 
 /**
@@ -203,17 +180,14 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
 
 /**
  *  Method that returns the function definition of the __call function
- *  @param  object_ptr
- *  @param  method_name
- *  @param  method_len
+ *
+ *  @param  object_ptr  Pointer to the object from which we want to retrieve the member function
+ *  @param  method      The method that we want information about
+ *  @param  key         ???
  *  @param  tsrm_ls
  *  @return zend_function
  */
-#if PHP_VERSION_ID < 50399
-zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int method_len TSRMLS_DC)
-#else
-zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int method_len, const zend_literal *key TSRMLS_DC)
-#endif
+zend_function *ClassImpl::getMethod(zval **object_ptr, zend_string *method, const zval *key TSRMLS_DC)
 {
     // something strange about the Zend engine (once more). The structure with
     // object-handlers has a get_method and call_method member. When a function is
@@ -224,11 +198,7 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
 
     // first we'll check if the default handler does not have an implementation,
     // in that case the method is probably already implemented as a regular method
-#if PHP_VERSION_ID < 50399
-    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len TSRMLS_CC);
-#else
-    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method_name, method_len, key TSRMLS_CC);
-#endif
+    auto *defaultFunction = std_object_handlers.get_method(object_ptr, method, key TSRMLS_CC);
 
     // did the default implementation do anything?
     if (defaultFunction) return defaultFunction;
@@ -254,7 +224,7 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
     function->required_num_args = 0;
     function->scope = entry;
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
-    function->function_name = method_name;
+    function->function_name = method;
 
     // store pointer to ourselves
     data->self = self(entry);
@@ -266,21 +236,18 @@ zend_function *ClassImpl::getMethod(zval **object_ptr, char *method_name, int me
 
 /**
  *  Method that is called right before a static method call is attempted
- *  @param  entry
- *  @param  method
- *  @param  method_len
+ *
+ *  @param  entry       The class entry to find the static function in
+ *  @param  method      The method to get information about
+ *  @param  key         ???
  *  @param  tsrm_ls
  *  @return zend_function
  */
-zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, char* method, int method_len TSRMLS_DC)
+zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *method, const zval *key TSRMLS_DC)
 {
     // first we'll check if the default handler does not have an implementation,
     // in that case the method is probably already implemented as a regular method
-#if PHP_VERSION_ID < 50399
-    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len TSRMLS_CC);
-#else
-    auto *defaultFunction = zend_std_get_static_method(entry, method, method_len, nullptr TSRMLS_CC);
-#endif
+    auto *defaultFunction = zend_std_get_static_method(entry, method, key TSRMLS_CC);
 
     // did the default implementation do anything?
     if (defaultFunction) return defaultFunction;
@@ -542,7 +509,7 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
  *  @param  val                     The object to be cloned
  *  @return zend_obejct_value       The object to be created
  */
-zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
+zend_object ClassImpl::cloneObject(zval *val TSRMLS_DC)
 {
     // retrieve the class entry linked to this object
     auto *entry = zend_get_class_entry(val TSRMLS_CC);
@@ -564,17 +531,8 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     // an exception back to the Zend engine)
     if (!cpp) zend_error(E_ERROR, "Unable to clone %s", entry->name);
 
-    // the thing we're going to return
-    zend_object_value result;
-
-    // set the handlers
-    result.handlers = impl->objectHandlers();
-
     // store the object
-    ObjectImpl *new_object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
-
-    // store the object in the object cache
-    result.handle = new_object->handle();
+    auto *new_object = new ObjectImpl(entry, cpp, impl->objectHandlers, 1 TSRMLS_CC);
 
     // clone the members (this will also call the __clone() function if the user
     // had registered that as a visible method)
@@ -584,7 +542,7 @@ zend_object_value ClassImpl::cloneObject(zval *val TSRMLS_DC)
     if (!entry->clone) meta->callClone(cpp);
 
     // done
-    return result;
+    return new_object->object();
 }
 
 /**
@@ -856,18 +814,16 @@ zval *ClassImpl::toZval(Value &&value, int type)
 
 /**
  *  Function that is called when a property is read
- *  @param  object
- *  @param  name
- *  @param  type
- *  @param  key
+ *
+ *  @param  object          The object on which it is called
+ *  @param  offset          The name of the property
+ *  @param  type            The type of the variable???
+ *  @param  cache_slot      The cache slot used
+ *  @param  rv              The "return value" (for errors
  *  @param  tsrm_ls
  *  @return val
  */
-#if PHP_VERSION_ID < 50399
-zval *ClassImpl::readProperty(zval *object, zval *name, int type TSRMLS_DC)
-#else
-zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_literal *key TSRMLS_DC)
-#endif
+zval *ClassImpl::readProperty(zval *object, zval *name, int type, void **cache_slot, zval *rv TSRMLS_DC)
 {
     // what to do with the type?
     //
@@ -924,11 +880,7 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
         if (!std_object_handlers.read_property) return nullptr;
 
         // call default
-#if PHP_VERSION_ID < 50399
-        return std_object_handlers.read_property(object, name, type TSRMLS_CC);
-#else
         return std_object_handlers.read_property(object, name, type, key TSRMLS_CC);
-#endif
     }
     catch (Exception &exception)
     {
@@ -950,15 +902,11 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, const zend_lit
  *  @param  object          The object on which it is called
  *  @param  name            The name of the property
  *  @param  value           The new value
- *  @param  key             ???
+ *  @param  cache_slot      The cache slot used
  *  @param  tsrm_ls
  *  @return zval
  */
-#if PHP_VERSION_ID < 50399
-void ClassImpl::writeProperty(zval *object, zval *name, zval *value TSRMLS_DC)
-#else
-void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_literal *key TSRMLS_DC)
-#endif
+void ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cache_slot TSRMLS_DC)
 {
     // retrieve the object and class
     Base *base = ObjectImpl::find(object TSRMLS_CC)->object();
@@ -1001,11 +949,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
         if (!std_object_handlers.write_property) return;
 
         // call the default
-#if PHP_VERSION_ID < 50399
-        std_object_handlers.write_property(object, name, value TSRMLS_CC);
-#else
         std_object_handlers.write_property(object, name, value, key TSRMLS_CC);
-#endif
     }
     catch (Exception &exception)
     {
@@ -1031,15 +975,11 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, const zend_
  *  @param  object          The object on which it is called
  *  @param  name            The name of the property to check
  *  @param  has_set_exists  See above
- *  @param  key             ???
+ *  @param  cache_slot      The cache slot used
  *  @param  tsrm_ls
  *  @return bool
  */
-#if PHP_VERSION_ID < 50399
-int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists TSRMLS_DC)
-#else
-int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const zend_literal *key TSRMLS_DC)
-#endif
+int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, void **cache_slot TSRMLS_DC)
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __isset method
@@ -1082,11 +1022,7 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
         if (!std_object_handlers.has_property) return 0;
 
         // call default
-#if PHP_VERSION_ID < 50399
-        return std_object_handlers.has_property(object, name, has_set_exists TSRMLS_CC);
-#else
         return std_object_handlers.has_property(object, name, has_set_exists, key TSRMLS_CC);
-#endif
     }
     catch (Exception &exception)
     {
@@ -1106,14 +1042,10 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, const z
  *
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
- *  @param  key
+ *  @param  cache_slot      The cache slot used
  *  @param  tsrm_ls
  */
-#if PHP_VERSION_ID < 50399
-void ClassImpl::unsetProperty(zval *object, zval *member TSRMLS_DC)
-#else
-void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *key TSRMLS_DC)
-#endif
+void ClassImpl::unsetProperty(zval *object, zval *member, void **cache_slot TSRMLS_DC)
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __unset method
@@ -1143,11 +1075,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
         if (!std_object_handlers.unset_property) return;
 
         // call the default
-#if PHP_VERSION_ID < 50399
-        std_object_handlers.unset_property(object, member TSRMLS_CC);
-#else
         std_object_handlers.unset_property(object, member, key TSRMLS_CC);
-#endif
     }
     catch (Exception &exception)
     {
@@ -1164,7 +1092,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, const zend_literal *ke
  *  @param  handle
  *  @param  tsrm_ls
  */
-void ClassImpl::destructObject(zend_object *object, zend_object_handle handle TSRMLS_DC)
+void ClassImpl::destructObject(zend_object *object TSRMLS_DC)
 {
     // find object
     ObjectImpl *obj = ObjectImpl::find(object);
@@ -1212,7 +1140,7 @@ void ClassImpl::freeObject(zend_object *object TSRMLS_DC)
  *  @param  tsrm_ls
  *  @return zend_object_value       The newly created object
  */
-zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
+zend_object ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
 {
     // we need the C++ class meta-information object
     ClassImpl *impl = self(entry);
@@ -1225,20 +1153,11 @@ zend_object_value ClassImpl::createObject(zend_class_entry *entry TSRMLS_DC)
     // the Zend engine)
     if (!cpp) zend_error(E_ERROR, "Unable to instantiate %s", entry->name);
 
-    // the thing we're going to return
-    zend_object_value result;
-
-    // set the handlers
-    result.handlers = impl->objectHandlers();
-
     // create the object in the zend engine
-    ObjectImpl *object = new ObjectImpl(entry, cpp, 1 TSRMLS_CC);
+    auto *object = new ObjectImpl(entry, cpp, impl->objectHandlers(), 1 TSRMLS_CC);
 
-    // store the object in the object cache
-    result.handle = object->handle();
-
-    // done
-    return result;
+    // return the php object stored in the implementation
+    return object->object();
 }
 
 /**
@@ -1427,6 +1346,14 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     // we need a special constructor
     entry.create_object = &ClassImpl::createObject;
 
+    // register destructor and deallocator
+    entry.dtor_obj = &ClassImpl::destructObject;
+    entry.free_obj = &ClassImpl::freeObject;
+
+    // set the offset for the zend_object, to allow PHP to
+    // locate the original point of the allocated memory
+    entry.offset = ObjectImpl::offset();
+
     // register function that is called for static method calls
     entry.get_static_method = &ClassImpl::getStaticMethod;
 
@@ -1477,30 +1404,6 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
 
     // this pointer has to be copied to temporary pointer, as &this causes compiler error
     ClassImpl *impl = this;
-
-#if PHP_VERSION_ID >= 50400
-
-    // allocate doc comment to contain an empty string + a hidden pointer
-    _self = (char *)malloc(1 + sizeof(ClassImpl *));
-
-    // empty string on first position
-    _self[0] = '\0';
-
-    // copy the 'this' pointer to the doc-comment
-    memcpy(_self+1, &impl, sizeof(ClassImpl *));
-
-    // set our comment in the actual class entry
-    _entry->info.user.doc_comment = _self;
-
-#else
-
-    // Reallocate some extra space in the name in the zend_class_entry so we can fit a pointer behind it
-    _entry->name = (char *) realloc(_entry->name, _entry->name_length + 1 + sizeof(ClassImpl *));
-
-    // Copy the pointer after it
-    memcpy(_entry->name + _entry->name_length + 1, &impl, sizeof(ClassImpl *));
-
-#endif
 
     // set access types flags for class
     _entry->ce_flags = (int)_type;

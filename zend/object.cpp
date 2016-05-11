@@ -76,13 +76,10 @@ Object::Object(zend_class_entry *entry, Base *base) : Value()
         // member in the base object), this is a self-destructing object that
         // will be destructed when the last reference to it has been removed,
         // we already set the reference to zero
-        new ObjectImpl(entry, base, 0 TSRMLS_CC);
+        new ObjectImpl(entry, base, ClassImpl::objectHandlers(entry) 0 TSRMLS_CC);
 
         // now we can store it
         operator=(Value(base));
-
-        // install the object handlers
-        Z_OBJVAL_P(_val).handlers = ClassImpl::objectHandlers(entry);
     }
 }
 

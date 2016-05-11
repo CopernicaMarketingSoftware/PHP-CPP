@@ -31,16 +31,13 @@ Value set_exception_handler(const std::function<Value(Parameters &params)> &hand
     Value output;
 
     // turn our user_exception_handler into a Value so we can return the original one later on
-    if (EG(user_exception_handler)) output = EG(user_exception_handler);
+    if (!Z_ISNULL(EG(user_exception_handler))) output = &EG(user_exception_handler);
 
     // detach so we have the zval
     auto value = functor.detach(true);
 
-    // allocate the user_exception_handler
-    ALLOC_ZVAL(EG(user_exception_handler));
-
     // copy our zval into the user_exception_handler
-    MAKE_COPY_ZVAL(&value, EG(user_exception_handler));
+    ZVAL_COPY(value, &EG(user_exception_handler));
 
     // return the original handler
     return output;
@@ -61,16 +58,13 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
     Value output;
 
     // turn our user_error_handler into a Value if we have one, just so we can return it later on
-    if (EG(user_error_handler)) output = EG(user_error_handler);
+    if (!Z_ISNULL(EG(user_error_handler))) output = &EG(user_error_handler);
 
     // detach so we have the zval
     auto value = functor.detach(true);
 
-    // alocate the user_error_handler
-    ALLOC_ZVAL(EG(user_error_handler));
-
     // copy our zval into the user_error_handler
-    MAKE_COPY_ZVAL(&value, EG(user_error_handler));
+    ZVAL_COPY(value, &EG(user_error_handler));
     EG(user_error_handler_error_reporting) = (int) error;
 
     // return the original handler
@@ -98,7 +92,7 @@ Value error_reporting(Error error)
     if (size < 0) return false;
 
     // alter the ini on the fly
-    zend_alter_ini_entry("error_reporting", sizeof("error_reporting"), str, size, ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
+    zend_alter_ini_entry(zend_string_init("error_reporting", sizeof("error_reporting"), 1), zend_string_init(str, size, 1), ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
 
     // return the output
     return output;

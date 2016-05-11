@@ -3,9 +3,9 @@
  *
  *  Base class for iterators. Extension writers that want to create traversable
  *  classes, should override the Php::Traversable base class. This base class
- *  forces you to implement a getIterator() method that returns an instance of 
+ *  forces you to implement a getIterator() method that returns an instance of
  *  a Php::Iterator class.
- * 
+ *
  *  In this file you find the signature of the Php::Iterator class. It mostly has
  *  pure virtual methods, which means that you should create a derived class
  *  that implements all these methods.
@@ -32,9 +32,9 @@ private:
     std::unique_ptr<Iterator> _iterator;
 
     /**
-     *  The current() method that is called by the Zend engine wants a 
-     *  pointer-to-pointer-to-a-zval. Because of this, we have to keep the 
-     *  current value in memory after the current() method returns because 
+     *  The current() method that is called by the Zend engine wants a
+     *  pointer-to-pointer-to-a-zval. Because of this, we have to keep the
+     *  current value in memory after the current() method returns because
      *  the pointer would otherwise fall out of scope. This is (once again)
      *  odd behavior of the Zend engine, but we'll have to live with that
      *  @var    Value
@@ -61,7 +61,7 @@ private:
     {
         return _iterator->valid();
     }
-    
+
     /**
      *  The value at the current position
      *  @return Value
@@ -70,7 +70,7 @@ private:
     {
         return _iterator->current();
     }
-    
+
     /**
      *  The key at the current position
      *  @return Value
@@ -79,7 +79,7 @@ private:
     {
         return _iterator->key();
     }
-    
+
     /**
      *  Move to the next position
      */
@@ -87,7 +87,7 @@ private:
     {
         return _iterator->next();
     }
-    
+
     /**
      *  Rewind the iterator to the front position
      */
@@ -95,7 +95,7 @@ private:
     {
         return _iterator->rewind();
     }
-    
+
     /**
      *  Iterator destructor method
      *  @param  iter
@@ -161,14 +161,16 @@ public:
      *  Constructor
      *  @param  iterator        The iterator that is implemented by the extension
      */
-    IteratorImpl(Iterator *iterator) : _iterator(iterator) 
+    IteratorImpl(Iterator *iterator) : _iterator(iterator)
     {
+        // wrap it in a zval
+        ZVAL_PTR(&_impl.data, this);
+
         // initialize impl object
-        _impl.data = this;
         _impl.index = 0;
         _impl.funcs = functions();
     }
-    
+
     /**
      *  Destructor
      */
@@ -183,7 +185,7 @@ public:
         return &_impl;
     }
 };
-    
+
 /**
  *  End namespace
  */

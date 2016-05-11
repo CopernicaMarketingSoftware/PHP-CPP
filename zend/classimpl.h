@@ -37,12 +37,12 @@ private:
      */
     ClassType _type = ClassType::Regular;
 
-    /** 
+    /**
      *  The class entry
      *  @var    zend_class_entry
      */
     zend_class_entry *_entry = nullptr;
-    
+
     /**
      *  Pointer to the entries
      *  @var    zend_function_entry[]
@@ -54,13 +54,13 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<Method>> _methods;
-    
+
     /**
      *  All class members (class properties)
      *  @var    std::list
      */
     std::list<std::shared_ptr<Member>> _members;
-    
+
     /**
      *  Map of dynamically accessible properties
      *  @var    std::map
@@ -72,19 +72,19 @@ private:
      *  @var    std::list
      */
     std::list<std::shared_ptr<ClassImpl>> _interfaces;
-    
+
     /**
      *  The parent/base class
      *  @var    std::shared_ptr
      */
     std::shared_ptr<ClassImpl> _parent;
-    
+
     /**
      *  The object handlers for instances of this class
      *  @var    zend_object_handlers
      */
     zend_object_handlers _handlers;
-    
+
     /**
      *  Are the handlers already initialized?
      *  @var    bool
@@ -98,10 +98,10 @@ private:
     char *_self = nullptr;
 
     /**
-     *  Retrieve an array of zend_function_entry objects that hold the 
+     *  Retrieve an array of zend_function_entry objects that hold the
      *  properties for each method. This method is called at extension
      *  startup time to register all methods.
-     * 
+     *
      *  @param  classname       The class name
      *  @return zend_function_entry[]
      */
@@ -155,16 +155,16 @@ public:
 
     /**
      *  Initialize the class, given its name
-     * 
+     *
      *  The module functions are registered on module startup, but classes are
      *  initialized afterwards. The Zend engine is a strange thing. Nevertheless,
      *  this means that this method is called after the module is already available.
      *  This function will inform the Zend engine about the existence of the
      *  class.
-     * 
-     *  @param  base        The extension C++ class 
+     *
+     *  @param  base        The extension C++ class
      *  @param  ns          Namespace name
-     *  @param  tsrm_ls     
+     *  @param  tsrm_ls
      *  @return zend_class_entry
      */
     struct _zend_class_entry *initialize(ClassBase *base, const std::string &ns TSRMLS_DC);
@@ -174,11 +174,11 @@ public:
      *  @param  entry                   Pointer to class information
      *  @param  val                     The object to be cloned
      *  @param  tsrm_ls
-     *  @return zend_object_value       Object info
+     *  @return zend_object             Object info
      */
-    static zend_object_value createObject(zend_class_entry *entry TSRMLS_DC);
-    static zend_object_value cloneObject(zval *val TSRMLS_DC);
-    static void destructObject(zend_object *object, unsigned int handle TSRMLS_DC);
+    static zend_object createObject(zend_class_entry *entry TSRMLS_DC);
+    static zend_object cloneObject(zval *val TSRMLS_DC);
+    static void destructObject(zend_object *object TSRMLS_DC);
     static void freeObject(zend_object *object TSRMLS_DC);
 
     /**
@@ -195,7 +195,7 @@ public:
 
     /**
      *  Function that is used to count the number of elements in the object
-     *  If the user has implemented the Countable interface, this method will 
+     *  If the user has implemented the Countable interface, this method will
      *  call the count() method
      *  @param  val
      *  @param  count
@@ -230,7 +230,7 @@ public:
      *  @return zend_object_handlers
      */
     static zend_object_handlers *objectHandlers(zend_class_entry *entry);
-    
+
     /**
      *  Function to create a new iterator to iterate over an object
      *  @param  entry                   The class entry
@@ -243,85 +243,72 @@ public:
 
     /**
      *  Function that is called when a property is being read
+     *
      *  @param  object          The object on which it is called
      *  @param  offset          The name of the property
      *  @param  type            The type of the variable???
-     *  @param  key             ???
+     *  @param  cache_slot      The cache slot used
+     *  @param  rv              The "return value" (for errors
      *  @param  tsrm_ls
      *  @return zval
      */
-#if PHP_VERSION_ID >= 50400    
-    static zval *readProperty(zval *object, zval *name, int type, const zend_literal *key TSRMLS_DC);
-#else
-    static zval *readProperty(zval *object, zval *name, int type TSRMLS_DC);
-#endif
+    static zval *readProperty(zval *object, zval *name, int type, void **cache_slot, zval *rv TSRMLS_DC);
 
     /**
      *  Function that is called when a property is set / updated
+     *
      *  @param  object          The object on which it is called
      *  @param  name            The name of the property
      *  @param  value           The new value
-     *  @param  key             ???
+     *  @param  cache_slot      The cache slot used
      *  @param  tsrm_ls
      *  @return zval
      */
-#if PHP_VERSION_ID >= 50400    
-    static void writeProperty(zval *object, zval *name, zval *value, const zend_literal *key TSRMLS_DC);
-#else
-    static void writeProperty(zval *object, zval *name, zval *value TSRMLS_DC);
-#endif
+    static void writeProperty(zval *object, zval *name, zval *value, void **cache_slot TSRMLS_DC);
 
     /**
      *  Function that is called to check whether a certain property is set
+     *
      *  @param  object          The object on which it is called
      *  @param  name            The name of the property to check
      *  @param  has_set_exists  See above
+     *  @param  cache_slot      The cache slot used
      *  @param  tsrm_ls
      *  @return bool
      */
-#if PHP_VERSION_ID >= 50400    
-    static int hasProperty(zval *object, zval *name, int has_set_exists, const zend_literal *key TSRMLS_DC);
-#else
-    static int hasProperty(zval *object, zval *name, int has_set_exists TSRMLS_DC);
-#endif
+    static int hasProperty(zval *object, zval *name, int has_set_exists, void **cache_slot TSRMLS_DC);
 
     /**
      *  Function that is called when a property is removed from the project
+     *
      *  @param  object          The object on which it is called
      *  @param  member          The member to remove
+     *  @param  cache_slot      The cache slot used
      *  @param  tsrm_ls
      */
-#if PHP_VERSION_ID >= 50400    
-    static void unsetProperty(zval *object, zval *member, const zend_literal *key TSRMLS_DC);
-#else
-    static void unsetProperty(zval *object, zval *member TSRMLS_DC);
-#endif
+    static void unsetProperty(zval *object, zval *member, void **cache_slot TSRMLS_DC);
 
     /**
      *  Method that returns information about the function signature of a undefined method
-     *  @param  object_ptr
-     *  @param  method
-     *  @param  method_len
-     *  @param  key
+     *
+     *  @param  object_ptr  Pointer to the object from which we want to retrieve the member function
+     *  @param  method      The method that we want information about
+     *  @param  key         ???
      *  @param  tsrm_ls
      *  @return zend_function
      */
-#if PHP_VERSION_ID >= 50400    
-    static zend_function *getMethod(zval **object_ptr, char *method, int method_len, const zend_literal *key TSRMLS_DC);
-#else
-    static zend_function *getMethod(zval **object_ptr, char *method, int method_len TSRMLS_DC);
-#endif
+    static zend_function *getMethod(zval **object_ptr, zend_string *method, const zval *key TSRMLS_DC);
 
     /**
      *  Method that returns information about the function signature of an undefined static method
-     *  @param  object_ptr
-     *  @param  method
-     *  @param  method_len
-     *  @param  key
+     *
+     *  @param  entry       The class entry to find the static function in
+     *  @param  method      The method that we want information about
+     *  @param  key         ???
      *  @param  tsrm_ls
      *  @return zend_function
      */
-    static zend_function *getStaticMethod(zend_class_entry *entry, char* method, int method_len TSRMLS_DC);
+    static zend_function *getStaticMethod(zend_class_entry *entry, zend_string *method, const zval *key TSRMLS_DC);
 
     /**
      *  Method that returns information about the __invoke() method
@@ -365,17 +352,17 @@ public:
      */
     static int serialize(zval *object, unsigned char **buffer, unsigned int *buf_len, zend_serialize_data *data TSRMLS_DC);
     static int unserialize(zval **object, zend_class_entry *entry, const unsigned char *buffer, unsigned int buf_len, zend_unserialize_data *data TSRMLS_DC);
-    
+
     /**
      *  Add a method to the class
-     *  zend_serialize_data     
+     *  zend_serialize_data
      *  The method will be accessible as one of the class methods in your PHP
      *  code. When the method is called, it will automatically be forwarded
      *  to the C++ implementation. The flags can be Php::Public, Php::Protected
      *  or Php::Private (using private methods can be useful if you for example
      *  want to make the __construct() function private). The access-modified
      *  flag can be bitwise combined with the flag Php::Final or Php::Abstract).
-     * 
+     *
      *  @param  name        Name of the method
      *  @param  method      The actual method
      *  @param  flags       Optional flags
@@ -392,11 +379,11 @@ public:
 
     /**
      *  Add a static method to the class
-     * 
+     *
      *  Because a C++ static method is just a regular function, that happens to
      *  have access to the private variables of the class at compile time, you
      *  can register any function that matches one of the function signatures
-     *  
+     *
      *  @param  name        Name of the method
      *  @param  method      The actual method
      *  @param  flags       Optional flags
@@ -409,30 +396,30 @@ public:
 
     /**
      *  Add an abstract method to the class
-     * 
+     *
      *  @param  name        Name of the method
      *  @param  flags       Optional flags (like public or protected)
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, int flags=0, const Arguments &args = {}) 
-    { 
+    void method(const char *name, int flags=0, const Arguments &args = {})
+    {
         // the "MethodModifiers" holds all the valid modifiers for a method: Final + Public + Protected + Private.
         // The "Static" and "Abstract" properties are also valid modifiers in this context (in fact, you would
         // expect that we could even force adding "Abstract" here, because we're adding an abstract method -- but
-        // in a PHP interface the "Abstract" modifier is not allowed - even though it is of course abstract. 
+        // in a PHP interface the "Abstract" modifier is not allowed - even though it is of course abstract.
         // So we only _allow_ abstract here, and expect the caller to _set_ it.
         _methods.push_back(std::make_shared<Method>(name, (flags & (MethodModifiers | Static | Abstract)), args));
     }
 
     /**
      *  Add a property to the class
-     * 
+     *
      *  Every instance of this class will have this property. The property
      *  can be Php::Public, Php::Protected or Php::Private (altough setting
      *  private properties is odd as the implementation of the class is in CPP,
      *  so why use private properties while the whole implementation is already
      *  hidden)
-     * 
+     *
      *  @param  name        Name of the property
      *  @param  value       Actual property value
      *  @param  flags       Optional flags
@@ -459,7 +446,7 @@ public:
     void property(const char *name, const getter_callback_1 &getter, const setter_callback_0 &setter)   { _properties[name] = std::make_shared<Property>(getter,setter); }
     void property(const char *name, const getter_callback_0 &getter, const setter_callback_1 &setter)   { _properties[name] = std::make_shared<Property>(getter,setter); }
     void property(const char *name, const getter_callback_1 &getter, const setter_callback_1 &setter)   { _properties[name] = std::make_shared<Property>(getter,setter); }
-    
+
     /**
      *  Add an interface that is implemented
      *  @param  interface   The interface that is implemented
