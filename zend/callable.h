@@ -113,9 +113,9 @@ protected:
 
     /**
      *  Required number of arguments
-     *  @var    integer
+     *  @var    unsigned integer
      */
-    int _required = 0;
+    unsigned int _required = 0;
 
     /**
      *  Total number of arguments

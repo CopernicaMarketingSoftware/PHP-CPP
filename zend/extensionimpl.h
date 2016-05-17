@@ -103,7 +103,7 @@ public:
 
 private:
     /**
-     *  Initialize the namespace after it was registered
+     *  Initialize the extension after it was registered
      *  @param  module_number
      *  @param  tsrm_ls
      *  @return bool

@@ -63,8 +63,11 @@ static std::map<int,ExtensionImpl*> number2extension;
  *
  *  @param  zend_module_entry
  */
-static int match_module(zend_module_entry *entry)
+static int match_module(zval *value TSRMLS_DC)
 {
+    // retrieve the module entry from the zval
+    auto *entry = (zend_module_entry*)Z_PTR_P(value);
+
     // check if there is an extension with this name
     auto iter = name2extension.find(entry->name);
     if (iter == name2extension.end()) return ZEND_HASH_APPLY_KEEP;
@@ -89,7 +92,7 @@ static ExtensionImpl *find(int number TSRMLS_DC)
     if (iter != number2extension.end()) return iter->second;
 
     // no, not yet, loop through all modules
-    zend_hash_apply(&module_registry, (apply_func_t)match_module TSRMLS_CC);
+    zend_hash_apply(&module_registry, match_module TSRMLS_CC);
 
     // find again
     iter = number2extension.find(number);

@@ -893,7 +893,7 @@ Value Value::exec(int argc, Value *argv) const
     zval params[argc];
 
     // convert all the values
-    for(unsigned i=0; i < argc; i++) { params[i] = *argv[i]._val; }
+    for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
 
     // call helper function
     return do_exec(nullptr, _val, argc, params);
@@ -915,7 +915,7 @@ Value Value::exec(const char *name, int argc, Value *argv) const
     zval params[argc];
 
     // convert all the values
-    for(unsigned i=0; i < argc; i++) { params[i] = *argv[i]._val; }
+    for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
 
     // call helper function
     return do_exec(_val, method._val, argc, params);
@@ -937,7 +937,7 @@ Value Value::exec(const char *name, int argc, Value *argv)
     zval params[argc];
 
     // convert all the values
-    for(unsigned i=0; i < argc; i++) { params[i] = *argv[i]._val; }
+    for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
 
     // call helper function
     return do_exec(_val, method._val, argc, params);
