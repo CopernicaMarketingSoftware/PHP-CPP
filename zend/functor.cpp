@@ -6,7 +6,7 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2015 Copernica BV
  */
- 
+
 /**
  *  Dependencies
  */
@@ -31,10 +31,10 @@ void Functor::initialize(TSRMLS_D)
 {
     // leap out if the class entry is already set
     if (_entry) return;
-    
+
     // construct functor object
     static std::unique_ptr<ClassBase> functor(new Class<Functor>("PhpCpp::Functor"));
-    
+
     // initialize the functor class
     _entry = functor->implementation()->initialize(functor.get(), "" TSRMLS_CC);
 }
@@ -48,7 +48,7 @@ void Functor::shutdown(TSRMLS_D)
     // we forget the entry
     _entry = nullptr;
 }
-    
+
 /**
  *  End of namespace
  */

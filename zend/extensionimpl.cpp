@@ -364,7 +364,7 @@ bool ExtensionImpl::initialize(int module_number TSRMLS_DC)
     });
 
     // last entry should be set to all zero's
-    memset(&_ini[i], 0, sizeof(zend_ini_entry));
+    memset(&_ini[i], 0, sizeof(_ini[i]));
 
     // register ini entries in Zend core
     zend_register_ini_entries(_ini.get(), module_number TSRMLS_CC);
