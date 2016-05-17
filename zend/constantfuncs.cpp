@@ -39,13 +39,13 @@ Value constant(const char *constant, size_t size)
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
 
-    // the value that holds the result
-    Value result;
-
     // retrieve the constant
-    if (!zend_get_constant(constant, size, result._val TSRMLS_CC)) return nullptr;
-    
-    // zval was correctly retrieved, wrap in value
+    auto *result = zend_get_constant(zend_string_init(constant, size, 1) TSRMLS_CC);
+
+    // did the constant exist?
+    if (!result) return nullptr;
+
+    // return the valid result
     return result;
 }
 
@@ -71,14 +71,13 @@ bool define(const char *name, size_t size, const Value &value)
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
-    
+
     // the constant structure from the zend engine
     zend_constant constant;
-    
-    // copy the name (note that name_len also includes the end-of-string '\0' byte)
-    constant.name = zend_strndup(name, size);
-    constant.name_len = size + 1;
-    
+
+    // copy the name
+    constant.name = zend_string_init(name, size, 1);
+
     // only scalar values can be used for constants
     if (value.isScalar())
     {
@@ -90,19 +89,19 @@ bool define(const char *name, size_t size, const Value &value)
     {
         // we're going to convert the value object into a string, and use that
         Value str = value.clone(Type::String);
-        
+
         // use the copied value
         constant.value = *str._val;
         zval_copy_ctor(&constant.value);
     }
-    
+
     // constants are case sensitive (but not persistent, because this is a user
     // space constant!)
     constant.flags = CONST_CS;
 
     // as module number we use a fake module number
     constant.module_number = PHP_USER_CONSTANT;
-    
+
     // register the constant
     return zend_register_constant(&constant TSRMLS_CC) == SUCCESS;
 }
@@ -137,20 +136,21 @@ bool define(const std::string &name, const Value &value)
  *  @param  size
  *  @return bool
  */
-bool defined(const char *name, size_t size) 
+bool defined(const char *name, size_t size)
 {
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
 
-    // result variable
-    zval c;
-
     // retrieve the constant
-    if (!zend_get_constant_ex(name, size, &c, NULL, ZEND_FETCH_CLASS_SILENT TSRMLS_CC)) return false;
+    auto *value = zend_get_constant_ex(zend_string_init(name, size, 1), nullptr, ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
+
+    // check if the value was found
+    if (!value) return false;
 
     // constant exists, but the returned zval should first be destructed
-    zval_dtor(&c);
-    
+    // @todo: is this necessary in PHP 7?
+    zval_dtor(value);
+
     // done
     return true;
 }

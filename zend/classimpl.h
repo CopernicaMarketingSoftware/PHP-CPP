@@ -93,9 +93,9 @@ private:
 
     /**
      *  Memory allocated by this object to hide a pointer
-     *  @var    char*
+     *  @var    zend_string*
      */
-    char *_self = nullptr;
+    zend_string *_self = nullptr;
 
     /**
      *  Retrieve an array of zend_function_entry objects that hold the
@@ -109,11 +109,13 @@ private:
 
     /**
      *  Helper method to turn a property into a zval
-     *  @param  value
-     *  @param  type
-     *  @return Value
+     *
+     *  @param  value   The value to convert to a zval
+     *  @param  type    The type of operation (read or write)
+     *  @param  rv      Pointer to where to store the data
+     *  @return The result (same as the ptr input)
      */
-    static zval *toZval(Value &&value, int type);
+    static zval *toZval(Value &&value, int type, zval *rv);
 
 public:
     /**
@@ -176,8 +178,8 @@ public:
      *  @param  tsrm_ls
      *  @return zend_object             Object info
      */
-    static zend_object createObject(zend_class_entry *entry TSRMLS_DC);
-    static zend_object cloneObject(zval *val TSRMLS_DC);
+    static zend_object *createObject(zend_class_entry *entry TSRMLS_DC);
+    static zend_object *cloneObject(zval *val TSRMLS_DC);
     static void destructObject(zend_object *object TSRMLS_DC);
     static void freeObject(zend_object *object TSRMLS_DC);
 
@@ -190,8 +192,8 @@ public:
      *  @param  return_value_used       Is the return value used or not?
      *  @param  tsrm_ls
      */
-    static void callMethod(int ht, zval *return_value, zval **return_value_ptr, zval *this_ptr, int return_value_used TSRMLS_DC);
-    static void callInvoke(int ht, zval *return_value, zval **return_value_ptr, zval *this_ptr, int return_value_used TSRMLS_DC);
+    static void callMethod(zend_execute_data *execute_data, zval *return_value TSRMLS_DC);
+    static void callInvoke(zend_execute_data *execute_data, zval *return_value TSRMLS_DC);
 
     /**
      *  Function that is used to count the number of elements in the object
@@ -210,10 +212,11 @@ public:
      *  @param  offset          The name of the property
      *  @param  value           The new value
      *  @param  type            The type of the variable???
+     *  @param  rv              Pointer to where to store the data
      *  @param  check_empty     ????
      *  @return zval
      */
-    static zval *readDimension(zval *object, zval *offset, int type TSRMLS_DC);
+    static zval *readDimension(zval *object, zval *offset, int type, zval *rv TSRMLS_DC);
     static void writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC);
     static int  hasDimension(zval *object, zval *offset, int check_empty TSRMLS_DC);
     static void unsetDimension(zval *object, zval *offset TSRMLS_DC);
@@ -248,7 +251,7 @@ public:
      *  @param  offset          The name of the property
      *  @param  type            The type of the variable???
      *  @param  cache_slot      The cache slot used
-     *  @param  rv              The "return value" (for errors
+     *  @param  rv              Pointer to where to store the data
      *  @param  tsrm_ls
      *  @return zval
      */
@@ -291,13 +294,13 @@ public:
     /**
      *  Method that returns information about the function signature of a undefined method
      *
-     *  @param  object_ptr  Pointer to the object from which we want to retrieve the member function
+     *  @param  object      Pointer to the object from which we want to retrieve the member function
      *  @param  method      The method that we want information about
      *  @param  key         ???
      *  @param  tsrm_ls
      *  @return zend_function
      */
-    static zend_function *getMethod(zval **object_ptr, zend_string *method, const zval *key TSRMLS_DC);
+    static zend_function *getMethod(zend_object **object, zend_string *method, const zval *key TSRMLS_DC);
 
     /**
      *  Method that returns information about the function signature of an undefined static method
@@ -308,7 +311,7 @@ public:
      *  @param  tsrm_ls
      *  @return zend_function
      */
-    static zend_function *getStaticMethod(zend_class_entry *entry, zend_string *method, const zval *key TSRMLS_DC);
+    static zend_function *getStaticMethod(zend_class_entry *entry, zend_string *method TSRMLS_DC);
 
     /**
      *  Method that returns information about the __invoke() method
@@ -319,7 +322,7 @@ public:
      *  @param  tsrm_ls
      *  @return int
      */
-    static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zval **object_ptr TSRMLS_DC);
+    static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr TSRMLS_DC);
 
     /**
      *  Function to cast the object to a different type
@@ -350,8 +353,8 @@ public:
      *  @param  tsrm_ls
      *  @return int
      */
-    static int serialize(zval *object, unsigned char **buffer, unsigned int *buf_len, zend_serialize_data *data TSRMLS_DC);
-    static int unserialize(zval **object, zend_class_entry *entry, const unsigned char *buffer, unsigned int buf_len, zend_unserialize_data *data TSRMLS_DC);
+    static int serialize(zval *object, unsigned char **buffer, size_t *buf_len, zend_serialize_data *data TSRMLS_DC);
+    static int unserialize(zval *object, zend_class_entry *entry, const unsigned char *buffer, size_t buf_len, zend_unserialize_data *data TSRMLS_DC);
 
     /**
      *  Add a method to the class

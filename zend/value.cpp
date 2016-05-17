@@ -34,31 +34,24 @@ namespace Php {
 /**
  *  Constructor (value = NULL)
  */
-Value::Value()
+Value::Value() : _val(new zval)
 {
     // create a null zval
-    MAKE_STD_ZVAL(_val);
     ZVAL_NULL(_val);
 }
 
 /**
  *  Constructor for null ptr
 */
-Value::Value(std::nullptr_t value)
-{
-    // create a null zval
-    MAKE_STD_ZVAL(_val);
-    ZVAL_NULL(_val);
-}
+Value::Value(std::nullptr_t value) : Value() {}
 
 /**
  *  Constructor based on integer value
  *  @param  value
  */
-Value::Value(int16_t value)
+Value::Value(int16_t value) : _val(new zval)
 {
     // create an integer zval
-    MAKE_STD_ZVAL(_val);
     ZVAL_LONG(_val, value);
 }
 
@@ -66,10 +59,9 @@ Value::Value(int16_t value)
  *  Constructor based on integer value
  *  @param  value
  */
-Value::Value(int32_t value)
+Value::Value(int32_t value) : _val(new zval)
 {
     // create an integer zval
-    MAKE_STD_ZVAL(_val);
     ZVAL_LONG(_val, value);
 }
 
@@ -77,10 +69,9 @@ Value::Value(int32_t value)
  *  Constructor based on int64_t value
  *  @param  value
  */
-Value::Value(int64_t value)
+Value::Value(int64_t value) : _val(new zval)
 {
     // create an integer zval
-    MAKE_STD_ZVAL(_val);
     ZVAL_LONG(_val, value);
 }
 
@@ -88,10 +79,9 @@ Value::Value(int64_t value)
  *  Constructor based on boolean value
  *  @param  value
  */
-Value::Value(bool value)
+Value::Value(bool value) : _val(new zval)
 {
     // create a boolean zval
-    MAKE_STD_ZVAL(_val);
     ZVAL_BOOL(_val, value);
 }
 
@@ -99,22 +89,20 @@ Value::Value(bool value)
  *  Constructor based on single character
  *  @param  value
  */
-Value::Value(char value)
+Value::Value(char value) : _val(new zval)
 {
     // create a string zval
-    MAKE_STD_ZVAL(_val);
-    ZVAL_STRINGL(_val, &value, 1, 1);
+    ZVAL_STRINGL(_val, &value, 1);
 }
 
 /**
  *  Constructor based on string value
  *  @param  value
  */
-Value::Value(const std::string &value)
+Value::Value(const std::string &value) : _val(new zval)
 {
     // create a string zval
-    MAKE_STD_ZVAL(_val);
-    ZVAL_STRINGL(_val, value.c_str(), value.size(), 1);
+    ZVAL_STRINGL(_val, value.c_str(), value.size());
 }
 
 /**
@@ -122,16 +110,13 @@ Value::Value(const std::string &value)
  *  @param  value
  *  @param  size
  */
-Value::Value(const char *value, int size)
+Value::Value(const char *value, int size) : _val(new zval)
 {
-    // allocate the zval
-    MAKE_STD_ZVAL(_val);
-
     // is there a value?
     if (value)
     {
         // create a string zval
-        ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size, 1);
+        ZVAL_STRINGL(_val, value, size < 0 ? ::strlen(value) : size);
     }
     else
     {
@@ -144,10 +129,9 @@ Value::Value(const char *value, int size)
  *  Constructor based on decimal value
  *  @param  value
  */
-Value::Value(double value)
+Value::Value(double value) : _val(new zval)
 {
     // create a double zval
-    MAKE_STD_ZVAL(_val);
     ZVAL_DOUBLE(_val, value);
 }
 
@@ -158,13 +142,16 @@ Value::Value(double value)
  */
 Value::Value(struct _zval_struct *val, bool ref) : _val(val)
 {
+    // not refcounted? then there is nothing we can here
+    if (!Z_REFCOUNTED_P(_val)) return;
+
     // if the variable is not already a reference, and it has more than one
     // variable pointing to it, we should seperate it so that any changes
     // we're going to make will not change the other variable
     if (ref && Z_REFCOUNT_P(_val) > 1)
     {
         // separate the zval
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+        SEPARATE_ZVAL_IF_NOT_REF(_val);
     }
 
     // we see ourselves as reference too
@@ -174,7 +161,7 @@ Value::Value(struct _zval_struct *val, bool ref) : _val(val)
     if (!ref || Z_ISREF_P(_val)) return;
 
     // make this a reference
-    Z_SET_ISREF_P(_val);
+    ZVAL_MAKE_REF(_val);
 }
 
 /**
@@ -193,34 +180,19 @@ Value::Value(const Base *object)
     // do we have a handle?
     if (!impl) throw FatalError("Assigning an unassigned object to a variable");
 
-    // make a regular zval, and set it to an object
-    MAKE_STD_ZVAL(_val);
-    Z_TYPE_P(_val) = IS_OBJECT;
-    Z_OBJ_HANDLE_P(_val) = impl->handle();
+    // allocate variable and set it to an object
+    _val = new zval;
+    Z_TYPE_INFO_P(_val) = IS_OBJECT;
 
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-
-    // we have to lookup the object in the object-table
-    zend_object_store_bucket *obj_bucket = &EG(objects_store).object_buckets[impl->handle()];
-
-    // there is one more reference to the object
-    obj_bucket->bucket.obj.refcount += 1;
-
-    // this is copy-pasted from zend_objects.c - and it is necessary too!
-    if (!obj_bucket->bucket.obj.handlers) obj_bucket->bucket.obj.handlers = ClassImpl::objectHandlers(impl->php()->ce);
-
-    // store the handlers in the zval too (cast is necessary for php 5.3)
-    Z_OBJ_HT_P(_val) = (zend_object_handlers*)obj_bucket->bucket.obj.handlers;
+    // increase refcount
+    GC_REFCOUNT(impl->php())++;
 }
 
 /**
  *  Wrap around a php.ini value
  *  @param  value
  */
-Value::Value(const IniValue &value) : Value((const char *)value)
-{
-}
+Value::Value(const IniValue &value) : Value((const char *)value) {}
 
 /**
  *  Copy constructor
@@ -228,57 +200,22 @@ Value::Value(const IniValue &value) : Value((const char *)value)
  */
 Value::Value(const Value &that)
 {
-    // is the other variable a reference?
-    if (Z_ISREF_P(that._val))
+    // is the other variable a reference? or is this a simple scalar?
+    if (Z_ISREF_P(that._val) || !Z_REFCOUNTED_P(that._val))
     {
         // because this is supposed to be a COPY, we can not add ourselves
         // to the variable but have to allocate a new variable
-        ALLOC_ZVAL(_val);
-        INIT_PZVAL_COPY(_val, that._val);
-
-        // we have to call the copy constructor to copy the entire other zval
-        zval_copy_ctor(_val);
+        _val = new zval;
+        ZVAL_DUP(_val, that._val);
     }
     else
     {
         // simply use the same zval
         _val = that._val;
+
+        // and increment the reference count
+        Z_ADDREF_P(_val);
     }
-
-    // that zval has one more reference
-    Z_ADDREF_P(_val);
-
-
-//  Below the old implementation - I thought really hard about it and I though
-//  it was a correct and very smart implementation. However, it does not work
-//  when you swap two variables. I changed it to the implementation above, but
-//  maybe that implementation introduces other bugs??? Let's keep the old
-//  implementation for a while in this file, but commented out
-//
-//    // how many references does the other object have?
-//    if (Z_REFCOUNT_P(that._val) > 1 && !Z_ISREF_P(that._val))
-//    {
-//        // there are already multiple variables linked to this value, and it
-//        // is not a reference. this implies that we can not turn this variable
-//        // into a reference, otherwise strange things could happen, we're going
-//        // to create a new zval
-//        ALLOC_ZVAL(_val);
-//        INIT_PZVAL_COPY(_val, that._val);
-//        zval_copy_ctor(_val);
-//    }
-//    else
-//    {
-//        // simply use the same zval
-//        _val = that._val;
-//    }
-//
-//    // the other object only has one variable using it, or it is already
-//    // a variable by reference, we can safely add one more reference to it
-//    // and make it a variable by reference if it was not already a ref
-//    Z_ADDREF_P(_val);
-//
-//    // make reference
-//    Z_SET_ISREF_P(_val);
 }
 
 /**
@@ -299,14 +236,23 @@ Value::~Value()
     // ignore if moved
     if (!_val) return;
 
-    // if there were two references or less, we're going to remove a reference
-    // and only one reference will remain, the object will then impossible be
-    // a reference
-    if (Z_REFCOUNT_P(_val) <= 2) Z_UNSET_ISREF_P(_val);
+    // are we not a refcounted variable?
+    if (!Z_REFCOUNTED_P(_val))
+    {
+        // we can simply delete it
+        delete _val;
+    }
+    else
+    {
+        // if there were two references or less, we're going to remove a reference
+        // and only one reference will remain, the object will then impossible be
+        // a reference
+        if (Z_REFCOUNT_P(_val) <= 2) ZVAL_UNREF(_val);
 
-    // destruct the zval (this function will decrement the reference counter,
-    // and only destruct if there are no other references left)
-    zval_ptr_dtor(&_val);
+        // destruct the zval (this function will decrement the reference counter,
+        // and only destruct if there are no other references left)
+        zval_ptr_dtor(_val);
+    }
 }
 
 /**
@@ -317,7 +263,7 @@ Value::~Value()
  *  deallocate the zval structure. This is used for functions that have to
  *  return a zval pointer, that would otherwise be deallocated the moment
  *  the function returns.
- * 
+ *
  *  @param  keeprefcount
  *  @return zval
  */
@@ -331,12 +277,12 @@ zval *Value::detach(bool keeprefcount)
 
     // reset internal object
     _val = nullptr;
-    
+
     // we're ready if we should keep the refcounter
     if (keeprefcount) return result;
 
     // decrement reference counter
-    Z_DELREF_P(result);
+    Z_TRY_DELREF_P(result);
 
     // done
     return result;
@@ -348,6 +294,10 @@ zval *Value::detach(bool keeprefcount)
  */
 int Value::refcount() const
 {
+    // are we not a refcounted variable?
+    if (!Z_REFCOUNTED_P(_val)) return 0;
+
+    // we are, retrieve the count
     return Z_REFCOUNT_P(_val);
 }
 
@@ -375,7 +325,7 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
         *_val = *value._val;
 
         // restore reference and refcount setting
-        Z_SET_ISREF_TO_P(_val, true);
+        ZVAL_MAKE_REF(_val);
         Z_SET_REFCOUNT_P(_val, refcount);
 
         // how many references did the old variable have?
@@ -398,7 +348,7 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
 
             // the last and only reference to the other object was
             // removed, we no longer need it
-            FREE_ZVAL(value._val);
+            delete value._val;
 
             // the other object is no longer valid
             value._val = nullptr;
@@ -408,7 +358,7 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
     {
         // destruct the zval (this function will decrement the reference counter,
         // and only destruct if there are no other references left)
-        if (_val) zval_ptr_dtor(&_val);
+        if (_val) zval_ptr_dtor(_val);
 
         // just copy the zval completely
         _val = value._val;
@@ -447,20 +397,20 @@ Value &Value::operator=(const Value &value)
         zval_copy_ctor(_val);
 
         // restore refcount and reference setting
-        Z_SET_ISREF_TO_P(_val, true);
+        ZVAL_MAKE_REF(_val);
         Z_SET_REFCOUNT_P(_val, refcount);
     }
     else
     {
         // destruct the zval (this function will decrement the reference counter,
         // and only destruct if there are no other references left)
-        zval_ptr_dtor(&_val);
+        zval_ptr_dtor(_val);
 
         // just copy the zval, and the refcounter
         _val = value._val;
 
         // and we have one more reference
-        Z_ADDREF_P(_val);
+        Z_TRY_ADDREF_P(_val);
     }
 
     // update the object
@@ -476,7 +426,7 @@ Value &Value::operator=(const Value &value)
 Value &Value::operator=(std::nullptr_t value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
@@ -496,7 +446,7 @@ Value &Value::operator=(std::nullptr_t value)
 Value &Value::operator=(int16_t value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
@@ -516,7 +466,7 @@ Value &Value::operator=(int16_t value)
 Value &Value::operator=(int32_t value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
@@ -536,7 +486,7 @@ Value &Value::operator=(int32_t value)
 Value &Value::operator=(int64_t value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
@@ -556,7 +506,7 @@ Value &Value::operator=(int64_t value)
 Value &Value::operator=(bool value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
@@ -576,13 +526,13 @@ Value &Value::operator=(bool value)
 Value &Value::operator=(char value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
 
     // set new value
-    ZVAL_STRINGL(_val, &value, 1, 1);
+    ZVAL_STRINGL(_val, &value, 1);
 
     // update the object
     return *this;
@@ -596,13 +546,13 @@ Value &Value::operator=(char value)
 Value &Value::operator=(const std::string &value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
 
     // set new value
-    ZVAL_STRINGL(_val, value.c_str(), value.size(), 1);
+    ZVAL_STRINGL(_val, value.c_str(), value.size());
 
     // update the object
     return *this;
@@ -616,13 +566,13 @@ Value &Value::operator=(const std::string &value)
 Value &Value::operator=(const char *value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
 
     // set new value
-    ZVAL_STRING(_val, value, 1);
+    ZVAL_STRINGL(_val, value, ::strlen(value));
 
     // update the object
     return *this;
@@ -636,7 +586,7 @@ Value &Value::operator=(const char *value)
 Value &Value::operator=(double value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // deallocate current zval (without cleaning the zval structure)
     zval_dtor(_val);
@@ -844,6 +794,9 @@ Value Value::operator()() const
  */
 bool Value::isCallable(const char *name)
 {
+    // this only makes sense if we are an object
+    if (!isObject()) return false;
+
     // wrap the name in a Php::Value object to get a zval
     Value method(name);
 
@@ -851,7 +804,7 @@ bool Value::isCallable(const char *name)
     TSRMLS_FETCH();
 
     // ask zend nicely whether the function is callable
-    return zend_is_callable_ex(method._val, _val, IS_CALLABLE_CHECK_NO_ACCESS, nullptr, nullptr, nullptr, nullptr TSRMLS_CC);
+    return zend_is_callable_ex(method._val, Z_OBJ_P(_val), IS_CALLABLE_CHECK_NO_ACCESS, nullptr, nullptr, nullptr TSRMLS_CC);
 }
 
 /**
@@ -880,25 +833,25 @@ Value Value::call(const char *name)
  *  Helper function that runs the actual call
  *  @param  object      The object to call it on
  *  @param  method      The function or method to call
- *  @param  args        Number of arguments
- *  @param  params      The parameters
+ *  @param  argc        Number of arguments
+ *  @param  argv        The parameters
  *  @return Value
  */
-static Value do_exec(zval *const *object, zval *method, int argc, zval ***params)
+static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
 {
     // the return zval
-    zval *retval = nullptr;
+    zval retval;
 
     // we need the tsrm_ls variable
     TSRMLS_FETCH();
 
     // the current exception
-    zval *oldException = EG(exception);
+    // zend_object *oldException = EG(exception);
 
     // call the function
     // we're casting the const away here, object is only const so we can call this method
     // from const methods after all..
-    if (call_user_function_ex(CG(function_table), (zval**) object, method, &retval, argc, params, 1, NULL TSRMLS_CC) != SUCCESS)
+    if (call_user_function_ex(CG(function_table), (zval*) object, method, &retval, argc, argv, 1, nullptr TSRMLS_CC) != SUCCESS)
     {
         // throw an exception, the function does not exist
         throw Exception("Invalid call to "+Value(method).stringValue());
@@ -910,14 +863,15 @@ static Value do_exec(zval *const *object, zval *method, int argc, zval ***params
     {
         // was an exception thrown inside the function? In that case we throw a C++ new exception
         // to give the C++ code the chance to catch it
-        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
-        
+        // @todo: make OrigException except a zend_object instance
+        // if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
+
         // leap out if nothing was returned
-        if (!retval) return nullptr;
-        
+        if (Z_ISUNDEF(retval)) return nullptr;
+
         // wrap the retval in a value
-        Php::Value result(retval);
-        
+        Php::Value result(&retval);
+
         // destruct the retval (this just decrements the refcounter, which is ok, because
         // it is already wrapped in a Php::Value so still has 1 reference)
         zval_ptr_dtor(&retval);
@@ -933,8 +887,14 @@ static Value do_exec(zval *const *object, zval *method, int argc, zval ***params
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(int argc, zval ***params) const
+Value Value::exec(int argc, Value *argv) const
 {
+    // array of zvals to execute
+    zval params[argc];
+
+    // convert all the values
+    for(unsigned i=0; i < argc; i++) { params[i] = *argv[i]._val; }
+
     // call helper function
     return do_exec(nullptr, _val, argc, params);
 }
@@ -946,13 +906,19 @@ Value Value::exec(int argc, zval ***params) const
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(const char *name, int argc, struct _zval_struct ***params) const
+Value Value::exec(const char *name, int argc, Value *argv) const
 {
     // wrap the name in a Php::Value object to get a zval
     Value method(name);
 
+    // array of zvals to execute
+    zval params[argc];
+
+    // convert all the values
+    for(unsigned i=0; i < argc; i++) { params[i] = *argv[i]._val; }
+
     // call helper function
-    return do_exec(&_val, method._val, argc, params);
+    return do_exec(_val, method._val, argc, params);
 }
 
 /**
@@ -962,13 +928,19 @@ Value Value::exec(const char *name, int argc, struct _zval_struct ***params) con
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(const char *name, int argc, struct _zval_struct ***params)
+Value Value::exec(const char *name, int argc, Value *argv)
 {
     // wrap the name in a Php::Value object to get a zval
     Value method(name);
 
+    // array of zvals to execute
+    zval params[argc];
+
+    // convert all the values
+    for(unsigned i=0; i < argc; i++) { params[i] = *argv[i]._val; }
+
     // call helper function
-    return do_exec(&_val, method._val, argc, params);
+    return do_exec(_val, method._val, argc, params);
 }
 
 /**
@@ -1031,24 +1003,29 @@ Value &Value::setType(Type type)
     if (this->type() == type) return *this;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // run the conversion, when it fails we throw a fatal error which will
     // in the end result in a zend_error() call. This FatalError class is necessary
     // because a direct call to zend_error() will do a longjmp() which may not
     // clean up the C++ objects created by the extension
     switch (type) {
-    case Type::Null:            convert_to_null(_val); break;
-    case Type::Numeric:         convert_to_long(_val); break;
-    case Type::Float:           convert_to_double(_val); break;
-    case Type::Bool:            convert_to_boolean(_val); break;
-    case Type::Array:           convert_to_array(_val); break;
-    case Type::Object:          convert_to_object(_val); break;
-    case Type::String:          convert_to_string(_val); break;
-    case Type::Resource:        throw FatalError("Resource types can not be handled by the PHP-CPP library"); break;
-    case Type::Constant:        throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
-    case Type::ConstantArray:   throw FatalError("Constant types can not be assigned to a PHP-CPP library variable"); break;
-    case Type::Callable:        throw FatalError("Callable types can not be assigned to a PHP-CPP library variable"); break;
+    case Type::Undefined:       throw FatalError{ "Cannot make a variable undefined"                                 }; break;
+    case Type::Null:            convert_to_null(_val);                                                                  break;
+    case Type::Numeric:         convert_to_long(_val);                                                                  break;
+    case Type::Float:           convert_to_double(_val);                                                                break;
+    case Type::Bool:            convert_to_boolean(_val);                                                               break;
+    case Type::False:           convert_to_boolean(_val); ZVAL_FALSE(_val);                                             break;
+    case Type::True:            convert_to_boolean(_val); ZVAL_TRUE(_val);                                              break;
+    case Type::Array:           convert_to_array(_val);                                                                 break;
+    case Type::Object:          convert_to_object(_val);                                                                break;
+    case Type::String:          convert_to_string(_val);                                                                break;
+    case Type::Resource:        throw FatalError{ "Resource types can not be handled by the PHP-CPP library"         }; break;
+    case Type::Constant:        throw FatalError{ "Constant types can not be assigned to a PHP-CPP library variable" }; break;
+    case Type::ConstantAST:     throw FatalError{ "Constant types can not be assigned to a PHP-CPP library variable" }; break;
+    case Type::Callable:        throw FatalError{ "Callable types can not be assigned to a PHP-CPP library variable" }; break;
+    case Type::Reference:       throw FatalError{ "Reference types cannot be assigned to a PHP-CPP library variable" }; break;
+
     }
 
     // done
@@ -1081,9 +1058,6 @@ zend_class_entry *Value::classEntry(bool allowString) const
     // is this an object
     if (isObject())
     {
-        // should have a class entry
-        if (!HAS_CLASS_ENTRY(*_val)) return nullptr;
-
         // class entry can be easily found
         return Z_OBJCE_P(_val);
     }
@@ -1092,14 +1066,8 @@ zend_class_entry *Value::classEntry(bool allowString) const
         // the value is not an object, is this allowed?
         if (!allowString || !isString()) return nullptr;
 
-        // temporary variable
-        zend_class_entry **ce;
-
         // find the class entry
-        if (zend_lookup_class(Z_STRVAL_P(_val), Z_STRLEN_P(_val), &ce TSRMLS_CC) == FAILURE) return nullptr;
-
-        // found the entry
-        return *ce;
+        return zend_lookup_class(Z_STR_P(_val) TSRMLS_CC);
     }
 }
 
@@ -1123,20 +1091,14 @@ bool Value::instanceOf(const char *classname, size_t size, bool allowString) con
     zend_class_entry *this_ce = classEntry(allowString);
     if (!this_ce) return false;
 
-    // class entry of the parameter
-    zend_class_entry **ce;
-
     // now we can look up the actual class
-    // the signature of zend_lookup_class_ex is slightly different since 5.4
-    // TODO The signature of this changed once again as of 5.6!
-#if PHP_VERSION_ID >= 50400
-    if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
-#else
-    if (zend_lookup_class_ex(classname, size, 0, &ce TSRMLS_CC) == FAILURE) return false;
-#endif
+    auto *ce = zend_lookup_class_ex(zend_string_init(classname, size, 1), nullptr, 0 TSRMLS_CC);
+
+    // no such class, then we are not instanceof
+    if (!ce) return false;
 
     // check if this is a subclass
-    return instanceof_function(this_ce, *ce TSRMLS_CC);
+    return instanceof_function(this_ce, ce TSRMLS_CC);
 }
 
 /**
@@ -1159,23 +1121,17 @@ bool Value::derivedFrom(const char *classname, size_t size, bool allowString) co
     zend_class_entry *this_ce = classEntry(allowString);
     if (!this_ce) return false;
 
-    // class entry of the parameter
-    zend_class_entry **ce;
-
     // now we can look up the actual class
-    // the signature of zend_lookup_class_ex is slightly different since 5.4
-    // TODO The signature of this changed once again as of 5.6!
-#if PHP_VERSION_ID >= 50400
-    if (zend_lookup_class_ex(classname, size, NULL, 0, &ce TSRMLS_CC) == FAILURE) return false;
-#else
-    if (zend_lookup_class_ex(classname, size, 0, &ce TSRMLS_CC) == FAILURE) return false;
-#endif
+    auto *ce = zend_lookup_class_ex(zend_string_init(classname, size, 1), nullptr, 0 TSRMLS_CC);
+
+    // unable to find the class entry?
+    if (!ce) return false;
 
     // should not be identical, it must be a real derived object
-    if (this_ce == *ce) return false;
+    if (this_ce == ce) return false;
 
     // check if this is a subclass
-    return instanceof_function(this_ce, *ce TSRMLS_CC);
+    return instanceof_function(this_ce, ce TSRMLS_CC);
 }
 
 /**
@@ -1185,16 +1141,10 @@ bool Value::derivedFrom(const char *classname, size_t size, bool allowString) co
 Value Value::clone() const
 {
     // the zval that will hold the copy
-    zval *copy;
-
-    // allocate memory
-    ALLOC_ZVAL(copy);
+    auto *copy = new zval;
 
     // copy the data
-    INIT_PZVAL_COPY(copy, _val);
-
-    // run the copy constructor to ensure that everything gets copied
-    zval_copy_ctor(copy);
+    ZVAL_DUP(copy, _val);
 
     // wrap it using the Value(zval*) constructor, this will +1 the refcount!!!!
     Value output(copy);
@@ -1239,11 +1189,13 @@ int64_t Value::numericValue() const
  */
 bool Value::boolValue() const
 {
-    // already a bool?
-    if (isBool()) return Z_BVAL_P(_val);
-
-    // make a clone
-    return clone(Type::Bool).boolValue();
+    // what variable type do we hold?
+    switch (type())
+    {
+        case Type::True:    return true;
+        case Type::False:   return false;
+        default:            return clone(Type::Bool).boolValue();
+    }
 }
 
 /**
@@ -1269,36 +1221,6 @@ char *Value::buffer() const
     if (!isString()) return nullptr;
 
     // already a string?
-    return Z_STRVAL_P(_val);
-}
-
-/**
- *  Reserve enough space
- *  @param  size
- *  @return char*
- */
-char *Value::reserve(size_t size)
-{
-    // must be a string
-    setType(Type::String);
-
-    // is the current buffer too small?
-    if (Z_STRLEN_P(_val) < (int)size)
-    {
-        // is there already a buffer?
-        if (!Z_STRVAL_P(_val)) Z_STRVAL_P(_val) = (char *)emalloc(size+1);
-
-        // reallocate an existing buffer
-        else Z_STRVAL_P(_val) = (char *)erealloc(Z_STRVAL_P(_val), size+1);
-
-        // last byte should be zero
-        Z_STRVAL_P(_val)[size] = 0;
-    }
-
-    // store size
-    Z_STRLEN_P(_val) = size;
-
-    // done
     return Z_STRVAL_P(_val);
 }
 
@@ -1413,7 +1335,7 @@ ValueIterator Value::createIterator(bool begin) const
         TSRMLS_FETCH();
 
         // is a special iterator method defined in the class entry?
-        auto *entry = zend_get_class_entry(_val TSRMLS_CC);
+        auto *entry = Z_OBJCE_P(_val);
 
         // check if there is an iterator
         if (entry->get_iterator)
@@ -1476,14 +1398,12 @@ bool Value::contains(int index) const
 {
     // if we're an object implementing ArrayAccess it makes sense for this method to work as well, so we call offsetExists
     if (isObject() && instanceOf("ArrayAccess")) return call("offsetExists", index).boolValue();
+
     // must be an array
     else if (!isArray()) return false;
 
-    // unused variable
-    zval **result;
-
     // check if this index is already in the array
-    return zend_hash_index_find(Z_ARRVAL_P(_val), index, (void**)&result) != FAILURE;
+    return zend_hash_index_find(Z_ARRVAL_P(_val), index) != nullptr;
 }
 
 /**
@@ -1497,14 +1417,11 @@ bool Value::contains(const char *key, int size) const
     // calculate size
     if (size < 0) size = ::strlen(key);
 
-    // unused variable
-    zval **result;
-
     // deal with arrays
     if (isArray())
     {
         // check if index is already in the array
-        return zend_hash_find(Z_ARRVAL_P(_val), key, size+1, (void **)&result) != FAILURE;
+        return zend_hash_find(Z_ARRVAL_P(_val), zend_string_init(key, size, 1)) != nullptr;
     }
     else if (isObject())
     {
@@ -1513,7 +1430,7 @@ bool Value::contains(const char *key, int size) const
 
         // retrieve the object pointer and check whether the property we are trying to retrieve
         // is marked as private/protected (cast necessary for php 5.3)
-        if (zend_check_property_access(zend_objects_get_address(_val TSRMLS_CC), const_cast<char *>(key), size TSRMLS_CC) == FAILURE) return false;
+        if (zend_check_property_access(Z_OBJ_P(_val), zend_string_init(key, size, 1) TSRMLS_CC) == FAILURE) return false;
 
         // check if the 'has_property' method is available for this object
         auto *has_property = Z_OBJ_HT_P(_val)->has_property;
@@ -1526,11 +1443,7 @@ bool Value::contains(const char *key, int size) const
 
         // call the has_property() method (0 means: check whether property exists and is not NULL,
         // this is not really what we want, but the closest to the possible values of that parameter)
-#if PHP_VERSION_ID >= 50400
         return has_property(_val, property._val, 0, nullptr TSRMLS_CC);
-#else
-        return has_property(_val, property._val, 0 TSRMLS_CC);
-#endif
     }
     else
     {
@@ -1549,19 +1462,19 @@ Value Value::get(int index) const
     // if we're an actual normal array we just use the zend_hash_index_find method
     if (isArray())
     {
-        // zval to retrieve
-        zval **result;
+        // retrieve the value
+        auto *result = zend_hash_index_find(Z_ARRVAL_P(_val), index);
 
-        // check if index is in the array
-        if (zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&result) == FAILURE) return Value();
+        // did the offset exist?
+        if (!result) return Type::Undefined;
 
         // wrap the value
-        return Value(*result);
+        return result;
     }
     // if we're an object implementing ArrayAccess it makes sense for this method to work as well, so we call offsetGet
     else if (isObject() && instanceOf("ArrayAccess")) return call("offsetGet", index);
     // if we're neither we return an empty value
-    else return Value();
+    else return Type::Undefined;
 }
 
 /**
@@ -1581,14 +1494,8 @@ Value Value::get(const char *key, int size) const
     // are we in an object or an array?
     if (isArray())
     {
-        // the result value
-        zval **result;
-
-        // check if this index is already in the array, otherwise we return NULL
-        if (zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&result) == FAILURE) return Value();
-
-        // wrap the value
-        return Value(*result);
+        // find the result and wrap it in a value
+        return Value{ zend_hash_find(Z_ARRVAL_P(_val), zend_string_init(key, size, 1)) };
     }
     else
     {
@@ -1598,8 +1505,11 @@ Value Value::get(const char *key, int size) const
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
 
-        // read the property (cast necessary for php 5.3)
-        zval *property = zend_read_property(nullptr, _val, const_cast<char *>(key), size, 0 TSRMLS_CC);
+        // temporary value for holding any error
+        zval rv;
+
+        // read the property
+        zval *property = zend_read_property(nullptr, _val, key, size, 0, &rv TSRMLS_CC);
 
         // wrap in value
         return Value(property);
@@ -1616,13 +1526,13 @@ Value Value::get(const char *key, int size) const
 void Value::setRaw(int index, const Value &value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // add the value (this will decrement refcount on any current variable)
     add_index_zval(_val, index, value._val);
 
     // the variable has one more reference (the array entry)
-    Z_ADDREF_P(value._val);
+    Z_TRY_ADDREF_P(value._val);
 }
 
 /**
@@ -1634,13 +1544,13 @@ void Value::setRaw(int index, const Value &value)
 void Value::set(int index, const Value &value)
 {
     // the current value
-    zval **current;
+    zval *current;
 
     // check if this index is already in the array, otherwise we return NULL
-    if (isArray() && zend_hash_index_find(Z_ARRVAL_P(_val), index, (void **)&current) != FAILURE)
+    if (isArray() && (current = zend_hash_index_find(Z_ARRVAL_P(_val), index)))
     {
         // skip if nothing is going to change
-        if (value._val == *current) return;
+        if (value._val == current) return;
     }
 
     // must be an array
@@ -1665,24 +1575,24 @@ void Value::setRaw(const char *key, int size, const Value &value)
     if (isObject())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+        SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
 
-        // update the property (cast necessary for php 5.3)
-        zend_update_property(nullptr, _val, const_cast<char *>(key), size, value._val TSRMLS_CC);
+        // update the property
+        zend_update_property(nullptr, _val, key, size, value._val TSRMLS_CC);
     }
     else
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+        SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // add the value (this will reduce the refcount of the current value)
         add_assoc_zval_ex(_val, key, size+1, value._val);
 
         // the variable has one more reference (the array entry)
-        Z_ADDREF_P(value._val);
+        Z_TRY_ADDREF_P(value._val);
     }
 }
 
@@ -1696,13 +1606,13 @@ void Value::setRaw(const char *key, int size, const Value &value)
 void Value::set(const char *key, int size, const Value &value)
 {
     // the current value
-    zval **current;
+    zval *current;
 
     // check if this index is already in the array, otherwise we return NULL
-    if (isArray() && zend_hash_find(Z_ARRVAL_P(_val), key, size + 1, (void **)&current) != FAILURE)
+    if (isArray() && (current = zend_hash_find(Z_ARRVAL_P(_val), zend_string_init(key, size, 1))))
     {
         // skip if nothing is going to change
-        if (value._val == *current) return;
+        if (value._val == current) return;
     }
 
     // this should be an object or an array
@@ -1722,7 +1632,7 @@ void Value::unset(int index)
     if (!isArray()) return;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(&_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // remove the index
     zend_hash_index_del(Z_ARRVAL_P(_val), index);
@@ -1739,7 +1649,7 @@ void Value::unset(const char *key, int size)
     if (isObject())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+        SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
@@ -1750,10 +1660,10 @@ void Value::unset(const char *key, int size)
     else if (isArray())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(&_val);
+        SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // remove the index
-        zend_hash_del(Z_ARRVAL_P(_val), key, size + 1);
+        zend_hash_del(Z_ARRVAL_P(_val), zend_string_init(key, size, 1));
     }
 }
 

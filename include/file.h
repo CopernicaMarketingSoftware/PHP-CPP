@@ -9,6 +9,11 @@
  */
 
 /**
+ *  Forward declarations
+ */
+struct _zend_string;
+
+/**
  *  Set up namespace
  */
 namespace Php {
@@ -81,15 +86,15 @@ public:
 private:
     /**
      *  The full resolved path name
-     *  @var const char *
+     *  @var struct _zend_string*
      */
-    char *_path = nullptr;
+    struct _zend_string *_path = nullptr;
 
     /**
      *  The opcodes of this file
-     *  @var Opcodes
+     *  @var std::unique_ptr<Opcodes>
      */
-    Opcodes *_opcodes = nullptr;
+    std::unique_ptr<Opcodes> _opcodes;
 
     /**
      *  Compile the file

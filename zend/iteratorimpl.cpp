@@ -49,21 +49,22 @@ int IteratorImpl::valid(zend_object_iterator *iter TSRMLS_DC)
 
 /**
  *  Fetch the current item
- *  @param  iter
- *  @param  data
- *  @param  tsrm_ls
+ *
+ *  @param  iter    The iterator to retrieve the value from
+ *  @param  tsrm_ls Thread safety variable
+ *  @return The current value of the iterator
  */
-void IteratorImpl::current(zend_object_iterator *iter, zval ***data TSRMLS_DC)
+zval *IteratorImpl::current(zend_object_iterator *iter TSRMLS_DC)
 {
     // get the actual iterator
-    IteratorImpl *iterator = self(iter);
+    auto *iterator = self(iter);
 
     // retrieve the value (and store it in a member so that it is not
     // destructed when the function returns)
     iterator->_current = iterator->current();
 
-    // copy the value
-    *data = &iterator->_current._val;
+    // return the value
+    return iterator->_current._val;
 }
 
 /**

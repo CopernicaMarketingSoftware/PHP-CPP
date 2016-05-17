@@ -32,10 +32,16 @@ Value Super::value()
     TSRMLS_FETCH();
 
     // call zend_is_auto_global to ensure that the just-in-time globals are loaded
-    if (_name) { zend_is_auto_global(_name, ::strlen(_name) TSRMLS_CC); _name = nullptr; }
-    
+    if (_name) {
+        // make the variable an auto global
+        zend_is_auto_global(zend_string_init(_name, ::strlen(_name), 1) TSRMLS_CC);
+
+        // reset because we only need to do this once
+        _name = nullptr;
+    }
+
     // create a value object that wraps around the actual zval
-    return Value(PG(http_globals)[_index]);
+    return &PG(http_globals)[_index];
 }
 
 /**

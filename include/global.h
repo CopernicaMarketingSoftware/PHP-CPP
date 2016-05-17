@@ -9,9 +9,10 @@
  */
 
 /**
- *  Forward definitions
+ *  Forward declarations
  */
 struct _zval_struct;
+struct _zend_string;
 
 /**
  *  Namespace
@@ -34,12 +35,12 @@ public:
      *  Move constructor
      *  @param  global
      */
-    Global(Global &&global) _NOEXCEPT : Value(std::move(global)), _name(std::move(global._name)), _exists(global._exists) {}
+    Global(Global &&global) _NOEXCEPT;
 
     /**
      *  Destructor
      */
-    virtual ~Global() {}
+    virtual ~Global();
 
     /**
      *  Assignment operator
@@ -143,35 +144,36 @@ protected:
 private:
     /**
      *  Constructor for non-existing var
-     *  @param  name
+     *
+     *  @param  name    Name for the variable that does not exist
      */
-    Global(const char *name) : Value(), _name(name), _exists(false) {}
+    Global(const char *name);
 
     /**
      *  Alternative constructor for non-existing var
      *  @param  name
      */
-    Global(const std::string &name) : Value(), _name(name), _exists(false) {}
+    Global(const std::string &name);
 
     /**
      *  Constructor to wrap zval for existing global bar
      *  @param  name
      *  @param  val
      */
-    Global(const char *name, struct _zval_struct *val) : Value(val, true), _name(name), _exists(true) {}
+    Global(const char *name, struct _zval_struct *val);
 
     /**
      *  Alternative constructor to wrap zval
      *  @param  name
      *  @param  val
      */
-    Global(const std::string &name, struct _zval_struct *val) : Value(val, true), _name(name), _exists(true) {}
+    Global(const std::string &name, struct _zval_struct *val);
 
     /**
      *  Name of the variable
-     *  @var string
+     *  @var struct _zend_string*
      */
-    std::string _name;
+    struct _zend_string *_name;
 
     /**
      *  Does it already exist?

@@ -77,7 +77,7 @@ public:
         _mixed->php.handlers = handlers;
 
         // set the initial refcount (if it is different than one, because one is the default)
-        if (refcount != 1) php()->gc.refcount = refcount;
+        if (refcount != 1) GC_REFCOUNT(php()) = refcount;
 
         // the object may remember that we are its implementation object
         base->_impl = this;

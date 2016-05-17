@@ -24,24 +24,23 @@ public:
      *  @param  name        Function or method name
      *  @param  arguments   Information about the arguments
      */
-    Callable(const char *name, const Arguments &arguments = {}) : _ptr(this, name)
+    Callable(const char *name, const Arguments &arguments = {}) :
+        _ptr(this, name),
+        _argc(arguments.size()),
+        _argv(new zend_internal_arg_info[_argc + 1])
     {
-        // construct vector for arguments
-        _argc = arguments.size();
-        _argv = new zend_arg_info[_argc+1];
-
         // the first record is initialized with information about the function,
         // so we skip that here
         int i=1;
 
         // loop through the arguments
-        for (auto it = arguments.begin(); it != arguments.end(); it++)
+        for (auto &argument : arguments)
         {
             // increment counter with number of required parameters
-            if (it->required()) _required++;
+            if (argument.required()) _required++;
 
             // fill the arg info
-            fill(&_argv[i++], *it);
+            fill(&_argv[i++], argument);
         }
     }
 
@@ -55,6 +54,8 @@ public:
         _required(that._required),
         _argc(that._argc),
         _argv(nullptr) {}
+        // @todo: we have no arguments after copy? is this correct?
+        // we do have the argument count though...
 
     /**
      *  Move constructor
@@ -65,19 +66,12 @@ public:
         _return(that._return),
         _required(that._required),
         _argc(that._argc),
-        _argv(that._argv)
-    {
-        // invalidate other object
-        that._argv = nullptr;
-    }
+        _argv(std::move(that._argv)) {}
 
     /**
      *  Destructor
      */
-    virtual ~Callable()
-    {
-        if (_argv) delete[] _argv;
-    }
+    virtual ~Callable() = default;
 
     /**
      *  Method that gets called every time the function is executed
@@ -101,7 +95,7 @@ public:
      *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      */
-    void initialize(zend_arg_info *info, const char *classname = nullptr) const;
+    void initialize(zend_internal_function_info *info, const char *classname = nullptr) const;
 
 
 protected:
@@ -131,22 +125,22 @@ protected:
 
     /**
      *  The arguments
-     *  @var zend_arg_info[]
+     *  @var std::unique_ptr<zend_internal_arg_info[]>
      */
-    zend_arg_info *_argv = nullptr;
+    std::unique_ptr<zend_internal_arg_info[]> _argv;
 
     /**
      *  Private helper method to fill an argument object
      *  @param  info        object from the zend engine
      *  @param  arg         original object
      */
-    void fill(zend_arg_info *info, const Argument &arg) const
+    void fill(zend_internal_arg_info *info, const Argument &arg) const
     {
         // fill members
-        info->name = zend_string_init(arg.name(), ::strlen(arg.name()), 1);
+        info->name = arg.name();
 
         // are we filling an object
-        if (arg.type() == Type::Object) info->class_name = zend_string_init(arg.classname(), ::strlen(arg.classname()), 1);
+        if (arg.type() == Type::Object) info->class_name = arg.classname();
         else info->class_name = nullptr;
 
         // since php 5.4 there is a type-hint, but we only support arrays, objects and callables

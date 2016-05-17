@@ -36,14 +36,14 @@ Globals &GLOBALS = Globals::instance();
  */
 Global Globals::operator[](const char *name)
 {
-    // pointer to a zval
-    zval **varvalue;
-    
     // we need the TSRMLS variable
     TSRMLS_FETCH();
-    
+
+    // retrieve the variable (if it exists)
+    auto *varvalue = zend_hash_find(&EG(symbol_table), zend_string_init(name, ::strlen(name), 0));
+
     // check if the variable already exists
-    if (zend_hash_find(&EG(symbol_table), name, ::strlen(name)+1, (void**)&varvalue) == FAILURE) 
+    if (!varvalue)
     {
         // the variable does not already exist, return a global object
         // that will automatically set the value when it is updated
@@ -53,7 +53,7 @@ Global Globals::operator[](const char *name)
     {
         // we are in the happy situation that the variable exists, we turn
         // this value into a reference value, and return that
-        return Global(name, *varvalue);
+        return Global(name, varvalue);
     }
 }
 
@@ -64,14 +64,14 @@ Global Globals::operator[](const char *name)
  */
 Global Globals::operator[](const std::string &name)
 {
-    // pointer to a zval
-    zval **varvalue;
-
     // we need the TSRMLS variable
     TSRMLS_FETCH();
-    
+
+    // retrieve the variable (if it exists)
+    auto *varvalue = zend_hash_find(&EG(symbol_table), zend_string_init(name.data(), name.size(), 0));
+
     // check if the variable already exists
-    if (zend_hash_find(&EG(symbol_table), name.c_str(), name.size()+1, (void**)&varvalue) == FAILURE) 
+    if (!varvalue)
     {
         // the variable does not already exist, return a global object
         // that will automatically set the value when it is updated
@@ -81,7 +81,7 @@ Global Globals::operator[](const std::string &name)
     {
         // we are in the happy situation that the variable exists, we turn
         // this value into a reference value, and return that
-        return Global(name, *varvalue);
+        return Global(name, varvalue);
     }
 }
 

@@ -50,7 +50,7 @@ public:
     /**
      *  Virtual destructor
      */
-    virtual ~Base() {}
+    virtual ~Base() = default;
 
     /**
      *  Get access to a property by name using the [] operator

@@ -382,7 +382,7 @@ public:
      */
     bool isNull()       const { return type() == Type::Null; }
     bool isNumeric()    const { return type() == Type::Numeric; }
-    bool isBool()       const { return type() == Type::Bool; }
+    bool isBool()       const { return type() == Type::False || type() == Type::True; }
     bool isString()     const { return type() == Type::String; }
     bool isFloat()      const { return type() == Type::Float; }
     bool isObject()     const { return type() == Type::Object; }
@@ -401,18 +401,6 @@ public:
      *  @return char *
      */
     char *buffer() const;
-
-    /**
-     *  Resize buffer space. If you want to write directly to the buffer (which
-     *  is returned by the buffer() method), you should first reserve enough
-     *  space in it. This can be done with this reserve() method. This will also
-     *  turn the Value object into a string (if it was not already a string).
-     *  The writable buffer is returned.
-     *
-     *  @param  size
-     *  @return char*
-     */
-    char *reserve(size_t size);
 
     /**
      *  Get access to the raw buffer for read operations. Note that this
@@ -977,14 +965,9 @@ public:
     {
         // store arguments
         Value vargs[] = { static_cast<Value>(args)... };
-        //Value vargs[] = { std::forward<Value>(args)... };
-
-        // array of parameters
-        _zval_struct **params[sizeof...(Args)];
-        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
 
         // call the function
-        return exec(sizeof...(Args), params);
+        return exec(sizeof...(Args), vargs);
     }
 
     /**
@@ -1021,12 +1004,8 @@ public:
         // store arguments
         Value vargs[] = { static_cast<Value>(args)... };
 
-        // array of parameters
-        _zval_struct **params[sizeof...(Args)];
-        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
-
         // call the function
-        return exec(name, sizeof...(Args), params);
+        return exec(name, sizeof...(Args), vargs);
     }
 
     template <typename ...Args>
@@ -1035,12 +1014,8 @@ public:
         // store arguments
         Value vargs[] = { static_cast<Value>(args)... };
 
-        // array of parameters
-        _zval_struct **params[sizeof...(Args)];
-        for(unsigned i=0; i < sizeof...(Args); i++) {params[i] = &vargs[i]._val;}
-
         // call the function
-        return exec(name, sizeof...(Args), params);
+        return exec(name, sizeof...(Args), vargs);
     }
 
     /**
@@ -1116,7 +1091,7 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(int argc, struct _zval_struct ***params) const;
+    Value exec(int argc, Value *argv) const;
 
     /**
      *  Call method with a number of parameters
@@ -1125,8 +1100,8 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(const char *name, int argc, struct _zval_struct ***params) const;
-    Value exec(const char *name, int argc, struct _zval_struct ***params);
+    Value exec(const char *name, int argc, Value *argv) const;
+    Value exec(const char *name, int argc, Value *argv);
 
     /**
      *  Refcount - the number of references to the value
@@ -1137,7 +1112,7 @@ private:
 protected:
     /**
      *  The wrapped zval
-     *  @var struct zval
+     *  @var struct zval*
      */
     struct _zval_struct *_val;
 

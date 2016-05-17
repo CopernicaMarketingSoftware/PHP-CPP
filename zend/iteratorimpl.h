@@ -114,11 +114,12 @@ private:
 
     /**
      *  Fetch the current item
-     *  @param  iter
-     *  @param  data
-     *  @param  tsrm_ls
+     *
+     *  @param  iter    The iterator used to retrieve the value from
+     *  @param  tsrm_ls Thread safety variable
+     *  @return The current value of the iterator
      */
-    static void current(zend_object_iterator *iter, zval ***data TSRMLS_DC);
+    static zval *current(zend_object_iterator *iter TSRMLS_DC);
 
     /**
      *  Fetch the key for the current element (optional, may be NULL). The key
