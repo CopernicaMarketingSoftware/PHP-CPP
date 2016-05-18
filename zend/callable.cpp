@@ -14,6 +14,16 @@
 namespace Php {
 
 /**
+ *  Map function names to their implementation
+ *
+ *  This is braindead, there should be a way to get this information
+ *  from the "This" zval in the execute_data, I just can't find it
+ *  @todo   Find a better way for this
+ *  @var    std::map<std::string, Callable*>
+ */
+static std::map<std::string, Callable*> callables;
+
+/**
  *  Function that is called by the Zend engine every time that a function gets called
  *  @param  ht
  *  @param  return_value
@@ -28,8 +38,8 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     // find the function name
     const char *name = get_active_function_name(TSRMLS_C);
 
-    // uncover the hidden pointer inside the function name
-    Callable *callable = HiddenPointer<Callable>(name);
+    // retrieve the callable from the map
+    auto *callable = callables.find(name)->second;
 
     // check if sufficient parameters were passed (for some reason this check
     // is not done by Zend, so we do it here ourselves)
@@ -75,8 +85,11 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
  */
 void Callable::initialize(zend_function_entry *entry, const char *classname, int flags) const
 {
+    // track the callable
+    callables[_name] = const_cast<Callable*>(this);
+
     // fill the members of the entity, and hide a pointer to the current object in the name
-    entry->fname = (const char *)_ptr;
+    entry->fname = _name.data();
     entry->handler = &Callable::invoke;
     entry->arg_info = _argv.get();
     entry->num_args = _argc;

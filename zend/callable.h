@@ -9,6 +9,11 @@
  */
 
 /**
+ *  Dependencies
+ */
+#include <cstring>
+
+/**
  *  Set up namespace
  */
 namespace Php {
@@ -25,7 +30,7 @@ public:
      *  @param  arguments   Information about the arguments
      */
     Callable(const char *name, const Arguments &arguments = {}) :
-        _ptr(this, name),
+        _name(name),
         _argc(arguments.size()),
         _argv(new zend_internal_arg_info[_argc + 1])
     {
@@ -49,7 +54,7 @@ public:
      *  @param  that
      */
     Callable(const Callable &that) :
-        _ptr(that._ptr),
+        _name(that._name),
         _return(that._return),
         _required(that._required),
         _argc(that._argc),
@@ -62,7 +67,7 @@ public:
      *  @param  that
      */
     Callable(Callable &&that) :
-        _ptr(std::move(that._ptr)),
+        _name(std::move(that._name)),
         _return(that._return),
         _required(that._required),
         _argc(that._argc),
@@ -100,10 +105,10 @@ public:
 
 protected:
     /**
-     *  Hidden pointer to the name and the function
-     *  @var    HiddenPointer
+     *  Name of the function
+     *  @var    std::string
      */
-    HiddenPointer<Callable> _ptr;
+    std::string _name;
 
     /**
      *  Suggestion for the return type

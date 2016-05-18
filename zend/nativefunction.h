@@ -70,8 +70,8 @@ public:
     void initialize(const std::string &prefix, zend_function_entry *entry)
     {
         // if there is a namespace prefix, we should adjust the name
-        if (prefix.size()) _ptr = HiddenPointer<Callable>(this, prefix+"\\"+(const char *)_ptr);
-        
+        if (!prefix.empty()) _name = prefix + '\\' + _name;
+
         // call base initialize
         Callable::initialize(entry);
     }
@@ -79,7 +79,7 @@ public:
 private:
     /**
      *  Union of supported callbacks
-     *  One of the callbacks will be set 
+     *  One of the callbacks will be set
      */
     union {
         native_callback_0 f0;
@@ -87,7 +87,7 @@ private:
         native_callback_2 f2;
         native_callback_3 f3;
     } _function;
-    
+
     /**
      *  The callback that is set
      *  @var integer
