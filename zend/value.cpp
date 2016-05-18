@@ -1146,11 +1146,12 @@ Value Value::clone() const
     // copy the data
     ZVAL_DUP(copy, _val);
 
-    // wrap it using the Value(zval*) constructor, this will +1 the refcount!!!!
+    // wrap it using the Value(zval*) constructor,
+    // this will +1 the refcount for counted values
     Value output(copy);
 
     // -1 the refcount to avoid future leaks
-    Z_DELREF_P(copy);
+    Z_TRY_DELREF_P(copy);
 
     // done
     return output;
