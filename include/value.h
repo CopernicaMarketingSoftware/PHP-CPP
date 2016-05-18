@@ -1114,7 +1114,7 @@ protected:
      *  The wrapped zval
      *  @var struct zval*
      */
-    struct _zval_struct *_val;
+    struct _zval_struct *_val = nullptr;
 
     /**
      *  Detach the zval

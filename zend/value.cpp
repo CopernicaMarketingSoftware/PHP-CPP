@@ -140,9 +140,13 @@ Value::Value(double value) : _val(new zval)
  *  @param  zval        Value to wrap
  *  @param  ref         Force this to be a reference
  */
-Value::Value(struct _zval_struct *val, bool ref) : _val(val)
+Value::Value(struct _zval_struct *val, bool ref) : _val(new zval)
 {
-    // not refcounted? then there is nothing we can here
+    // copy the value over (and add reference if relevant)
+    ZVAL_COPY(_val, val);
+
+    // not refcounted? then there is nothing we can do here
+    // @todo: we should be able to force a reference somehow
     if (!Z_REFCOUNTED_P(_val)) return;
 
     // if the variable is not already a reference, and it has more than one
@@ -206,7 +210,7 @@ Value::Value(const Value &that)
         // because this is supposed to be a COPY, we can not add ourselves
         // to the variable but have to allocate a new variable
         _val = new zval;
-        ZVAL_DUP(_val, that._val);
+        ZVAL_COPY_VALUE(_val, that._val);
     }
     else
     {
@@ -236,22 +240,28 @@ Value::~Value()
     // ignore if moved
     if (!_val) return;
 
+    // copy to local variable
+    auto val = _val;
+
+    // reset local
+    _val = nullptr;
+
     // are we not a refcounted variable?
-    if (!Z_REFCOUNTED_P(_val))
+    if (!Z_REFCOUNTED_P(val))
     {
         // we can simply delete it
-        delete _val;
+        delete val;
     }
     else
     {
         // if there were two references or less, we're going to remove a reference
         // and only one reference will remain, the object will then impossible be
         // a reference
-        if (Z_REFCOUNT_P(_val) <= 2) ZVAL_UNREF(_val);
+        if (Z_REFCOUNT_P(val) <= 2) ZVAL_UNREF(val);
 
         // destruct the zval (this function will decrement the reference counter,
         // and only destruct if there are no other references left)
-        zval_ptr_dtor(_val);
+        zval_ptr_dtor(val);
     }
 }
 
@@ -1140,18 +1150,11 @@ bool Value::derivedFrom(const char *classname, size_t size, bool allowString) co
  */
 Value Value::clone() const
 {
-    // the zval that will hold the copy
-    auto *copy = new zval;
+    // value to clone to
+    Value output;
 
-    // copy the data
-    ZVAL_DUP(copy, _val);
-
-    // wrap it using the Value(zval*) constructor,
-    // this will +1 the refcount for counted values
-    Value output(copy);
-
-    // -1 the refcount to avoid future leaks
-    Z_TRY_DELREF_P(copy);
+    // copy the value over to the output
+    ZVAL_COPY_VALUE(output._val, _val);
 
     // done
     return output;
@@ -1164,11 +1167,14 @@ Value Value::clone() const
  */
 Value Value::clone(Type type) const
 {
-    // regular clone if nothing changes
-    if (this->type() == type) return clone();
+    // first create the clone
+    auto cloned = clone();
 
-    // make a clone
-    return clone().setType(type);
+    // should we change the type
+    if (this->type() != type) cloned.setType(type);
+
+    // return the finished clone
+    return cloned;
 }
 
 /**
@@ -1193,9 +1199,15 @@ bool Value::boolValue() const
     // what variable type do we hold?
     switch (type())
     {
-        case Type::True:    return true;
-        case Type::False:   return false;
-        default:            return clone(Type::Bool).boolValue();
+        case Type::Undefined:   return false;
+        case Type::Null:        return false;
+        case Type::False:       return false;
+        case Type::True:        return true;
+        case Type::Numeric:     return numericValue();
+        case Type::Float:       return floatValue();
+        case Type::String:      return size();
+        case Type::Array:       return size();
+        default:                return clone(Type::Bool).boolValue();
     }
 }
 
@@ -1205,10 +1217,19 @@ bool Value::boolValue() const
  */
 std::string Value::stringValue() const
 {
-    // already a string?
-    if (isString()) return std::string(Z_STRVAL_P(_val), Z_STRLEN_P(_val));
+    // what kind of casting do we need to do?
+    switch (type())
+    {
+        case Type::Null:        return {};
+        case Type::False:       return "0";
+        case Type::True:        return "1";
+        case Type::Numeric:     return std::to_string(numericValue());
+        case Type::Float:       return std::to_string(floatValue());
+        case Type::String:      return { Z_STRVAL_P(_val), Z_STRLEN_P(_val) };
+        default:                break;
+    }
 
-    // make a clone
+    // clone the value and convert it to a string
     return clone(Type::String).stringValue();
 }
 
