@@ -114,7 +114,7 @@ protected:
      *  Suggestion for the return type
      *  @var    Type
      */
-    Type _return = Type::Null;
+    Type _return = Type::Undefined;
 
     /**
      *  Required number of arguments

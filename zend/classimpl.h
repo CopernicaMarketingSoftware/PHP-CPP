@@ -102,7 +102,6 @@ private:
      *  properties for each method. This method is called at extension
      *  startup time to register all methods.
      *
-     *  @param  classname       The class name
      *  @return zend_function_entry[]
      */
     const zend_function_entry *entries();

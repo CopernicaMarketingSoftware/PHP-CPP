@@ -1341,7 +1341,7 @@ const struct _zend_function_entry *ClassImpl::entries()
     zend_function_entry *last = &_entries[i];
 
     // all should be set to zero
-    memset(last, 0, sizeof(zend_function_entry));
+    memset(last, 0, sizeof(*last));
 
     // done
     return _entries;
