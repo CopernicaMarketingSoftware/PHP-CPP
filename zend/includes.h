@@ -40,6 +40,13 @@
 #include <SAPI.h>
 
 /**
+ *  We don't compile for php7 just yet
+ */
+#if PHP_VERSION_ID >= 70000
+#   error "This library is currently not yet compatible with php7."
+#endif
+
+/**
  *  Macro to convert results to success status
  */
 #define BOOL2SUCCESS(b) ((b) ? SUCCESS : FAILURE)
