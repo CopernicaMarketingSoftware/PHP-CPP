@@ -42,8 +42,8 @@
 /**
  *  We don't compile for php7 just yet
  */
-#if PHP_VERSION_ID >= 70000
-#   error "This library is currently not yet compatible with php7."
+#if PHP_VERSION_ID < 70000
+#   error "This library required PHP version 7.0 or higher. Use PHP-CPP-LEGACY for older versions."
 #endif
 
 /**

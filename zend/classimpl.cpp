@@ -1439,6 +1439,9 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     // copy over the 'this'-pointer after the null-character
     std::memcpy(ZSTR_VAL(_self) + 1, &impl, sizeof(impl));
 
+    // install the doc_comment
+    _entry->info.user.doc_comment = _self;
+
     // set access types flags for class
     _entry->ce_flags = (int)_type;
 
