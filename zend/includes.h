@@ -40,10 +40,10 @@
 #include <SAPI.h>
 
 /**
- *  We don't compile for php7 just yet
+ *  We don't work with older versions of PHP
  */
 #if PHP_VERSION_ID < 70000
-#   error "This library required PHP version 7.0 or higher. Use PHP-CPP-LEGACY for older versions."
+#   error "This library requires PHP version 7.0 or higher. Use PHP-CPP-LEGACY for older versions."
 #endif
 
 /**
