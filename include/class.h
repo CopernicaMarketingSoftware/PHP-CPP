@@ -53,7 +53,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Class() {}
+    virtual ~Class() = default;
 
     /**
      *  Add a regular method to the class
@@ -461,8 +461,12 @@ private:
         // cast to actual object
         T *obj = (T *)base;
 
-        // pass on
-        return Value(obj->__toString()).setType(Type::String);
+        // retrieve the casted value and convert it if necessary
+        auto result = obj->__toString();
+        result.setType(Type::String);
+
+        // return the converted result
+        return result;
     }
 
     /**
@@ -475,8 +479,12 @@ private:
         // cast to actual object
         T *obj = (T *)base;
 
-        // pass on
-        return Value(obj->__toInteger()).setType(Type::Numeric);
+        // retrieve the casted value and convert it if necessary
+        auto result = obj->__toInteger();
+        result.setType(Type::Numeric);
+
+        // return the converted result
+        return result;
     }
 
     /**
@@ -489,8 +497,12 @@ private:
         // cast to actual object
         T *obj = (T *)base;
 
-        // pass on
-        return Value(obj->__toFloat()).setType(Type::Float);
+        // retrieve the casted value and convert it if necessary
+        auto result = obj->__toFloat();
+        result.setType(Type::Float);
+
+        // return the converted result
+        return result;
     }
 
     /**
@@ -503,8 +515,12 @@ private:
         // cast to actual object
         T *obj = (T *)base;
 
-        // pass on
-        return Value(obj->__toBool()).setType(Type::Bool);
+        // retrieve the casted value and convert it if necessary
+        auto result = obj->__toBool();
+        result.setType(Type::Bool);
+
+        // return the converted result
+        return result;
     }
 
     /**

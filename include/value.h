@@ -361,7 +361,7 @@ public:
      *  Change the internal type of the variable
      *  @param  Type
      */
-    virtual Value &setType(Type type);
+    virtual Value &setType(Type type) &;
 
     /**
      *  Make a clone of the value with the same type

@@ -90,7 +90,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ClassBase() {}
+    virtual ~ClassBase() = default;
 
     /**
      *  Construct a new instance of the object, or to clone the object

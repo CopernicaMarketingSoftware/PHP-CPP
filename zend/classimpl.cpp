@@ -455,38 +455,27 @@ int ClassImpl::cast(zval *val, zval *retval, int type TSRMLS_DC)
     // we need the C++ class meta-information object
     ClassBase *meta = self(entry)->_base;
 
-    // retval is not yet initialized --- and again feelings of disbelief,
-    // frustration, wonder and anger come up when you see that there are not two
-    // functions in the Zend engine that have a comparable API
-    //
-    // this function was removed, because it was supposedly no longer necessary
-    // can we get away with removing it here too?
-    // INIT_PZVAL(retval);
-
     // when the magic function it not implemented, an exception will be thrown,
     // and the extension may throw a Php::Exception
     try
     {
-        // the result zval
-        zval *result = nullptr;
+        // the result value
+        Value result;
 
         // check type
         switch ((Type)type) {
-            case Type::Numeric:     result = meta->callToInteger(object).detach(true);  break;
-            case Type::Float:       result = meta->callToFloat(object).detach(true);    break;
-            case Type::Bool:        result = meta->callToBool(object).detach(true);     break;
-            case Type::String:      result = meta->callToString(object).detach(true);   break;
-            default:                throw NotImplemented();                             break;
+            case Type::Numeric:     result = meta->callToInteger(object);   break;
+            case Type::Float:       result = meta->callToFloat(object);     break;
+            case Type::Bool:        result = meta->callToBool(object);      break;
+            case Type::String:      result = meta->callToString(object);    break;
+            default:                throw NotImplemented();                 break;
         }
 
         // @todo do we turn into endless conversion if the __toString object returns 'this' ??
         // (and if it does: who cares? If the extension programmer is stupid, why do we have to suffer?)
 
-        // is the original parameter overwritten?
-        if (val == retval) zval_dtor(val);
-
         // overwrite the result
-        ZVAL_ZVAL(retval, result, 1, 1);
+        ZVAL_DUP(retval, result._val);
 
         // done
         return SUCCESS;

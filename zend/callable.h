@@ -148,12 +148,22 @@ protected:
         if (arg.type() == Type::Object) info->class_name = arg.classname();
         else info->class_name = nullptr;
 
-        // since php 5.4 there is a type-hint, but we only support arrays, objects and callables
-        switch (arg.type()) {
-        case Type::Array:       info->type_hint = IS_ARRAY; break;
-        case Type::Callable:    info->type_hint = IS_CALLABLE; break;
-        case Type::Object:      info->type_hint = IS_OBJECT; break;
-        default:                info->type_hint = IS_NULL; break;
+        // set the correct type-hint
+        switch (arg.type())
+        {
+            case Type::Undefined:   info->type_hint = IS_UNDEF;     break;  // undefined means we'll accept any type
+            case Type::Null:        info->type_hint = IS_UNDEF;     break;  // this is likely an error, what good would accepting NULL be? accept anything
+            case Type::False:       info->type_hint = _IS_BOOL;     break;  // accept true as well ;)
+            case Type::True:        info->type_hint = _IS_BOOL;     break;  // accept false as well
+            case Type::Bool:        info->type_hint = _IS_BOOL;     break;  // any bool will do, true, false, the options are limitless
+            case Type::Numeric:     info->type_hint = IS_LONG;      break;  // accept integers here
+            case Type::Float:       info->type_hint = IS_DOUBLE;    break;  // floating-point values welcome too
+            case Type::String:      info->type_hint = IS_STRING;    break;  // accept strings, should auto-cast objects with __toString as well
+            case Type::Array:       info->type_hint = IS_ARRAY;     break;  // array of anything (individual members cannot be restricted)
+            case Type::Object:      info->type_hint = IS_OBJECT;    break;  // must be an object of the given classname
+            case Type::Callable:    info->type_hint = IS_CALLABLE;  break;  // anything that can be invoked
+            default:                info->type_hint = IS_UNDEF;     break;  // if not specified we allow anything
+
         }
 
         // from PHP 5.6 and onwards, an is_variadic property can be set, this

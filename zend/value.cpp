@@ -143,7 +143,7 @@ Value::Value(double value) : _val(new zval)
 Value::Value(struct _zval_struct *val, bool ref) : _val(new zval)
 {
     // copy the value over (and add reference if relevant)
-    ZVAL_COPY(_val, val);
+    ZVAL_DUP(_val, val);
 
     // not refcounted? then there is nothing we can do here
     // @todo: we should be able to force a reference somehow
@@ -240,28 +240,22 @@ Value::~Value()
     // ignore if moved
     if (!_val) return;
 
-    // copy to local variable
-    auto val = _val;
-
-    // reset local
-    _val = nullptr;
-
     // are we not a refcounted variable?
-    if (!Z_REFCOUNTED_P(val))
+    if (!Z_REFCOUNTED_P(_val))
     {
         // we can simply delete it
-        delete val;
+        delete _val;
     }
     else
     {
-        // if there were two references or less, we're going to remove a reference
-        // and only one reference will remain, the object will then impossible be
-        // a reference
-        if (Z_REFCOUNT_P(val) <= 2) ZVAL_UNREF(val);
+        // remove the reference that we have
+        Z_DELREF_P(_val);
 
-        // destruct the zval (this function will decrement the reference counter,
-        // and only destruct if there are no other references left)
-        zval_ptr_dtor(val);
+        // one would assume we would need to explicitly delete
+        // _val here too, since we allocated it ourselves, this
+        // turns out to lead to double-free problems, we should
+        // check whether this is true in all cases and whether
+        // this leads to memory leaks here...
     }
 }
 
@@ -353,9 +347,6 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
         }
         else
         {
-            // we need the tsrm_ls variable
-            TSRMLS_FETCH();
-
             // the last and only reference to the other object was
             // removed, we no longer need it
             delete value._val;
@@ -366,9 +357,8 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
     }
     else
     {
-        // destruct the zval (this function will decrement the reference counter,
-        // and only destruct if there are no other references left)
-        if (_val) zval_ptr_dtor(_val);
+        // first destruct ourselves properly
+        this->~Value();
 
         // just copy the zval completely
         _val = value._val;
@@ -1007,7 +997,7 @@ Type Value::type() const
  *  @param  type
  *  @return Value
  */
-Value &Value::setType(Type type)
+Value &Value::setType(Type type) &
 {
     // skip if nothing changes
     if (this->type() == type) return *this;
@@ -1035,7 +1025,6 @@ Value &Value::setType(Type type)
     case Type::ConstantAST:     throw FatalError{ "Constant types can not be assigned to a PHP-CPP library variable" }; break;
     case Type::Callable:        throw FatalError{ "Callable types can not be assigned to a PHP-CPP library variable" }; break;
     case Type::Reference:       throw FatalError{ "Reference types cannot be assigned to a PHP-CPP library variable" }; break;
-
     }
 
     // done
@@ -1154,7 +1143,7 @@ Value Value::clone() const
     Value output;
 
     // copy the value over to the output
-    ZVAL_COPY_VALUE(output._val, _val);
+    ZVAL_DUP(output._val, _val);
 
     // done
     return output;

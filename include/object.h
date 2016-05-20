@@ -106,7 +106,7 @@ public:
      *  Change the internal type of the variable
      *  @param  Type
      */
-    virtual Value &setType(Type type) override
+    virtual Value &setType(Type type) & override
     {
         // throw exception if things are going wrong
         if (type != Type::Object) throw FatalError("Changing type of a fixed object variable");

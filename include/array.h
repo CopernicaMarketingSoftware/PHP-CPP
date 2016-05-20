@@ -79,7 +79,7 @@ public:
      *  Change the internal type of the variable
      *  @param  Type
      */
-    virtual Value &setType(Type type) override
+    virtual Value &setType(Type type) & override
     {
         // throw exception if things are going wrong
         if (type != Type::Array) throw FatalError("Changing type of a fixed array variable");
