@@ -13,68 +13,6 @@
 namespace Php {
 
 /**
- *  Store the object in the PHP object cache
- *  @param  entry               Class entry
- *  @param  tsrm_ls
- *  @return MixedObject
- */
-//MixedObject *Base::store(zend_class_entry *entry TSRMLS_DC)
-//{
-//    // allocate memory for the object
-//    MixedObject *result = (MixedObject *)emalloc(sizeof(MixedObject));
-//    
-//    // store the new c++ object
-//    result->cpp = this;
-//    
-//    // store the class entry in the newly created object
-//    result->php.ce = entry;
-//    
-//    // initialize the object
-//    zend_object_std_init(&result->php, entry TSRMLS_CC);
-//
-//#if PHP_VERSION_ID < 50399
-//
-//    // tmp variable
-//    zval *tmp;
-//    
-//    // initialize the properties, php 5.3 way
-//    zend_hash_copy(result->php.properties, &entry->default_properties, (copy_ctor_func_t) zval_property_ctor, &tmp, sizeof(zval*));
-//
-//#else
-//
-//    // version higher than 5.3 have an easier way to initialize
-//    object_properties_init(&result->php, entry);
-//
-//#endif    
-//
-//#ifdef ZTS
-//
-//    // when in thread safety mode, the destruct method and free method have
-//    // an extra parameter holding thread information
-//    using DestructType = void(zend_object*,unsigned int,void***);
-//    using FreeType = void(zend_object*,void***);
-//    
-//#else
-//
-//    // not in thread mode: no special parameter for the tsrm_ls variable
-//    using DestructType = void(zend_object*,unsigned int);
-//    using FreeType = void(zend_object*);
-//    
-//#endif
-//    
-//    // store the two destruct methods in temporary vars
-//    DestructType *destructMethod = &ClassImpl::destructObject;
-//    FreeType *freeMethod = &ClassImpl::freeObject;
-//
-//    // the destructor and clone handlers are set to NULL. I dont know why, but they do not
-//    // seem to be necessary...
-//    _handle = zend_objects_store_put(result, (zend_objects_store_dtor_t)destructMethod, (zend_objects_free_object_storage_t)freeMethod, NULL TSRMLS_CC);
-//    
-//    // done
-//    return result;
-//}
-
-/**
  *  Overridable method that is called right before an object is destructed
  */
 void Base::__destruct() const

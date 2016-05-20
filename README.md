@@ -5,6 +5,9 @@ The PHP-CPP library is a C++ library for developing PHP extensions. It offers a 
 of well documented and easy-to-use classes that can be used and extended to build native
 extensions for PHP. The full documentation can be found on http://www.php-cpp.com.
 
+Please note that this extension is designed to work with PHP versions 7.0 and up. If you
+wish to create extensions for older versions, use PHP-CPP-LEGACY.
+
 ABOUT
 =====
 
