@@ -846,7 +846,7 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     TSRMLS_FETCH();
 
     // the current exception
-    // zend_object *oldException = EG(exception);
+    zend_object *oldException = EG(exception);
 
     // call the function
     // we're casting the const away here, object is only const so we can call this method
@@ -863,8 +863,7 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     {
         // was an exception thrown inside the function? In that case we throw a C++ new exception
         // to give the C++ code the chance to catch it
-        // @todo: make OrigException except a zend_object instance
-        // if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
+        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
 
         // leap out if nothing was returned
         if (Z_ISUNDEF(retval)) return nullptr;

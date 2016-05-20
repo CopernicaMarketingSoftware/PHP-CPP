@@ -41,12 +41,12 @@ public:
      *  Constructor
      *  @param  &string
      */
-    Exception(const std::string &message, int code = 0) : std::exception(), _message(message), _code(code) {}
+    Exception(std::string message, int code = 0) : std::exception(), _message(std::move(message)), _code(code) {}
 
     /**
      *  Destructor
      */
-    virtual ~Exception() throw() {}
+    virtual ~Exception() = default;
 
     /**
      *  Overridden what method

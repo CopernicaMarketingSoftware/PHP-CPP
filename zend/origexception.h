@@ -16,7 +16,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class OrigException : public Value, public Exception
+class OrigException : public Exception
 {
 private:
     /**
@@ -42,10 +42,9 @@ private:
 public:
     /**
      *  Constructor
-     *  @param  val
+     *  @param  object  The object that was thrown
      */
-    OrigException(zval *val TSRMLS_DC) :
-        Value(val), Exception("OrigException")
+    OrigException(zend_object *object) : Exception(std::string{ ZSTR_VAL(object->ce->name), ZSTR_LEN(object->ce->name) })
     {
 #ifdef ZTS
         // copy tsrm_ls
@@ -58,7 +57,7 @@ public:
      *  @param  exception
      */
     OrigException(const OrigException &exception) :
-        Value(exception), Exception("OrigException"), _handled(exception._handled)
+        Exception("OrigException"), _handled(exception._handled)
     {
 #ifdef ZTS
         // copy tsrm_ls
@@ -71,7 +70,7 @@ public:
      *  @param  exception
      */
     OrigException(OrigException &&exception) :
-        Value(std::move(exception)), Exception("OrigException"), _handled(exception._handled)
+        Exception("OrigException"), _handled(exception._handled)
     {
         // set other exception to handled so that it wont do anything on destruction
         exception._handled = true;

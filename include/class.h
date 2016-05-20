@@ -462,7 +462,7 @@ private:
         T *obj = (T *)base;
 
         // retrieve the casted value and convert it if necessary
-        auto result = obj->__toString();
+        Value result{ obj->__toString() };
         result.setType(Type::String);
 
         // return the converted result
@@ -480,7 +480,7 @@ private:
         T *obj = (T *)base;
 
         // retrieve the casted value and convert it if necessary
-        auto result = obj->__toInteger();
+        Value result{ obj->__toInteger() };
         result.setType(Type::Numeric);
 
         // return the converted result
@@ -498,7 +498,7 @@ private:
         T *obj = (T *)base;
 
         // retrieve the casted value and convert it if necessary
-        auto result = obj->__toFloat();
+        Value result{ obj->__toFloat() };
         result.setType(Type::Float);
 
         // return the converted result
@@ -516,7 +516,7 @@ private:
         T *obj = (T *)base;
 
         // retrieve the casted value and convert it if necessary
-        auto result = obj->__toBool();
+        Value result{ obj->__toBool() };
         result.setType(Type::Bool);
 
         // return the converted result

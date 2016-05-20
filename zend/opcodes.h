@@ -93,8 +93,7 @@ public:
 
         // was an exception thrown inside the eval()'ed code? In that case we
         // throw a C++ new exception to give the C++ code the chance to catch it
-        // todo: OrigException with constructor for zend_object
-        // if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
+        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception) TSRMLS_CC);
 
         // we're ready if there is no return value
         if (ZVAL_IS_NULL(&retval)) return nullptr;
