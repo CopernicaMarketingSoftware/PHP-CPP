@@ -14,6 +14,12 @@
 namespace Php {
 
 /**
+ *  Constructor
+ *  @param  impl        Implementation iterator
+ */
+ValueIterator::ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
+
+/**
  *  Copy constructor
  *  @param  that
  *  @param  tsrm_ls
@@ -23,11 +29,7 @@ ValueIterator::ValueIterator(const ValueIterator &that) : _impl(that._impl->clon
 /**
  *  Destructor
  */
-ValueIterator::~ValueIterator()
-{
-    // get rid of implementation
-    delete _impl;
-}
+ValueIterator::~ValueIterator() = default;
 
 /**
  *  Increment position
@@ -37,7 +39,7 @@ ValueIterator &ValueIterator::operator++()
 {
     // increment implementation
     _impl->increment();
-    
+
     // done
     return *this;
 }
@@ -50,7 +52,7 @@ ValueIterator &ValueIterator::operator--()
 {
     // decrement implementation
     _impl->decrement();
-    
+
     // done
     return *this;
 }
@@ -62,7 +64,7 @@ ValueIterator &ValueIterator::operator--()
  */
 bool ValueIterator::operator==(const ValueIterator &that) const
 {
-    return _impl->equals(that._impl);
+    return _impl->equals(that._impl.get());
 }
 
 /**
@@ -72,7 +74,7 @@ bool ValueIterator::operator==(const ValueIterator &that) const
  */
 bool ValueIterator::operator!=(const ValueIterator &that) const
 {
-    return !_impl->equals(that._impl);
+    return !_impl->equals(that._impl.get());
 }
 
 /**

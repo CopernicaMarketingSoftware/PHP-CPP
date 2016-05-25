@@ -31,7 +31,7 @@ public:
      *  Constructor
      *  @param  impl        Implementation iterator
      */
-    ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
+    ValueIterator(ValueIteratorImpl *impl);
 
     /**
      *  Copy constructor
@@ -117,9 +117,9 @@ public:
 private:
     /**
      *  Pointer to the actual implementation
-     *  @var    std::unique_ptr
+     *  @var    std::unique_ptr<ValueIteratorImpl>
      */
-    ValueIteratorImpl *_impl;
+    std::unique_ptr<ValueIteratorImpl> _impl;
 
 };
 

@@ -315,59 +315,28 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
     // skip self assignment
     if (this == &value) return *this;
 
-    // is the object a reference?
-    if (_val && Z_ISREF_P(_val))
+    // if neither value is a reference we can simply swap the values
+    // the other value will then destruct and reduce the refcount
+    if (!Z_ISREF_P(value._val) && (!_val || !Z_ISREF_P(_val)))
     {
-        // @todo difference if the other object is a reference or not?
-
-        // the current object is a reference, this means that we should
-        // keep the zval object, and copy the other value into it, get
-        // the current refcount
-        int refcount = Z_REFCOUNT_P(_val);
-
-        // make the copy
-        *_val = *value._val;
-
-        // restore reference and refcount setting
-        ZVAL_MAKE_REF(_val);
-        Z_SET_REFCOUNT_P(_val, refcount);
-
-        // how many references did the old variable have?
-        if (Z_REFCOUNT_P(value._val) > 1)
-        {
-            // the other object already had multiple references, this
-            // implies that many other PHP variables are also referring
-            // to it, and we still need to store its contents, with one
-            // reference less
-            Z_DELREF_P(value._val);
-
-            // and we need to run the copy constructor on the current
-            // value, because we're making a deep copy
-            zval_copy_ctor(_val);
-        }
-        else
-        {
-            // the last and only reference to the other object was
-            // removed, we no longer need it
-            delete value._val;
-
-            // the other object is no longer valid
-            value._val = nullptr;
-        }
+        // just swap the pointer
+        std::swap(_val, value._val);
+    }
+    else if (_val)
+    {
+        // copy the value over to our local zval
+        ZVAL_COPY_VALUE(_val, value._val);
     }
     else
     {
-        // first destruct ourselves properly
-        this->~Value();
+        // first swap the value out
+        std::swap(_val, value._val);
 
-        // just copy the zval completely
-        _val = value._val;
-
-        // the other object is no longer valid
-        value._val = nullptr;
+        // and make sure it is no longer a reference
+        ZVAL_UNREF(_val);
     }
 
-    // done
+    // allow chaining
     return *this;
 }
 

@@ -223,6 +223,10 @@ private:
      */
     bool invalidate()
     {
+        // set position to be one after the end
+        zend_hash_internal_pointer_end_ex(_table, &_position);
+        zend_hash_move_forward_ex(_table, &_position);
+
         // no longer valid
         _valid = false;
 
