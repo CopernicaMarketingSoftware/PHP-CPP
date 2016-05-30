@@ -37,9 +37,25 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 {
     // find the function name
     const char *name = get_active_function_name(TSRMLS_C);
+    const char *classname = get_active_class_name(nullptr TSRMLS_C);
 
-    // retrieve the callable from the map
-    auto *callable = callables.find(name)->second;
+    // the callable we are retrieving
+    Callable *callable = nullptr;
+
+    // are we invoking a member function?
+    if (classname && classname[0])
+    {
+        // construct the full name to search for
+        auto fullname = std::string{ classname } + "::" + name;
+
+        // and find the callable in the map
+        callable = callables.find(fullname)->second;
+    }
+    else
+    {
+        // retrieve the callable from the map without mangling
+        callable = callables.find(name)->second;
+    }
 
     // check if sufficient parameters were passed (for some reason this check
     // is not done by Zend, so we do it here ourselves)
@@ -85,8 +101,22 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
  */
 void Callable::initialize(zend_function_entry *entry, const char *classname, int flags) const
 {
-    // track the callable
-    callables[_name] = const_cast<Callable*>(this);
+    // if we have a classname we have to combine the two for a unique name
+    // otherwise similar functions  - like __construct - will overwrite functions
+    // declared before
+    if (classname)
+    {
+        // build the unique name
+        auto name = std::string{ classname } + "::" + _name;
+
+        // add it to the map
+        callables[name] = const_cast<Callable*>(this);
+    }
+    else
+    {
+        // no need to mangle the name
+        callables[_name] = const_cast<Callable*>(this);
+    }
 
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _name.data();
