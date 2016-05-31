@@ -187,6 +187,7 @@ Value::Value(const Base *object)
     // allocate variable and set it to an object
     _val = new zval;
     Z_TYPE_INFO_P(_val) = IS_OBJECT;
+    Z_OBJ_P(_val) = impl->php();
 
     // increase refcount
     GC_REFCOUNT(impl->php())++;
