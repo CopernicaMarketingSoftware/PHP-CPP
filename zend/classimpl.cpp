@@ -307,8 +307,9 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
     function->function_name = nullptr;
 
-    // store pointer to ourselves
-    data->self = self(*entry_ptr);
+    // store pointer to ourselves (note that the entry_ptr is useless
+    // inside this function as it is always uninitialized for some reason)
+    data->self = self(Z_OBJCE_P(object));
 
     // assign this dynamically allocated variable to the func parameter
     // the cast is ok, because zend_internal_function is a member of the
