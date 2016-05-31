@@ -26,8 +26,8 @@ namespace Php {
 enum class PHPCPP_EXPORT ClassType {
     Regular     =   0x00,
     Abstract    =   0x20,
-    Final       =   0x40,
-    Interface   =   0x80
+    Final       =   0x04,
+    Interface   =   0x40,
 };
 
 /**
