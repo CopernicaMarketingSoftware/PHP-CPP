@@ -14,11 +14,26 @@
 namespace Php {
 
 /**
+ *  Definition of the callback function
+ */
+using CallableFunction = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
+
+/**
  *  Class definition
  */
 class Method : public Callable
 {
 public:
+    /**
+     *  Constructor
+     *
+     *  @param  name            Method name
+     *  @param  callback        Callback to invoke
+     *  @param  flags           Access flags
+     *  @param  args            Argument description
+     */
+    Method(const char *name, CallableFunction callback, int flags, const Arguments &args) : Callable(callback, name, args), _flags(flags) {}
+
     /**
      *  Constructor 
      * 
@@ -50,10 +65,8 @@ public:
 
     /**
      *  Destructor
-     *  @param  type
-     *  @param  callback
      */
-    virtual ~Method() {}
+    virtual ~Method() = default;
 
     /**
      *  Internal method to fill a function entry

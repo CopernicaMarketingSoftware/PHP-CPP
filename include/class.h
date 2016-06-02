@@ -65,28 +65,29 @@ public:
      *  want to make the __construct() function private). The access-modified
      *  flag can be bitwise combined with the flag Php::Final or Php::Abstract).
      *
+     *  The template parameter should be the actual method to be invoked.
+     *
      *  @param  name        Name of the method
-     *  @param  method      The actual method
      *  @param  flags       Optional flags
      *  @param  args        Argument descriptions
      *  @return Class       Same object to allow chaining
      */
-    Class<T> &method(const char *name, void  (T::*method)(),                         int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)(),                         int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)(),                                    const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params),                  const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)(),                                    const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params),                  const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)()                   const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_4>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)()                   const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), flags,  args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_4>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), Public, args); return *this; }
-    Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), Public, args); return *this; }
+    template <void  (T::*callback)()                            >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <Value (T::*callback)()                            >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <void  (T::*callback)(Parameters &params)          >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <Value (T::*callback)(Parameters &params)          >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <void  (T::*callback)()                            >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <Value (T::*callback)()                            >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <void  (T::*callback)(Parameters &params)          >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <Value (T::*callback)(Parameters &params)          >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <void  (T::*callback)()                    const   >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <Value (T::*callback)()                    const   >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <void  (T::*callback)(Parameters &params)  const   >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <Value (T::*callback)(Parameters &params)  const   >   Class<T> &method(const char *name,  int flags,  const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, flags,  args); return *this;    }
+    template <void  (T::*callback)()                    const   >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <Value (T::*callback)()                    const   >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <void  (T::*callback)(Parameters &params)  const   >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
+    template <Value (T::*callback)(Parameters &params)  const   >   Class<T> &method(const char *name,              const Arguments &args = {})  { ClassBase::method(name, &Callable2::invoke<T, callback>, Public, args); return *this;    }
 
     /**
      *  Add a static method to a class
@@ -108,14 +109,86 @@ public:
      *  @param  args        Argument descriptions
      *  @return Class       Same object to allow chaining
      */
-    Class<T> &method(const char *name, const native_callback_0 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
-    Class<T> &method(const char *name, const native_callback_1 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
-    Class<T> &method(const char *name, const native_callback_2 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
-    Class<T> &method(const char *name, const native_callback_3 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
-    Class<T> &method(const char *name, const native_callback_0 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
-    Class<T> &method(const char *name, const native_callback_1 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
-    Class<T> &method(const char *name, const native_callback_2 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
-    Class<T> &method(const char *name, const native_callback_3 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    template <void  (*callback)()                               >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, flags,  args); return *this; }
+    template <Value (*callback)()                               >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, flags,  args); return *this; }
+    template <void  (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, flags,  args); return *this; }
+    template <Value (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, flags,  args); return *this; }
+    template <void  (*callback)()                               >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, Public, args); return *this; }
+    template <Value (*callback)()                               >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, Public, args); return *this; }
+    template <void  (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, Public, args); return *this; }
+    template <Value (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &Callable2::invoke<callback>, Public, args); return *this; }
+
+    /**
+     *  Add a regular method to the class
+     *
+     *  DEPRECATED
+     *
+     *  Instead of these functions you should use the templated versions
+     *  defined above.
+     *
+     *  The method will be accessible as one of the class methods in your PHP
+     *  code. When the method is called, it will automatically be forwarded
+     *  to the C++ implementation. The flags can be Php::Public, Php::Protected
+     *  or Php::Private (using private methods can be useful if you for example
+     *  want to make the __construct() function private). The access-modified
+     *  flag can be bitwise combined with the flag Php::Final or Php::Abstract).
+     *
+     *  @param  name        Name of the method
+     *  @param  method      The actual method
+     *  @param  flags       Optional flags
+     *  @param  args        Argument descriptions
+     *  @return Class       Same object to allow chaining
+     */
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)(),                         int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)(),                         int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)(Parameters &params),       int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)(),                                    const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_0>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)(Parameters &params),                  const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_1>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)(),                                    const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_2>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)(Parameters &params),                  const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_3>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)()                   const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_4>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)()                   const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const, int flags, const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_4>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, void  (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_5>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)()                   const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_6>(method), Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, Value (T::*method)(Parameters &params) const,            const Arguments &args = {}) { ClassBase::method(name, static_cast<method_callback_7>(method), Public, args); return *this; }
+
+    /**
+     *  Add a static method to a class
+     *
+     *  DEPRECATED
+     *
+     *  Instead of these functions you should use the templated versions
+     *  defined above.
+     *
+     *  In C++ a static method is in reality just a plain function, that at
+     *  compile time has access to private properties of the class that it is a
+     *  static member of.
+     *
+     *  Because a C++ static method is not a real method with a 'this' pointer,
+     *  it has the same signature as a normal C++ (non-method) function. Therefore,
+     *  you can register real static member functions (&MyClass::myMethod) as well
+     *  as normal functions (myFunction) as class methods.
+     *
+     *  In PHP scripts, such functions will be callable as static class methods
+     *
+     *  @param  name        Name of the method
+     *  @param  method      The actual method
+     *  @param  flags       Optional flags
+     *  @param  args        Argument descriptions
+     *  @return Class       Same object to allow chaining
+     */
+    DEPRECATED Class<T> &method(const char *name, const native_callback_0 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_1 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_2 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_3 &function, int flags, const Arguments &args = {}) { ClassBase::method(name, function, flags,  args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_0 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_1 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_2 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
+    DEPRECATED Class<T> &method(const char *name, const native_callback_3 &function,            const Arguments &args = {}) { ClassBase::method(name, function, Public, args); return *this; }
 
     /**
      *  Add an abstract method to the class

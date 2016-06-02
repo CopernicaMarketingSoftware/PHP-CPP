@@ -35,6 +35,8 @@ static std::map<std::string, Callable*> callables;
  */
 void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 {
+    std::cout << "Oh noes! Old and slow implementation!" << std::endl;
+
     // find the function name
     const char *name = get_active_function_name(TSRMLS_C);
     const char *classname = get_active_class_name(nullptr TSRMLS_C);
@@ -101,26 +103,39 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
  */
 void Callable::initialize(zend_function_entry *entry, const char *classname, int flags) const
 {
-    // if we have a classname we have to combine the two for a unique name
-    // otherwise similar functions  - like __construct - will overwrite functions
-    // declared before
-    if (classname)
+    // do we already have a proper callback function?
+    if (_callback)
     {
-        // build the unique name
-        auto name = std::string{ classname } + "::" + _name;
-
-        // add it to the map
-        callables[name] = const_cast<Callable*>(this);
+        // that's nice, we simply install the callback
+        // no need to store any data in a lookup map
+        entry->handler = _callback;
     }
     else
     {
-        // no need to mangle the name
-        callables[_name] = const_cast<Callable*>(this);
+        // if we have a classname we have to combine the two for a unique name
+        // otherwise similar functions  - like __construct - will overwrite functions
+        // declared before
+        if (classname)
+        {
+            // build the unique name
+            auto name = std::string{ classname } + "::" + _name;
+
+            // add it to the map
+            callables[name] = const_cast<Callable*>(this);
+        }
+        else
+        {
+            // no need to mangle the name
+            callables[_name] = const_cast<Callable*>(this);
+        }
+
+        // we use our own invoke method, which does a lookup
+        // in the map we just installed ourselves in
+        entry->handler = &Callable::invoke;
     }
 
     // fill the members of the entity, and hide a pointer to the current object in the name
     entry->fname = _name.data();
-    entry->handler = &Callable::invoke;
     entry->arg_info = _argv.get();
     entry->num_args = _argc;
     entry->flags = flags;

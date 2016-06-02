@@ -1,0 +1,387 @@
+/**
+ *  callable.h
+ *
+ *  A wrapper to handle a callback coming from
+ *  within PHP
+ *
+ *  @author Martijn Otto <martijn.otto@copernica.com>
+ *  @copyright 2016 Copernica B.V.
+ */
+
+/**
+ *  Include guard
+ */
+#pragma once
+
+/**
+ *  Forward declarations
+ */
+struct _zend_execute_data;
+struct _zval_struct;
+
+/**
+ *  Start namespace
+ */
+namespace Php {
+
+/**
+ *  Callback wrapper class
+ */
+class PHPCPP_EXPORT Callable2
+{
+private:
+    /**
+     *  Retrieve pointer to the base of the object implementation
+     *
+     *  @param  execute_data    The current execution scope
+     *  @return Pointer to base
+     */
+    static Base *instance(struct _zend_execute_data *execute_data);
+
+    /**
+     *  Retrieve the input parameters for the function
+     *
+     *  @param  execute_data    The current execution scope
+     *  @return The input parameters
+     */
+    static Parameters parameters(struct _zend_execute_data *execute_data);
+
+    /**
+     *  Handle exceptions
+     *
+     *  @param  exception   The exception to handle
+     */
+    static void handle(Exception &exception);
+
+    /**
+     *  Yield (return) the given value
+     *
+     *  @param  return_value    The return_value to set
+     *  @param  value           The value to return to PHP
+     */
+    static void yield(struct _zval_struct *return_value, std::nullptr_t value);
+    static void yield(struct _zval_struct *return_value, const Php::Value &value);
+public:
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    Data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, void (T::*callback)()>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // cast the base to the correct object and invoke the member
+            (static_cast<T*>(instance(execute_data))->*callback)();
+
+            // there is no return value, so we just return null
+            yield(return_value, nullptr);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    Data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, void (T::*callback)() const>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // cast the base to the correct object and invoke the member
+            (static_cast<T*>(instance(execute_data))->*callback)();
+
+            // there is no return value, so we just return null
+            yield(return_value, nullptr);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    Data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, Value (T::*callback)()>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // cast the base to the correct object and invoke the member
+            auto result = (static_cast<T*>(instance(execute_data))->*callback)();
+
+            // store the return value in the return_value
+            yield(return_value, result);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    Data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, Value (T::*callback)() const>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // cast the base to the correct object and invoke the member
+            auto result = (static_cast<T*>(instance(execute_data))->*callback)();
+
+            // store the return value in the return_value
+            yield(return_value, result);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, void(T::*callback)(Parameters &parameters)>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // retrieve the parameters
+            auto params = parameters(execute_data);
+
+            // cast the base to the correct object and invoke the member
+            (static_cast<T*>(instance(execute_data))->*callback)(params);
+
+            // there is no return value, so we just reutrn null
+            yield(return_value, nullptr);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, void(T::*callback)(Parameters &parameters) const>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // retrieve the parameters
+            auto params = parameters(execute_data);
+
+            // cast the base to the correct object and invoke the member
+            (static_cast<T*>(instance(execute_data))->*callback)(params);
+
+            // there is no return value, so we just return null
+            yield(return_value, nullptr);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, Value (T::*callback)(Parameters &parameters)>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // retrieve the parameters
+            auto params = parameters(execute_data);
+
+            // cast the base to the correct object and invoke the member
+            auto result = (static_cast<T*>(instance(execute_data))->*callback)(params);
+
+            // store the return value in the return_value
+            yield(return_value, result);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <typename T, Value (T::*callback)(Parameters &parameters) const>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // retrieve the parameters
+            auto params = parameters(execute_data);
+
+            // cast the base to the correct object and invoke the member
+            auto result = (static_cast<T*>(instance(execute_data))->*callback)(params);
+
+            // store the return value in the return_value
+            yield(return_value, result);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <void(*callback)()>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // execute the callback
+            callback();
+
+            // there is no return value, so we just return null
+            yield(return_value, nullptr);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <Value(*callback)()>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // execute the callback
+            auto result = callback();
+
+            // store the return value in the return_value
+            yield(return_value, result);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <void(*callback)(Parameters &parameters)>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // retrieve the parameters
+            auto params = parameters(execute_data);
+
+            // execute the callback
+            callback(params);
+
+            // there is no return value, so we just return null
+            yield(return_value, nullptr);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+
+    /**
+     *  Execute the callback
+     *
+     *  @param  execute_data    data about the PHP call stack
+     *  @param  return_value    The value we are returning to PHP
+     */
+    template <Value(*callback)(Parameters &parameters)>
+    static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+    {
+        // catch exceptions thrown by the C++ methods
+        try
+        {
+            // retrieve the parameters
+            auto params = parameters(execute_data);
+
+            // execute the callback
+            auto result = callback(params);
+
+            // store the return value in the return_value
+            yield(return_value, result);
+        }
+        catch (Exception &exception)
+        {
+            // handle the exception
+            handle(exception);
+        }
+    }
+};
+
+/**
+ *  End namespace
+ */
+}

@@ -55,6 +55,7 @@
  *  Include other files from this library
  */
 #include "../include/visibility.h"
+#include "../include/deprecated.h"
 #include "../include/noexcept.h"
 #include "../include/platform.h"
 #include "../include/version.h"
@@ -89,6 +90,7 @@
 #include "../include/classbase.h"
 #include "../include/interface.h"
 #include "../include/constant.h"
+#include "../include/callable.h"
 #include "../include/class.h"
 #include "../include/namespace.h"
 #include "../include/extension.h"

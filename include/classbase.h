@@ -15,9 +15,26 @@
  */
 
 /**
+ *  Forward declarations
+ */
+struct _zend_execute_data;
+struct _zval_struct;
+
+
+/**
  *  Set up namespace
  */
 namespace Php {
+
+/**
+ *  Forward declarations
+ */
+class ClassImpl;
+
+/**
+ *  Definition of the callback function
+ */
+using CallableFunction = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
 
 /**
  *  A couple of predefined native callback functions that can be registered.
@@ -48,12 +65,6 @@ typedef Value   (Base::*getter_callback_0)();
 typedef Value   (Base::*getter_callback_1)() const;
 typedef void    (Base::*setter_callback_0)(const Php::Value &value);
 typedef void    (Base::*setter_callback_1)(const Php::Value &value) const;
-
-/**
- *  Forward declarations
- */
-class ClassImpl;
-
 /**
  *  Class definition
  */
@@ -168,6 +179,23 @@ protected:
      *  is not implemented
      */
     static void notImplemented();
+
+    /**
+     *  Add a method to the class
+     *
+     *  The method will be accessible as one of the class methods in your PHP
+     *  code. When the method is called, it will automatically be forwarded
+     *  to the C++ implementation. The flags can be Php::Public, Php::Protected
+     *  or Php::Private (using private methods can be useful if you for example
+     *  want to make the __construct() function private). The access-modified
+     *  flag can be bitwise combined with the flag Php::Final or Php::Abstract).
+     *
+     *  @param  name        Name of the method
+     *  @param  method      The actual method
+     *  @param  flags       Optional flags
+     *  @param  args        Description of the supported arguments
+     */
+    void method(const char *name, CallableFunction callback, int flags = 0, const Arguments &args = {});
 
     /**
      *  Add a method to the class

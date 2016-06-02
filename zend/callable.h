@@ -19,6 +19,11 @@
 namespace Php {
 
 /**
+ *  Definition of the callback function
+ */
+using CallableFunction = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
+
+/**
  *  Class definition
  */
 class Callable
@@ -26,10 +31,13 @@ class Callable
 public:
     /**
      *  Constructor
+     *
+     *  @param  callback    The callback to invoke
      *  @param  name        Function or method name
      *  @param  arguments   Information about the arguments
      */
-    Callable(const char *name, const Arguments &arguments = {}) :
+    Callable(CallableFunction callback, const char *name, const Arguments &arguments = {}) :
+        _callback(callback),
         _name(name),
         _argc(arguments.size()),
         _argv(new zend_internal_arg_info[_argc + 1])
@@ -48,6 +56,15 @@ public:
             fill(&_argv[i++], argument);
         }
     }
+
+    /**
+     *  Constructor
+     *
+     *  @param  name        Function or method name
+     *  @param  arguments   Information about the arguments
+     */
+    Callable(const char *name, const Arguments &arguments = {}) :
+        Callable(nullptr, name, arguments) {}
 
     /**
      *  Copy constructor
@@ -104,6 +121,13 @@ public:
 
 
 protected:
+
+    /**
+     *  The callback to invoke
+     *  @var    CallableFunction
+     */
+    CallableFunction _callback;
+
     /**
      *  Name of the function
      *  @var    std::string

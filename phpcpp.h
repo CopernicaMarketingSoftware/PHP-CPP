@@ -28,6 +28,7 @@
  *  Include all headers files that are related to this library
  */
 #include <phpcpp/visibility.h>
+#include <phpcpp/deprecated.h>
 #include <phpcpp/noexcept.h>
 #include <phpcpp/platform.h>
 #include <phpcpp/version.h>
@@ -62,6 +63,7 @@
 #include <phpcpp/classbase.h>
 #include <phpcpp/constant.h>
 #include <phpcpp/interface.h>
+#include <phpcpp/callable.h>
 #include <phpcpp/class.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>
