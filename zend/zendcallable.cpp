@@ -27,6 +27,37 @@ Base *ZendCallable::instance(struct _zend_execute_data *execute_data)
 }
 
 /**
+ *  Check whether we have received valid parameters
+ *
+ *  If this function returns false a warning will have been
+ *  generated and the return value has been set to NULL.
+ *
+ *  @param  execute_data    The current execution scope
+ *  @param  return_value    The return value to set on failure
+ */
+bool ZendCallable::valid(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
+{
+    // how many parameters are required and how many to we have?
+    auto required = execute_data->func->common.required_num_args;
+    auto provided = ZEND_NUM_ARGS();
+
+    // if we have the required minimum number of arguments there is no problem
+    if (provided >= required) return true;
+
+    // retrieve the function name to display the error
+    auto *name = get_active_function_name(TSRMLS_C);
+
+    // we do not have enough input parameters, show a warning about this
+    Php::warning << name << "() expects at least " << required << " parameter(s), " << provided << " given" << std::flush;
+
+    // set the return value to NULL
+    RETVAL_NULL();
+
+    // we are not in a valid state
+    return false;
+}
+
+/**
  *  Retrieve the input parameters for the function
  *
  *  @param  execute_data    The current execution scope

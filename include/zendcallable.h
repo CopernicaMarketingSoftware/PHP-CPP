@@ -39,6 +39,17 @@ private:
     static Base *instance(struct _zend_execute_data *execute_data);
 
     /**
+     *  Check whether we have received valid parameters
+     *
+     *  If this function returns false a warning will have been
+     *  generated and the return value has been set to NULL.
+     *
+     *  @param  execute_data    The current execution scope
+     *  @param  return_value    The return value to set on failure
+     */
+    static bool valid(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
+
+    /**
      *  Retrieve the input parameters for the function
      *
      *  @param  execute_data    The current execution scope
@@ -171,12 +182,15 @@ public:
     template <typename T, void(T::*callback)(Parameters &parameters)>
     static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
     {
+        // check parameter count
+        if (!valid(execute_data, return_value)) return;
+
+        // retrieve the parameters
+        auto params = parameters(execute_data);
+
         // catch exceptions thrown by the C++ methods
         try
         {
-            // retrieve the parameters
-            auto params = parameters(execute_data);
-
             // cast the base to the correct object and invoke the member
             (static_cast<T*>(instance(execute_data))->*callback)(params);
 
@@ -199,12 +213,15 @@ public:
     template <typename T, void(T::*callback)(Parameters &parameters) const>
     static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
     {
+        // check parameter count
+        if (!valid(execute_data, return_value)) return;
+
+        // retrieve the parameters
+        auto params = parameters(execute_data);
+
         // catch exceptions thrown by the C++ methods
         try
         {
-            // retrieve the parameters
-            auto params = parameters(execute_data);
-
             // cast the base to the correct object and invoke the member
             (static_cast<T*>(instance(execute_data))->*callback)(params);
 
@@ -227,12 +244,15 @@ public:
     template <typename T, Value (T::*callback)(Parameters &parameters)>
     static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
     {
+        // check parameter count
+        if (!valid(execute_data, return_value)) return;
+
+        // retrieve the parameters
+        auto params = parameters(execute_data);
+
         // catch exceptions thrown by the C++ methods
         try
         {
-            // retrieve the parameters
-            auto params = parameters(execute_data);
-
             // cast the base to the correct object and invoke the member
             auto result = (static_cast<T*>(instance(execute_data))->*callback)(params);
 
@@ -255,12 +275,15 @@ public:
     template <typename T, Value (T::*callback)(Parameters &parameters) const>
     static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
     {
+        // check parameter count
+        if (!valid(execute_data, return_value)) return;
+
+        // retrieve the parameters
+        auto params = parameters(execute_data);
+
         // catch exceptions thrown by the C++ methods
         try
         {
-            // retrieve the parameters
-            auto params = parameters(execute_data);
-
             // cast the base to the correct object and invoke the member
             auto result = (static_cast<T*>(instance(execute_data))->*callback)(params);
 
@@ -333,12 +356,15 @@ public:
     template <void(*callback)(Parameters &parameters)>
     static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
     {
+        // check parameter count
+        if (!valid(execute_data, return_value)) return;
+
+        // retrieve the parameters
+        auto params = parameters(execute_data);
+
         // catch exceptions thrown by the C++ methods
         try
         {
-            // retrieve the parameters
-            auto params = parameters(execute_data);
-
             // execute the callback
             callback(params);
 
@@ -361,12 +387,15 @@ public:
     template <Value(*callback)(Parameters &parameters)>
     static void invoke(struct _zend_execute_data *execute_data, struct _zval_struct *return_value)
     {
+        // check parameter count
+        if (!valid(execute_data, return_value)) return;
+
+        // retrieve the parameters
+        auto params = parameters(execute_data);
+
         // catch exceptions thrown by the C++ methods
         try
         {
-            // retrieve the parameters
-            auto params = parameters(execute_data);
-
             // execute the callback
             auto result = callback(params);
 

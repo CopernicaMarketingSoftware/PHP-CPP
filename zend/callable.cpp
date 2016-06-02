@@ -62,7 +62,7 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     if (ZEND_NUM_ARGS() < callable->_required)
     {
         // PHP itself only generates a warning when this happens, so we do the same too
-        Php::warning << name << "() expects at least " << callable->_required << " parameters, " << ZEND_NUM_ARGS() << " given" << std::flush;
+        Php::warning << name << "() expects at least " << callable->_required << " parameter(s), " << ZEND_NUM_ARGS() << " given" << std::flush;
 
         // and we return null
         RETURN_NULL();
