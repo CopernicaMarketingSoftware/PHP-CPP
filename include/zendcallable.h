@@ -27,7 +27,7 @@ namespace Php {
 /**
  *  Callback wrapper class
  */
-class PHPCPP_EXPORT Callable2
+class PHPCPP_EXPORT ZendCallable
 {
 private:
     /**

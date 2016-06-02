@@ -63,7 +63,7 @@
 #include <phpcpp/classbase.h>
 #include <phpcpp/constant.h>
 #include <phpcpp/interface.h>
-#include <phpcpp/callable.h>
+#include <phpcpp/zendcallable.h>
 #include <phpcpp/class.h>
 #include <phpcpp/namespace.h>
 #include <phpcpp/extension.h>

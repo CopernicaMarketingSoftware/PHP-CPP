@@ -55,6 +55,16 @@ protected:
     std::list<std::shared_ptr<Namespace>> _namespaces;
 
     /**
+     *  Add a native function directly to the namespace
+     *
+     *  @param  name        Name of the function
+     *  @param  function    The raw function to add
+     *  @param  arguments   Optional argument specification
+     *  @return Same object to allow chaining
+     */
+    Namespace &add(const char *name, ZendCallback function, const Arguments &arguments = {});
+
+    /**
      *  Is the object locked?
      *
      *  After the object is locked, no more elements can be added to it.
@@ -84,7 +94,19 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Namespace() {}
+    virtual ~Namespace() = default;
+
+    /**
+     *  Add a native function directly to the namespace
+     *
+     *  @param  name        Name of the function
+     *  @param  arguments   Optional argument specification
+     *  @return Same object to allow chaining
+     */
+    template <void  (*callback)()>                          Namespace &add(const char *name, const Arguments &arguments = {}) { return add(name, &ZendCallable::invoke<callback>, arguments); }
+    template <void  (*callback)(Parameters &parameters)>    Namespace &add(const char *name, const Arguments &arguments = {}) { return add(name, &ZendCallable::invoke<callback>, arguments); }
+    template <Value (*callback)()>                          Namespace &add(const char *name, const Arguments &arguments = {}) { return add(name, &ZendCallable::invoke<callback>, arguments); }
+    template <Value (*callback)(Parameters &parameters)>    Namespace &add(const char *name, const Arguments &arguments = {}) { return add(name, &ZendCallable::invoke<callback>, arguments); }
 
     /**
      *  Add a native function directly to the namespace
@@ -93,10 +115,10 @@ public:
      *  @param  arguments   Optional argument specification
      *  @return Namespace   Same object to allow chaining
      */
-    Namespace &add(const char *name, const native_callback_0 &function, const Arguments &arguments = {});
-    Namespace &add(const char *name, const native_callback_1 &function, const Arguments &arguments = {});
-    Namespace &add(const char *name, const native_callback_2 &function, const Arguments &arguments = {});
-    Namespace &add(const char *name, const native_callback_3 &function, const Arguments &arguments = {});
+    PHPCPP_DEPRECATED Namespace &add(const char *name, const native_callback_0 &function, const Arguments &arguments = {});
+    PHPCPP_DEPRECATED Namespace &add(const char *name, const native_callback_1 &function, const Arguments &arguments = {});
+    PHPCPP_DEPRECATED Namespace &add(const char *name, const native_callback_2 &function, const Arguments &arguments = {});
+    PHPCPP_DEPRECATED Namespace &add(const char *name, const native_callback_3 &function, const Arguments &arguments = {});
 
     /**
      *  Add a native class to the namespace by moving it

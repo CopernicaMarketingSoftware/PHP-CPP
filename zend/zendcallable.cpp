@@ -20,7 +20,7 @@ namespace Php {
  *  @param  execute_data    The current execution scope
  *  @return Pointer (as void because this cannot be templated!)
  */
-Base *Callable2::instance(struct _zend_execute_data *execute_data)
+Base *ZendCallable::instance(struct _zend_execute_data *execute_data)
 {
     // find the object implementation and retrieve the base object
     return ObjectImpl::find(getThis())->object();
@@ -32,7 +32,7 @@ Base *Callable2::instance(struct _zend_execute_data *execute_data)
  *  @param  execute_data    The current execution scope
  *  @return The input parameters
  */
-Parameters Callable2::parameters(struct _zend_execute_data *execute_data)
+Parameters ZendCallable::parameters(struct _zend_execute_data *execute_data)
 {
     // parse and return the parameters
     return ParametersImpl{ getThis(), ZEND_NUM_ARGS() TSRMLS_CC };
@@ -43,7 +43,7 @@ Parameters Callable2::parameters(struct _zend_execute_data *execute_data)
  *
  *  @param  exception   The exception to handle
  */
-void Callable2::handle(Exception &exception)
+void ZendCallable::handle(Exception &exception)
 {
     // pass it on to the exception handler
     process(exception);
@@ -55,7 +55,7 @@ void Callable2::handle(Exception &exception)
  *  @param  return_value    The return_value to set
  *  @param  value           The value to return to PHP
  */
-void Callable2::yield(struct _zval_struct *return_value, std::nullptr_t value)
+void ZendCallable::yield(struct _zval_struct *return_value, std::nullptr_t value)
 {
     // set the return value to null
     RETVAL_NULL();
@@ -67,7 +67,7 @@ void Callable2::yield(struct _zval_struct *return_value, std::nullptr_t value)
  *  @param  return_value    The return_value to set
  *  @param  value           The value to return to PHP
  */
-void Callable2::yield(struct _zval_struct *return_value, const Php::Value &value)
+void ZendCallable::yield(struct _zval_struct *return_value, const Php::Value &value)
 {
     // copy the value over to the return value
     RETVAL_ZVAL(value._val, 1, 0);

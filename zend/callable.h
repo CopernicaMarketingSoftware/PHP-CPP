@@ -19,11 +19,6 @@
 namespace Php {
 
 /**
- *  Definition of the callback function
- */
-using CallableFunction = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
-
-/**
  *  Class definition
  */
 class Callable
@@ -36,7 +31,7 @@ public:
      *  @param  name        Function or method name
      *  @param  arguments   Information about the arguments
      */
-    Callable(CallableFunction callback, const char *name, const Arguments &arguments = {}) :
+    Callable(ZendCallback callback, const char *name, const Arguments &arguments = {}) :
         _callback(callback),
         _name(name),
         _argc(arguments.size()),
@@ -124,9 +119,9 @@ protected:
 
     /**
      *  The callback to invoke
-     *  @var    CallableFunction
+     *  @var    ZendCallback
      */
-    CallableFunction _callback;
+    ZendCallback _callback;
 
     /**
      *  Name of the function
@@ -142,9 +137,9 @@ protected:
 
     /**
      *  Required number of arguments
-     *  @var    unsigned integer
+     *  @var    uint32_t
      */
-    unsigned int _required = 0;
+    uint32_t _required = 0;
 
     /**
      *  Total number of arguments

@@ -35,8 +35,6 @@ static std::map<std::string, Callable*> callables;
  */
 void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 {
-    std::cout << "Oh noes! Old and slow implementation!" << std::endl;
-
     // find the function name
     const char *name = get_active_function_name(TSRMLS_C);
     const char *classname = get_active_class_name(nullptr TSRMLS_C);

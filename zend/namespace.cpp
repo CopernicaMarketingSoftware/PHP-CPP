@@ -14,6 +14,26 @@
 namespace Php {
 
 /**
+ *  Add a native function directly to the namespace
+ *
+ *  @param  name        Name of the function
+ *  @param  function    The raw function to add
+ *  @param  arguments   Optional argument specification
+ *  @return Same object to allow chaining
+ */
+Namespace &Namespace::add(const char *name, ZendCallback function, const Arguments &arguments)
+{
+    // skip when locked
+    if (locked()) return *this;
+
+    // add a function
+    _functions.push_back(std::make_shared<NativeFunction>(name, function, arguments));
+
+    // allow chaining
+    return *this;
+}
+
+/**
  *  Add a native function directly to the extension
  *  @param  name        Name of the function
  *  @param  function    The function to add

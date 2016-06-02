@@ -14,11 +14,6 @@
 namespace Php {
 
 /**
- *  Definition of the callback function
- */
-using CallableFunction = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
-
-/**
  *  Class definition
  */
 class ClassImpl
@@ -375,7 +370,7 @@ public:
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, CallableFunction callback, int flags = 0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, callback, flags & MethodModifiers, args)); }
+    void method(const char *name, ZendCallback callback, int flags = 0, const Arguments &args = {}) { _methods.push_back(std::make_shared<Method>(name, callback, flags & MethodModifiers, args)); }
 
     /**
      *  Add a method to the class

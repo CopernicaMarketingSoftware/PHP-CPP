@@ -62,7 +62,7 @@ void ClassBase::notImplemented()
  *  @param  flags       Optional flags
  *  @param  args        Description of the supported arguments
  */
-void ClassBase::method(const char *name, CallableFunction callback, int flags, const Arguments &args)
+void ClassBase::method(const char *name, ZendCallback callback, int flags, const Arguments &args)
 {
     _impl->method(name, callback, flags, args);
 }

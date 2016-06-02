@@ -32,9 +32,16 @@ namespace Php {
 class ClassImpl;
 
 /**
- *  Definition of the callback function
+ *  Callback function for the zend engine
+ *
+ *  These functions can be directly set as handlers
+ *  in the zend engine and do all the necessary conversion
+ *  between zend and PHP-CPP structures.
+ *
+ *  @param  execute_data    Data about the current call stack
+ *  @param  return_value    Holder for the return value
  */
-using CallableFunction = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
+using ZendCallback = void(*)(struct _zend_execute_data *execute_data, struct _zval_struct *return_value);
 
 /**
  *  A couple of predefined native callback functions that can be registered.
@@ -195,7 +202,7 @@ protected:
      *  @param  flags       Optional flags
      *  @param  args        Description of the supported arguments
      */
-    void method(const char *name, CallableFunction callback, int flags = 0, const Arguments &args = {});
+    void method(const char *name, ZendCallback callback, int flags = 0, const Arguments &args = {});
 
     /**
      *  Add a method to the class
