@@ -58,7 +58,7 @@ extern "C"
         static Php::Extension extension("globals","1.0");
         
         // add function to extension
-        extension.add("process_globals", process_globals);
+        extension.add<process_globals>("process_globals");
         
         // return the extension module
         return extension.module();

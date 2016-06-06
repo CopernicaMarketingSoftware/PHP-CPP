@@ -131,15 +131,15 @@ extern "C"
         Php::Class<MyCustomClass> customClass("MyClass");
         
         // add methods to it
-        customClass.method("myMethod", &MyCustomClass::myMethod, Php::Final, {});
-        customClass.method("myMethod2", &MyCustomClass::myMethod);
+        customClass.method<&MyCustomClass::myMethod>("myMethod", Php::Final, {});
+        customClass.method<&MyCustomClass::myMethod>("myMethod2");
         customClass.property("property1", "prop1");
         customClass.property("property2", "prop2", Php::Protected);
 
-        customClass.method("loopArray", &MyCustomClass::loop, {
+        customClass.method<&MyCustomClass::loop>("loopArray", {
             Php::ByVal("arr", Php::Type::Array)
         });
-        customClass.method("loopObject", &MyCustomClass::loop, {
+        customClass.method<&MyCustomClass::loop>("loopObject", {
             Php::ByVal("obj", Php::Type::Object)
         });
         

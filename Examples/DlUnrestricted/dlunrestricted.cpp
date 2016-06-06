@@ -51,7 +51,7 @@ extern "C" {
         static Php::Extension myExtension("dl_unrestricted", "1.0");
         
         // the extension has one method
-        myExtension.add("dl_unrestricted", dl_unrestricted, {
+        myExtension.add<dl_unrestricted>("dl_unrestricted", {
             Php::ByVal("pathname", Php::Type::String)
         });
         

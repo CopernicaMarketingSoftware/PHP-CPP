@@ -35,7 +35,7 @@ extern "C"
         static Php::Extension extension("my_function_void","1.0");
         
         // add function to extension
-        extension.add("my_void_function", my_function_void);
+        extension.add<my_function_void>("my_void_function");
         
         // return the extension module
         return extension.module();

@@ -35,7 +35,7 @@ extern "C"
         static Php::Extension extension("my_function_no_parameters","1.0");
         
         // add function to extension
-        extension.add("my_no_parameters_function", my_no_parameters_function);
+        extension.add<my_no_parameters_function>("my_no_parameters_function");
         
         // return the extension module
         return extension.module();

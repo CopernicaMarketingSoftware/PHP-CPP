@@ -42,7 +42,7 @@ extern "C"
         static Php::Extension extension("call_php_function","1.0");
         
         // add function to extension
-        extension.add("call_php_function", call_php_function, {
+        extension.add<call_php_function>("call_php_function", {
             Php::ByVal("addFunc", Php::Type::Callable),
             Php::ByVal("x", Php::Type::Numeric)
             });

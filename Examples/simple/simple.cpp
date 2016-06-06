@@ -160,19 +160,19 @@ extern "C"
         static Php::Extension extension("simple","1.0");
 
         // define the functions
-        extension.add("my_plus", my_plus, {
+        extension.add<my_plus>("my_plus", {
             Php::ByVal("a", Php::Type::Numeric),
             Php::ByVal("b", Php::Type::Numeric),
             Php::ByVal("c", "MyClass"),
             Php::ByRef("d", Php::Type::String)
         });
         
-        extension.add("bubblesort", bubblesort);
+        extension.add<bubblesort>("bubblesort");
         
         // define classes
         Php::Class<MyCustomClass> myCustomClass("my_class");
-        myCustomClass.method("mymethod", &MyCustomClass::myMethod);
-        myCustomClass.method("__construct", &MyCustomClass::__construct);
+        myCustomClass.method<&MyCustomClass::myMethod>("mymethod");
+        myCustomClass.method<&MyCustomClass::__construct>("__construct");
         
         // add to extension
         extension.add(myCustomClass);

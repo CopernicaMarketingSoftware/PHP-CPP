@@ -25,7 +25,7 @@ extern "C" {
         Php::Class<Child> child("child");
         
         // the master class has one method - to return a child
-        master.method("child", &Master::child);
+        master.method<&Master::child>("child");
         
         // add all classes to the extension
         extension.add(master);

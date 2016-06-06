@@ -35,7 +35,7 @@ extern "C"
         static Php::Extension extension("my_function_return_value","1.0");
         
         // add function to extension
-        extension.add("my_return_value_function", my_return_value_function);
+        extension.add<my_return_value_function>("my_return_value_function");
         
         // return the extension module
         return extension.module();
