@@ -108,7 +108,6 @@
 /**
  *  Specific zend implementation  files for internal use only
  */
-#include "hiddenpointer.h"
 #include "init.h"
 #include "callable.h"
 #include "nativefunction.h"
