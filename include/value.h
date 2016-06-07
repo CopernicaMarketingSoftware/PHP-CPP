@@ -19,9 +19,9 @@
  */
 
 /**
- *  Forward definitions
+ *  Dependencies
  */
-struct _zval_struct;
+#include "zval.h"
 
 /**
  *  Set up namespace
@@ -1112,9 +1112,9 @@ private:
 protected:
     /**
      *  The wrapped zval
-     *  @var struct zval*
+     *  @var Zval
      */
-    struct _zval_struct *_val = nullptr;
+    Php::Zval _val;
 
     /**
      *  Detach the zval
@@ -1128,7 +1128,7 @@ protected:
      *  @param  keeprefcount    Keep the same refcount
      *  @return zval
      */
-    struct _zval_struct *detach(bool keeprefcount = true);
+    Php::Zval detach(bool keeprefcount = true);
 
     /**
      *  Set a certain property without running any checks (you must already know

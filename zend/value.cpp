@@ -35,7 +35,7 @@ namespace Php {
 /**
  *  Constructor (value = NULL)
  */
-Value::Value() : _val(new zval)
+Value::Value()
 {
     // create a null zval
     ZVAL_NULL(_val);
@@ -50,7 +50,7 @@ Value::Value(std::nullptr_t value) : Value() {}
  *  Constructor based on integer value
  *  @param  value
  */
-Value::Value(int16_t value) : _val(new zval)
+Value::Value(int16_t value)
 {
     // create an integer zval
     ZVAL_LONG(_val, value);
@@ -60,7 +60,7 @@ Value::Value(int16_t value) : _val(new zval)
  *  Constructor based on integer value
  *  @param  value
  */
-Value::Value(int32_t value) : _val(new zval)
+Value::Value(int32_t value)
 {
     // create an integer zval
     ZVAL_LONG(_val, value);
@@ -70,7 +70,7 @@ Value::Value(int32_t value) : _val(new zval)
  *  Constructor based on int64_t value
  *  @param  value
  */
-Value::Value(int64_t value) : _val(new zval)
+Value::Value(int64_t value)
 {
     // create an integer zval
     ZVAL_LONG(_val, value);
@@ -80,7 +80,7 @@ Value::Value(int64_t value) : _val(new zval)
  *  Constructor based on boolean value
  *  @param  value
  */
-Value::Value(bool value) : _val(new zval)
+Value::Value(bool value)
 {
     // create a boolean zval
     ZVAL_BOOL(_val, value);
@@ -90,7 +90,7 @@ Value::Value(bool value) : _val(new zval)
  *  Constructor based on single character
  *  @param  value
  */
-Value::Value(char value) : _val(new zval)
+Value::Value(char value)
 {
     // create a string zval
     ZVAL_STRINGL(_val, &value, 1);
@@ -100,7 +100,7 @@ Value::Value(char value) : _val(new zval)
  *  Constructor based on string value
  *  @param  value
  */
-Value::Value(const std::string &value) : _val(new zval)
+Value::Value(const std::string &value)
 {
     // create a string zval
     ZVAL_STRINGL(_val, value.c_str(), value.size());
@@ -111,7 +111,7 @@ Value::Value(const std::string &value) : _val(new zval)
  *  @param  value
  *  @param  size
  */
-Value::Value(const char *value, int size) : _val(new zval)
+Value::Value(const char *value, int size)
 {
     // is there a value?
     if (value)
@@ -130,7 +130,7 @@ Value::Value(const char *value, int size) : _val(new zval)
  *  Constructor based on decimal value
  *  @param  value
  */
-Value::Value(double value) : _val(new zval)
+Value::Value(double value)
 {
     // create a double zval
     ZVAL_DOUBLE(_val, value);
@@ -141,7 +141,7 @@ Value::Value(double value) : _val(new zval)
  *  @param  zval        Value to wrap
  *  @param  ref         Force this to be a reference
  */
-Value::Value(struct _zval_struct *val, bool ref) : _val(new zval)
+Value::Value(struct _zval_struct *val, bool ref)
 {
     // copy the value over (and add reference if relevant)
     ZVAL_DUP(_val, val);
@@ -185,8 +185,7 @@ Value::Value(const Base *object)
     // do we have a handle?
     if (!impl) throw FatalError("Assigning an unassigned object to a variable");
 
-    // allocate variable and set it to an object
-    _val = new zval;
+    // set it to an object
     Z_TYPE_INFO_P(_val) = IS_OBJECT;
     Z_OBJ_P(_val) = impl->php();
 
@@ -204,7 +203,7 @@ Value::Value(const IniValue &value) : Value((const char *)value) {}
  *  Copy constructor
  *  @param  value
  */
-Value::Value(const Value &that) : _val(new zval)
+Value::Value(const Value &that)
 {
     // copy over the zval
     ZVAL_COPY(_val, that._val);
@@ -216,8 +215,11 @@ Value::Value(const Value &that) : _val(new zval)
  */
 Value::Value(Value &&that)  _NOEXCEPT: _val(that._val)
 {
-    // clear the other object
-    that._val = nullptr;
+    // initialize to be undefined
+    ZVAL_UNDEF(_val);
+
+    // and then swap the values
+    std::swap(_val, that._val);
 }
 
 /**
@@ -225,14 +227,8 @@ Value::Value(Value &&that)  _NOEXCEPT: _val(that._val)
  */
 Value::~Value()
 {
-    // ignore if moved
-    if (!_val) return;
-
     // reduce the refcount - if necessary
     Z_TRY_DELREF_P(_val);
-
-    // cleanup the variable
-    delete _val;
 }
 
 /**
@@ -247,22 +243,19 @@ Value::~Value()
  *  @param  keeprefcount
  *  @return zval
  */
-zval *Value::detach(bool keeprefcount)
+Php::Zval Value::detach(bool keeprefcount)
 {
-    // leap out if already detached
-    if (!_val) return nullptr;
+    // the return value
+    Php::Zval result;
 
-    // copy return value
-    zval *result = _val;
+    // copy the value
+    ZVAL_COPY_VALUE(result, _val);
 
-    // reset internal object
-    _val = nullptr;
+    // should we keep the reference count?
+    if (!keeprefcount) Z_TRY_DELREF_P(_val);
 
-    // we're ready if we should keep the refcounter
-    if (keeprefcount) return result;
-
-    // decrement reference counter
-    Z_TRY_DELREF_P(result);
+    // we no longer represent a valid value
+    ZVAL_UNDEF(_val);
 
     // done
     return result;

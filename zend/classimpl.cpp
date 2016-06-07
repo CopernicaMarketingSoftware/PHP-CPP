@@ -796,7 +796,7 @@ void ClassImpl::unsetDimension(zval *object, zval *member TSRMLS_DC)
 zval *ClassImpl::toZval(Value &&value, int type, zval *rv)
 {
     // the result zval that needs to be copied over
-    zval *result = nullptr;
+    Zval result;
 
     /**
      *  Because we do not want the value object to destruct the zval when
@@ -810,13 +810,13 @@ zval *ClassImpl::toZval(Value &&value, int type, zval *rv)
     if (type == 0 || value.refcount() <= 1)
     {
         // first retrieve the value so we can copy it
-        result = value.detach(false);
+        result = value.detach(true);
     }
     // this is an editable zval, return a reference to it
     else
     {
         // we're dealing with an editable zval, retrieve a reference variable
-        result = Value(value.detach(false), true).detach(false);
+        result = Value(value.detach(false), true).detach(true);
     }
 
     // now copy the value over to the pointer

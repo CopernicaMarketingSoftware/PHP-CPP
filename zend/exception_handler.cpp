@@ -65,7 +65,7 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
     auto value = functor.detach(true);
 
     // copy our zval into the user_error_handler
-    ZVAL_COPY(value, &EG(user_error_handler));
+    ZVAL_COPY_VALUE(&EG(user_error_handler), value);
     EG(user_error_handler_error_reporting) = (int) error;
 
     // return the original handler
