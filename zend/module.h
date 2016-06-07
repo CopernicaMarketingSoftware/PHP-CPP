@@ -216,7 +216,7 @@ public:
         if (zend_startup_module_ex(entry TSRMLS_CC) == FAILURE) return false;
 
         // was a startup-function defined? if not
-        if (!entry->request_startup_func)
+        if (entry->request_startup_func)
         {
             // call the startup function
             if (entry->request_startup_func(MODULE_TEMPORARY, entry->module_number TSRMLS_CC) == FAILURE) return false;
