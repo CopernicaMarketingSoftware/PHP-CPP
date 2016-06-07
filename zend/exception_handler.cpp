@@ -10,6 +10,7 @@
  *  Dependencies
  */
 #include "includes.h"
+#include "string.h"
 
 /**
  *  Open the PHP namespace
@@ -91,8 +92,11 @@ Value error_reporting(Error error)
     // if we failed for some reason we bail out
     if (size < 0) return false;
 
+    // the entry to change - static to avoid unnecessary extra allocations
+    static String entry{ "error_reporting" };
+
     // alter the ini on the fly
-    zend_alter_ini_entry(zend_string_init("error_reporting", sizeof("error_reporting"), 1), zend_string_init(str, size, 1), ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
+    zend_alter_ini_entry(entry, String(str, size), ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
 
     // return the output
     return output;

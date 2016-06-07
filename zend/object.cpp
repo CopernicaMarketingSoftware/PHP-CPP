@@ -5,6 +5,7 @@
  *  @copyright 2014 Copernica BV
  */
 #include "includes.h"
+#include "string.h"
 
 /**
  *  Set up namespace
@@ -36,7 +37,7 @@ Object::Object(const char *name, Base *base) : Value()
         // here because this function is called from C++ context, and zend_error()
         // would cause a longjmp() which does not clean up C++ objects created
         // by the extension).
-        auto *entry = zend_fetch_class(zend_string_init(name, ::strlen(name), 0), ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
+        auto *entry = zend_fetch_class(String{ name }, ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
         if (!entry) throw FatalError(std::string("Unknown class name ") + name);
 
         // construct an implementation (this will also set the implementation
@@ -118,7 +119,7 @@ bool Object::instantiate(const char *name)
     // here because this function is called from C++ context, and zend_error()
     // would cause a longjmp() which does not clean up C++ objects created
     // by the extension).
-    auto *entry = zend_fetch_class(zend_string_init(name, ::strlen(name), 0), ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
+    auto *entry = zend_fetch_class(String{ name }, ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
     if (!entry) throw FatalError(std::string("Unknown class name ") + name);
 
     // initiate the zval (which was already allocated in the base constructor)
@@ -133,8 +134,11 @@ bool Object::instantiate(const char *name)
     // @todo    is this a memory leak? the base class first initializes a stdClass,
     //          and then we overwrite it with a specific class
 
+    // initialize the string for __construct only once
+    static zend_string *construct = zend_string_init("__construct", sizeof("__construct"), 0);
+
     // return whether there is a __construct function
-    return zend_hash_exists(&entry->function_table, zend_string_init("__construct", 12, 1));
+    return zend_hash_exists(&entry->function_table, construct);
 }
 
 /**

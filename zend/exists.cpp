@@ -11,15 +11,7 @@
  *  Dependencies
  */
 #include "includes.h"
-
-/**
- *  On php 5.3 ZEND_ACC_TRAIT isn't defined, so we simply define it to 0
- *  so all operations with it are basically no-ops. Currently unconfirmed
- *  if this actually works correctly on php 5.3, but it at least compiles.
- */
-#ifndef ZEND_ACC_TRAIT
-#define ZEND_ACC_TRAIT 0
-#endif
+#include "string.h"
 
 /**
  *  Open the PHP namespace
@@ -42,7 +34,7 @@ bool class_exists(const char *classname, size_t len, bool autoload)
     if (autoload)
     {
         // retrieve class entry
-        auto *ce = zend_lookup_class(zend_string_init(classname, len, 1) TSRMLS_CC);
+        auto *ce = zend_lookup_class(String{ classname, len } TSRMLS_CC);
 
         // no auto-load
         if (!ce) return false;
@@ -55,11 +47,11 @@ bool class_exists(const char *classname, size_t len, bool autoload)
         // starting slashes can be ignored
         if (len > 0 && classname[0] == '\\') { classname++; len--; }
 
-        // allocate a zend_string
-        auto *string = zend_string_alloc(len, 1);
+        // create the string wrapper
+        String string{ classname, len };
 
         // copy the name to lowercase, but ignore the starting slash (if there is one)
-        zend_str_tolower_copy(ZSTR_VAL(string), classname, len);
+        zend_str_tolower(string.data(), string.size());
 
         // see if there is a class with this name
         auto *val = zend_hash_find(EG(class_table), string);

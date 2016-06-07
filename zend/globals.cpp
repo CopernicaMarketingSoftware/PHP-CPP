@@ -7,6 +7,7 @@
  *  @copyright 2013 Copernica BV
  */
 #include "includes.h"
+#include "string.h"
 
 /**
  *  Namespace
@@ -40,7 +41,7 @@ Global Globals::operator[](const char *name)
     TSRMLS_FETCH();
 
     // retrieve the variable (if it exists)
-    auto *varvalue = zend_hash_find(&EG(symbol_table), zend_string_init(name, ::strlen(name), 0));
+    auto *varvalue = zend_hash_find(&EG(symbol_table), String{ name });
 
     // check if the variable already exists
     if (!varvalue)
@@ -68,7 +69,7 @@ Global Globals::operator[](const std::string &name)
     TSRMLS_FETCH();
 
     // retrieve the variable (if it exists)
-    auto *varvalue = zend_hash_find(&EG(symbol_table), zend_string_init(name.data(), name.size(), 0));
+    auto *varvalue = zend_hash_find(&EG(symbol_table), String{ name.data(), name.size() });
 
     // check if the variable already exists
     if (!varvalue)

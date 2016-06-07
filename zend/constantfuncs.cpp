@@ -11,6 +11,7 @@
  *  Dependencies
  */
 #include "includes.h"
+#include "string.h"
 
 /**
  *  Set up namespace
@@ -40,7 +41,7 @@ Value constant(const char *constant, size_t size)
     TSRMLS_FETCH();
 
     // retrieve the constant
-    auto *result = zend_get_constant(zend_string_init(constant, size, 1) TSRMLS_CC);
+    auto *result = zend_get_constant(String{ constant, size } TSRMLS_CC);
 
     // did the constant exist?
     if (!result) return nullptr;
@@ -75,7 +76,7 @@ bool define(const char *name, size_t size, const Value &value)
     // the constant structure from the zend engine
     zend_constant constant;
 
-    // copy the name
+    // copy the name - we don't decrease the refcount here on purpose
     constant.name = zend_string_init(name, size, 1);
 
     // only scalar values can be used for constants
@@ -142,7 +143,7 @@ bool defined(const char *name, size_t size)
     TSRMLS_FETCH();
 
     // retrieve the constant
-    auto *value = zend_get_constant_ex(zend_string_init(name, size, 1), nullptr, ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
+    auto *value = zend_get_constant_ex(String{ name, size }, nullptr, ZEND_FETCH_CLASS_SILENT TSRMLS_CC);
 
     // check if the value was found
     if (!value) return false;

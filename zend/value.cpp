@@ -25,6 +25,7 @@
  *  @copyright 2013, 2014 Copernica BV
  */
 #include "includes.h"
+#include "string.h"
 
 /**
  *  Set up namespace
@@ -203,24 +204,10 @@ Value::Value(const IniValue &value) : Value((const char *)value) {}
  *  Copy constructor
  *  @param  value
  */
-Value::Value(const Value &that)
+Value::Value(const Value &that) : _val(new zval)
 {
-    // is the other variable a reference? or is this a simple scalar?
-    if (Z_ISREF_P(that._val) || !Z_REFCOUNTED_P(that._val))
-    {
-        // because this is supposed to be a COPY, we can not add ourselves
-        // to the variable but have to allocate a new variable
-        _val = new zval;
-        ZVAL_COPY_VALUE(_val, that._val);
-    }
-    else
-    {
-        // simply use the same zval
-        _val = that._val;
-
-        // and increment the reference count
-        Z_ADDREF_P(_val);
-    }
+    // copy over the zval
+    ZVAL_COPY(_val, that._val);
 }
 
 /**
@@ -241,23 +228,11 @@ Value::~Value()
     // ignore if moved
     if (!_val) return;
 
-    // are we not a refcounted variable?
-    if (!Z_REFCOUNTED_P(_val))
-    {
-        // we can simply delete it
-        delete _val;
-    }
-    else
-    {
-        // remove the reference that we have
-        Z_DELREF_P(_val);
+    // reduce the refcount - if necessary
+    Z_TRY_DELREF_P(_val);
 
-        // one would assume we would need to explicitly delete
-        // _val here too, since we allocated it ourselves, this
-        // turns out to lead to double-free problems, we should
-        // check whether this is true in all cases and whether
-        // this leads to memory leaks here...
-    }
+    // cleanup the variable
+    delete _val;
 }
 
 /**
@@ -742,64 +717,6 @@ Value Value::operator%(const char *value)           { return Value(numericValue(
 Value Value::operator%(double value)                { return Value(numericValue() % (int)value); }
 
 /**
- *  Call the function in PHP
- *  We have ten variants of this function, depending on the number of parameters
- *  This call operator is only useful when the variable represents a callable
- *  @param  p0-p10          Parameters of the function to be called.
- *  @return Value
- */
-Value Value::operator()() const
-{
-    // call with zero parameters
-    return exec(0, NULL);
-}
-
-/**
- *  Is a method with the given name callable?
- *
- *  This is only applicable when the Value contains a PHP object
- *
- *  @param  name        Name of the function
- *  @return boolean
- */
-bool Value::isCallable(const char *name)
-{
-    // this only makes sense if we are an object
-    if (!isObject()) return false;
-
-    // wrap the name in a Php::Value object to get a zval
-    Value method(name);
-
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-
-    // ask zend nicely whether the function is callable
-    return zend_is_callable_ex(method._val, Z_OBJ_P(_val), IS_CALLABLE_CHECK_NO_ACCESS, nullptr, nullptr, nullptr TSRMLS_CC);
-}
-
-/**
- *  Call the method - if the variable holds an object with the given method
- *  @param  name        name of the method to call
- *  @return Value
- */
-Value Value::call(const char *name) const
-{
-    // call with zero parameters
-    return exec(name, 0, NULL);
-}
-
-/**
- *  Call the method - if the variable holds an object with the given method
- *  @param  name        name of the method to call
- *  @return Value
- */
-Value Value::call(const char *name)
-{
-    // call with zero parameters
-    return exec(name, 0, NULL);
-}
-
-/**
  *  Helper function that runs the actual call
  *  @param  object      The object to call it on
  *  @param  method      The function or method to call
@@ -848,6 +765,70 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
         // done
         return result;
     }
+}
+
+/**
+ *  Call the function in PHP
+ *  We have ten variants of this function, depending on the number of parameters
+ *  This call operator is only useful when the variable represents a callable
+ *  @param  p0-p10          Parameters of the function to be called.
+ *  @return Value
+ */
+Value Value::operator()() const
+{
+    // call with zero parameters
+    return do_exec(nullptr, _val, 0, nullptr);
+}
+
+/**
+ *  Is a method with the given name callable?
+ *
+ *  This is only applicable when the Value contains a PHP object
+ *
+ *  @param  name        Name of the function
+ *  @return boolean
+ */
+bool Value::isCallable(const char *name)
+{
+    // this only makes sense if we are an object
+    if (!isObject()) return false;
+
+    // wrap the name in a Php::Value object to get a zval
+    Value method(name);
+
+    // we need the tsrm_ls variable
+    TSRMLS_FETCH();
+
+    // ask zend nicely whether the function is callable
+    return zend_is_callable_ex(method._val, Z_OBJ_P(_val), IS_CALLABLE_CHECK_NO_ACCESS, nullptr, nullptr, nullptr TSRMLS_CC);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @return Value
+ */
+Value Value::call(const char *name) const
+{
+    // wrap the name in a Php::Value to get a zval
+    Value method(name);
+
+    // call helper function
+    return do_exec(_val, method._val, 0, nullptr);
+}
+
+/**
+ *  Call the method - if the variable holds an object with the given method
+ *  @param  name        name of the method to call
+ *  @return Value
+ */
+Value Value::call(const char *name)
+{
+    // wrap the name in a Php::Value to get a zval
+    Value method(name);
+
+    // call  helper function
+    return do_exec(_val, method._val, 0, nullptr);
 }
 
 /**
@@ -1060,7 +1041,7 @@ bool Value::instanceOf(const char *classname, size_t size, bool allowString) con
     if (!this_ce) return false;
 
     // now we can look up the actual class
-    auto *ce = zend_lookup_class_ex(zend_string_init(classname, size, 1), nullptr, 0 TSRMLS_CC);
+    auto *ce = zend_lookup_class_ex(String(classname, size), nullptr, 0 TSRMLS_CC);
 
     // no such class, then we are not instanceof
     if (!ce) return false;
@@ -1090,7 +1071,7 @@ bool Value::derivedFrom(const char *classname, size_t size, bool allowString) co
     if (!this_ce) return false;
 
     // now we can look up the actual class
-    auto *ce = zend_lookup_class_ex(zend_string_init(classname, size, 1), nullptr, 0 TSRMLS_CC);
+    auto *ce = zend_lookup_class_ex(String(classname, size), nullptr, 0 TSRMLS_CC);
 
     // unable to find the class entry?
     if (!ce) return false;
@@ -1401,7 +1382,7 @@ bool Value::contains(const char *key, int size) const
     if (isArray())
     {
         // check if index is already in the array
-        return zend_hash_find(Z_ARRVAL_P(_val), zend_string_init(key, size, 1)) != nullptr;
+        return zend_hash_find(Z_ARRVAL_P(_val), String(key, size)) != nullptr;
     }
     else if (isObject())
     {
@@ -1410,7 +1391,7 @@ bool Value::contains(const char *key, int size) const
 
         // retrieve the object pointer and check whether the property we are trying to retrieve
         // is marked as private/protected (cast necessary for php 5.3)
-        if (zend_check_property_access(Z_OBJ_P(_val), zend_string_init(key, size, 1) TSRMLS_CC) == FAILURE) return false;
+        if (zend_check_property_access(Z_OBJ_P(_val), String(key, size) TSRMLS_CC) == FAILURE) return false;
 
         // check if the 'has_property' method is available for this object
         auto *has_property = Z_OBJ_HT_P(_val)->has_property;
@@ -1475,7 +1456,7 @@ Value Value::get(const char *key, int size) const
     if (isArray())
     {
         // find the result and wrap it in a value
-        return Value{ zend_hash_find(Z_ARRVAL_P(_val), zend_string_init(key, size, 1)) };
+        return Value(zend_hash_find(Z_ARRVAL_P(_val), String(key, size)));
     }
     else
     {
@@ -1589,7 +1570,7 @@ void Value::set(const char *key, int size, const Value &value)
     zval *current;
 
     // check if this index is already in the array, otherwise we return NULL
-    if (isArray() && (current = zend_hash_find(Z_ARRVAL_P(_val), zend_string_init(key, size, 1))))
+    if (isArray() && (current = zend_hash_find(Z_ARRVAL_P(_val), String(key, size))))
     {
         // skip if nothing is going to change
         if (value._val == current) return;
@@ -1643,7 +1624,7 @@ void Value::unset(const char *key, int size)
         SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // remove the index
-        zend_hash_del(Z_ARRVAL_P(_val), zend_string_init(key, size, 1));
+        zend_hash_del(Z_ARRVAL_P(_val), String(key, size));
     }
 }
 
