@@ -77,13 +77,35 @@ public:
     String(const char (&string)[size]) : _string(zend_string_init(string, size - 1, 1)) {}
 
     /**
+     *  Copy constructor
+     *
+     *  @param  that    The string to copy
+     */
+    String(const String &that) : _string(that._string)
+    {
+        // increment refcount
+        zend_string_addref(_string);
+    }
+
+    /**
+     *  Move constructor
+     *
+     *  @param  that    The string to move
+     */
+    String(String &&that) : _string(that._string)
+    {
+        // reset other string
+        that._string = nullptr;
+    }
+
+    /**
      *  Destructor
      */
     virtual ~String()
     {
         // release the reference, freeing the
         // string if we are the last referee
-        zend_string_release(_string);
+        if (_string) zend_string_release(_string);
     }
 
     /**
