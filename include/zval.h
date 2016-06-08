@@ -13,9 +13,19 @@
 #pragma once
 
 /**
+ *  Dependencies
+ */
+#include <type_traits>
+
+/**
  *  Forward declarations
  */
 struct _zval_struct;
+
+/**
+ *  Typedef for zval aligned storage
+ */
+using aligned_zval_struct = typename std::aligned_storage<16>::type;
 
 /**
  *  Start namespace
@@ -31,9 +41,9 @@ class Zval
 private:
     /**
      *  The zval buffer
-     *  @var    char[]
+     *  @var    aligned_zval_struct
      */
-    char _buffer[16];
+    aligned_zval_struct _buffer;
 public:
     /**
      *  Cast to a zval
@@ -43,7 +53,7 @@ public:
     operator _zval_struct * () const &
     {
         // reinterpret the value as a zval
-        return const_cast<struct _zval_struct*>(reinterpret_cast<const struct _zval_struct*>(_buffer));
+        return const_cast<struct _zval_struct*>(reinterpret_cast<const struct _zval_struct*>(&_buffer));
     }
 
     /**
@@ -54,7 +64,7 @@ public:
     struct _zval_struct &operator* () const &
     {
         // reinterpret and dereference
-        return *const_cast<struct _zval_struct*>(reinterpret_cast<const struct _zval_struct*>(_buffer));
+        return *const_cast<struct _zval_struct*>(reinterpret_cast<const struct _zval_struct*>(&_buffer));
     }
 };
 
