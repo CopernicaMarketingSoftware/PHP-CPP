@@ -203,7 +203,7 @@ public:
      *  @param  tsrm_ls
      *  @return int
      */
-    static int countElements(zval *object, long *count TSRMLS_DC);
+    static int countElements(zval *object, zend_long *count TSRMLS_DC);
 
     /**
      *  Function that is called when the object is used as an array in PHP

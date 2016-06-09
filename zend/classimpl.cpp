@@ -551,7 +551,7 @@ zend_object *ClassImpl::cloneObject(zval *val TSRMLS_DC)
  *  @param  count
  *  @return int
  */
-int ClassImpl::countElements(zval *object, long *count TSRMLS_DC)
+int ClassImpl::countElements(zval *object, zend_long *count TSRMLS_DC)
 {
     // does it implement the countable interface?
     Countable *countable = dynamic_cast<Countable*>(ObjectImpl::find(object TSRMLS_CC)->object());
