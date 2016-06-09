@@ -1226,7 +1226,7 @@ int Value::size() const
         if (!Z_OBJ_HT_P(_val)->count_elements) return 0;
 
         // create a variable to hold the result
-        long result;
+        zend_long result;
 
         // we need the tsrm_ls variable
         TSRMLS_FETCH();
