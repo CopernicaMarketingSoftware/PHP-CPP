@@ -30,6 +30,7 @@
 #include <phpcpp/visibility.h>
 #include <phpcpp/deprecated.h>
 #include <phpcpp/noexcept.h>
+#include <phpcpp/thread_local.h>
 #include <phpcpp/platform.h>
 #include <phpcpp/version.h>
 #include <phpcpp/inivalue.h>

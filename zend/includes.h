@@ -8,6 +8,11 @@
  */
 
 /**
+ *  Include guard
+ */
+#pragma once
+
+/**
  *  Include standard C and C++ libraries
  */
 #include <stdlib.h>
@@ -57,6 +62,7 @@
 #include "../include/visibility.h"
 #include "../include/deprecated.h"
 #include "../include/noexcept.h"
+#include "../include/thread_local.h"
 #include "../include/platform.h"
 #include "../include/version.h"
 #include "../include/inivalue.h"
