@@ -135,7 +135,7 @@ bool Object::instantiate(const char *name)
     //          and then we overwrite it with a specific class
 
     // initialize the string for __construct only once
-    static zend_string *construct = zend_string_init("__construct", sizeof("__construct"), 0);
+    static String construct{ "__construct" };
 
     // return whether there is a __construct function
     return zend_hash_exists(&entry->function_table, construct);

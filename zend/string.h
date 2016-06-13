@@ -148,6 +148,17 @@ public:
         // return the wrapped string
         return _string;
     }
+
+    /**
+     *  Retrieve the underlying string
+     *
+     *  @return The zend string
+     */
+    zend_string *operator->()
+    {
+        // return the wrapped string
+        return _string;
+    }
 };
 
 /**
