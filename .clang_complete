@@ -1,5 +1,5 @@
 -std=c++11
--include phpcpp.h
+-include zend/includes.h
 -I/usr/include/php/20151012
 -I/usr/include/php/20151012/main
 -I/usr/include/php/20151012/TSRM

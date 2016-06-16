@@ -43,9 +43,9 @@ private:
 
     /**
      *  The object iterator as is needed by the Zend engine
-     *  @var    zend_object_iterator
+     *  @var    *zend_object_iterator
      */
-    zend_object_iterator _impl;
+    zend_object_iterator *_impl;
 
     /**
      *  Get access to all iterator functions
@@ -162,20 +162,29 @@ public:
      *  Constructor
      *  @param  iterator        The iterator that is implemented by the extension
      */
-    IteratorImpl(Iterator *iterator) : _iterator(iterator)
+    IteratorImpl(Iterator *iterator) :
+        _iterator(iterator),
+        _impl((zend_object_iterator*)emalloc(sizeof(zend_object_iterator)))
     {
+        // initialize the iterator
+        zend_iterator_init(_impl);
+
         // wrap it in a zval
-        ZVAL_PTR(&_impl.data, this);
+        ZVAL_PTR(&_impl->data, this);
 
         // initialize impl object
-        _impl.index = 0;
-        _impl.funcs = functions();
+        _impl->index = 0;
+        _impl->funcs = functions();
     }
 
     /**
      *  Destructor
+     *
+     *  Note that we don't free _impl, since PHP will
+     *  throw up all over the place if we do this
+     *  ourselves.
      */
-    virtual ~IteratorImpl() {}
+    virtual ~IteratorImpl() = default;
 
     /**
      *  Internal method that returns the implementation object
@@ -183,7 +192,7 @@ public:
      */
     zend_object_iterator *implementation()
     {
-        return &_impl;
+        return _impl;
     }
 };
 
