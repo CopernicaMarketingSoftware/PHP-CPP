@@ -17,8 +17,8 @@
 #   installed in the default directory, you can change that here.
 #
 
-PHP_CONFIG				=	php-config
-
+PHP_CONFIG			=	php-config
+UNAME 				:= 	$(shell uname)
 
 #
 #   Installation directory
@@ -30,9 +30,16 @@ PHP_CONFIG				=	php-config
 #   and /usr/local/lib. You can of course change it to whatever suits you best
 #
 
-INSTALL_PREFIX			=	/usr
+# Since OSX 10.10 Yosemite, /usr/include gives problem
+# So, let's switch to /usr/local as default instead.
+ifeq ($(UNAME), Darwin)
+  INSTALL_PREFIX		=	/usr/local
+else
+  INSTALL_PREFIX		=	/usr
+endif
+
 INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
-INSTALL_LIB				=	${INSTALL_PREFIX}/lib
+INSTALL_LIB			=	${INSTALL_PREFIX}/lib
 
 
 #
