@@ -1543,7 +1543,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
         SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // add the value (this will reduce the refcount of the current value)
-        add_assoc_zval_ex(_val, key, size+1, value._val);
+        add_assoc_zval_ex(_val, key, size, value._val);
 
         // the variable has one more reference (the array entry)
         Z_TRY_ADDREF_P(value._val);
