@@ -30,7 +30,7 @@ const int Const     =   0;
 /**
  *  Modifiers that are supported for methods and properties
  */
-const int MethodModifiers           =   Final | Public | Protected | Private;
+const int MethodModifiers           =   Final | Public | Protected | Private | Static;
 const int PropertyModifiers         =   Final | Public | Protected | Private | Const | Static;
 
 /**
