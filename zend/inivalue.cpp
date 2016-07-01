@@ -18,7 +18,7 @@ namespace Php {
  */
 int64_t IniValue::numericValue() const
 {
-    return zend_ini_long(const_cast<char*>(_name.c_str()), _name.size()+1, _isorig);
+    return zend_ini_long(const_cast<char*>(_name.c_str()), _name.size(), _isorig);
 
 }
 
@@ -28,7 +28,7 @@ int64_t IniValue::numericValue() const
  */
 const char* IniValue::rawValue() const
 {
-    return zend_ini_string(const_cast<char*>(_name.c_str()), _name.size()+1, _isorig);
+    return zend_ini_string(const_cast<char*>(_name.c_str()), _name.size(), _isorig);
 }
 
 /**
@@ -37,7 +37,7 @@ const char* IniValue::rawValue() const
  */
 IniValue::operator double() const
 {
-    return zend_ini_double(const_cast<char*>(_name.c_str()), _name.size()+1, _isorig);
+    return zend_ini_double(const_cast<char*>(_name.c_str()), _name.size(), _isorig);
 }
 
 /**
