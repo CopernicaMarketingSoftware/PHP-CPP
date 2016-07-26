@@ -936,6 +936,100 @@ Type Value::type() const
 }
 
 /**
+ *  Are we null? This will also check if we're a reference to a null value
+ *  @return bool
+ */
+bool Value::isNull() const
+{
+    // if we're null we simply return true
+    if (type() == Type::Null) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Null;
+}
+
+/**
+ *  Are we a number? This will also check if we're a reference to a number
+ *  @return bool
+ */
+bool Value::isNumeric() const
+{
+    // if we're a number we simply return true
+    if (type() == Type::Numeric) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Numeric;
+}
+
+/**
+ *  Are we a boolean? This will also check if we're a reference to a boolean
+ *  @return bool
+ */
+bool Value::isBool() const
+{
+    // if we're a true or false type right away we just return true
+    if (type() == Type::False || type() == Type::True) return true;
+
+    // retrieve the type
+    auto type = ((Type) Z_TYPE_P(_val.dereference()));
+
+    // are we a true or false type?
+    return type == Type::True || type == Type::False;
+}
+
+/**
+ *  Are we a string? This will also check if we're a reference to a string
+ *  @return bool
+ */
+bool Value::isString() const
+{
+    // if we're a string we just return true right away
+    if (type() == Type::String) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::String;
+}
+
+/**
+ *  Are we a float? This will also check if we're a reference to a float
+ *  @return bool
+ */
+bool Value::isFloat() const
+{
+    // if we're a float ourselves we just return true right away
+    if (type() == Type::Float) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Float;
+}
+
+/**
+ *  Are we an object? This will also check if we're a reference to an object
+ *  @return bool
+ */
+bool Value::isObject() const
+{
+    // if we're an object right away we just return true
+    if (type() == Type::Object) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Object;
+}
+
+/**
+ *  Are we an array? This will also check if we're a reference to an array
+ *  @return bool
+ */
+bool Value::isArray() const
+{
+    // if we're directly an array we just return true
+    if (type() == Type::Array) return true;
+
+    // check the type of the dereference
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Array;
+}
+
+/**
  *  Change the internal type
  *  @param  type
  *  @return Value
@@ -1280,7 +1374,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
 ValueIterator Value::createIterator(bool begin) const
 {
     // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin, true));
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val.dereference()), begin, true));
 
     // get access to the hash table
     if (isObject())

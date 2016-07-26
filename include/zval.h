@@ -66,6 +66,13 @@ public:
         // reinterpret and dereference
         return *const_cast<struct _zval_struct*>(reinterpret_cast<const struct _zval_struct*>(&_buffer));
     }
+
+    /**
+     *  In case this is a reference, dereference it into a zval.. In case it isn't
+     *  the actual value is returned.
+     *  @return struct _zval_struct*
+     */
+    struct _zval_struct *dereference() const;
 };
 
 /**
