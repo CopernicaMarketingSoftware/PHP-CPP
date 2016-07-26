@@ -1448,8 +1448,11 @@ Value Value::get(const char *key, int size) const
     // are we in an object or an array?
     if (isArray())
     {
-        // find the result and wrap it in a value
-        return Value(zend_hash_find(Z_ARRVAL_P(_val), String(key, size)));
+        // find the result
+        auto val = zend_hash_find(Z_ARRVAL_P(_val), String(key, size));
+
+        // wrap it in a value if it isn't null, otherwise return an empty value
+        return val ? Value(val) : Value();
     }
     else
     {
