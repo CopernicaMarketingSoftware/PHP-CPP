@@ -1199,20 +1199,27 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
 
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object TSRMLS_CC)->object());
-
-    // user may throw an exception in the getIterator() function
+    
+    // use might throw an exception in the getIterator() function
     try
     {
-        // create an iterator
-        auto *iterator = new IteratorImpl(traversable->getIterator());
+        // get userspace iterator
+        auto *userspace = traversable->getIterator();
 
-        // return the implementation
-        return iterator->implementation();
+        // we are going to allocate an extended iterator (because php nowadays destructs
+        // the iteraters itself, we can no longer let c++ allocate the buffer + object
+        // directly, so we first allocate the buffer, which is going to be cleaned up by php)
+        auto *buffer = emalloc(sizeof(IteratorImpl));
+    
+        // and then we use placement-new to allocate the implementation
+        auto *wrapper = new(buffer)IteratorImpl(object, userspace);
+        
+        // done
+        return wrapper->implementation();
     }
     catch (Exception &exception)
     {
-        // user threw an exception in its method
-        // implementation, send it to user space
+        // user threw an exception in its method, send it to user space
         process(exception TSRMLS_CC);
 
         // unreachable
@@ -1372,7 +1379,12 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     entry.get_static_method = &ClassImpl::getStaticMethod;
 
     // for traversable classes we install a special method to get the iterator
-    if (_base->traversable()) entry.get_iterator = &ClassImpl::getIterator;
+    if (_base->traversable()) 
+    {
+        // install iterator functions
+        entry.get_iterator = &ClassImpl::getIterator;
+        entry.iterator_funcs.funcs = IteratorImpl::functions();
+    }
 
     // for serializable classes, we install callbacks for serializing and unserializing
     if (_base->serializable())

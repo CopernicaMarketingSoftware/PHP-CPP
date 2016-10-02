@@ -44,6 +44,7 @@ private:
      *  @var    aligned_zval_struct
      */
     aligned_zval_struct _buffer;
+
 public:
     /**
      *  Cast to a zval

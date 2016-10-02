@@ -24,34 +24,31 @@ namespace Php {
  */
 class IteratorImpl
 {
-private:
-    /**
-     *  Unique pointer to the iterator that is returned by the extension
-     *  @var    std::unique_ptr
-     */
-    std::unique_ptr<Iterator> _iterator;
-
-    /**
-     *  The current() method that is called by the Zend engine wants a
-     *  pointer-to-pointer-to-a-zval. Because of this, we have to keep the
-     *  current value in memory after the current() method returns because
-     *  the pointer would otherwise fall out of scope. This is (once again)
-     *  odd behavior of the Zend engine, but we'll have to live with that
-     *  @var    Value
-     */
-    Value _current;
-
-    /**
-     *  The object iterator as is needed by the Zend engine
-     *  @var    zend_object_iterator
-     */
-    zend_object_iterator _impl;
-
+public:
     /**
      *  Get access to all iterator functions
      *  @return zend_object_iterator_funcs
      */
     static zend_object_iterator_funcs *functions();
+
+private:
+    /**
+     *  The normal zend_object_iterator
+     *  @var zend_object_iterator
+     */
+    zend_object_iterator _iterator;
+
+    /**
+     *  Unique pointer to the user space iterator that is returned by the extension
+     *  @var    std::unique_ptr
+     */
+    std::unique_ptr<Iterator> _userspace;
+
+    /**
+     *  Current value
+     *  @var Value
+     */
+    Value _current;
 
     /**
      *  Is the iterator on a valid position
@@ -59,16 +56,17 @@ private:
      */
     bool valid()
     {
-        return _iterator->valid();
+        return _userspace->valid();
     }
 
     /**
      *  The value at the current position
      *  @return Value
      */
-    Value current()
+    Value &current()
     {
-        return _iterator->current();
+        // get from the user space iterator, and store as member
+        return _current = _userspace->current();
     }
 
     /**
@@ -77,7 +75,7 @@ private:
      */
     Value key()
     {
-        return _iterator->key();
+        return _userspace->key();
     }
 
     /**
@@ -85,7 +83,7 @@ private:
      */
     void next()
     {
-        return _iterator->next();
+        return _userspace->next();
     }
 
     /**
@@ -93,8 +91,23 @@ private:
      */
     void rewind()
     {
-        return _iterator->rewind();
+        return _userspace->rewind();
     }
+    
+    /**
+     *  Invalidate the current variable
+     */
+    void invalidate()
+    {
+        _current.invalidate();
+    }
+
+    /**
+     *  Helper method to get access to ourselves
+     *  @param  iter
+     *  @return IteratorImpl
+     */
+    static IteratorImpl *self(zend_object_iterator *iter);
 
     /**
      *  Iterator destructor method
@@ -133,17 +146,6 @@ private:
     static void key(zend_object_iterator *iter, zval *data TSRMLS_DC);
 
     /**
-     *  Function to retrieve the current key, php 5.3 style
-     *  @param  iter
-     *  @param  str_key
-     *  @param  str_key_len
-     *  @param  int_key
-     *  @param  tsrm_ls
-     *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
-     */
-    static int key(zend_object_iterator *iter, char **str_key, unsigned int *str_key_len, unsigned long *int_key TSRMLS_DC);
-
-    /**
      *  Step forwards to the next element
      *  @param  iter
      *  @param  tsrm_ls
@@ -156,26 +158,28 @@ private:
      *  @param  tsrm_ls
      */
     static void rewind(zend_object_iterator *iter TSRMLS_DC);
+    
+    /**
+     *  Invalidate current object
+     *  @param  iter
+     *  @paraam tsrm_ls
+     */
+    static void invalidate(zend_object_iterator *iter TSRMLS_DC);
 
 public:
     /**
      *  Constructor
+     *  @param  zval            The object that is being iterated
      *  @param  iterator        The iterator that is implemented by the extension
      */
-    IteratorImpl(Iterator *iterator) : _iterator(iterator)
-    {
-        // wrap it in a zval
-        ZVAL_PTR(&_impl.data, this);
-
-        // initialize impl object
-        _impl.index = 0;
-        _impl.funcs = functions();
-    }
+    IteratorImpl(zval *object, Iterator *iterator);
 
     /**
      *  Destructor
+     *  Important: this should not be virtual because this object is not allowed
+     *  to have a vtable because it replies of memory alignment of the first member.
      */
-    virtual ~IteratorImpl() {}
+    ~IteratorImpl();
 
     /**
      *  Internal method that returns the implementation object
@@ -183,7 +187,7 @@ public:
      */
     zend_object_iterator *implementation()
     {
-        return &_impl;
+        return &_iterator;
     }
 };
 

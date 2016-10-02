@@ -262,6 +262,21 @@ Php::Zval Value::detach(bool keeprefcount)
 }
 
 /**
+ *  Invalidate the object - so that it will not be destructed
+ */
+void Value::invalidate()
+{
+    // do nothing if object is already undefined
+	if (Z_TYPE_P(_val) == IS_UNDEF) return;
+
+    // call destructor
+    zval_ptr_dtor(_val);
+    
+    // undefine it
+    ZVAL_UNDEF(_val);
+}
+
+/**
  *  Retrieve the refcount
  *  @return int
  */

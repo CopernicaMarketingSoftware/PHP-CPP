@@ -14,13 +14,41 @@
 namespace Php {
 
 /**
+ *  Constructor
+ *  @param  zval            The object that is being iterated
+ *  @param  iterator        The iterator that is implemented by the extension
+ */
+IteratorImpl::IteratorImpl(zval *object, Iterator *iterator) : _userspace(iterator)
+{
+    // initialize the iterator
+    zend_iterator_init(&_iterator);
+
+    // copy the object to the iterator, and set the callbacks
+	ZVAL_COPY(&_iterator.data, object);
+	_iterator.funcs = functions();
+}
+
+/**
+ *  Destructor
+ */
+IteratorImpl::~IteratorImpl()
+{
+    // invalidate current
+    invalidate();
+    
+    // one reference less to the original object
+	zval_ptr_dtor(&_iterator.data);
+}
+
+/**
  *  Helper method to get access to ourselves
  *  @param  iter
  *  @return IteratorImpl
  */
-static IteratorImpl *self(zend_object_iterator *iter)
+IteratorImpl *IteratorImpl::self(zend_object_iterator *iter)
 {
-    return (IteratorImpl *)Z_PTR(iter->data);
+    // cast to the the other variable
+    return (IteratorImpl *)iter;
 }
 
 /**
@@ -30,8 +58,9 @@ static IteratorImpl *self(zend_object_iterator *iter)
  */
 void IteratorImpl::destructor(zend_object_iterator *iter TSRMLS_DC)
 {
-    // delete the object
-    delete self(iter);
+    // we are not going to deallocate the memory, because the php engine
+    // seems to do that automagically nowadays, we just call the destructor explicitly
+    self(iter)->~IteratorImpl();
 }
 
 /**
@@ -61,10 +90,10 @@ zval *IteratorImpl::current(zend_object_iterator *iter TSRMLS_DC)
 
     // retrieve the value (and store it in a member so that it is not
     // destructed when the function returns)
-    iterator->_current = iterator->current();
+    auto &value = iterator->current();
 
-    // return the value
-    return iterator->_current._val;
+    // return the internal zval
+    return value._val;
 }
 
 /**
@@ -86,40 +115,6 @@ void IteratorImpl::key(zend_object_iterator *iter, zval *key TSRMLS_DC)
 
     // copy it to the key
     ZVAL_ZVAL(key, val, 1, 1);
-}
-
-/**
- *  Function to retrieve the current key, php 5.3 style
- *  @param  iter
- *  @param  str_key
- *  @param  str_key_len
- *  @param  int_key
- *  @param  tsrm_ls
- *  @return HASH_KEY_IS_STRING or HASH_KEY_IS_LONG
- */
-int IteratorImpl::key(zend_object_iterator *iter, char **str_key, uint *str_key_len, ulong *int_key TSRMLS_DC)
-{
-    // retrieve the key
-    Value retval(self(iter)->key());
-
-    // is this a numeric string?
-    if (retval.isString())
-    {
-        // copy the key and the from the value
-        *str_key = estrndup(retval.rawValue(), retval.size());
-        *str_key_len = retval.size() + 1;
-
-        // done
-        return HASH_KEY_IS_STRING;
-    }
-    else
-    {
-        // convert to a numeric
-        *int_key = retval.numericValue();
-
-        // done
-        return HASH_KEY_IS_LONG;
-    }
 }
 
 /**
@@ -145,6 +140,17 @@ void IteratorImpl::rewind(zend_object_iterator *iter TSRMLS_DC)
 }
 
 /**
+ *  Invalidate the current value of the object
+ *  @param  iter
+ *  @param  tsrm_ls
+ */
+void IteratorImpl::invalidate(zend_object_iterator *iter TSRMLS_DC)
+{
+    // call the rewind method
+    self(iter)->invalidate();
+}
+
+/**
  *  Get access to all iterator functions
  *  @return zend_object_iterator_funcs
  */
@@ -166,9 +172,7 @@ zend_object_iterator_funcs *IteratorImpl::functions()
     funcs.get_current_key = &IteratorImpl::key;
     funcs.move_forward = &IteratorImpl::next;
     funcs.rewind = &IteratorImpl::rewind;
-
-    // invalidate is not yet supported
-    funcs.invalidate_current = nullptr;
+    funcs.invalidate_current = &IteratorImpl::invalidate;
 
     // remember that functions are initialized
     initialized = true;

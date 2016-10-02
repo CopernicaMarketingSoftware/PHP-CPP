@@ -1131,6 +1131,11 @@ protected:
     Php::Zval detach(bool keeprefcount = true);
 
     /**
+     *  Invalidate the object - so that it will not be destructed
+     */
+    void invalidate();
+
+    /**
      *  Set a certain property without running any checks (you must already know
      *  for sure that this is an array, and that the index is not yet in use)
      *
