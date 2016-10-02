@@ -951,6 +951,100 @@ Type Value::type() const
 }
 
 /**
+ *  Are we null? This will also check if we're a reference to a null value
+ *  @return bool
+ */
+bool Value::isNull() const
+{
+    // if we're null we simply return true
+    if (type() == Type::Null) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Null;
+}
+
+/**
+ *  Are we a number? This will also check if we're a reference to a number
+ *  @return bool
+ */
+bool Value::isNumeric() const
+{
+    // if we're a number we simply return true
+    if (type() == Type::Numeric) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Numeric;
+}
+
+/**
+ *  Are we a boolean? This will also check if we're a reference to a boolean
+ *  @return bool
+ */
+bool Value::isBool() const
+{
+    // if we're a true or false type right away we just return true
+    if (type() == Type::False || type() == Type::True) return true;
+
+    // retrieve the type
+    auto type = ((Type) Z_TYPE_P(_val.dereference()));
+
+    // are we a true or false type?
+    return type == Type::True || type == Type::False;
+}
+
+/**
+ *  Are we a string? This will also check if we're a reference to a string
+ *  @return bool
+ */
+bool Value::isString() const
+{
+    // if we're a string we just return true right away
+    if (type() == Type::String) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::String;
+}
+
+/**
+ *  Are we a float? This will also check if we're a reference to a float
+ *  @return bool
+ */
+bool Value::isFloat() const
+{
+    // if we're a float ourselves we just return true right away
+    if (type() == Type::Float) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Float;
+}
+
+/**
+ *  Are we an object? This will also check if we're a reference to an object
+ *  @return bool
+ */
+bool Value::isObject() const
+{
+    // if we're an object right away we just return true
+    if (type() == Type::Object) return true;
+
+    // derefence ourselves and check the type of that
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Object;
+}
+
+/**
+ *  Are we an array? This will also check if we're a reference to an array
+ *  @return bool
+ */
+bool Value::isArray() const
+{
+    // if we're directly an array we just return true
+    if (type() == Type::Array) return true;
+
+    // check the type of the dereference
+    return ((Type) Z_TYPE_P(_val.dereference())) == Type::Array;
+}
+
+/**
  *  Change the internal type
  *  @param  type
  *  @return Value
@@ -1295,7 +1389,7 @@ std::map<std::string,Php::Value> Value::mapValue() const
 ValueIterator Value::createIterator(bool begin) const
 {
     // check type
-    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val), begin, true));
+    if (isArray()) return ValueIterator(new HashIterator(Z_ARRVAL_P(_val.dereference()), begin, true));
 
     // get access to the hash table
     if (isObject())
@@ -1372,7 +1466,7 @@ bool Value::contains(int index) const
     else if (!isArray()) return false;
 
     // check if this index is already in the array
-    return zend_hash_index_find(Z_ARRVAL_P(_val), index) != nullptr;
+    return zend_hash_index_find(Z_ARRVAL_P(_val.dereference()), index) != nullptr;
 }
 
 /**
@@ -1390,7 +1484,7 @@ bool Value::contains(const char *key, int size) const
     if (isArray())
     {
         // check if index is already in the array
-        return zend_hash_find(Z_ARRVAL_P(_val), String(key, size)) != nullptr;
+        return zend_hash_find(Z_ARRVAL_P(_val.dereference()), String(key, size)) != nullptr;
     }
     else if (isObject())
     {
@@ -1432,7 +1526,7 @@ Value Value::get(int index) const
     if (isArray())
     {
         // retrieve the value
-        auto *result = zend_hash_index_find(Z_ARRVAL_P(_val), index);
+        auto *result = zend_hash_index_find(Z_ARRVAL_P(_val.dereference()), index);
 
         // did the offset exist?
         if (!result) return Type::Undefined;
@@ -1463,8 +1557,11 @@ Value Value::get(const char *key, int size) const
     // are we in an object or an array?
     if (isArray())
     {
-        // find the result and wrap it in a value
-        return Value(zend_hash_find(Z_ARRVAL_P(_val), String(key, size)));
+        // find the result
+        auto val = zend_hash_find(Z_ARRVAL_P(_val.dereference()), String(key, size));
+
+        // wrap it in a value if it isn't null, otherwise return an empty value
+        return val ? Value(val) : Value();
     }
     else
     {
@@ -1516,7 +1613,7 @@ void Value::set(int index, const Value &value)
     zval *current;
 
     // check if this index is already in the array, otherwise we return NULL
-    if (isArray() && (current = zend_hash_index_find(Z_ARRVAL_P(_val), index)))
+    if (isArray() && (current = zend_hash_index_find(Z_ARRVAL_P(_val.dereference()), index)))
     {
         // skip if nothing is going to change
         if (value._val == current) return;
@@ -1558,7 +1655,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
         SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // add the value (this will reduce the refcount of the current value)
-        add_assoc_zval_ex(_val, key, size+1, value._val);
+        add_assoc_zval_ex(_val, key, size, value._val);
 
         // the variable has one more reference (the array entry)
         Z_TRY_ADDREF_P(value._val);
@@ -1578,7 +1675,7 @@ void Value::set(const char *key, int size, const Value &value)
     zval *current;
 
     // check if this index is already in the array, otherwise we return NULL
-    if (isArray() && (current = zend_hash_find(Z_ARRVAL_P(_val), String(key, size))))
+    if (isArray() && (current = zend_hash_find(Z_ARRVAL_P(_val.dereference()), String(key, size))))
     {
         // skip if nothing is going to change
         if (value._val == current) return;
@@ -1604,7 +1701,7 @@ void Value::unset(int index)
     SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // remove the index
-    zend_hash_index_del(Z_ARRVAL_P(_val), index);
+    zend_hash_index_del(Z_ARRVAL_P(_val.dereference()), index);
 }
 
 /**
@@ -1632,7 +1729,7 @@ void Value::unset(const char *key, int size)
         SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // remove the index
-        zend_hash_del(Z_ARRVAL_P(_val), String(key, size));
+        zend_hash_del(Z_ARRVAL_P(_val.dereference()), String(key, size));
     }
 }
 

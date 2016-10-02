@@ -109,14 +109,14 @@ public:
      *  @param  args        Argument descriptions
      *  @return Class       Same object to allow chaining
      */
-    template <void  (*callback)()                               >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, flags,  args); return *this; }
-    template <Value (*callback)()                               >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, flags,  args); return *this; }
-    template <void  (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, flags,  args); return *this; }
-    template <Value (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, flags,  args); return *this; }
-    template <void  (*callback)()                               >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Public, args); return *this; }
-    template <Value (*callback)()                               >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Public, args); return *this; }
-    template <void  (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Public, args); return *this; }
-    template <Value (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Public, args); return *this; }
+    template <void  (*callback)()                               >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | flags,  args); return *this; }
+    template <Value (*callback)()                               >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | flags,  args); return *this; }
+    template <void  (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | flags,  args); return *this; }
+    template <Value (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name, int flags,   const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | flags,  args); return *this; }
+    template <void  (*callback)()                               >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | Public, args); return *this; }
+    template <Value (*callback)()                               >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | Public, args); return *this; }
+    template <void  (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | Public, args); return *this; }
+    template <Value (*callback)(Parameters &parameters)         >   Class<T> &method(const char *name,              const Arguments &args = {}) { ClassBase::method(name, &ZendCallable::invoke<callback>, Static | Public, args); return *this; }
 
     /**
      *  Add a regular method to the class

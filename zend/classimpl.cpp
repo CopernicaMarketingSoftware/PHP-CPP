@@ -825,12 +825,6 @@ zval *ClassImpl::toZval(Value &&value, int type, zval *rv)
     // if the zval has a reference count we must decrease it
     Z_TRY_DELREF_P(result);
 
-    // the pointer from the value may now be destroyed
-    // (it was allocated by the value and detached)
-    // we do not actually "destroy" the value here,
-    // even if the refcount reaches 0 here!
-    delete result;
-
     // return the pointer to the value
     return rv;
 }
