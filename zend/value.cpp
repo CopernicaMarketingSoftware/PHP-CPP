@@ -26,6 +26,7 @@
  */
 #include "includes.h"
 #include "string.h"
+#include "lowercase.h"
 
 /**
  *  Set up namespace
@@ -800,15 +801,38 @@ bool Value::isCallable(const char *name)
 {
     // this only makes sense if we are an object
     if (!isObject()) return false;
+    
+    // get the class properties
+    zend_class_entry *ce = Z_OBJCE_P(_val);
 
-    // wrap the name in a Php::Value object to get a zval
-    Value method(name);
-
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-
-    // ask zend nicely whether the function is callable
-    return zend_is_callable_ex(method._val, Z_OBJ_P(_val), IS_CALLABLE_CHECK_NO_ACCESS, nullptr, nullptr, nullptr TSRMLS_CC);
+    // convert the name to lowercase
+    LowerCase methodname{String(name)};
+    
+    // check if the function indeed exists
+    if (zend_hash_exists(&ce->function_table, methodname)) return true;
+    
+    // can we dynamically fetch the method?
+    if (Z_OBJ_HT_P(_val)->get_method == nullptr) return false;
+    
+    // get the function
+    union _zend_function *func = Z_OBJ_HT_P(_val)->get_method(&Z_OBJ_P(_val), methodname, nullptr);
+    
+    // if function does not exist, we do not have to check further
+    if (func == nullptr) return false;
+    
+    // i dont get this code, it is copied from the method_exists() function (but the code has 
+    // of course been prettified because the php guys dont know how to write good looking code)
+    if (!(func->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)) return true;
+    
+    // check the result ("Returns true to the fake Closure's __invoke")
+    bool result = func->common.scope == zend_ce_closure && zend_string_equals_literal(methodname.value(), ZEND_INVOKE_FUNC_NAME);
+    
+    // free resources (still don't get this code, copied from zend_builtin_functions.c)
+    zend_string_release(func->common.function_name);
+    zend_free_trampoline(func);
+    
+    // done
+    return result;
 }
 
 /**
