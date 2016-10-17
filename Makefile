@@ -157,6 +157,11 @@ PHP_SHARED_OBJECTS		=	$(PHP_SOURCES:%.cpp=shared/%.o)
 COMMON_STATIC_OBJECTS	=	$(COMMON_SOURCES:%.cpp=static/%.o)
 PHP_STATIC_OBJECTS		=	$(PHP_SOURCES:%.cpp=static/%.o)
 
+#
+#   Dependencies
+#
+
+DEPENDENCIES            =   $(wildcard shared/common/*.d) $(wildcard shared/zend/*.d) $(wildcard static/common/*.d) $(wildcard static/zend/*.d)
 
 #
 #   End of the variables section. Here starts the list of instructions and
@@ -166,6 +171,8 @@ PHP_STATIC_OBJECTS		=	$(PHP_SOURCES:%.cpp=static/%.o)
 all: COMPILER_FLAGS 	+=	-g
 all: LINKER_FLAGS		+=  -g
 all: phpcpp
+
+-include ${DEPENDENCIES}
 
 release: COMPILER_FLAGS +=	-O2
 release: LINKER_FLAGS	+=  -O2
