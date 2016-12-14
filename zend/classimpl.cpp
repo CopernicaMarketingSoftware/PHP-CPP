@@ -822,9 +822,6 @@ zval *ClassImpl::toZval(Value &&value, int type, zval *rv)
     // now copy the value over to the pointer
     ZVAL_COPY_VALUE(rv, result);
 
-    // if the zval has a reference count we must decrease it
-    Z_TRY_DELREF_P(result);
-
     // return the pointer to the value
     return rv;
 }

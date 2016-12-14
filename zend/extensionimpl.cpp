@@ -417,6 +417,9 @@ bool ExtensionImpl::shutdown(int module_number TSRMLS_DC)
     // is the callback registered?
     if (_onShutdown) _onShutdown();
 
+    // we are no longer locked
+    _locked = false;
+
     // done
     return true;
 }

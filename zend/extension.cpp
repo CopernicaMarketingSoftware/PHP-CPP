@@ -19,15 +19,11 @@ namespace Php {
  */
 Extension::Extension(const char *name, const char *version, int apiversion) :
     Namespace(""), _impl(new ExtensionImpl(this, name, version, apiversion)) {}
-    
+
 /**
  *  Destructor
  */
-Extension::~Extension()
-{
-    // get rid of the implementation object
-    delete _impl;
-}
+Extension::~Extension() = default;
 
 /**
  *  Register a function to be called when the PHP engine is ready
@@ -38,7 +34,7 @@ Extension &Extension::onStartup(const Callback &callback)
 {
     // pass on to the implementation
     _impl->onStartup(callback);
-    
+
     // allow chaining
     return *this;
 }
@@ -52,7 +48,7 @@ Extension &Extension::onShutdown(const Callback &callback)
 {
     // pass on to the implementation
     _impl->onShutdown(callback);
-    
+
     // allow chaining
     return *this;
 }
@@ -65,7 +61,7 @@ Extension &Extension::onRequest(const Callback &callback)
 {
     // pass on to the implementation
     _impl->onRequest(callback);
-    
+
     // allow chaining
     return *this;
 }
@@ -78,14 +74,14 @@ Extension &Extension::onIdle(const Callback &callback)
 {
     // pass on to the implementation
     _impl->onIdle(callback);
-    
+
     // allow chaining
     return *this;
 }
 
 /**
  *  Retrieve the module pointer
- * 
+ *
  *  This is the memory address that should be exported by the get_module()
  *  function.
  *
@@ -101,7 +97,7 @@ void *Extension::module()
  *  Is the extension object in a locked state? This happens after the
  *  get_module() function was called for the first time ("apache reload"
  *  forces a new call to get_module())
- * 
+ *
  *  @return bool
  */
 bool Extension::locked() const
