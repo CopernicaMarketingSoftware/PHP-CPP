@@ -15,7 +15,7 @@ namespace Php {
 /**
  *  Supported types of errors, this is mostly a copy from Zend/zend_errors.h
  */
-enum class PHPCPP_EXPORT Error : int {
+enum class Error : int {
     Error                =   (1 << 0L),
     Warning              =   (1 << 1L),
     Parse                =   (1 << 2L),

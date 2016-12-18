@@ -17,7 +17,7 @@ namespace Php {
  *  Supported types for variables
  *  The values are the same as the ones used internally in Zend
  */
-enum class PHPCPP_EXPORT Type : unsigned char {
+enum class Type : unsigned char {
     Undefined       =   0,  // Variable is not set
     Null            =   1,  // Null will allow any type
     False           =   2,  // Boolean false
