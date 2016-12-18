@@ -161,7 +161,7 @@ Value::Value(struct _zval_struct *val, bool ref)
     }
 
     // we see ourselves as reference too
-    Z_ADDREF_P(_val);
+    // Z_ADDREF_P(_val); // ZVAL_DUP will increment reference count for refcounted types
 
     // we're ready if we do not have to force it as a reference
     if (!ref || Z_ISREF_P(_val)) return;
