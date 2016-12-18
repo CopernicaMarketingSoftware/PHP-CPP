@@ -25,9 +25,8 @@ zend_class_entry *Functor::_entry = nullptr;
 
 /**
  *  Initialize the class
- *  @param  tsrmls
  */
-void Functor::initialize(TSRMLS_D)
+void Functor::initialize()
 {
     // leap out if the class entry is already set
     if (_entry) return;
@@ -36,14 +35,13 @@ void Functor::initialize(TSRMLS_D)
     static std::unique_ptr<ClassBase> functor(new Class<Functor>("PhpCpp::Functor"));
 
     // initialize the functor class
-    _entry = functor->implementation()->initialize(functor.get(), "" TSRMLS_CC);
+    _entry = functor->implementation()->initialize(functor.get(), "");
 }
 
 /**
  *  Shutdown the class
- *  @param  tsrmls
  */
-void Functor::shutdown(TSRMLS_D)
+void Functor::shutdown()
 {
     // we forget the entry
     _entry = nullptr;

@@ -22,7 +22,6 @@ ValueIterator::ValueIterator(ValueIteratorImpl *impl) : _impl(impl) {}
 /**
  *  Copy constructor
  *  @param  that
- *  @param  tsrm_ls
  */
 ValueIterator::ValueIterator(const ValueIterator &that) : _impl(that._impl->clone()) {}
 

@@ -38,14 +38,6 @@ private:
      */
     int _no_extensions;
 
-#ifdef ZTS
-    /**
-     *  When in thread safety mode, we also keep track of the TSRM_LS var
-     *  @var void***
-     */
-    void ***tsrm_ls;
-#endif
-
 public:
     /**
      *  No trivial constructor
@@ -56,18 +48,13 @@ public:
      *  Constructor
      *  @param  no_extensions
      */
-    ExecuteState(int no_extensions TSRMLS_DC)
+    ExecuteState(int no_extensions)
     {
         // store all the original stuff
         _active_op_array = CG(active_op_array);
         _return_value  = EG(current_execute_data)->return_value;
         _opline = EG(current_execute_data)->opline;
         _no_extensions = no_extensions;
-
-#ifdef ZTS
-        // copy tsrm_ls param
-        this->tsrm_ls = tsrm_ls;
-#endif
     }
 
     /**

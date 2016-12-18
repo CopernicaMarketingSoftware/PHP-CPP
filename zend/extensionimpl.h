@@ -105,64 +105,57 @@ private:
     /**
      *  Initialize the extension after it was registered
      *  @param  module_number
-     *  @param  tsrm_ls
      *  @return bool
      */
-    bool initialize(int module_number TSRMLS_DC);
+    bool initialize(int module_number);
 
     /**
      *  Shutdown the extension
      *  @param  module_number
-     *  @param  tsrm_ls
      *  @return bool
      */
-    bool shutdown(int module_number TSRMLS_DC);
+    bool shutdown(int module_number);
 
     /**
      *  Function that is called when the extension initializes
      *  @param  type        Module type
      *  @param  number      Module number
-     *  @param  tsrm_ls
      *  @return int         0 on success
      */
-    static int processStartup(int type, int module_number TSRMLS_DC);
+    static int processStartup(int type, int module_number);
 
     /**
      *  Function that is called when the extension is about to be stopped
      *  @param  type        Module type
      *  @param  number      Module number
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int processShutdown(int type, int module_number TSRMLS_DC);
+    static int processShutdown(int type, int module_number);
 
     /**
      *  Function that is called when a request starts
      *  @param  type        Module type
      *  @param  number      Module number
-     *  @param  tsrm_ls
      *  @return int         0 on success
      */
-    static int processRequest(int type, int module_number TSRMLS_DC);
+    static int processRequest(int type, int module_number);
 
     /**
      *  Function that is called when a request is ended
      *  @param  type        Module type
      *  @param  number      Module number
-     *  @param  tsrm_ls
      *  @return int         0 on success
      */
-    static int processIdle(int type, int module_number TSRMLS_DC);
+    static int processIdle(int type, int module_number);
 
     /**
      *  Function that is called when the PHP engine initializes with a different PHP-CPP
      *  version for the libphpcpp.so file than the version the extension was compiled for
      *  @param  type        Module type
      *  @param  number      Module number
-     *  @param  tsrm_ls
      *  @return int         0 on success
      */
-    static int processMismatch(int type, int module_number TSRMLS_DC);
+    static int processMismatch(int type, int module_number);
 };
 
 /**

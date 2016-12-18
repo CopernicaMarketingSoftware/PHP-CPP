@@ -28,11 +28,8 @@ namespace Php {
  */
 File::File(const char *name, size_t size)
 {
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-
     // resolve the path
-    _path = zend_resolve_path(name, size TSRMLS_CC);
+    _path = zend_resolve_path(name, size);
 }
 
 /**
@@ -59,23 +56,20 @@ bool File::compile()
     // we are going to open the file
     zend_file_handle fileHandle;
 
-    // we need the tsrm_ls variable (@todo would it be better if this was a member?)
-    TSRMLS_FETCH();
-
     // open the file
-    if (zend_stream_open(ZSTR_VAL(_path), &fileHandle TSRMLS_CC) == FAILURE) return false;
+    if (zend_stream_open(ZSTR_VAL(_path), &fileHandle) == FAILURE) return false;
 
     // make sure the path name is stored in the handle (@todo: is this necessary? do we need the copy?)
     if (!fileHandle.opened_path) fileHandle.opened_path = zend_string_copy(_path);
 
     // we need temporary compiler options
-    CompilerOptions options(ZEND_COMPILE_DEFAULT TSRMLS_CC);
+    CompilerOptions options(ZEND_COMPILE_DEFAULT);
 
     // create the opcodes
-    _opcodes.reset(new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE TSRMLS_CC) TSRMLS_CC));
+    _opcodes.reset(new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE)));
 
     // close the file handle
-    zend_destroy_file_handle(&fileHandle TSRMLS_CC);
+    zend_destroy_file_handle(&fileHandle);
 
     // done
     return _opcodes->valid();
@@ -135,9 +129,6 @@ Value File::once()
 {
     // skip if the path is invalid
     if (!_path) return nullptr;
-
-    // we need the tsrm_ls variable (@todo would it be better if this was a member?)
-    TSRMLS_FETCH();
 
     // check if this file was already included
     if (zend_hash_exists(&EG(included_files), _path)) return nullptr;

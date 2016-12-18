@@ -29,13 +29,10 @@ Super REQUEST   (TRACK_VARS_REQUEST, "_REQUEST");
  */
 Value Super::value()
 {
-    // we need the tsrm_ls pointer
-    TSRMLS_FETCH();
-
     // call zend_is_auto_global to ensure that the just-in-time globals are loaded
     if (_name) {
         // make the variable an auto global
-        zend_is_auto_global(String{ _name } TSRMLS_CC);
+        zend_is_auto_global(String{ _name });
 
         // reset because we only need to do this once
         _name = nullptr;

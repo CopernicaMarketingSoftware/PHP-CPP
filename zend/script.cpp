@@ -33,15 +33,11 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
     // simpler Php::Value object
     Php::Value source(phpcode, size);
 
-    // we need the tsrm_ls variable
-    // @todo it would be better if this was passed as param to the compile() method
-    TSRMLS_FETCH();
-    
     // remember the old compiler options, and set new compiler options
-    CompilerOptions options(ZEND_COMPILE_DEFAULT_FOR_EVAL TSRMLS_CC);
+    CompilerOptions options(ZEND_COMPILE_DEFAULT_FOR_EVAL);
     
     // compile the string
-    return zend_compile_string(source._val, (char *)name TSRMLS_CC);
+    return zend_compile_string(source._val, (char *)name);
 }
 
 /**
@@ -52,11 +48,8 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
  */
 Script::Script(const char *name, const char *phpcode, size_t size) _NOEXCEPT
 {
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-
     // construct opcodes
-    _opcodes = new Opcodes(compile(name, phpcode, size) TSRMLS_CC);
+    _opcodes = new Opcodes(compile(name, phpcode, size));
 }
 
 /**

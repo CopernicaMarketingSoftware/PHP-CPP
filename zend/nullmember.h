@@ -33,22 +33,19 @@ public:
     /**
      *  Internal method to declare the property as constant
      *  @param  zend_class_entry
-     *  @param  tsrm_ls
      */
-    virtual void constant(struct _zend_class_entry *entry TSRMLS_DC) override
+    virtual void constant(struct _zend_class_entry *entry) override
     {
-        zend_declare_class_constant_null(entry, _name.c_str(), _name.size() TSRMLS_CC);
+        zend_declare_class_constant_null(entry, _name.c_str(), _name.size());
     }
 
     /**
      *  Virtual method to declare the property
      *  @param  entry       Class entry
-     *  @param  tsrm_ls
      */
-    virtual void declare(struct _zend_class_entry *entry TSRMLS_DC) override
+    virtual void declare(struct _zend_class_entry *entry) override
     {
-        // char* cast is necessary for php 5.3
-        zend_declare_property_null(entry, (char *)_name.c_str(), _name.size(), _flags TSRMLS_CC);
+        zend_declare_property_null(entry, _name.c_str(), _name.size(), _flags);
     }
 };
 

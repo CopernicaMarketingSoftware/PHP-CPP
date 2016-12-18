@@ -165,22 +165,20 @@ public:
      *
      *  @param  base        The extension C++ class
      *  @param  ns          Namespace name
-     *  @param  tsrm_ls
      *  @return zend_class_entry
      */
-    struct _zend_class_entry *initialize(ClassBase *base, const std::string &ns TSRMLS_DC);
+    struct _zend_class_entry *initialize(ClassBase *base, const std::string &ns);
 
     /**
      *  Static member functions to create or clone objects based on this class
      *  @param  entry                   Pointer to class information
      *  @param  val                     The object to be cloned
-     *  @param  tsrm_ls
      *  @return zend_object             Object info
      */
-    static zend_object *createObject(zend_class_entry *entry TSRMLS_DC);
-    static zend_object *cloneObject(zval *val TSRMLS_DC);
-    static void destructObject(zend_object *object TSRMLS_DC);
-    static void freeObject(zend_object *object TSRMLS_DC);
+    static zend_object *createObject(zend_class_entry *entry);
+    static zend_object *cloneObject(zval *val);
+    static void destructObject(zend_object *object);
+    static void freeObject(zend_object *object);
 
     /**
      *  Static member function that get called when a method or object is called
@@ -189,10 +187,9 @@ public:
      *  @param  return_value_ptr        Pointer to the same zval
      *  @param  this_ptr                Object being called
      *  @param  return_value_used       Is the return value used or not?
-     *  @param  tsrm_ls
      */
-    static void callMethod(zend_execute_data *execute_data, zval *return_value TSRMLS_DC);
-    static void callInvoke(zend_execute_data *execute_data, zval *return_value TSRMLS_DC);
+    static void callMethod(zend_execute_data *execute_data, zval *return_value);
+    static void callInvoke(zend_execute_data *execute_data, zval *return_value);
 
     /**
      *  Function that is used to count the number of elements in the object
@@ -200,10 +197,9 @@ public:
      *  call the count() method
      *  @param  val
      *  @param  count
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int countElements(zval *object, zend_long *count TSRMLS_DC);
+    static int countElements(zval *object, zend_long *count);
 
     /**
      *  Function that is called when the object is used as an array in PHP
@@ -215,10 +211,10 @@ public:
      *  @param  check_empty     ????
      *  @return zval
      */
-    static zval *readDimension(zval *object, zval *offset, int type, zval *rv TSRMLS_DC);
-    static void writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC);
-    static int  hasDimension(zval *object, zval *offset, int check_empty TSRMLS_DC);
-    static void unsetDimension(zval *object, zval *offset TSRMLS_DC);
+    static zval *readDimension(zval *object, zval *offset, int type, zval *rv);
+    static void writeDimension(zval *object, zval *offset, zval *value);
+    static int  hasDimension(zval *object, zval *offset, int check_empty);
+    static void unsetDimension(zval *object, zval *offset);
 
     /**
      *  Retrieve pointer to our own object handlers
@@ -238,10 +234,9 @@ public:
      *  @param  entry                   The class entry
      *  @param  object                  The object to iterate over
      *  @param  by_ref                  ?????
-     *  @param  tsrm_ls
      *  @return zend_object_iterator*   Pointer to the iterator
      */
-    static zend_object_iterator *getIterator(zend_class_entry *entry, zval *object, int by_ref TSRMLS_DC);
+    static zend_object_iterator *getIterator(zend_class_entry *entry, zval *object, int by_ref);
 
     /**
      *  Function that is called when a property is being read
@@ -251,10 +246,9 @@ public:
      *  @param  type            The type of the variable???
      *  @param  cache_slot      The cache slot used
      *  @param  rv              Pointer to where to store the data
-     *  @param  tsrm_ls
      *  @return zval
      */
-    static zval *readProperty(zval *object, zval *name, int type, void **cache_slot, zval *rv TSRMLS_DC);
+    static zval *readProperty(zval *object, zval *name, int type, void **cache_slot, zval *rv);
 
     /**
      *  Function that is called when a property is set / updated
@@ -263,10 +257,9 @@ public:
      *  @param  name            The name of the property
      *  @param  value           The new value
      *  @param  cache_slot      The cache slot used
-     *  @param  tsrm_ls
      *  @return zval
      */
-    static void writeProperty(zval *object, zval *name, zval *value, void **cache_slot TSRMLS_DC);
+    static void writeProperty(zval *object, zval *name, zval *value, void **cache_slot);
 
     /**
      *  Function that is called to check whether a certain property is set
@@ -275,10 +268,9 @@ public:
      *  @param  name            The name of the property to check
      *  @param  has_set_exists  See above
      *  @param  cache_slot      The cache slot used
-     *  @param  tsrm_ls
      *  @return bool
      */
-    static int hasProperty(zval *object, zval *name, int has_set_exists, void **cache_slot TSRMLS_DC);
+    static int hasProperty(zval *object, zval *name, int has_set_exists, void **cache_slot);
 
     /**
      *  Function that is called when a property is removed from the project
@@ -286,9 +278,8 @@ public:
      *  @param  object          The object on which it is called
      *  @param  member          The member to remove
      *  @param  cache_slot      The cache slot used
-     *  @param  tsrm_ls
      */
-    static void unsetProperty(zval *object, zval *member, void **cache_slot TSRMLS_DC);
+    static void unsetProperty(zval *object, zval *member, void **cache_slot);
 
     /**
      *  Method that returns information about the function signature of a undefined method
@@ -296,10 +287,9 @@ public:
      *  @param  object      Pointer to the object from which we want to retrieve the member function
      *  @param  method      The method that we want information about
      *  @param  key         ???
-     *  @param  tsrm_ls
      *  @return zend_function
      */
-    static zend_function *getMethod(zend_object **object, zend_string *method, const zval *key TSRMLS_DC);
+    static zend_function *getMethod(zend_object **object, zend_string *method, const zval *key);
 
     /**
      *  Method that returns information about the function signature of an undefined static method
@@ -307,10 +297,9 @@ public:
      *  @param  entry       The class entry to find the static function in
      *  @param  method      The method that we want information about
      *  @param  key         ???
-     *  @param  tsrm_ls
      *  @return zend_function
      */
-    static zend_function *getStaticMethod(zend_class_entry *entry, zend_string *method TSRMLS_DC);
+    static zend_function *getStaticMethod(zend_class_entry *entry, zend_string *method);
 
     /**
      *  Method that returns information about the __invoke() method
@@ -318,29 +307,26 @@ public:
      *  @param  entry
      *  @param  func
      *  @param  object_ptr
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr TSRMLS_DC);
+    static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr);
 
     /**
      *  Function to cast the object to a different type
      *  @param  object
      *  @param  retval
      *  @param  type
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int cast(zval *object, zval *retval, int type TSRMLS_DC);
+    static int cast(zval *object, zval *retval, int type);
 
     /**
      *  Function to compare two objects
      *  @param  object1
      *  @param  object2
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int compare(zval *object1, zval *object2 TSRMLS_DC);
+    static int compare(zval *object1, zval *object2);
 
     /**
      *  Methods that are called to serialize/unserialize an object
@@ -349,11 +335,10 @@ public:
      *  @param  buffer      Buffer in which to store the data
      *  @param  buf_len     Size of the bufffer
      *  @param  data        Structure describing the serialize/unserialize data
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int serialize(zval *object, unsigned char **buffer, size_t *buf_len, zend_serialize_data *data TSRMLS_DC);
-    static int unserialize(zval *object, zend_class_entry *entry, const unsigned char *buffer, size_t buf_len, zend_unserialize_data *data TSRMLS_DC);
+    static int serialize(zval *object, unsigned char **buffer, size_t *buf_len, zend_serialize_data *data);
+    static int unserialize(zval *object, zend_class_entry *entry, const unsigned char *buffer, size_t buf_len, zend_unserialize_data *data);
 
     /**
      *  Add a method to the class

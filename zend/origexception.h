@@ -95,7 +95,6 @@ public:
 /**
  *  Global function to process an exception
  *  @param  exception
- *  @param  tsrm_ls
  */
 inline void process(Exception &exception)
 {

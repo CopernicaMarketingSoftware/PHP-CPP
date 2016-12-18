@@ -22,9 +22,8 @@ public:
      *  Constructor
      *  @param  this_ptr    Pointer to the object
      *  @param  argc        Number of arguments
-     *  @param  tsrm_ls
      */
-    ParametersImpl(zval *this_ptr, uint32_t argc TSRMLS_DC) : Parameters(this_ptr ? ObjectImpl::find(this_ptr TSRMLS_CC)->object() : nullptr)
+    ParametersImpl(zval *this_ptr, uint32_t argc) : Parameters(this_ptr ? ObjectImpl::find(this_ptr)->object() : nullptr)
     {
         // reserve plenty of space
         reserve(argc);

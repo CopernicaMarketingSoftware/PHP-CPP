@@ -112,27 +112,24 @@ private:
     /**
      *  Iterator destructor method
      *  @param  iter
-     *  @param  tsrm_ls
      */
-    static void destructor(zend_object_iterator *iter TSRMLS_DC);
+    static void destructor(zend_object_iterator *iter);
 
     /**
      *  Iterator valid function
      *  Returns FAILURE or SUCCESS
      *  @param  iter
-     *  @param  tsrm_ls
      *  @return int
      */
-    static int valid(zend_object_iterator *iter TSRMLS_DC);
+    static int valid(zend_object_iterator *iter);
 
     /**
      *  Fetch the current item
      *
      *  @param  iter    The iterator used to retrieve the value from
-     *  @param  tsrm_ls Thread safety variable
      *  @return The current value of the iterator
      */
-    static zval *current(zend_object_iterator *iter TSRMLS_DC);
+    static zval *current(zend_object_iterator *iter);
 
     /**
      *  Fetch the key for the current element (optional, may be NULL). The key
@@ -141,30 +138,26 @@ private:
      *  used.
      *  @param  iter
      *  @param  data
-     *  @param  tsrm_ls
      */
-    static void key(zend_object_iterator *iter, zval *data TSRMLS_DC);
+    static void key(zend_object_iterator *iter, zval *data);
 
     /**
      *  Step forwards to the next element
      *  @param  iter
-     *  @param  tsrm_ls
      */
-    static void next(zend_object_iterator *iter TSRMLS_DC);
+    static void next(zend_object_iterator *iter);
 
     /**
      *  Rewind the iterator back to the start
      *  @param  iter
-     *  @param  tsrm_ls
      */
-    static void rewind(zend_object_iterator *iter TSRMLS_DC);
+    static void rewind(zend_object_iterator *iter);
     
     /**
      *  Invalidate current object
      *  @param  iter
-     *  @paraam tsrm_ls
      */
-    static void invalidate(zend_object_iterator *iter TSRMLS_DC);
+    static void invalidate(zend_object_iterator *iter);
 
 public:
     /**
