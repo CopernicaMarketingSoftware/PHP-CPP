@@ -206,8 +206,12 @@ Value::Value(const IniValue &value) : Value((const char *)value) {}
  */
 Value::Value(const Value &that)
 {
-    // copy over the zval
-    ZVAL_COPY(_val, that._val);
+    if (Z_ISREF_P(that._val)) {
+        zend_assign_to_variable(_val, that._val, IS_VAR);
+    }
+    else {
+        ZVAL_COPY(_val, that._val);
+    }
 }
 
 /**
@@ -335,39 +339,7 @@ Value &Value::operator=(const Value &value)
     // skip self assignment
     if (this == &value) return *this;
 
-    // is the object a reference?
-    if (Z_ISREF_P(_val))
-    {
-        // the current object is a reference, this means that we should
-        // keep the zval object, and copy the other value into it, get
-        // the current refcount
-        int refcount = Z_REFCOUNT_P(_val);
-
-        // clean up the current zval (but keep the zval structure)
-        zval_dtor(_val);
-
-        // make the copy
-        *_val = *value._val;
-        zval_copy_ctor(_val);
-
-        // restore refcount and reference setting
-        ZVAL_MAKE_REF(_val);
-        Z_SET_REFCOUNT_P(_val, refcount);
-    }
-    else
-    {
-        // destruct the zval (this function will decrement the reference counter,
-        // and only destruct if there are no other references left)
-        zval_ptr_dtor(_val);
-
-        // just copy the zval, and the refcounter
-        _val = value._val;
-
-        // and we have one more reference
-        Z_TRY_ADDREF_P(_val);
-    }
-
-    // update the object
+    zend_assign_to_variable(_val, value._val, IS_VAR);
     return *this;
 }
 
