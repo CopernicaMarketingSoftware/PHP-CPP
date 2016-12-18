@@ -228,8 +228,7 @@ Value::Value(Value &&that)  _NOEXCEPT: _val(that._val)
  */
 Value::~Value()
 {
-    // reduce the refcount - if necessary
-    Z_TRY_DELREF_P(_val);
+    zval_ptr_dtor(_val);
 }
 
 /**
