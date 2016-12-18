@@ -680,7 +680,7 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value TSRMLS_DC
         catch (Exception &exception)
         {
             // process the exception (send it to user space
-            process(exception TSRMLS_CC);
+            process(exception);
         }
     }
     else
@@ -729,7 +729,7 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty TSRMLS_D
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            process(exception TSRMLS_CC);
+            process(exception);
 
             // unreachable
             return false;
@@ -772,7 +772,7 @@ void ClassImpl::unsetDimension(zval *object, zval *member TSRMLS_DC)
         catch (Exception &exception)
         {
             // process the exception (send it to user space)
-            process(exception TSRMLS_CC);
+            process(exception);
         }
     }
     else
@@ -900,7 +900,7 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, void **cache_s
     {
         // user threw an exception in its magic method
         // implementation, send it to user space
-        process(exception TSRMLS_CC);
+        process(exception);
 
         // unreachable
         return Value(nullptr).detach(false);
@@ -969,7 +969,7 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cach
     {
         // user threw an exception in its magic method
         // implementation, send it to user space
-        process(exception TSRMLS_CC);
+        process(exception);
     }
 }
 
@@ -1042,7 +1042,7 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, void **
     {
         // user threw an exception in its magic method
         // implementation, send it to user space
-        process(exception TSRMLS_CC);
+        process(exception);
 
         // unreachable
         return false;
@@ -1095,7 +1095,7 @@ void ClassImpl::unsetProperty(zval *object, zval *member, void **cache_slot TSRM
     {
         // user threw an exception in its magic method
         // implementation, send it to user space
-        process(exception TSRMLS_CC);
+        process(exception);
     }
 }
 
@@ -1128,7 +1128,7 @@ void ClassImpl::destructObject(zend_object *object TSRMLS_DC)
     {
         // a regular Php::Exception was thrown by the extension, pass it on
         // to PHP user space
-        process(exception TSRMLS_CC);
+        process(exception);
     }
 }
 
@@ -1211,7 +1211,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
     catch (Exception &exception)
     {
         // user threw an exception in its method, send it to user space
-        process(exception TSRMLS_CC);
+        process(exception);
 
         // unreachable
         return nullptr;
@@ -1248,7 +1248,7 @@ int ClassImpl::serialize(zval *object, unsigned char **buffer, size_t *buf_len, 
     {
         // user threw an exception in its method
         // implementation, send it to user space
-        process(exception TSRMLS_CC);
+        process(exception);
 
         // unreachable
         return FAILURE;
@@ -1285,8 +1285,8 @@ int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned
     {
         // user threw an exception in its method
         // implementation, send it to user space
-        //process(exception TSRMLS_CC);
-        php_error_docref(NULL TSRMLS_CC, E_NOTICE, "Error while unserializing");
+        //process(exception);
+        php_error_docref(NULL, E_NOTICE, "Error while unserializing");
 
         // unreachable
         return FAILURE;

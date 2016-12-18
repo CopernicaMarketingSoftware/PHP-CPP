@@ -31,14 +31,6 @@ private:
      */
     bool _handled = true;
 
-#ifdef ZTS
-    /**
-     *  When we run in multi-thread mode, we store the thread handle
-     *  @var void***
-     */
-    TSRMLS_D;
-#endif
-
 public:
     /**
      *  Constructor
@@ -46,10 +38,6 @@ public:
      */
     OrigException(zend_object *object) : Exception(std::string{ ZSTR_VAL(object->ce->name), ZSTR_LEN(object->ce->name) })
     {
-#ifdef ZTS
-        // copy tsrm_ls
-        this->TSRMLS_C = TSRMLS_C;
-#endif
     }
 
     /**
@@ -59,10 +47,6 @@ public:
     OrigException(const OrigException &exception) :
         Exception("OrigException"), _handled(exception._handled)
     {
-#ifdef ZTS
-        // copy tsrm_ls
-        TSRMLS_C = exception.TSRMLS_C;
-#endif
     }
 
     /**
@@ -74,11 +58,6 @@ public:
     {
         // set other exception to handled so that it wont do anything on destruction
         exception._handled = true;
-
-#ifdef ZTS
-        // copy tsrm_ls
-        TSRMLS_C = exception.TSRMLS_C;
-#endif
     }
 
     /**
@@ -91,7 +70,7 @@ public:
         if (!_handled) return;
 
         // the exception was handled, so we should clean it up
-        zend_clear_exception(TSRMLS_C);
+        zend_clear_exception();
     }
 
     /**
@@ -118,13 +97,13 @@ public:
  *  @param  exception
  *  @param  tsrm_ls
  */
-inline void process(Exception &exception TSRMLS_DC)
+inline void process(Exception &exception)
 {
     // is this a native exception?
     if (exception.native())
     {
         // the exception is native, call the zend throw method
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), (char *)exception.what(), 0 TSRMLS_CC);
+        zend_throw_exception(zend_exception_get_default(), (char *)exception.what(), 0);
     }
 
     // or does it have its own report function?

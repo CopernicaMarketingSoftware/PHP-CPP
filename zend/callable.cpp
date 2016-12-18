@@ -84,7 +84,7 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
         catch (Exception &exception)
         {
             // process the exception
-            process(exception TSRMLS_CC);
+            process(exception);
         }
     }
 }
