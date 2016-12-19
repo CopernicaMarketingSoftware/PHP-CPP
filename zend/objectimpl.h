@@ -85,7 +85,10 @@ public:
     /**
      *  Destructor
      */
-    virtual ~ObjectImpl() = default;
+    virtual ~ObjectImpl()
+    {
+        zend_object_std_dtor(&_mixed->php);
+    }
 
     /**
      *  Destruct the object
