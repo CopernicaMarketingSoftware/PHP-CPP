@@ -58,15 +58,13 @@ public:
 
     /**
      *  Initialize the class
-     *  @param  tsrmls
      */
-    static void initialize(TSRMLS_D);
+    static void initialize();
 
     /**
      *  Shutdown the class
-     *  @param  tsrmls
      */
-    static void shutdown(TSRMLS_D);
+    static void shutdown();
 
 private:
     /**
