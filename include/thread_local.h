@@ -11,7 +11,7 @@
  */
 
 // are we dealing with an outdated sort of compiler?
-#ifdef _MSC_VER && _MSC_VER < 1500
+#if defined(_MSC_VER) && _MSC_VER < 1500
     // can't use thread_local, but we can use their
     // limited storage scope specifier in this case
     #define thread_local __declspec( thread )
