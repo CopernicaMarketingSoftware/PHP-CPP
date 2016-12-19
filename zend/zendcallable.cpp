@@ -45,7 +45,7 @@ bool ZendCallable::valid(struct _zend_execute_data *execute_data, struct _zval_s
     if (provided >= required) return true;
 
     // retrieve the function name to display the error
-    auto *name = get_active_function_name(TSRMLS_C);
+    auto *name = get_active_function_name();
 
     // we do not have enough input parameters, show a warning about this
     Php::warning << name << "() expects at least " << required << " parameter(s), " << provided << " given" << std::flush;
@@ -66,7 +66,7 @@ bool ZendCallable::valid(struct _zend_execute_data *execute_data, struct _zval_s
 Parameters ZendCallable::parameters(struct _zend_execute_data *execute_data)
 {
     // parse and return the parameters
-    return ParametersImpl{ getThis(), ZEND_NUM_ARGS() TSRMLS_CC };
+    return ParametersImpl{ getThis(), ZEND_NUM_ARGS() };
 }
 
 /**

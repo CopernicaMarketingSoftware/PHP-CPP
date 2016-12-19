@@ -32,14 +32,12 @@ public:
 
     /**
      *  Clone the object
-     *  @param  tsrm_ls
      *  @return ValueIteratorImpl*
      */
     virtual ValueIteratorImpl *clone() = 0;
 
     /**
      *  Increment position (pre-increment)
-     *  @param  tsrm_ls
      *  @return bool
      */
     virtual bool increment() = 0;

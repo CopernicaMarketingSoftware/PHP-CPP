@@ -203,7 +203,6 @@ protected:
      *  @param  return_value_ptr
      *  @param  this_ptr
      *  @param  return_value_used
-     *  @param  tsrm_ls
      *  @return integer
      */
     static void invoke(INTERNAL_FUNCTION_PARAMETERS);
