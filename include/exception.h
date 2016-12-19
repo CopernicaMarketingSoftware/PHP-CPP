@@ -26,9 +26,19 @@ private:
 
     /**
      *  The PHP exception code
-     *  @var    int
+     *  @var    long int
      */
-    int _code;
+    long int _code;
+
+    /**
+     * PHP source file
+     */
+    std::string _file;
+
+    /**
+     * PHP source line
+     */
+    long int _line;
 
     /**
      *  Has this exception been processed by native C++ code?
@@ -41,7 +51,7 @@ public:
      *  Constructor
      *  @param  &string
      */
-    Exception(std::string message, int code = 0) : std::exception(), _message(std::move(message)), _code(code) {}
+    Exception(std::string message, long int code = 0) : std::exception(), _message(std::move(message)), _code(code) {}
 
     /**
      *  Destructor
@@ -67,6 +77,25 @@ public:
     }
 
     /**
+     * Returns the exception code
+     * @return long int
+     */
+    long int code() const _NOEXCEPT
+    {
+        return _code;
+    }
+
+    const std::string& file() const _NOEXCEPT
+    {
+        return _file;
+    }
+
+    long int line() const _NOEXCEPT
+    {
+        return _line;
+    }
+
+    /**
      *  Is this a native exception (one that was thrown from C++ code)
      *  @return bool
      */
@@ -84,6 +113,43 @@ public:
     {
         // this is not done here
         return false;
+    }
+
+protected:
+    /**
+     * Set the message of the exception
+     * @param msg
+     */
+    void setMessage(const std::string& msg)
+    {
+        _message = msg;
+    }
+
+    /**
+     * Set the exception code
+     * @param code
+     */
+    void setCode(long int code)
+    {
+        _code = code;
+    }
+
+    /**
+     * Set the source file
+     * @param file
+     */
+    void setFile(const std::string& file)
+    {
+        _file = file;
+    }
+
+    /**
+     * Set the source line
+     * @param line
+     */
+    void setLine(long int line)
+    {
+        _line = line;
     }
 };
 

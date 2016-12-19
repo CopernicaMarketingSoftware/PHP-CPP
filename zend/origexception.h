@@ -38,6 +38,19 @@ public:
      */
     OrigException(zend_object *object) : Exception(std::string{ ZSTR_VAL(object->ce->name), ZSTR_LEN(object->ce->name) })
     {
+        zval rv;
+        zval ex;
+        ZVAL_OBJ(&ex, object);
+        zend_string* msg  = zval_get_string(zend_read_property(Z_OBJCE(ex), &ex, ZEND_STRL("message"), 1, &rv));
+        zend_string* file = zval_get_string(zend_read_property(Z_OBJCE(ex), &ex, ZEND_STRL("file"), 1, &rv));
+        zend_long   code  = zval_get_long(zend_read_property(Z_OBJCE(ex), &ex, ZEND_STRL("code"), 1, &rv));
+        zend_long   line  = zval_get_long(zend_read_property(Z_OBJCE(ex), &ex, ZEND_STRL("line"), 1, &rv));
+        setMessage(std::string{ ZSTR_VAL(msg), ZSTR_LEN(msg) });
+        setCode(code);
+        setFile(std::string{ ZSTR_VAL(file), ZSTR_LEN(file) });
+        setLine(line);
+        zend_string_release(msg);
+        zend_string_release(file);
     }
 
     /**
