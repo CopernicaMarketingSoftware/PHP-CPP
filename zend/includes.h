@@ -37,7 +37,6 @@
 /**
  *  PHP includes
  */
-#pragma GCC system_header
 #include <php.h>
 #include <zend_exceptions.h>
 #include <zend_interfaces.h>
