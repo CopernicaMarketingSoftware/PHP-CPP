@@ -186,12 +186,9 @@ Value::Value(const Base *object)
     // do we have a handle?
     if (!impl) throw FatalError("Assigning an unassigned object to a variable");
 
-    // set it to an object
-    Z_TYPE_INFO_P(_val) = IS_OBJECT;
-    Z_OBJ_P(_val) = impl->php();
-
-    // increase refcount
-    GC_REFCOUNT(impl->php())++;
+    // set it to an object and increase refcount
+    ZVAL_OBJ(_val, impl->php());
+    Z_ADDREF_P(_val);
 }
 
 /**
