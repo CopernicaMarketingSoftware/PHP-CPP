@@ -1195,11 +1195,7 @@ Value Value::clone(Type type) const
  */
 int64_t Value::numericValue() const
 {
-    // already a long?
-    if (isNumeric()) return Z_LVAL_P(_val);
-
-    // make a clone
-    return clone(Type::Numeric).numericValue();
+    return zval_get_long(_val);
 }
 
 /**
@@ -1229,20 +1225,10 @@ bool Value::boolValue() const
  */
 std::string Value::stringValue() const
 {
-    // what kind of casting do we need to do?
-    switch (type())
-    {
-        case Type::Null:        return {};
-        case Type::False:       return "0";
-        case Type::True:        return "1";
-        case Type::Numeric:     return std::to_string(numericValue());
-        case Type::Float:       return std::to_string(floatValue());
-        case Type::String:      return { Z_STRVAL_P(_val), Z_STRLEN_P(_val) };
-        default:                break;
-    }
-
-    // clone the value and convert it to a string
-    return clone(Type::String).stringValue();
+    zend_string* s  = zval_get_string(_val);
+    std::string ret(ZSTR_VAL(s), ZSTR_LEN(s));
+    zend_string_release(s);
+    return ret;
 }
 
 /**
@@ -1279,11 +1265,7 @@ const char *Value::rawValue() const
  */
 double Value::floatValue() const
 {
-    // already a double
-    if (isFloat()) return Z_DVAL_P(_val);
-
-    // make a clone
-    return clone(Type::Float).floatValue();
+    return zval_get_double(_val);
 }
 
 /**
