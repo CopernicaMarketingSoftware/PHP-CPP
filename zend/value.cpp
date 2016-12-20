@@ -203,12 +203,12 @@ Value::Value(const IniValue &value) : Value((const char *)value) {}
  */
 Value::Value(const Value &that)
 {
-    if (Z_ISREF_P(that._val)) {
-        zend_assign_to_variable(_val, that._val, IS_VAR);
+    zval* z = that._val;
+    while (Z_ISREF_P(z)) {
+        ZVAL_DEREF(z);
     }
-    else {
-        ZVAL_COPY(_val, that._val);
-    }
+
+    ZVAL_COPY(_val, z);
 }
 
 /**
@@ -335,7 +335,14 @@ Value &Value::operator=(const Value &value)
     // skip self assignment
     if (this == &value) return *this;
 
-    zend_assign_to_variable(_val, value._val, IS_VAR);
+    if (Z_REFCOUNTED_P(_val) || Z_ISREF_P(_val) || Z_ISREF_P(value._val)) {
+        zend_assign_to_variable(_val, value._val, IS_CV);
+    }
+    else {
+        zval_ptr_dtor(_val);
+        ZVAL_COPY(_val, value._val);
+    }
+
     return *this;
 }
 
