@@ -1561,7 +1561,7 @@ Value Value::get(const char *key, int size) const
         zval rv;
 
         // read the property
-        zval *property = zend_read_property(nullptr, _val, key, size, 0, &rv);
+        zval *property = zend_read_property(EG(scope), _val, key, size, 0, &rv);
 
         // wrap in value
         return Value(property);
@@ -1630,7 +1630,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
         SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // update the property
-        zend_update_property(nullptr, _val, key, size, value._val);
+        zend_update_property(EG(scope), _val, key, size, value._val);
     }
     else
     {
