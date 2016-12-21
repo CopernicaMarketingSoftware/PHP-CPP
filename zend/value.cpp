@@ -144,30 +144,15 @@ Value::Value(double value)
  */
 Value::Value(struct _zval_struct *val, bool ref)
 {
-    // copy the value over (and add reference if relevant)
-    ZVAL_DUP(_val, val);
-
-    // not refcounted? then there is nothing we can do here
-    // @todo: we should be able to force a reference somehow
-    if (!Z_REFCOUNTED_P(_val)) return;
-
-    // if the variable is not already a reference, and it has more than one
-    // variable pointing to it, we should seperate it so that any changes
-    // we're going to make will not change the other variable
-    if (ref && Z_REFCOUNT_P(_val) > 1)
-    {
-        // separate the zval
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+    if (!ref) {
+        ZVAL_DUP(_val, val);
     }
-
-    // we see ourselves as reference too
-    // Z_ADDREF_P(_val); // ZVAL_DUP will increment reference count for refcounted types
-
-    // we're ready if we do not have to force it as a reference
-    if (!ref || Z_ISREF_P(_val)) return;
-
-    // make this a reference
-    ZVAL_MAKE_REF(_val);
+    else {
+        ZVAL_MAKE_REF(val);
+        zend_reference *ref = Z_REF_P(val);
+        ++GC_REFCOUNT(ref);
+        ZVAL_REF(_val, ref);
+    }
 }
 
 /**
@@ -203,19 +188,46 @@ Value::Value(const IniValue &value) : Value((const char *)value) {}
  */
 Value::Value(const Value &that)
 {
-    zval* z = that._val;
-    while (Z_ISREF_P(z)) {
-        ZVAL_DEREF(z);
+    zval* b = that._val;
+    zval* a = _val;
+
+    if (Z_ISREF_P(b)) {
+        ZVAL_DEREF(b);
     }
 
-    ZVAL_COPY(_val, z);
+    ZVAL_COPY(a, b);
+}
+
+/**
+ * Creates a reference to another Value
+ *
+ * Value a = Value::makeReference(b);
+ *
+ * is equivalent to
+ *
+ * $a = &$b;
+ *
+ * @param to Variable to which the reference should be created
+ * @return Value
+ */
+Value Value::makeReference(const Value& to)
+{
+    Value res;
+    zval* b = to._val;
+    zval* a = res._val;
+
+    ZVAL_MAKE_REF(b);
+    zend_reference *ref = Z_REF_P(b);
+    GC_REFCOUNT(ref)++;
+    ZVAL_REF(a, ref);
+    return res;
 }
 
 /**
  *  Move constructor
  *  @param  value
  */
-Value::Value(Value &&that)  _NOEXCEPT: _val(that._val)
+Value::Value(Value &&that)  _NOEXCEPT
 {
     // initialize to be undefined
     ZVAL_UNDEF(_val);
@@ -325,6 +337,57 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
     return *this;
 }
 
+Value& Value::operator=(struct _zval_struct* b)
+{
+    zval* a = _val;
+
+    // Dereference values
+    if (Z_ISREF_P(b)) {
+        b = Z_REFVAL_P(b);
+    }
+
+    if (Z_ISREF_P(a)) {
+        a = Z_REFVAL_P(a);
+    }
+
+    if (Z_IMMUTABLE_P(a)) {
+        throw Exception("Cannot assign to an immutable variable");
+    }
+
+    if (Z_REFCOUNTED_P(a)) {
+        // SURPRISE - Objects can have their own assignment handler)
+        if (Z_TYPE_P(a) == IS_OBJECT && Z_OBJ_HANDLER_P(a, set)) {
+            Z_OBJ_HANDLER_P(a, set)(a, b);
+            return *this;
+        }
+
+        if (a == b) {
+            return *this;
+        }
+
+        if (Z_REFCOUNT_P(a) == 1) {
+            // Technically we need to call Z_DELREF_P(a) before zval_dtor(a) and Z_ADDREF_P(a) after ZVAL_COPY_VALUE(a, b)
+            // but (-1 + 1) == 0
+            zval_dtor(a);
+            ZVAL_COPY_VALUE(a, b);
+
+            assert(Z_REFCOUNT_P(a) == 1);
+            return *this;
+        }
+
+        // It is possible to make IS_REF point to another IS_REF, but that's a bug
+        assert(Z_TYPE_P(a) != IS_REFERENCE);
+        assert(Z_REFCOUNT_P(a) > 1);
+
+        // Separate variable
+        zval_ptr_dtor(a); // this will decrement the reference count and invoke GC_ZVAL_CHECK_FOR_POSSIBLE_ROOT()
+        zval_copy_ctor_func(a);
+    }
+
+    ZVAL_COPY(a, b);
+    return *this;
+}
+
 /**
  *  Assignment operator
  *  @param  value
@@ -332,20 +395,8 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
  */
 Value &Value::operator=(const Value &value)
 {
-    // skip self assignment
-    if (this == &value) return *this;
-
-    if (Z_REFCOUNTED_P(_val) || Z_ISREF_P(_val) || Z_ISREF_P(value._val)) {
-        zend_assign_to_variable(_val, value._val, IS_CV);
-    }
-    else {
-        zval_ptr_dtor(_val);
-        ZVAL_COPY(_val, value._val);
-    }
-
-    return *this;
+    return operator=(value._val);
 }
-
 
 /**
  *  Assignment operator
@@ -354,17 +405,10 @@ Value &Value::operator=(const Value &value)
  */
 Value &Value::operator=(std::nullptr_t value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // change to null value
-    ZVAL_NULL(_val);
-
-    // update the object
-    return *this;
+    ZVAL_NULL(&z);
+    return operator=(&z);
 }
 
 /**
@@ -374,17 +418,10 @@ Value &Value::operator=(std::nullptr_t value)
  */
 Value &Value::operator=(int16_t value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new value
-    ZVAL_LONG(_val, value);
-
-    // update the object
-    return *this;
+    ZVAL_LONG(&z, value);
+    return operator=(&z);
 }
 
 /**
@@ -394,17 +431,10 @@ Value &Value::operator=(int16_t value)
  */
 Value &Value::operator=(int32_t value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new value
-    ZVAL_LONG(_val, value);
-
-    // update the object
-    return *this;
+    ZVAL_LONG(&z, value);
+    return operator=(&z);
 }
 
 /**
@@ -414,17 +444,10 @@ Value &Value::operator=(int32_t value)
  */
 Value &Value::operator=(int64_t value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new value
-    ZVAL_LONG(_val, value);
-
-    // update the object
-    return *this;
+    ZVAL_LONG(&z, value);
+    return operator=(&z);
 }
 
 /**
@@ -434,17 +457,10 @@ Value &Value::operator=(int64_t value)
  */
 Value &Value::operator=(bool value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new value
-    ZVAL_BOOL(_val, value);
-
-    // update the object
-    return *this;
+    ZVAL_BOOL(&z, value);
+    return operator=(&z);
 }
 
 /**
@@ -454,16 +470,11 @@ Value &Value::operator=(bool value)
  */
 Value &Value::operator=(char value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new value
-    ZVAL_STRINGL(_val, &value, 1);
-
-    // update the object
+    ZVAL_STRINGL(&z, &value, 1);
+    operator=(&z);
+    zval_dtor(&z);
     return *this;
 }
 
@@ -474,16 +485,17 @@ Value &Value::operator=(char value)
  */
 Value &Value::operator=(const std::string &value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
+    if (value.size()) {
+        ZVAL_STRINGL(&z, value.c_str(), value.size());
+    }
+    else {
+        ZVAL_EMPTY_STRING(&z);
+    }
 
-    // set new value
-    ZVAL_STRINGL(_val, value.c_str(), value.size());
-
-    // update the object
+    operator=(&z);
+    zval_dtor(&z);
     return *this;
 }
 
@@ -494,16 +506,17 @@ Value &Value::operator=(const std::string &value)
  */
 Value &Value::operator=(const char *value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
+    if (value) {
+        ZVAL_STRINGL(&z, value, std::strlen(value));
+    }
+    else {
+        ZVAL_EMPTY_STRING(&z);
+    }
 
-    // set new value
-    ZVAL_STRINGL(_val, value, ::strlen(value));
-
-    // update the object
+    operator=(&z);
+    zval_dtor(&z);
     return *this;
 }
 
@@ -514,17 +527,10 @@ Value &Value::operator=(const char *value)
  */
 Value &Value::operator=(double value)
 {
-    // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    zval z;
 
-    // deallocate current zval (without cleaning the zval structure)
-    zval_dtor(_val);
-
-    // set new value
-    ZVAL_DOUBLE(_val, value);
-
-    // update the object
-    return *this;
+    ZVAL_DOUBLE(&z, value);
+    return operator=(&z);
 }
 
 /**
@@ -1750,6 +1756,25 @@ Base *Value::implementation() const
 
     // retrieve the mixed object that contains the base
     return ObjectImpl::find(_val)->object();
+}
+
+std::string Value::debugZval() const
+{
+    std::string s;
+    zval* z = _val;
+
+    s = "[type=" + std::to_string(static_cast<int>(Z_TYPE_P(z)))
+      + " refcounted=" + std::to_string(Z_REFCOUNTED_P(z))
+      + " isref=" + std::to_string(Z_ISREF_P(z))
+      + " refcount=" + std::to_string(Z_REFCOUNTED_P(z) ? Z_REFCOUNT_P(z) : 0)
+      + "] "
+    ;
+
+    zend_string* zs = zval_get_string(z);
+    s += std::string(ZSTR_VAL(zs), ZSTR_LEN(zs));
+    zend_string_release(zs);
+
+    return s;
 }
 
 /**
