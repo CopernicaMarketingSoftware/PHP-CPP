@@ -1091,6 +1091,10 @@ public:
     bool derivedFrom(const char *classname, bool allowString = false) const { return derivedFrom(classname, strlen(classname), allowString); }
     bool derivedFrom(const std::string &classname, bool allowString = false) const { return derivedFrom(classname.c_str(), classname.size(), allowString); }
 
+    /**
+     * @internal
+     */
+    std::string debugZval() const;
 
 private:
     /**
@@ -1130,11 +1134,6 @@ private:
      * @internal
      */
     Value& operator=(struct _zval_struct* v);
-
-    /**
-     * @internal
-     */
-    std::string debugZval() const;
 
 protected:
     /**
