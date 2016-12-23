@@ -35,7 +35,7 @@ public:
         zend_get_parameters_array_ex(argc, arguments);
 
         // loop through the arguments
-        for (int i=0; i<argc; i++)
+        for (uint32_t i=0; i<argc; i++)
         {
             // append value
             emplace_back(&arguments[i]);
