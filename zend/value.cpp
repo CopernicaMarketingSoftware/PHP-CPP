@@ -216,6 +216,7 @@ Value Value::makeReference(const Value& to)
     zval* b = to._val;
     zval* a = res._val;
 
+    // Optimized version of zend_assign_to_variable_reference()
     ZVAL_MAKE_REF(b);
     zend_reference *ref = Z_REF_P(b);
     GC_REFCOUNT(ref)++;
@@ -265,6 +266,7 @@ Php::Zval Value::detach(bool keeprefcount)
     ZVAL_COPY_VALUE(result, _val);
 
     // should we keep the reference count?
+    /// FIXME: what if reference count will become 0? Maybe we should call zval_ptr_dtor()
     if (!keeprefcount) Z_TRY_DELREF_P(_val);
 
     // we no longer represent a valid value
@@ -354,32 +356,37 @@ Value& Value::operator=(struct _zval_struct* b)
         throw Exception("Cannot assign to an immutable variable");
     }
 
+    // If the destination is refcounted
     if (Z_REFCOUNTED_P(a)) {
-        // SURPRISE - Objects can have their own assignment handler)
+        // Objects can have their own assignment handler
         if (Z_TYPE_P(a) == IS_OBJECT && Z_OBJ_HANDLER_P(a, set)) {
             Z_OBJ_HANDLER_P(a, set)(a, b);
             return *this;
         }
 
+        // If a and b are the same, there is nothing left to do
         if (a == b) {
-            return *this;
-        }
-
-        if (Z_REFCOUNT_P(a) == 1) {
-            zval_dtor(a);
-            ZVAL_COPY(a, b);
             return *this;
         }
 
         // It is possible to make IS_REF point to another IS_REF, but that's a bug
         assert(Z_TYPE_P(a) != IS_REFERENCE);
-        assert(Z_REFCOUNT_P(a) > 1);
 
-        // Separate variable
-        zval_ptr_dtor(a); // this will decrement the reference count and invoke GC_ZVAL_CHECK_FOR_POSSIBLE_ROOT()
-        zval_copy_ctor_func(a);
+        if (Z_REFCOUNT_P(a) > 1) {
+            // If reference count is greater than 1, we need to separate zval
+            // This is the optimized version of SEPARATE_ZVAL_NOREF()
+            if (Z_COPYABLE_P(a)) {
+                zval_ptr_dtor(a); // this will decrement the reference count and invoke GC_ZVAL_CHECK_FOR_POSSIBLE_ROOT()
+                zval_copy_ctor_func(a);
+            }
+        }
+        else {  // Z_REFCOUNT_P(a) == 1
+            // Destroy the current value of the variable and free up resources
+            zval_dtor(a);
+        }
     }
 
+    // Copy the value of b to a and increment the reference count if necessary
     ZVAL_COPY(a, b);
     return *this;
 }
