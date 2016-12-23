@@ -1071,10 +1071,10 @@ Value &Value::setType(Type type) &
     case Type::Array:           convert_to_array(_val);                                                                 break;
     case Type::Object:          convert_to_object(_val);                                                                break;
     case Type::String:          convert_to_string(_val);                                                                break;
-    case Type::Resource:        throw FatalError{ "Resource types can not be handled by the PHP-CPP library"         }; break;
-    case Type::Constant:        throw FatalError{ "Constant types can not be assigned to a PHP-CPP library variable" }; break;
-    case Type::ConstantAST:     throw FatalError{ "Constant types can not be assigned to a PHP-CPP library variable" }; break;
-    case Type::Callable:        throw FatalError{ "Callable types can not be assigned to a PHP-CPP library variable" }; break;
+    case Type::Resource:        throw FatalError{ "Resource types cannot be handled by the PHP-CPP library"          }; break;
+    case Type::Constant:        throw FatalError{ "Constant types cannot be assigned to a PHP-CPP library variable"  }; break;
+    case Type::ConstantAST:     throw FatalError{ "Constant types cannot be assigned to a PHP-CPP library variable"  }; break;
+    case Type::Callable:        throw FatalError{ "Callable types cannot be assigned to a PHP-CPP library variable"  }; break;
     case Type::Reference:       throw FatalError{ "Reference types cannot be assigned to a PHP-CPP library variable" }; break;
     }
 
@@ -1761,6 +1761,12 @@ Base *Value::implementation() const
     return ObjectImpl::find(_val)->object();
 }
 
+/**
+ * This function is used in tests to make sure that the way we assign
+ * variable is consistent with that of PHP.
+ *
+ * @internal
+ */
 std::string Value::debugZval() const
 {
     std::string s;
