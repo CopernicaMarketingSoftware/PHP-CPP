@@ -366,12 +366,8 @@ Value& Value::operator=(struct _zval_struct* b)
         }
 
         if (Z_REFCOUNT_P(a) == 1) {
-            // Technically we need to call Z_DELREF_P(a) before zval_dtor(a) and Z_ADDREF_P(a) after ZVAL_COPY_VALUE(a, b)
-            // but (-1 + 1) == 0
             zval_dtor(a);
-            ZVAL_COPY_VALUE(a, b);
-
-            assert(Z_REFCOUNT_P(a) == 1);
+            ZVAL_COPY(a, b);
             return *this;
         }
 
