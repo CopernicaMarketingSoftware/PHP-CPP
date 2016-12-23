@@ -8,6 +8,8 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
 
+#include <cstring>
+
 /**
  *  Set up namespace
  */
@@ -25,10 +27,9 @@ public:
      *  Extension writers do not have to access the super-globals themselves.
      *  They are always accessible via Php::POST, Php::GET, et cetera.
      *
-     *  @param  index   index number
      *  @param  name    name of the variable in PHP
      */
-    Super(int index, const char *name) : _index(index), _name(name) {}
+    Super(const char *name) : _ziag_called(false), _name(name) {}
 
     /**
      *  Destructor
@@ -44,7 +45,7 @@ public:
     Value operator[](const std::string &key)
     {
         // convert object to a value object, and retrieve the key
-        return value().get(key);
+        return getKey(key.c_str(), key.size());
     }
 
     /**
@@ -56,7 +57,7 @@ public:
     Value operator[](const char *key)
     {
         // convert object to a value object, and retrieve the key
-        return value().get(key);
+        return getKey(key, std::strlen(key));
     }
 
     /**
@@ -91,10 +92,9 @@ public:
 
 private:
     /**
-     *  Index number
-     *  @var    int
+     *  Whether @c zend_is_auto_global() was called for this superglobal
      */
-    int _index;
+    bool _ziag_called;
 
     /**
      *  Name of the variable in PHP
@@ -103,11 +103,22 @@ private:
     const char *_name;
 
     /**
+     * Calls @c zend_is_auto_global() if necessary and looks up this superglobal in the symbol table
+     * @internal
+     */
+    struct _zval_struct* resolve();
+
+    /**
      *  Turn the object into a value object
      *  @return Value
      */
     Value value();
 
+    /**
+     * Returns @c SUPERGLOBAL[key].
+     * If there is no @c key index, it gets created
+     */
+    Value getKey(const char* key, std::size_t len);
 };
 
 /**
