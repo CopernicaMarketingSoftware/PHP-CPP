@@ -1532,8 +1532,13 @@ Value Value::get(const char *key, int size) const
         // temporary value for holding any error
         zval rv;
 
+#if PHP_VERSION_ID < 70100
+        zend_class_entry* scope = EG(scope);
+#else
+        zend_class_entry* scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
+#endif
         // read the property
-        zval *property = zend_read_property(EG(scope), _val, key, size, 0, &rv);
+        zval *property = zend_read_property(scope, _val, key, size, 0, &rv);
 
         // wrap in value
         return Value(property);
@@ -1602,7 +1607,12 @@ void Value::setRaw(const char *key, int size, const Value &value)
         SEPARATE_ZVAL_IF_NOT_REF(_val);
 
         // update the property
-        zend_update_property(EG(scope), _val, key, size, value._val);
+#if PHP_VERSION_ID < 70100
+        zend_class_entry* scope = EG(scope);
+#else
+        zend_class_entry* scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
+#endif
+        zend_update_property(scope, _val, key, size, value._val);
     }
     else
     {
