@@ -266,7 +266,8 @@ Php::Zval Value::detach(bool keeprefcount)
     ZVAL_COPY_VALUE(result, _val);
 
     // should we keep the reference count?
-    /// FIXME: what if reference count will become 0? Maybe we should call zval_ptr_dtor()
+    /// FIXME: what if reference count becomes 0?
+    /// Maybe we should call zval_ptr_dtor()?
     if (!keeprefcount) Z_TRY_DELREF_P(_val);
 
     // we no longer represent a valid value
