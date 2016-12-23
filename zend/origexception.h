@@ -96,7 +96,7 @@ public:
  *  Global function to process an exception
  *  @param  exception
  */
-inline void process(Exception &exception)
+static inline void process(Exception &exception)
 {
     // is this a native exception?
     if (exception.native())
