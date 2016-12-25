@@ -29,7 +29,7 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 
     // Sanity check
     assert(info[argc+1].class_name == nullptr && info[argc+1].name == nullptr);
-    assert(info[argc+1].class_name != nullptr && info[argc+2].name == nullptr);
+    assert(info[argc+2].class_name != nullptr && info[argc+2].name == nullptr);
 
     // the callable we are retrieving
     Callable *callable = reinterpret_cast<Callable*>(info[argc+2].class_name);
