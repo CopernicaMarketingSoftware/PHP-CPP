@@ -41,7 +41,7 @@ public:
      *  Copy constructor
      *  @param  that
      */
-    NativeFunction(const NativeFunction &that) : Callable(that), _function(that._function), _type(that._type) {}
+    NativeFunction(const NativeFunction &that) = delete;
 
     /**
      *  Move constructor

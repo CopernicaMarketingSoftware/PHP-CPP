@@ -35,7 +35,7 @@ public:
         _callback(callback),
         _name(name),
         _argc(arguments.size()),
-        _argv(new zend_internal_arg_info[_argc + 1])
+        _argv(new zend_internal_arg_info[_argc + 3])
     {
         // the first record is initialized with information about the function,
         // so we skip that here
@@ -50,6 +50,11 @@ public:
             // fill the arg info
             fill(&_argv[i++], argument);
         }
+
+        _argv[i].class_name   = nullptr;
+        _argv[i].name         = nullptr;
+        _argv[i+1].class_name = nullptr;
+        _argv[i+1].name       = nullptr;
     }
 
     /**
@@ -65,14 +70,7 @@ public:
      *  Copy constructor
      *  @param  that
      */
-    Callable(const Callable &that) :
-        _name(that._name),
-        _return(that._return),
-        _required(that._required),
-        _argc(that._argc),
-        _argv(nullptr) {}
-        // @todo: we have no arguments after copy? is this correct?
-        // we do have the argument count though...
+    Callable(const Callable &that) = delete;
 
     /**
      *  Move constructor
