@@ -144,13 +144,24 @@ Value::Value(double value)
  */
 Value::Value(struct _zval_struct *val, bool ref)
 {
-    if (!ref) {
+    // do we have to force a reference?
+    if (!ref)
+    {
+        // we don't, simply duplicate the value
         ZVAL_DUP(_val, val);
     }
-    else {
+    else
+    {
+        // make sure the value is a reference
         ZVAL_MAKE_REF(val);
+
+        // retrieve the reference
         zend_reference *ref = Z_REF_P(val);
+
+        // increment refcount
         ++GC_REFCOUNT(ref);
+
+        // store the reference in our value
         ZVAL_REF(_val, ref);
     }
 }
@@ -188,20 +199,21 @@ Value::Value(const IniValue &value) : Value((const char *)value) {}
  */
 Value::Value(const Value &that)
 {
-    zval* b = that._val;
-    zval* a = _val;
+    // retrieve value to copy from and to
+    zval* from = that._val;
+    zval* to   = _val;
 
-    if (Z_ISREF_P(b)) {
-        ZVAL_DEREF(b);
-    }
+    // make sure it is not a reference
+    ZVAL_DEREF(from);
 
-    ZVAL_COPY(a, b);
+    // copy the value
+    ZVAL_COPY(to, from);
 }
 
 /**
  * Creates a reference to another Value
  *
- * Value a = Value::makeReference(b);
+ * Value a = b.makeReference();
  *
  * is equivalent to
  *
@@ -210,18 +222,29 @@ Value::Value(const Value &that)
  * @param to Variable to which the reference should be created
  * @return Value
  */
-Value Value::makeReference(const Value& to)
+Value Value::makeReference()
 {
-    Value res;
-    zval* b = to._val;
-    zval* a = res._val;
+    // the result value
+    Value result;
 
-    // Optimized version of zend_assign_to_variable_reference()
-    ZVAL_MAKE_REF(b);
-    zend_reference *ref = Z_REF_P(b);
+    // the value we are making a reference to and the reference to create
+    zval* from = _val;
+    zval* to   = result._val;
+
+    // make sure it is a reference
+    ZVAL_MAKE_REF(from);
+
+    // retriece the reference
+    zend_reference *ref = Z_REF_P(from);
+
+    // increment reference count
     GC_REFCOUNT(ref)++;
-    ZVAL_REF(a, ref);
-    return res;
+
+    // copy the reference
+    ZVAL_REF(to, ref);
+
+    // return the result
+    return result;
 }
 
 /**
@@ -340,55 +363,62 @@ Value &Value::operator=(Value &&value) _NOEXCEPT
     return *this;
 }
 
-Value& Value::operator=(struct _zval_struct* b)
+/**
+ *  Assign a raw zval structure
+ *
+ *  @param  value   The value to assign
+ *  @return Value
+ */
+Value& Value::operator=(struct _zval_struct* value)
 {
-    zval* a = _val;
+    // the value to assign to
+    zval* to = _val;
 
     // Dereference values
-    if (Z_ISREF_P(b)) {
-        b = Z_REFVAL_P(b);
-    }
+    if (Z_ISREF_P(value))   value = Z_REFVAL_P(value);
+    if (Z_ISREF_P(to))      to    = Z_REFVAL_P(to);
 
-    if (Z_ISREF_P(a)) {
-        a = Z_REFVAL_P(a);
-    }
-
-    if (Z_IMMUTABLE_P(a)) {
-        throw Exception("Cannot assign to an immutable variable");
-    }
+    // check if we are allowed to update this value
+    if (Z_IMMUTABLE_P(to)) throw Exception("Cannot assign to an immutable variable");
 
     // If the destination is refcounted
-    if (Z_REFCOUNTED_P(a)) {
-        // Objects can have their own assignment handler
-        if (Z_TYPE_P(a) == IS_OBJECT && Z_OBJ_HANDLER_P(a, set)) {
-            Z_OBJ_HANDLER_P(a, set)(a, b);
+    if (Z_REFCOUNTED_P(to))
+    {
+        // objects can have their own assignment handler
+        if (Z_TYPE_P(to) == IS_OBJECT && Z_OBJ_HANDLER_P(to, set))
+        {
+            Z_OBJ_HANDLER_P(to, set)(to, value);
             return *this;
         }
 
-        // If a and b are the same, there is nothing left to do
-        if (a == b) {
-            return *this;
-        }
+        // If to and from are the same, there is nothing left to do
+        if (to == value) return *this;
 
         // It is possible to make IS_REF point to another IS_REF, but that's a bug
-        assert(Z_TYPE_P(a) != IS_REFERENCE);
+        assert(Z_TYPE_P(to) != IS_REFERENCE);
 
-        if (Z_REFCOUNT_P(a) > 1) {
+        if (Z_REFCOUNT_P(to) > 1)
+        {
             // If reference count is greater than 1, we need to separate zval
             // This is the optimized version of SEPARATE_ZVAL_NOREF()
-            if (Z_COPYABLE_P(a)) {
-                zval_ptr_dtor(a); // this will decrement the reference count and invoke GC_ZVAL_CHECK_FOR_POSSIBLE_ROOT()
-                zval_copy_ctor_func(a);
+            if (Z_COPYABLE_P(to))
+            {
+                // this will decrement the reference count and invoke GC_ZVAL_CHECK_FOR_POSSIBLE_ROOT()
+                zval_ptr_dtor(to);
+                zval_copy_ctor_func(to);
             }
         }
-        else {  // Z_REFCOUNT_P(a) == 1
+        else
+        {
             // Destroy the current value of the variable and free up resources
-            zval_dtor(a);
+            zval_dtor(to);
         }
     }
 
     // Copy the value of b to a and increment the reference count if necessary
-    ZVAL_COPY(a, b);
+    ZVAL_COPY(to, value);
+
+    // allow chaining
     return *this;
 }
 

@@ -135,16 +135,15 @@ public:
     /**
      * Creates a reference to another Value
      *
-     * Value a = Value::makeReference(b);
+     * Value a = b.makeReference();
      *
      * is equivalent to
      *
      * $a = &$b;
      *
-     * @param to Variable to which the reference should be created
      * @return Value
      */
-    static Value makeReference(const Value& to);
+    Value makeReference();
 
     /**
      *  Move constructor
@@ -1128,12 +1127,12 @@ private:
     int refcount() const;
 
     /**
-     * Assigns @c this value a variable @v.
-     * This is where all assignment magic happens.
-     * @return Value
-     * @internal
+     *  Assign a raw zval structure
+     *
+     *  @param  value   The value to assign
+     *  @return Value
      */
-    Value& operator=(struct _zval_struct* v);
+    Value& operator=(struct _zval_struct* value);
 
 protected:
     /**

@@ -132,7 +132,7 @@ public:
      *  Derefecence, this returns a std::pair with the current key and value
      *  @return std::pair
      */
-    virtual const std::pair<Value,Value> &current() const
+    virtual const std::pair<Value,Value> &current() const override
     {
         return _data;
     }
