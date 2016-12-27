@@ -133,6 +133,20 @@ public:
     Value(const Value &that);
 
     /**
+     * Creates a reference to another Value
+     *
+     * Value a = Value::makeReference(b);
+     *
+     * is equivalent to
+     *
+     * $a = &$b;
+     *
+     * @param to Variable to which the reference should be created
+     * @return Value
+     */
+    static Value makeReference(const Value& to);
+
+    /**
      *  Move constructor
      *  @param  value
      */
@@ -1077,6 +1091,10 @@ public:
     bool derivedFrom(const char *classname, bool allowString = false) const { return derivedFrom(classname, strlen(classname), allowString); }
     bool derivedFrom(const std::string &classname, bool allowString = false) const { return derivedFrom(classname.c_str(), classname.size(), allowString); }
 
+    /**
+     * @internal
+     */
+    std::string debugZval() const;
 
 private:
     /**
@@ -1108,6 +1126,14 @@ private:
      *  @return int
      */
     int refcount() const;
+
+    /**
+     * Assigns @c this value a variable @v.
+     * This is where all assignment magic happens.
+     * @return Value
+     * @internal
+     */
+    Value& operator=(struct _zval_struct* v);
 
 protected:
     /**
