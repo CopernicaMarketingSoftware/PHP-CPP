@@ -134,17 +134,7 @@ bool define(const std::string &name, const Value &value)
 bool defined(const char *name, size_t size)
 {
     // retrieve the constant
-    auto *value = zend_get_constant_ex(String{ name, size }, nullptr, ZEND_FETCH_CLASS_SILENT);
-
-    // check if the value was found
-    if (!value) return false;
-
-    // constant exists, but the returned zval should first be destructed
-    // @todo: is this necessary in PHP 7?
-    zval_dtor(value);
-
-    // done
-    return true;
+    return zend_get_constant_ex(String{ name, size }, nullptr, ZEND_FETCH_CLASS_SILENT) != nullptr;
 }
 
 /**
