@@ -55,7 +55,7 @@ public:
      *  Copy and move constructors
      *  @param  that
      */
-    Method(const Method &that) : Callable(that), _type(that._type), _flags(that._flags), _callback(that._callback) {}
+    Method(const Method &that) = delete;
     Method(Method &&that) : Callable(std::move(that)), _type(that._type), _flags(that._flags), _callback(that._callback) {}
 
     /**
