@@ -37,9 +37,7 @@ public:
     /**
      *  Destructor
      */
-    virtual ~FatalError() throw()
-    {
-    }
+    virtual ~FatalError() = default;
 
     /**
      *  Is this a native exception (one that was thrown from C++ code)
