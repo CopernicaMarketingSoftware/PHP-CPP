@@ -6,6 +6,7 @@
  *  @copyright 2013, 2014 Copernica BV
  */
 #include <exception>
+#include <string>
 
 /**
  *  Set up namespace
@@ -17,41 +18,20 @@ namespace Php {
  */
 class PHPCPP_EXPORT Exception : public std::exception
 {
-private:
+protected:
     /**
      *  The exception message
      *  @var    char*
      */
     std::string _message;
 
-    /**
-     *  The PHP exception code
-     *  @var    long int
-     */
-    long int _code;
-
-    /**
-     * PHP source file
-     */
-    std::string _file;
-
-    /**
-     * PHP source line
-     */
-    long int _line;
-
-    /**
-     *  Has this exception been processed by native C++ code?
-     *  @var    bool
-     */
-    bool _processed = false;
-
 public:
     /**
      *  Constructor
-     *  @param  &string
+     *
+     *  @param  message The exception message
      */
-    Exception(std::string message, long int code = 0) : std::exception(), _message(std::move(message)), _code(code) {}
+    Exception(std::string message) : _message(std::move(message)) {}
 
     /**
      *  Destructor
@@ -78,21 +58,52 @@ public:
 
     /**
      * Returns the exception code
-     * @return long int
+     *
+     *  @note   This only works if the exception was originally
+     *          thrown in PHP userland. If the native() member
+     *          function returns true, this function will not
+     *          be able to correctly provide the filename.
+     *
+     * @return The exception code
      */
-    long int code() const _NOEXCEPT
+    virtual long int code() const _NOEXCEPT
     {
-        return _code;
+        return -1;
     }
 
-    const std::string& file() const _NOEXCEPT
+    /**
+     *  Retrieve the filename the exception was thrown in
+     *
+     *  @note   This only works if the exception was originally
+     *          thrown in PHP userland. If the native() member
+     *          function returns true, this function will not
+     *          be able to correctly provide the filename.
+     *
+     *  @return The filename the exception was thrown in
+     */
+    virtual const std::string& file() const _NOEXCEPT
     {
-        return _file;
+        // we don't know the file the exception is from
+        static std::string file{ "<filename unknown>" };
+
+        // return the missing filename
+        return file;
     }
 
-    long int line() const _NOEXCEPT
+    /**
+     *  Retrieve the line at which the exception was thrown
+     *
+     *  @note   This only works if the exception was originally
+     *          thrown in PHP userland. If the native() member
+     *          function returns true, this function will not
+     *          be able to correctly provide the line number.
+     *
+     *  @return The line number the exception was thrown at
+     */
+    virtual long int line() const _NOEXCEPT
     {
-        return _line;
+        // we don't know the file the exception is from
+        return -1;
     }
 
     /**
@@ -113,43 +124,6 @@ public:
     {
         // this is not done here
         return false;
-    }
-
-protected:
-    /**
-     * Set the message of the exception
-     * @param msg
-     */
-    void setMessage(const std::string& msg)
-    {
-        _message = msg;
-    }
-
-    /**
-     * Set the exception code
-     * @param code
-     */
-    void setCode(long int code)
-    {
-        _code = code;
-    }
-
-    /**
-     * Set the source file
-     * @param file
-     */
-    void setFile(const std::string& file)
-    {
-        _file = file;
-    }
-
-    /**
-     * Set the source line
-     * @param line
-     */
-    void setLine(long int line)
-    {
-        _line = line;
     }
 };
 
