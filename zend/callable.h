@@ -35,7 +35,7 @@ public:
         _callback(callback),
         _name(name),
         _argc(arguments.size()),
-        _argv(new zend_internal_arg_info[_argc + 1])
+        _argv(new zend_internal_arg_info[_argc + 2])
     {
         // the first record is initialized with information about the function,
         // so we skip that here
@@ -50,6 +50,10 @@ public:
             // fill the arg info
             fill(&_argv[i++], argument);
         }
+
+        // initialize the extra argument
+        _argv[i].class_name = nullptr;
+        _argv[i].name       = nullptr;
     }
 
     /**

@@ -14,16 +14,6 @@
 namespace Php {
 
 /**
- *  Map function names to their implementation
- *
- *  This is braindead, there should be a way to get this information
- *  from the "This" zval in the execute_data, I just can't find it
- *  @todo   Find a better way for this
- *  @var    std::map<std::string, Callable*>
- */
-static std::map<std::string, Callable*> callables;
-
-/**
  *  Function that is called by the Zend engine every time that a function gets called
  *  @param  ht
  *  @param  return_value
@@ -34,34 +24,21 @@ static std::map<std::string, Callable*> callables;
  */
 void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 {
-    // find the function name
-    const char *name = get_active_function_name();
-    const char *classname = get_active_class_name(nullptr);
+    uint32_t argc       = EX(func)->common.num_args;
+    zend_arg_info* info = EX(func)->common.arg_info;
+
+    // Sanity check
+    assert(info[argc].class_name != nullptr && info[argc].name == nullptr);
 
     // the callable we are retrieving
-    Callable *callable = nullptr;
-
-    // are we invoking a member function?
-    if (classname && classname[0])
-    {
-        // construct the full name to search for
-        auto fullname = std::string{ classname } + "::" + name;
-
-        // and find the callable in the map
-        callable = callables.find(fullname)->second;
-    }
-    else
-    {
-        // retrieve the callable from the map without mangling
-        callable = callables.find(name)->second;
-    }
+    Callable *callable = reinterpret_cast<Callable*>(info[argc].class_name);
 
     // check if sufficient parameters were passed (for some reason this check
     // is not done by Zend, so we do it here ourselves)
     if (ZEND_NUM_ARGS() < callable->_required)
     {
         // PHP itself only generates a warning when this happens, so we do the same too
-        Php::warning << name << "() expects at least " << callable->_required << " parameter(s), " << ZEND_NUM_ARGS() << " given" << std::flush;
+        Php::warning << get_active_function_name() << "() expects at least " << callable->_required << " parameter(s), " << ZEND_NUM_ARGS() << " given" << std::flush;
 
         // and we return null
         RETURN_NULL();
@@ -109,22 +86,8 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
     }
     else
     {
-        // if we have a classname we have to combine the two for a unique name
-        // otherwise similar functions  - like __construct - will overwrite functions
-        // declared before
-        if (classname)
-        {
-            // build the unique name
-            auto name = std::string{ classname } + "::" + _name;
-
-            // add it to the map
-            callables[name] = const_cast<Callable*>(this);
-        }
-        else
-        {
-            // no need to mangle the name
-            callables[_name] = const_cast<Callable*>(this);
-        }
+        // install ourselves in the extra argument
+        _argv[_argc + 1].class_name = reinterpret_cast<const char*>(this);
 
         // we use our own invoke method, which does a lookup
         // in the map we just installed ourselves in
