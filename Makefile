@@ -17,8 +17,8 @@
 #   installed in the default directory, you can change that here.
 #
 
-PHP_CONFIG			=	php-config
-UNAME 				:= 	$(shell uname)
+PHP_CONFIG                = php-config
+UNAME                    := $(shell uname)
 
 #
 #   Installation directory
@@ -33,13 +33,13 @@ UNAME 				:= 	$(shell uname)
 # Since OSX 10.10 Yosemite, /usr/include gives problem
 # So, let's switch to /usr/local as default instead.
 ifeq ($(UNAME), Darwin)
-  INSTALL_PREFIX		=	/usr/local
+  INSTALL_PREFIX          = /usr/local
 else
-  INSTALL_PREFIX		=	/usr
+  INSTALL_PREFIX          = /usr
 endif
 
-INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
-INSTALL_LIB			=	${INSTALL_PREFIX}/lib
+DESTDIR_HEADERS           = $(INSTALL_PREFIX)/include
+DESTDIR_LIB               = $(INSTALL_PREFIX)/lib
 
 
 #
@@ -49,8 +49,8 @@ INSTALL_LIB			=	${INSTALL_PREFIX}/lib
 #   Otherwise only release verions changes. (version is MAJOR.MINOR.RELEASE)
 #
 
-SONAME					=	2.0
-VERSION					=	2.0.0
+SONAME                    = 2
+VERSION                   = 2.0.0
 
 
 #
@@ -61,8 +61,10 @@ VERSION					=	2.0.0
 #   you can change that here.
 #
 
-PHP_SHARED_LIBRARY		=	libphpcpp.so.$(VERSION)
-PHP_STATIC_LIBRARY		=	libphpcpp.a.$(VERSION)
+PHP_SHARED_LIBRARY_BASE   = libphpcpp.so
+PHP_SHARED_LIBRARY_SONAME = $(PHP_SHARED_LIBRARY_BASE).$(SONAME)
+PHP_SHARED_LIBRARY        = $(PHP_SHARED_LIBRARY_BASE).$(VERSION)
+PHP_STATIC_LIBRARY        = libphpcpp.a
 
 
 #
@@ -74,20 +76,6 @@ PHP_STATIC_LIBRARY		=	libphpcpp.a.$(VERSION)
 #   the linker (the program that links all object files into a single .so
 #   library file. By default, g++ (the GNU C++ compiler) is used for both.
 #
-
-ifdef CXX
- COMPILER				=	${CXX}
- LINKER					=	${CXX}
-else
- COMPILER				=	g++
- LINKER					=	g++
-endif
-
-ifdef AR
-  ARCHIVER				=	${AR} rcs
-else
-  ARCHIVER				=	ar rcs
-endif
 
 #
 #   Compiler flags
@@ -101,10 +89,8 @@ endif
 #   you want to leave that flag out on production servers).
 #
 
-COMPILER_FLAGS			=	-Wall -c -std=c++11 -fvisibility=hidden -DBUILDING_PHPCPP -Wno-write-strings -MD
-SHARED_COMPILER_FLAGS	=	-fpic
-STATIC_COMPILER_FLAGS	=
-PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
+CXXFLAGS_EXTRA            = -Wall -fvisibility=hidden -fvisibility-inlines-hidden
+CPPFLAGS_EXTRA            = -std=c++11 -DBUILDING_PHPCPP $(shell $(PHP_CONFIG) --includes)
 
 #
 #   Linker flags
@@ -116,9 +102,7 @@ PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
 #   to the linker flags
 #
 
-LINKER_FLAGS			=	-shared
-PHP_LINKER_FLAGS		=	${LINKER_FLAGS} `${PHP_CONFIG} --ldflags`
-
+LDFLAGS_EXTRA             = -shared $(shell $(PHP_CONFIG) --ldflags) -Wl,-soname,libphpcpp.so.$(SONAME)
 
 #
 #   Command to remove files, copy files, link files and create directories.
@@ -127,10 +111,10 @@ PHP_LINKER_FLAGS		=	${LINKER_FLAGS} `${PHP_CONFIG} --ldflags`
 #   So you can probably leave this as it is
 #
 
-RM						=	rm -fr
-CP						=	cp -f
-LN						=	ln -f -s
-MKDIR					=	mkdir -p
+RM                        = rm -f
+CP                        = cp -f
+LN                        = ln -f -s
+MKDIR                     = mkdir -p
 
 
 #
@@ -141,8 +125,9 @@ MKDIR					=	mkdir -p
 #   probably necessary here
 #
 
-COMMON_SOURCES			=	$(wildcard common/*.cpp)
-PHP_SOURCES				=	$(wildcard zend/*.cpp)
+COMMON_SOURCES            = $(wildcard common/*.cpp)
+PHP_SOURCES               = $(wildcard zend/*.cpp)
+HEADERS                   = $(wildcard include/*.h)
 
 #
 #   The object files
@@ -152,10 +137,13 @@ PHP_SOURCES				=	$(wildcard zend/*.cpp)
 #   library. We also use a Makefile function here that takes all source files.
 #
 
-COMMON_SHARED_OBJECTS	=	$(COMMON_SOURCES:%.cpp=shared/%.o)
-PHP_SHARED_OBJECTS		=	$(PHP_SOURCES:%.cpp=shared/%.o)
-COMMON_STATIC_OBJECTS	=	$(COMMON_SOURCES:%.cpp=static/%.o)
-PHP_STATIC_OBJECTS		=	$(PHP_SOURCES:%.cpp=static/%.o)
+COMMON_SHARED_OBJECTS     = $(COMMON_SOURCES:%.cpp=shared/%.o)
+PHP_SHARED_OBJECTS        = $(PHP_SOURCES:%.cpp=shared/%.o)
+COMMON_STATIC_OBJECTS     = $(COMMON_SOURCES:%.cpp=static/%.o)
+PHP_STATIC_OBJECTS        = $(PHP_SOURCES:%.cpp=static/%.o)
+
+OBJECTS                   = $(COMMON_SHARED_OBJECTS) $(PHP_SHARED_OBJECTS) $(COMMON_STATIC_OBJECTS) $(PHP_STATIC_OBJECTS) 
+SOURCE_DEPS               = $(patsubst %.o,%.d,$(OBJECTS))
 
 
 #
@@ -163,70 +151,75 @@ PHP_STATIC_OBJECTS		=	$(PHP_SOURCES:%.cpp=static/%.o)
 #   dependencies that are used by the compiler.
 #
 
-all: COMPILER_FLAGS 	+=	-g
-all: LINKER_FLAGS		+=  -g
+all: CXXFLAGS_EXTRA += -g
 all: phpcpp
 
-release: COMPILER_FLAGS +=	-O2
-release: LINKER_FLAGS	+=  -O2
+release: CXXFLAGS_EXTRA += -O2
 release: phpcpp
 
-phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
+phpcpp: $(PHP_SHARED_LIBRARY_BASE) $(PHP_STATIC_LIBRARY)
 	@echo
 	@echo "Build complete."
 
-${PHP_SHARED_LIBRARY}: shared_directories ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -Wl,-soname,libphpcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
+$(PHP_SHARED_LIBRARY_BASE): $(PHP_SHARED_LIBRARY_SONAME)
+	$(LN) "$^" "$@"
 
-${PHP_STATIC_LIBRARY}: static_directories ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
-	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
+$(PHP_SHARED_LIBRARY_SONAME): $(PHP_SHARED_LIBRARY)
+	$(LN) "$^" "$@" 
 
-shared_directories:
-	${MKDIR} shared/common
-	${MKDIR} shared/zend
+$(PHP_SHARED_LIBRARY): $(COMMON_SHARED_OBJECTS) $(PHP_SHARED_OBJECTS)
+	$(CXX) $(LDFLAGS) $(LDFLAGS_EXTRA) $^ $(LDLIBS) -o "$@"
 
-static_directories:
-	${MKDIR} static/common
-	${MKDIR} static/zend
+$(PHP_STATIC_LIBRARY): $(COMMON_STATIC_OBJECTS) $(PHP_STATIC_OBJECTS)
+	$(AR) rcs $@ $^
+
+shared_directories: shared/common shared/zend
+static_directories: static/common static/zend
+shared/common shared/zend static/common static/zend:
+	$(MKDIR) $@
 
 clean:
-	${RM} shared ${PHP_SHARED_LIBRARY}
-	${RM} static ${PHP_STATIC_LIBRARY}
-	find -name *.o | xargs ${RM}
+	$(RM) $(PHP_SHARED_LIBRARY_BASE) $(PHP_SHARED_LIBRARY_SONAME) $(PHP_SHARED_LIBRARY) $(PHP_STATIC_LIBRARY) $(OBJECTS)
+	-$(RM) -r shared static
 
-${COMMON_SHARED_OBJECTS}:
-	${COMPILER} ${COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
+clean: clean-deps
 
-${COMMON_STATIC_OBJECTS}:
-	${COMPILER} ${COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
+clean-deps:
+	-rm -f $(SOURCE_DEPS)
 
-${PHP_SHARED_OBJECTS}:
-	${COMPILER} ${PHP_COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
+ifeq (,$(findstring clean,$(MAKECMDGOALS)))
+-include $(SOURCE_DEPS)
+endif
 
-${PHP_STATIC_OBJECTS}:
-	${COMPILER} ${PHP_COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
+static/%.o: %.cpp | static_directories
+	$(CXX) -c "$<" $(CPPFLAGS) $(CPPFLAGS_EXTRA) $(CXXFLAGS) $(CXXFLAGS_EXTRA) -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -MT"$(@:%.o=%.d)" -o "$@"
 
+shared/%.o: %.cpp | shared_directories
+	$(CXX) -c "$<" $(CPPFLAGS) $(CPPFLAGS_EXTRA) $(CXXFLAGS) $(CXXFLAGS_EXTRA) -fpic -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" -MT"$(@:%.o=%.d)" -o "$@"
 
 # The if statements below must be seen as single line by make
 
 install:
-	${MKDIR} ${INSTALL_HEADERS}/phpcpp
-	${MKDIR} ${INSTALL_LIB}
-	${CP} phpcpp.h ${INSTALL_HEADERS}
-	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
-		${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
-		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
+	$(MKDIR) "$(DESTDIR_HEADERS)/phpcpp"
+	$(MKDIR) "$(DESTDIR_LIB)"
+	$(CP) phpcpp.h "$(DESTDIR_HEADERS)"
+	$(CP) $(notdir $(HEADERS)) "$(DESTDIR_HEADERS)/phpcpp/"
+	if [ -e $(PHP_SHARED_LIBRARY) ]; then \
+		$(CP) $(PHP_SHARED_LIBRARY) "$(DESTDIR_LIB)/"; \
+		$(LN) "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_SONAME)"; \
+		$(LN) "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_SONAME)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_BASE)"; \
 	fi
-	if [ -e ${PHP_STATIC_LIBRARY} ]; then ${CP} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${INSTALL_LIB}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
+	if [ -e $(PHP_STATIC_LIBRARY) ]; then \
+		$(CP) $(PHP_STATIC_LIBRARY) "$(DESTDIR_LIB)/"; \
 	fi
 	if `which ldconfig`; then \
 		sudo ldconfig; \
 	fi
 
 uninstall:
-	${RM} ${INSTALL_HEADERS}/phpcpp*
-	${RM} ${INSTALL_LIB}/libphpcpp.*
+	$(RM) "$(DESTDIR_HEADERS)/phpcpp.h"
+	$(RM) $(addprefix $(DESTDIR_HEADERS)/ $(notdir $(HEADERS)))
+	$(RM) "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_BASE)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_SONAME)"
+	-$(RM) -r "$(DESTDIR_HEADERS)/phpcpp.h"
 
+.PHONY: shared_directories static_directories clean clean-deps install uninstall all release phpcpp
