@@ -180,12 +180,12 @@ shared/common shared/zend static/common static/zend:
 
 clean:
 	$(RM) $(PHP_SHARED_LIBRARY_BASE) $(PHP_SHARED_LIBRARY_SONAME) $(PHP_SHARED_LIBRARY) $(PHP_STATIC_LIBRARY) $(OBJECTS)
-	-$(RM) -r shared static
+	-$(RM) shared/common shared/zend static/common static/zend shared static
 
 clean: clean-deps
 
 clean-deps:
-	-rm -f $(SOURCE_DEPS)
+	-$(RM) $(SOURCE_DEPS)
 
 ifeq (,$(findstring clean,$(MAKECMDGOALS)))
 -include $(SOURCE_DEPS)
@@ -220,6 +220,6 @@ uninstall:
 	$(RM) "$(DESTDIR_HEADERS)/phpcpp.h"
 	$(RM) $(addprefix $(DESTDIR_HEADERS)/ $(notdir $(HEADERS)))
 	$(RM) "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_BASE)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_SONAME)"
-	-$(RM) -r "$(DESTDIR_HEADERS)/phpcpp.h"
+	-$(RM) "$(DESTDIR_HEADERS)/phpcpp.h"
 
 .PHONY: shared_directories static_directories clean clean-deps install uninstall all release phpcpp
