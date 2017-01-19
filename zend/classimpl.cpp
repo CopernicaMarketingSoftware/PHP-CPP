@@ -259,8 +259,8 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
     function->arg_info = nullptr;
     function->num_args = 0;
     function->required_num_args = 0;
-    function->scope = nullptr;
-    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
+    function->scope = entry;
+    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER | ZEND_ACC_STATIC;
     function->function_name = method;
 
     // store pointer to ourselves
