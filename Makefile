@@ -203,7 +203,7 @@ install:
 	$(MKDIR) "$(DESTDIR_HEADERS)/phpcpp"
 	$(MKDIR) "$(DESTDIR_LIB)"
 	$(CP) phpcpp.h "$(DESTDIR_HEADERS)"
-	$(CP) $(notdir $(HEADERS)) "$(DESTDIR_HEADERS)/phpcpp/"
+	$(CP) $(HEADERS) "$(DESTDIR_HEADERS)/phpcpp/"
 	if [ -e $(PHP_SHARED_LIBRARY) ]; then \
 		$(CP) $(PHP_SHARED_LIBRARY) "$(DESTDIR_LIB)/"; \
 		$(LN) "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY)" "$(DESTDIR_LIB)/$(PHP_SHARED_LIBRARY_SONAME)"; \
