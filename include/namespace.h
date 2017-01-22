@@ -265,7 +265,7 @@ public:
     size_t functions() const
     {
         // number of functions in this namespace
-        int result = _functions.size();
+        size_t result = _functions.size();
 
         // number of functions in sub-namespace
         for (auto &ns : _namespaces) result += ns->functions();
