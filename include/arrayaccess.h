@@ -47,6 +47,11 @@ public:
      *  @param key
      */
     virtual void offsetUnset(const Php::Value &key) = 0;
+
+    /**
+     *  Destructor
+     */
+    virtual ~ArrayAccess() = default;
 };
 
 /**

@@ -37,11 +37,8 @@ Globals &GLOBALS = Globals::instance();
  */
 Global Globals::operator[](const char *name)
 {
-    // we need the TSRMLS variable
-    TSRMLS_FETCH();
-
     // retrieve the variable (if it exists)
-    auto *varvalue = zend_hash_find(&EG(symbol_table), String{ name });
+    zval *varvalue = zend_hash_find_ind(&EG(symbol_table), String{ name });
 
     // check if the variable already exists
     if (!varvalue)
@@ -65,11 +62,8 @@ Global Globals::operator[](const char *name)
  */
 Global Globals::operator[](const std::string &name)
 {
-    // we need the TSRMLS variable
-    TSRMLS_FETCH();
-
     // retrieve the variable (if it exists)
-    auto *varvalue = zend_hash_find(&EG(symbol_table), String{ name.data(), name.size() });
+    auto *varvalue = zend_hash_find_ind(&EG(symbol_table), String{ name.data(), name.size() });
 
     // check if the variable already exists
     if (!varvalue)

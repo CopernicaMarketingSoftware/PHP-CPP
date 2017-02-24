@@ -150,7 +150,7 @@ public:
     /**
      *  Because the add function exists in both the Namespace base class
      *  as well as this extended Extension class, we have to tell the compiler
-     *  that the add methods from the base are accessble too
+     *  that the add methods from the base are accessible too
      */
     using Namespace::add;
 
@@ -210,9 +210,9 @@ private:
     /**
      *  The implementation object
      *
-     *  @var ExtensionImpl
+     *  @var std::unique_ptr<ExtensionImpl>
      */
-    ExtensionImpl *_impl;
+    std::unique_ptr<ExtensionImpl> _impl;
 
     /**
      *  Ini entry defined by the extension

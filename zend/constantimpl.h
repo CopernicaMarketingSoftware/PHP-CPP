@@ -174,9 +174,8 @@ public:
      *  Initialize the constant
      *  @param  prefix          Namespace prefix
      *  @param  module_number   The module number
-     *  @param  tsrmls          Optional parameter when running in multi-threading context
      */
-    void initialize(const std::string &prefix, int module_number TSRMLS_DC)
+    void initialize(const std::string &prefix, int module_number)
     {
         // is there a namespace name involved?
         if (!prefix.empty())
@@ -203,7 +202,7 @@ public:
         _constant.module_number = module_number;
 
         // register the zval
-        zend_register_constant(&_constant TSRMLS_CC);
+        zend_register_constant(&_constant);
     }
 
 private:

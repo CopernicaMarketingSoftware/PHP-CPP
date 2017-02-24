@@ -83,14 +83,11 @@ Global &Global::update()
     // skip if the variable already exists
     if (_exists) return *this;
 
-    // we need the TSRMLS variable
-    TSRMLS_FETCH();
-
-    // add the variable to the globals
-    zend_hash_add(EG(current_execute_data)->symbol_table, _name, _val);
-
     // add one extra reference because the variable now is a global var too
     Z_TRY_ADDREF_P(_val);
+
+    // add the variable to the globals
+    zend_symtable_update_ind(&EG(symbol_table), _name, _val);
 
     // remember that the variable now exists
     _exists = true;

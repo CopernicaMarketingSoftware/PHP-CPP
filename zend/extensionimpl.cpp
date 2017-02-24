@@ -7,17 +7,17 @@
 #include "includes.h"
 
 /**
- *  Set up namespace
- */
-namespace Php {
-
-/**
  *  If this extension is compiled for a PHP version with multi
  *  threading support, we need an additional header file
  */
 #ifdef ZTS
 #include "TSRM.h"
 #endif
+
+/**
+ *  Set up namespace
+ */
+namespace Php {
 
 /**
  *  We're almost there, we now need to declare an instance of the
@@ -63,7 +63,7 @@ static std::map<int,ExtensionImpl*> number2extension;
  *
  *  @param  zend_module_entry
  */
-static int match_module(zval *value TSRMLS_DC)
+static int match_module(zval *value)
 {
     // retrieve the module entry from the zval
     auto *entry = (zend_module_entry*)Z_PTR_P(value);
@@ -82,17 +82,16 @@ static int match_module(zval *value TSRMLS_DC)
 /**
  *  Find an extension based on the module number
  *  @param  number
- *  @param  tsrm_ls
  *  @return Extension*
  */
-static ExtensionImpl *find(int number TSRMLS_DC)
+static ExtensionImpl *find(int number)
 {
     // do we already have an extension with this number?
     auto iter = number2extension.find(number);
     if (iter != number2extension.end()) return iter->second;
 
     // no, not yet, loop through all modules
-    zend_hash_apply(&module_registry, match_module TSRMLS_CC);
+    zend_hash_apply(&module_registry, match_module);
 
     // find again
     iter = number2extension.find(number);
@@ -106,51 +105,48 @@ static ExtensionImpl *find(int number TSRMLS_DC)
  *  Function that is called when the extension initializes
  *  @param  type        Module type
  *  @param  number      Module number
- *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int ExtensionImpl::processStartup(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processStartup(int type, int module_number)
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL);
 
     // get the extension
-    auto *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number);
 
     // initialize the extension
-    return BOOL2SUCCESS(extension->initialize(module_number TSRMLS_CC));
+    return BOOL2SUCCESS(extension->initialize(module_number));
 }
 
 /**
  *  Function that is called when the extension is about to be stopped
  *  @param  type        Module type
  *  @param  number      Module number
- *  @param  tsrm_ls
  *  @return int
  */
-int ExtensionImpl::processShutdown(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processShutdown(int type, int module_number)
 {
     // get the extension
-    auto *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number);
 
     // we no longer need the number-to-extension mapping
     number2extension.erase(module_number);
 
     // done
-    return BOOL2SUCCESS(extension->shutdown(module_number TSRMLS_CC));
+    return BOOL2SUCCESS(extension->shutdown(module_number));
 }
 
 /**
  *  Function that is called when a request starts
  *  @param  type        Module type
  *  @param  number      Module number
- *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int ExtensionImpl::processRequest(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processRequest(int type, int module_number)
 {
     // get the extension
-    auto *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number);
 
     // is the callback registered?
     if (extension->_onRequest) extension->_onRequest();
@@ -163,13 +159,12 @@ int ExtensionImpl::processRequest(int type, int module_number TSRMLS_DC)
  *  Function that is called when a request is ended
  *  @param  type        Module type
  *  @param  number      Module number
- *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int ExtensionImpl::processIdle(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processIdle(int type, int module_number)
 {
     // get the extension
-    auto *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number);
 
     // is the callback registered?
     if (extension->_onIdle) extension->_onIdle();
@@ -183,13 +178,12 @@ int ExtensionImpl::processIdle(int type, int module_number TSRMLS_DC)
  *  version for the libphpcpp.so file than the version the extension was compiled for
  *  @param  type        Module type
  *  @param  number      Module number
- *  @param  tsrm_ls
  *  @return int         0 on success
  */
-int ExtensionImpl::processMismatch(int type, int module_number TSRMLS_DC)
+int ExtensionImpl::processMismatch(int type, int module_number)
 {
     // get the extension
-    auto *extension = find(module_number TSRMLS_CC);
+    auto *extension = find(module_number);
 
     // report a warning
     warning << "Version mismatch between PHP-CPP and extension " << extension->name() << " " << extension->version() << " (recompile needed?)" << std::endl;
@@ -339,10 +333,9 @@ zend_module_entry *ExtensionImpl::module()
 /**
  *  Initialize the extension after it was started
  *  @param  module_number
- *  @param  tsrm_ls
  *  @return bool
  */
-bool ExtensionImpl::initialize(int module_number TSRMLS_DC)
+bool ExtensionImpl::initialize(int module_number)
 {
     // array contains ini settings
     _ini.reset(new zend_ini_entry_def[_data->iniVariables()+1]);
@@ -367,24 +360,24 @@ bool ExtensionImpl::initialize(int module_number TSRMLS_DC)
     memset(&_ini[i], 0, sizeof(_ini[i]));
 
     // register ini entries in Zend core
-    zend_register_ini_entries(_ini.get(), module_number TSRMLS_CC);
+    zend_register_ini_entries(_ini.get(), module_number);
 
     // the constants are registered after the module is ready
-    _data->constants([module_number TSRMLS_CC](const std::string &prefix, Constant &c) {
+    _data->constants([module_number](const std::string &prefix, Constant &c) {
 
         // forward to implementation class
-        c.implementation()->initialize(prefix, module_number TSRMLS_CC);
+        c.implementation()->initialize(prefix, module_number);
     });
 
     // we also need to register each class, find out all classes
-    _data->classes([TSRMLS_C](const std::string &prefix, ClassBase &c) {
+    _data->classes([](const std::string &prefix, ClassBase &c) {
 
         // forward to implementation class
-        c.implementation()->initialize(&c, prefix TSRMLS_CC);
+        c.implementation()->initialize(&c, prefix);
     });
 
     // initialize the PhpCpp::Functor class
-    Functor::initialize(TSRMLS_C);
+    Functor::initialize();
 
     // remember that we're initialized (when you use "apache reload" it is
     // possible that the processStartup() method is called more than once)
@@ -400,22 +393,24 @@ bool ExtensionImpl::initialize(int module_number TSRMLS_DC)
 /**
  *  Function that is called when the extension shuts down
  *  @param  module_number
- *  @param  tsrmls
  *  @return bool
  */
-bool ExtensionImpl::shutdown(int module_number TSRMLS_DC)
+bool ExtensionImpl::shutdown(int module_number)
 {
     // unregister the ini entries
-    zend_unregister_ini_entries(module_number TSRMLS_CC);
+    zend_unregister_ini_entries(module_number);
 
     // destruct the ini entries
     _ini.reset();
 
     // shutdown the functor class
-    Functor::shutdown(TSRMLS_C);
+    Functor::shutdown();
 
     // is the callback registered?
     if (_onShutdown) _onShutdown();
+
+    // we are no longer locked
+    _locked = false;
 
     // done
     return true;

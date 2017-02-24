@@ -23,7 +23,7 @@ namespace Php {
  *  used here.
  *
  */
-enum class PHPCPP_EXPORT ClassType {
+enum class ClassType {
     Regular     =   0x00,
     Abstract    =   0x20,
     Final       =   0x04,

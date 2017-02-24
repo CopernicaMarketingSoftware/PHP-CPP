@@ -27,14 +27,11 @@ namespace Php {
  */
 bool class_exists(const char *classname, size_t len, bool autoload)
 {
-    // we need the tsrm_ls variable
-    TSRMLS_FETCH();
-
     // should we autoload the class?
     if (autoload)
     {
         // retrieve class entry
-        auto *ce = zend_lookup_class(String{ classname, len } TSRMLS_CC);
+        auto *ce = zend_lookup_class(String{ classname, len });
 
         // no auto-load
         if (!ce) return false;

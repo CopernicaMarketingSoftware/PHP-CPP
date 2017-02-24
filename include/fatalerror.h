@@ -37,15 +37,13 @@ public:
     /**
      *  Destructor
      */
-    virtual ~FatalError() throw()
-    {
-    }
+    virtual ~FatalError() = default;
 
     /**
      *  Is this a native exception (one that was thrown from C++ code)
      *  @return bool
      */
-    virtual bool native() const
+    virtual bool native() const override
     {
         // although it is native, we return 0 because it should not persist
         // as exception, but it should live on as zend_error() in stead

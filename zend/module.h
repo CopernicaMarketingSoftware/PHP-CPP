@@ -44,13 +44,6 @@ private:
      */
     zend_module_entry *_entry = nullptr;
     
-#ifdef ZTS
-    /**
-     *  When in thread safety mode, we also keep track of the TSRM_LS var
-     *  @var void***
-     */
-    void ***tsrm_ls;
-#endif
 
     /**
      *  Internal helper class with persistent modules
@@ -129,16 +122,8 @@ public:
      */
     Module(const char *module, bool persistent)
     {
-#ifdef ZTS
-        // fetch multi-threading thing
-        TSRMLS_FETCH();
-
-        // copy tsrm_ls param
-        this->tsrm_ls = tsrm_ls;
-#endif
-
         // the path we're going to load
-        ExtensionPath path(module TSRMLS_CC);
+        ExtensionPath path(module);
         
         // load the module
         _handle = DL_LOAD(path);
@@ -204,7 +189,7 @@ public:
         // @todo does loading an extension even work in a multi-threading setup?
         
         // register the module, this apparently returns a copied entry pointer
-        auto *entry = zend_register_module_ex(_entry TSRMLS_CC);
+        auto *entry = zend_register_module_ex(_entry);
 
         // forget the entry, so that a new call to start() will fail too
         _entry = nullptr;
@@ -213,13 +198,13 @@ public:
         if (entry == NULL) return false;
 
         // startup the module
-        if (zend_startup_module_ex(entry TSRMLS_CC) == FAILURE) return false;
+        if (zend_startup_module_ex(entry) == FAILURE) return false;
 
         // was a startup-function defined? if not
         if (entry->request_startup_func)
         {
             // call the startup function
-            if (entry->request_startup_func(MODULE_TEMPORARY, entry->module_number TSRMLS_CC) == FAILURE) return false;
+            if (entry->request_startup_func(MODULE_TEMPORARY, entry->module_number) == FAILURE) return false;
         }
         
         // all is ok, we can forget about the handle now, so that is won't get destructed

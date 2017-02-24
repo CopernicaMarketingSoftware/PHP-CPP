@@ -31,13 +31,23 @@ private:
      */
     bool _handled = true;
 
-#ifdef ZTS
     /**
-     *  When we run in multi-thread mode, we store the thread handle
-     *  @var void***
+     *  The PHP exception code
+     *  @var    long int
      */
-    TSRMLS_D;
-#endif
+    long int _code;
+
+    /**
+     *  PHP source file
+     *  @var    std::string
+     */
+    std::string _file;
+
+    /**
+     *  PHP source line
+     *  @var    long int
+     */
+    long int _line;
 
 public:
     /**
@@ -46,10 +56,27 @@ public:
      */
     OrigException(zend_object *object) : Exception(std::string{ ZSTR_VAL(object->ce->name), ZSTR_LEN(object->ce->name) })
     {
-#ifdef ZTS
-        // copy tsrm_ls
-        this->TSRMLS_C = TSRMLS_C;
-#endif
+        // the result value from zend and the object zval
+        zval result, properties;
+
+        // retrieve the object properties
+        ZVAL_OBJ(&properties, object);
+
+        // retrieve the message, filename, error code and line number
+        auto message = zval_get_string(zend_read_property(Z_OBJCE(properties), &properties, ZEND_STRL("message"), 1, &result));
+        auto file    = zval_get_string(zend_read_property(Z_OBJCE(properties), &properties, ZEND_STRL("file"   ), 1, &result));
+        auto code    = zval_get_long  (zend_read_property(Z_OBJCE(properties), &properties, ZEND_STRL("code"   ), 1, &result));
+        auto line    = zval_get_long  (zend_read_property(Z_OBJCE(properties), &properties, ZEND_STRL("line"   ), 1, &result));
+
+        // store the message, code, filename and line number
+        _message.assign(ZSTR_VAL(message), ZSTR_LEN(message));
+        _code = code;
+        _file.assign(ZSTR_VAL(file), ZSTR_LEN(file));
+        _line = line;
+
+        // clean up message and file strings
+        zend_string_release(message);
+        zend_string_release(file);
     }
 
     /**
@@ -57,13 +84,7 @@ public:
      *  @param  exception
      */
     OrigException(const OrigException &exception) :
-        Exception("OrigException"), _handled(exception._handled)
-    {
-#ifdef ZTS
-        // copy tsrm_ls
-        TSRMLS_C = exception.TSRMLS_C;
-#endif
-    }
+        Exception("OrigException"), _handled(exception._handled) {}
 
     /**
      *  Move constructor
@@ -74,11 +95,6 @@ public:
     {
         // set other exception to handled so that it wont do anything on destruction
         exception._handled = true;
-
-#ifdef ZTS
-        // copy tsrm_ls
-        TSRMLS_C = exception.TSRMLS_C;
-#endif
     }
 
     /**
@@ -91,7 +107,7 @@ public:
         if (!_handled) return;
 
         // the exception was handled, so we should clean it up
-        zend_clear_exception(TSRMLS_C);
+        zend_clear_exception();
     }
 
     /**
@@ -111,20 +127,57 @@ public:
         // it was not handled by extension C++ code
         _handled = false;
     }
+
+    /**
+     * Returns the exception code
+     *
+     *  @note   This only works if the exception was originally
+     *          thrown in PHP userland. If the native() member
+     *          function returns true, this function will not
+     *          be able to correctly provide the filename.
+     *
+     * @return The exception code
+     */
+    virtual long int code() const _NOEXCEPT override
+    {
+        // return the stored code
+        return _code;
+    }
+
+    /**
+     *  Retrieve the filename the exception was thrown in
+     *
+     *  @return The filename the exception was thrown in
+     */
+    virtual const std::string& file() const _NOEXCEPT override
+    {
+        // return the stored filename
+        return _file;
+    }
+
+    /**
+     *  Retrieve the line at which the exception was thrown
+     *
+     *  @return The line number the exception was thrown at
+     */
+    virtual long int line() const _NOEXCEPT override
+    {
+        // return the stored line number
+        return _line;
+    }
 };
 
 /**
  *  Global function to process an exception
  *  @param  exception
- *  @param  tsrm_ls
  */
-inline void process(Exception &exception TSRMLS_DC)
+static inline void process(Exception &exception)
 {
     // is this a native exception?
     if (exception.native())
     {
         // the exception is native, call the zend throw method
-        zend_throw_exception(zend_exception_get_default(TSRMLS_C), (char *)exception.what(), 0 TSRMLS_CC);
+        zend_throw_exception(zend_exception_get_default(), (char *)exception.what(), 0);
     }
 
     // or does it have its own report function?
