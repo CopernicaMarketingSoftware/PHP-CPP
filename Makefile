@@ -33,9 +33,9 @@ UNAME 				:= 	$(shell uname)
 # Since OSX 10.10 Yosemite, /usr/include gives problem
 # So, let's switch to /usr/local as default instead.
 ifeq ($(UNAME), Darwin)
-  INSTALL_PREFIX		=	/usr/local
+  INSTALL_PREFIX		=	$(DESTDIR)/usr/local
 else
-  INSTALL_PREFIX		=	/usr
+  INSTALL_PREFIX		=	$(DESTDIR)/usr
 endif
 
 INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
@@ -216,13 +216,13 @@ install:
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
 	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
 		${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
-		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
 	fi
 	if [ -e ${PHP_STATIC_LIBRARY} ]; then ${CP} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${INSTALL_LIB}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
+		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
 	fi
-	if `which ldconfig`; then \
+	if `which ldconfig` && [ "$(DESTDIR)" == "" ]; then \
 		sudo ldconfig; \
 	fi
 
