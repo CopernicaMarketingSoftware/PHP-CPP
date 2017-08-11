@@ -223,7 +223,7 @@ install:
 		${LN} ${INSTALL_LIB}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
 	fi
 	if `which ldconfig`; then \
-		sudo ldconfig; \
+		ldconfig; \
 	fi
 
 uninstall:
