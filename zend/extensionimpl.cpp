@@ -41,14 +41,14 @@ static void init_globals(zend_phpcpp_globals *globals) {}
  *  variable. However, there does not seem to be a decent API call in Zend to
  *  get back the original module_entry linked to this number. So we have to
  *  look up entries in a hash table to find the right module entry. To make things
- *  even worse, the records in this hash table are copies of the original
+ *  even worse, the records in this hash table are copies of the original 
  *  zend_module_entry structure, so we can also not hide the C++ extension
  *  object pointer in the entry that we created ourselves.
- *
+ * 
  *  We have an ugly solution, we keep track of a map of all C++ extension names
  *  and their associated extension object, and a map of all module number and
  *  the linked extension object.
- *
+ * 
  *  @var map
  */
 static std::map<std::string,ExtensionImpl*> name2extension;
@@ -56,11 +56,11 @@ static std::map<int,ExtensionImpl*> number2extension;
 
 /**
  *  Handler function that is used in combination with zend_hash_apply()
- *
+ * 
  *  This function is called when we need to find an extension object based on
- *  an extension number. We loop through the list of all registered modules, and
+ *  an extension number. We loop through the list of all registered modules, and 
  *  for each module we check if we know the extension based on the name
- *
+ * 
  *  @param  zend_module_entry
  */
 static int match_module(zval *value)
@@ -71,10 +71,10 @@ static int match_module(zval *value)
     // check if there is an extension with this name
     auto iter = name2extension.find(entry->name);
     if (iter == name2extension.end()) return ZEND_HASH_APPLY_KEEP;
-
+    
     // we have the extension, store in combination with the number
     number2extension[entry->module_number] = iter->second;
-
+    
     // done
     return ZEND_HASH_APPLY_KEEP;
 }
@@ -89,14 +89,14 @@ static ExtensionImpl *find(int number)
     // do we already have an extension with this number?
     auto iter = number2extension.find(number);
     if (iter != number2extension.end()) return iter->second;
-
+    
     // no, not yet, loop through all modules
     zend_hash_apply(&module_registry, match_module);
-
+    
     // find again
     iter = number2extension.find(number);
     if (iter == number2extension.end()) return nullptr;
-
+    
     // found!
     return iter->second;
 }
@@ -110,7 +110,7 @@ static ExtensionImpl *find(int number)
 int ExtensionImpl::processStartup(int type, int module_number)
 {
     // initialize and allocate the "global" variables
-    ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL);
+    ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
 
     // get the extension
     auto *extension = find(module_number);
@@ -147,10 +147,10 @@ int ExtensionImpl::processRequest(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
-
+    
     // is the callback registered?
     if (extension->_onRequest) extension->_onRequest();
-
+    
     // done
     return BOOL2SUCCESS(true);
 }
@@ -165,10 +165,10 @@ int ExtensionImpl::processIdle(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
-
+    
     // is the callback registered?
     if (extension->_onIdle) extension->_onIdle();
-
+    
     // done
     return BOOL2SUCCESS(true);
 }
@@ -184,10 +184,10 @@ int ExtensionImpl::processMismatch(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
-
+    
     // report a warning
     warning << "Version mismatch between PHP-CPP and extension " << extension->name() << " " << extension->version() << " (recompile needed?)" << std::endl;
-
+    
     // done
     return BOOL2SUCCESS(true);
 }
@@ -199,12 +199,12 @@ int ExtensionImpl::processMismatch(int type, int module_number)
  *  @param  version     Version number
  *  @param  apiversion  API version number
  */
-ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *version, int apiversion) :
+ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *version, int apiversion) : 
     ExtensionBase(data)
 {
     // keep extension pointer based on the name
     name2extension[name] = this;
-
+    
     // assign all members (apart from the globals)
     _entry.size = sizeof(zend_module_entry);                       // size of the data
     _entry.zend_api = ZEND_MODULE_API_NO;                          // api number
@@ -239,8 +239,8 @@ ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *vers
 
     // everything is ok if the api versions match
     if (apiversion == PHPCPP_API_VERSION) return;
-
-    // mismatch between api versions, the extension is invalid, we use a
+    
+    // mismatch between api versions, the extension is invalid, we use a 
     // different startup function to report to the user
     _entry.module_startup_func = &ExtensionImpl::processMismatch;
 
@@ -257,7 +257,7 @@ ExtensionImpl::~ExtensionImpl()
 {
     // remove from the array
     name2extension.erase(_entry.name);
-
+    
     // deallocate functions
     delete[] _entry.functions;
 }
@@ -297,7 +297,7 @@ zend_module_entry *ExtensionImpl::module()
 
     // the number of functions
     int count = _data->functions();
-
+    
     // skip if there are no functions
     if (count == 0) return &_entry;
 
@@ -309,10 +309,10 @@ zend_module_entry *ExtensionImpl::module()
 
     // apply a function to each function
     _data->functions([&i, entries](const std::string &prefix, NativeFunction &function) {
-
+        
         // initialize the function
         function.initialize(prefix, &entries[i]);
-
+        
         // move on to the next iteration
         i++;
     });
@@ -338,23 +338,23 @@ zend_module_entry *ExtensionImpl::module()
 bool ExtensionImpl::initialize(int module_number)
 {
     // array contains ini settings
-    _ini.reset(new zend_ini_entry_def[_data->iniVariables()+1]);
+    _ini.reset(new zend_ini_entry_def[_ini_entries.size()+1]);
 
     // the entry that we're filling
     int i = 0;
 
     // Fill the php.ini entries
-    _data->iniVariables([this, &i, module_number](Ini &ini) {
-
+    for (auto ini : _ini_entries)
+    {
         // initialize the function
         zend_ini_entry_def *entry = &_ini[i];
-
+        
         // fill the property
-        ini.fill(entry, module_number);
-
+        ini->fill(entry, module_number);
+        
         // move on to the next iteration
         ++i;
-    });
+    }
 
     // last entry should be set to all zero's
     memset(&_ini[i], 0, sizeof(_ini[i]));
@@ -364,14 +364,14 @@ bool ExtensionImpl::initialize(int module_number)
 
     // the constants are registered after the module is ready
     _data->constants([module_number](const std::string &prefix, Constant &c) {
-
+        
         // forward to implementation class
         c.implementation()->initialize(prefix, module_number);
     });
-
+    
     // we also need to register each class, find out all classes
     _data->classes([](const std::string &prefix, ClassBase &c) {
-
+        
         // forward to implementation class
         c.implementation()->initialize(&c, prefix);
     });
@@ -379,7 +379,7 @@ bool ExtensionImpl::initialize(int module_number)
     // initialize the PhpCpp::Functor class
     Functor::initialize();
 
-    // remember that we're initialized (when you use "apache reload" it is
+    // remember that we're initialized (when you use "apache reload" it is 
     // possible that the processStartup() method is called more than once)
     _locked = true;
 
@@ -402,6 +402,9 @@ bool ExtensionImpl::shutdown(int module_number)
 
     // destruct the ini entries
     _ini.reset();
+    
+    // rest the ini_entries
+    _ini_entries.clear();
 
     // shutdown the functor class
     Functor::shutdown();
@@ -411,9 +414,60 @@ bool ExtensionImpl::shutdown(int module_number)
 
     // we are no longer locked
     _locked = false;
-
+    
     // done
     return true;
+}
+
+/**
+ *  Add a ini entry to the extension implementation by moving it
+ *  @param  ini         The php.ini setting
+ *  @return Extension   Same object to allow chaining
+ */
+void ExtensionImpl::add(Ini &&ini)
+{
+    // skip when locked
+    if (_locked) return;
+    
+    // and add it to the list of classes
+    _ini_entries.emplace_back(new Ini(std::move(ini)));
+}
+
+/**
+ *  Add a ini entry to the extension implementation by copying it
+ *  @param  ini         The php.ini setting
+ *  @param  Extension   Same object to allow chaining
+ */
+void ExtensionImpl::add(const Ini &ini)
+{
+    // skip when locked
+    if (_locked) return;
+
+    // and add it to the list of classes
+    _ini_entries.emplace_back(new Ini(ini));
+}
+
+
+/**
+ *  The total number of php.ini variables
+ *  @return size_t
+ */
+size_t ExtensionImpl::iniVariables() const
+{
+    return _ini_entries.size();
+}
+
+/**
+ *  Apply a callback to each php.ini variable
+ *
+ *  The callback will be called with a reference to the ini variable.
+ *
+ *  @param  callback
+ */
+void ExtensionImpl::iniVariables(const std::function<void(Ini &ini)> &callback)
+{
+    // loop through the entries and apply the callback to each one
+    for (auto ini : _ini_entries) callback(*ini);
 }
 
 /**
