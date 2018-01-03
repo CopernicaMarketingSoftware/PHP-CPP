@@ -214,9 +214,9 @@ protected:
                         /// FIXME this leaks, although this happens only once during startup / MINIT
                         /// Probably not critical
 
-                        char* orig      = arg.classname();
-                        std::size_t len = std::strlen(orig);
-                        char* newname   = new char[len + 2]; // trailing NUL and heading ?
+                        const char* orig = arg.classname();
+                        std::size_t len  = std::strlen(orig);
+                        char* newname    = new char[len + 2]; // trailing NUL and heading ?
                         newname[0] = '?';
                         std::memcpy(newname + 1, orig, len + 1 /* Trailing NUL */);
                     }
