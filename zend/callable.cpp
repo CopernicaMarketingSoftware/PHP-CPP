@@ -27,11 +27,19 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     uint32_t argc       = EX(func)->common.num_args;
     zend_arg_info* info = EX(func)->common.arg_info;
 
+#if PHP_VERSION_ID < 70200
     // Sanity check
     assert(info[argc].class_name != nullptr && info[argc].name == nullptr);
 
     // the callable we are retrieving
     Callable *callable = reinterpret_cast<Callable*>(info[argc].class_name);
+#else
+    // Sanity check
+    assert(info[argc].type != 0 && info[argc].name == nullptr);
+
+    // the callable we are retrieving
+    Callable *callable = reinterpret_cast<Callable*>(info[argc].type);
+#endif
 
     // check if sufficient parameters were passed (for some reason this check
     // is not done by Zend, so we do it here ourselves)
@@ -87,7 +95,11 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
     else
     {
         // install ourselves in the extra argument
+#if PHP_VERSION_ID < 70200
         _argv[_argc + 1].class_name = reinterpret_cast<const char*>(this);
+#else
+        _argv[_argc + 1].type = reinterpret_cast<zend_type>(this);
+#endif
 
         // we use our own invoke method, which does a lookup
         // in the map we just installed ourselves in
@@ -111,6 +123,7 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
  */
 void Callable::initialize(zend_internal_function_info *info, const char *classname) const
 {
+#if PHP_VERSION_ID < 70200
     // store the classname
     info->class_name = classname;
 
@@ -126,6 +139,18 @@ void Callable::initialize(zend_internal_function_info *info, const char *classna
     // them to false
     info->allow_null = false;
     info->_is_variadic = false;
+#else
+    info->required_num_args = _required;
+    info->return_reference = false;
+    info->_is_variadic = false;
+
+    if (_return == Type::Object) {
+        info->type = reinterpret_cast<zend_type>(classname);
+    }
+    else {
+        info->type = ZEND_TYPE_ENCODE(static_cast<unsigned char>(_return), 0);
+    }
+#endif
 }
 
 /**
