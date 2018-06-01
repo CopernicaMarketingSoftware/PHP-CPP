@@ -103,7 +103,7 @@ endif
 
 COMPILER_FLAGS			=	-Wall -c -std=c++11 -fvisibility=hidden -DBUILDING_PHPCPP -Wno-write-strings -MD
 SHARED_COMPILER_FLAGS	=	-fpic
-STATIC_COMPILER_FLAGS	=
+STATIC_COMPILER_FLAGS	=	-fpic
 PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
 
 #
