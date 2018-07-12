@@ -117,7 +117,7 @@ PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
 #
 
 LINKER_FLAGS			=	-shared
-PHP_LINKER_FLAGS		=	${LINKER_FLAGS} `${PHP_CONFIG} --ldflags`
+PHP_LINKER_FLAGS		=	`${PHP_CONFIG} --ldflags` ${LINKER_FLAGS}
 
 
 #

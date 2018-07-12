@@ -1,6 +1,8 @@
 PHP-CPP
 =======
 
+[![Build Status](https://travis-ci.org/CopernicaMarketingSoftware/PHP-CPP.svg?branch=master)](https://travis-ci.org/CopernicaMarketingSoftware/PHP-CPP)
+
 The PHP-CPP library is a C++ library for developing PHP extensions. It offers a collection
 of well documented and easy-to-use classes that can be used and extended to build native
 extensions for PHP. The full documentation can be found on http://www.php-cpp.com.
