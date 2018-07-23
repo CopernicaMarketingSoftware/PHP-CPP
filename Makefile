@@ -7,6 +7,13 @@
 #   probably not have to make any changes
 #
 
+
+#
+#	Run make with more threads to speed up the compiling process.
+#	If you don't set a value, it will use as many threads as possible
+
+THREADS				=
+
 #
 #   Php-config utility
 #
@@ -18,7 +25,6 @@
 #
 
 PHP_CONFIG			=	php-config
-UNAME 				:= 	$(shell uname)
 
 #
 #   Installation directory
@@ -30,6 +36,8 @@ UNAME 				:= 	$(shell uname)
 #   and /usr/local/lib. You can of course change it to whatever suits you best
 #
 
+UNAME	:=	$(shell uname)
+
 # Since OSX 10.10 Yosemite, /usr/include gives problem
 # So, let's switch to /usr/local as default instead.
 ifeq ($(UNAME), Darwin)
@@ -39,14 +47,14 @@ else
 endif
 
 INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
-INSTALL_LIB			=	${INSTALL_PREFIX}/lib
+INSTALL_LIB				=	${INSTALL_PREFIX}/lib
 
 
 #
 #   SONAME and version
 #
 #   When ABI changes, soname and minor version of the library should be raised.
-#   Otherwise only release verions changes. (version is MAJOR.MINOR.RELEASE)
+#   Otherwise only release versions change. (version is MAJOR.MINOR.RELEASE)
 #
 
 SONAME					=	2.1
@@ -92,19 +100,27 @@ endif
 #
 #   Compiler flags
 #
-#   This variable holds the flags that are passed to the compiler. By default,
-#   we include the -O2 flag. This flag tells the compiler to optimize the code,
-#   but it makes debugging more difficult. So if you're debugging your application,
-#   you probably want to remove this -O2 flag. At the same time, you can then
-#   add the -g flag to instruct the compiler to include debug information in
-#   the library (but this will make the final libphpcpp.so file much bigger, so
-#   you want to leave that flag out on production servers).
+#   This variable holds the flags that are passed to the compiler. The default (all)
+#   target also adds -g to make debugging easier. If you plan to use it on
+#   production servers, you will have to use the `release` target, which doesn't
+#   include the -g flag, but does include the -O2 flag, which takes a bit longer
+#   to compile, but makes the binary faster.
 #
 
-COMPILER_FLAGS			=	-Wall -c -std=c++11 -fvisibility=hidden -DBUILDING_PHPCPP -Wno-write-strings -MD
+COMPILER_FLAGS			=	-c -std=c++11 -MD -pipe -fvisibility=hidden \
+							-DBUILDING_PHPCPP \
+							-Wall -Wextra -Wno-write-strings \
+							-Wno-unused-parameter -Wno-ignored-qualifiers
+
 SHARED_COMPILER_FLAGS	=	-fpic
 STATIC_COMPILER_FLAGS	=
 PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
+
+
+# Clang doesn't have this warning, but we should disable it on g++
+ifeq (${COMPILER}, g++)
+	COMPILER_FLAGS += -Wno-stringop-truncation
+endif
 
 #
 #   Linker flags
@@ -112,8 +128,8 @@ PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
 #   Just like the compiler, the linker can have flags too. The default flag
 #   is probably the only one you need.
 #
-#   Are you compiling on OSX? You may have to append the option "-undefined dynamic_lookup"
-#   to the linker flags
+#   Are you compiling on OSX? You may have to append the option
+#   "-undefined dynamic_lookup" to the linker flags
 #
 
 LINKER_FLAGS			=	-shared
@@ -123,26 +139,29 @@ PHP_LINKER_FLAGS		=	`${PHP_CONFIG} --ldflags` ${LINKER_FLAGS}
 #
 #   Command to remove files, copy files, link files and create directories.
 #
-#   I've never encountered a *nix environment in which these commands do not work.
-#   So you can probably leave this as it is
+#   I've never encountered a *nix environment in which these commands don't work,
+#   so you can probably leave these as they are.
 #
 
 RM						=	rm -fr
 CP						=	cp -f
 LN						=	ln -f -s
 MKDIR					=	mkdir -p
-
+FIND					=   find
 
 #
 #   The source files
 #
 #   For this we use a special Makefile function that automatically scans the
-#   common/ and zend/ directories for all *.cpp files. No changes are
+#   common/ and zend/ directories for all *.cpp and *.h files. No changes are
 #   probably necessary here
 #
 
 COMMON_SOURCES			=	$(wildcard common/*.cpp)
 PHP_SOURCES				=	$(wildcard zend/*.cpp)
+
+COMMON_HEADERS			=	$(wildcard common/*.h)
+PHP_HEADERS				=	$(wildcard zend/*.h)
 
 #
 #   The object files
@@ -159,61 +178,112 @@ PHP_STATIC_OBJECTS		=	$(PHP_SOURCES:%.cpp=static/%.o)
 
 
 #
-#   End of the variables section. Here starts the list of instructions and
-#   dependencies that are used by the compiler.
+#   .PHONY
+#
+#   All targets that do not create a file with the same name, belong in the
+#   .PHONY category to prevent errors from happening if such a file is made.
+#   See https://www.gnu.org/software/make/manual/html_node/Phony-Targets.html
+#   for more information.
 #
 
-all: COMPILER_FLAGS 	+=	-g
-all: LINKER_FLAGS		+=  -g
+.PHONY: _fast all release phpcpp create_shared_dirs create_static_dirs \
+		clean install uninstall debug
+
+
+
+#   ------------------------------------------------------------------------
+#    End of the variables section. Here starts the list of instructions and
+#    dependencies that are used by the compiler.
+#   ------------------------------------------------------------------------
+
+
+ifndef _FAST
+
+_fast:
+	@echo "Rerunning make with more threads. Run make with _FAST=0 to disable"
+	@make _FAST=1 --no-print-directory -j ${THREADS} ${MAKECMDGOALS}
+	@exit 0
+
+# Overwrite popular targets with the faster function
+all: _fast
+release: _fast
+
+else
+
+# Place the regular targets here
+
+# -g also outputs debugging information
+# -Og only enables optimizations which don't interfere with debugging
+all: COMPILER_FLAGS 	+=	-g -Og
+all: LINKER_FLAGS		+=  -g -Og
 all: phpcpp
 
+# -O2 is the medium level of optimization. If you really want to optimize
+# everything as much as possible, it can be replaced with -O3 which takes
+# longer to compile, but optimizes even more
 release: COMPILER_FLAGS +=	-O2
 release: LINKER_FLAGS	+=  -O2
 release: phpcpp
+
+endif
+
+
 
 phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo
 	@echo "Build complete."
 
-${PHP_SHARED_LIBRARY}: shared_directories ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -Wl,-soname,libphpcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
 
-${PHP_STATIC_LIBRARY}: static_directories ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
-	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
-
-shared_directories:
+create_shared_dirs:
 	${MKDIR} shared/common
 	${MKDIR} shared/zend
 
-static_directories:
+create_static_dirs:
 	${MKDIR} static/common
 	${MKDIR} static/zend
+
+
+${PHP_SHARED_LIBRARY}: create_shared_dirs ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
+	${LINKER} ${PHP_LINKER_FLAGS} -Wl,-soname,libphpcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS} ;\
+
+${PHP_STATIC_LIBRARY}: create_static_dirs ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
+	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS} ;\
+
 
 clean:
 	${RM} shared ${PHP_SHARED_LIBRARY}
 	${RM} static ${PHP_STATIC_LIBRARY}
-	find -name *.o | xargs ${RM}
+	${FIND} -iname '*.o' | xargs ${RM}
 
-${COMMON_SHARED_OBJECTS}:
+
+#
+# These objects have all headers as a dependency, because it's hard to determine
+# which headers each object needs. This means that all objects will get
+# recompiled once a single header file changes, but that also means that you
+# won't have to `make clean` every time you change a header file.
+# However, the same would happen if you did `make clean`, so there's no
+# difference in behaviour and compilation time.
+#
+
+${COMMON_SHARED_OBJECTS}: shared/%.o: %.cpp ${COMMON_HEADERS}
 	${COMPILER} ${COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
 
-${COMMON_STATIC_OBJECTS}:
+${COMMON_STATIC_OBJECTS}: static/%.o: %.cpp ${COMMON_HEADERS}
 	${COMPILER} ${COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
 
-${PHP_SHARED_OBJECTS}:
+${PHP_SHARED_OBJECTS}: shared/%.o: %.cpp ${PHP_HEADERS}
 	${COMPILER} ${PHP_COMPILER_FLAGS} ${SHARED_COMPILER_FLAGS} -o $@ ${@:shared/%.o=%.cpp}
 
-${PHP_STATIC_OBJECTS}:
+${PHP_STATIC_OBJECTS}: static/%.o: %.cpp ${PHP_HEADERS}
 	${COMPILER} ${PHP_COMPILER_FLAGS} ${STATIC_COMPILER_FLAGS} -o $@ ${@:static/%.o=%.cpp}
 
-
-# The if statements below must be seen as single line by make
 
 install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
 	${MKDIR} ${INSTALL_LIB}
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
+	@# The if statements below must be seen as single line by make
 	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
 		${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
 		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
@@ -226,7 +296,48 @@ install:
 		ldconfig; \
 	fi
 
+
 uninstall:
 	${RM} ${INSTALL_HEADERS}/phpcpp*
 	${RM} ${INSTALL_LIB}/libphpcpp.*
 
+
+debug:
+	@echo "THREADS: " ${THREADS}
+	@echo "UNAME:   " ${UNAME}
+	@echo ""
+	@echo "INSTALL_PREFIX:  " ${INSTALL_PREFIX}
+	@echo "INSTALL_HEADERS: " ${INSTALL_HEADERS}
+	@echo "INSTALL_LIB:     " ${INSTALL_LIB}
+	@echo ""
+	@echo "SONAME:  " ${SONAME}
+	@echo "VERSION: " ${VERSION}
+	@echo "PHP_SHARED_LIBRARY: " ${PHP_SHARED_LIBRARY}
+	@echo "PHP_STATIC_LIBRARY: " ${PHP_STATIC_LIBRARY}
+	@echo ""
+	@echo "PHP_CONFIG: " ${PHP_CONFIG}
+	@echo "COMPILER:   " ${COMPILER}
+	@echo "LINKER:     " ${LINKER}
+	@echo "ARCHIVER:   " ${ARCHIVER}
+	@echo "RM:         " ${RM}
+	@echo "CP:         " ${CP}
+	@echo "LN:         " ${LN}
+	@echo "MKDIR:      " ${MKDIR}
+	@echo "FIND:       " ${FIND}
+	@echo ""
+	@echo "COMPILER_FLAGS:        " ${COMPILER_FLAGS}; echo
+	@echo "PHP_COMPILER_FLAGS:    " ${PHP_COMPILER_FLAGS}; echo
+	@echo "SHARED_COMPILER_FLAGS: " ${SHARED_COMPILER_FLAGS}
+	@echo "STATIC_COMPILER_FLAGS: " ${STATIC_COMPILER_FLAGS}
+	@echo "LINKER_FLAGS:          " ${LINKER_FLAGS}
+	@echo "PHP_LINKER_FLAGS:      " ${PHP_LINKER_FLAGS}
+	@echo ""
+	@echo "COMMON_SOURCES: " ${COMMON_SOURCES}; echo
+	@echo "PHP_SOURCES:    " ${PHP_SOURCES}; echo
+	@echo "COMMON_HEADERS: " ${COMMON_HEADERS}; echo
+	@echo "PHP_HEADERS:    " ${PHP_HEADERS}; echo
+	@echo ""
+	@echo "COMMON_SHARED_OBJECTS: " ${COMMON_SHARED_OBJECTS}; echo
+	@echo "PHP_SHARED_OBJECTS:    " ${PHP_SHARED_OBJECTS}; echo
+	@echo "COMMON_STATIC_OBJECTS: " ${COMMON_STATIC_OBJECTS}; echo
+	@echo "PHP_STATIC_OBJECTS:    " ${PHP_STATIC_OBJECTS}; echo
