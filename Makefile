@@ -9,8 +9,9 @@
 
 
 #
-#	Run make with more threads to speed up the compiling process.
-#	If you don't set a value, it will use as many threads as possible
+#   Run make with more threads to speed up the compiling process.
+#   If you don't set a value, it will use as many threads as possible
+#
 
 THREADS				=
 
@@ -257,12 +258,12 @@ clean:
 
 
 #
-# These objects have all headers as a dependency, because it's hard to determine
-# which headers each object needs. This means that all objects will get
-# recompiled once a single header file changes, but that also means that you
-# won't have to `make clean` every time you change a header file.
-# However, the same would happen if you did `make clean`, so there's no
-# difference in behaviour and compilation time.
+#   These objects have all headers as a dependency, because it's hard to determine
+#   which headers each object needs. This means that all objects will get
+#   recompiled once a single header file changes, but that also means that you
+#   won't have to `make clean` every time you change a header file.
+#   However, the same would happen if you did `make clean`, so there's no
+#   difference in behaviour and compilation time.
 #
 
 ${COMMON_SHARED_OBJECTS}: shared/%.o: %.cpp ${COMMON_HEADERS}
