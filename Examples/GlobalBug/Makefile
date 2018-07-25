@@ -43,7 +43,7 @@ ${OBJECTS}: %.o: %.cpp ${HEADERS}
 clean:
 	${RM} *.obj *~* "${OBJECTS}" "${NAME}.so"
 
-#   Since the phpcpp.so file is (during development) in a unusual directory,
+#   Since the phpcpp.so file is (during development) in an unusual directory,
 #   we have to specify where we can find it.
 run: export LD_LIBRARY_PATH = ${PHPCPPROOT}
 run: ${NAME}.so
