@@ -114,6 +114,9 @@ public:
 
         // call base
         Value::set(index, value);
+
+        // force update current object
+        force_update();
     }
 
     /**
@@ -131,6 +134,9 @@ public:
 
         // call base
         Value::set(key, size, value);
+
+        // force update current object
+        force_update();
     }
 
 
@@ -140,6 +146,12 @@ protected:
      *  @return Value
      */
     Global &update();
+
+    /**
+     *  Update the underlying value forcefully
+     *  @return Value
+     */
+    Global &force_update();
 
 private:
     /**
