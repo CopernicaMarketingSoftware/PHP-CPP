@@ -406,7 +406,7 @@ Value& Value::operator=(struct _zval_struct* value)
         {
             // If reference count is greater than 1, we need to separate zval
             // This is the optimized version of SEPARATE_ZVAL_NOREF()
-            if (Z_COPYABLE_P(to))
+            if (Z_COPYABLE_P(to)))
             {
                 // this will decrement the reference count and invoke GC_ZVAL_CHECK_FOR_POSSIBLE_ROOT()
                 zval_ptr_dtor(to);
