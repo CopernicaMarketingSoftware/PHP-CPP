@@ -1354,7 +1354,9 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     {
         // install iterator functions
         entry.get_iterator = &ClassImpl::getIterator;
+#if PHP_VERSION_ID < 70300
         entry.iterator_funcs.funcs = IteratorImpl::functions();
+#endif
     }
 
     // for serializable classes, we install callbacks for serializing and unserializing

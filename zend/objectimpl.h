@@ -74,10 +74,13 @@ public:
 
         // install the handlers
         _mixed->php.handlers = handlers;
-
+#if PHP_VERSION_ID < 70300
         // set the initial refcount (if it is different than one, because one is the default)
         if (refcount != 1) GC_REFCOUNT(php()) = refcount;
-
+#else
+        // set the initial refcount (if it is different than one, because one is the default)
+        if (refcount != 1) GC_SET_REFCOUNT(php(),refcount);
+#endif
         // the object may remember that we are its implementation object
         base->_impl = this;
     }
