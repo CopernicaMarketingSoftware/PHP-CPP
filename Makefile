@@ -117,8 +117,16 @@ PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`
 #
 
 LINKER_FLAGS			=	-shared
+ifeq ($(UNAME), Darwin)
+	LINKER_FLAGS		+=	-undefined dynamic_lookup
+endif
 PHP_LINKER_FLAGS		=	`${PHP_CONFIG} --ldflags` ${LINKER_FLAGS}
 
+ifeq ($(UNAME), Darwin)
+	LINKER_SONAME_OPTION	=	-install_name
+else
+	LINKER_SONAME_OPTION    =   -soname
+endif
 
 #
 #   Command to remove files, copy files, link files and create directories.
@@ -176,7 +184,7 @@ phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
 	@echo "Build complete."
 
 ${PHP_SHARED_LIBRARY}: shared_directories ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -Wl,-soname,libphpcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
+	${LINKER} ${PHP_LINKER_FLAGS} -Wl,${LINKER_SONAME_OPTION},libphpcpp.so.$(SONAME) -o $@ ${COMMON_SHARED_OBJECTS} ${PHP_SHARED_OBJECTS}
 
 ${PHP_STATIC_LIBRARY}: static_directories ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
 	${ARCHIVER} $@ ${COMMON_STATIC_OBJECTS} ${PHP_STATIC_OBJECTS}
