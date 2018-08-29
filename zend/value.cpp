@@ -1049,6 +1049,16 @@ bool Value::isFloat() const
 }
 
 /**
+ *  Are we a reference?
+ *  @return bool
+ */
+bool Value::isReference() const
+{
+    // check our pointer if we are a reference
+    return Z_ISREF_P(_val);
+}
+
+/**
  *  Are we an object? This will also check if we're a reference to an object
  *  @return bool
  */
@@ -1130,12 +1140,20 @@ bool Value::isCallable() const
  */
 zend_class_entry *Value::classEntry(bool allowString) const
 {
+    // are we a reference
+    if (isReference())
+    {
+        // we go through the reference to retrieve the object
+        return Z_OBJCE_P(Z_REFVAL_P(_val));
+    }
+
     // is this an object
-    if (isObject())
+    else if (isObject())
     {
         // class entry can be easily found
         return Z_OBJCE_P(_val);
     }
+
     else
     {
         // the value is not an object, is this allowed?
@@ -1777,11 +1795,14 @@ HashMember<std::string> Value::operator[](const char *key)
  */
 Base *Value::implementation() const
 {
+    // are we a reference
+    if (isReference()) return ObjectImpl::find(Z_REFVAL_P(_val))->object();
+
     // must be an object
-    if (!isObject()) return nullptr;
+    if (isObject()) return ObjectImpl::find(_val)->object();
 
     // retrieve the mixed object that contains the base
-    return ObjectImpl::find(_val)->object();
+    return nullptr;
 }
 
 /**
