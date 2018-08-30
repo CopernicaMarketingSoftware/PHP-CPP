@@ -1360,10 +1360,10 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         entry.iterator_funcs.funcs = IteratorImpl::functions();
 #else
         // from 7.3 and up, we have to allocate it ourself
-        entry.iterator_funcs_ptr = calloc(1, sizeof(zend_class_iterator_funcs));
+        entry.iterator_funcs_ptr = (zend_class_iterator_funcs*) calloc(1, sizeof(zend_class_iterator_funcs));
 
         // and we finally include the pointer to the functions in the newly allocated structure
-        entry.iterator_funcs_ptr->funcs = IteratorImp::functions();
+        entry.iterator_funcs_ptr->funcs = IteratorImpl::functions();
 #endif
     }
 
