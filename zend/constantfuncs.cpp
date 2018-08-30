@@ -98,7 +98,7 @@ bool define(const char *name, size_t size, const Value &value)
     constant.module_number = PHP_USER_CONSTANT;
 #else
     // from 7.3 onwards there is a macro for setting the constant flags and module number
-    ZEND_CONSTANT_SET_FLAGS(constant, CONST_CS, PHP_USER_CONSTANT);
+    ZEND_CONSTANT_SET_FLAGS(&constant, CONST_CS, PHP_USER_CONSTANT);
 #endif
 
     // register the constant

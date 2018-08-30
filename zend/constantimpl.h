@@ -204,7 +204,7 @@ public:
         _constant.module_number = module_number;
 #else
         // from 7.3 onwards there is a macro for setting the constant flags and module number
-        ZEND_CONSTANT_SET_FLAGS(_constant, CONST_CS | CONST_PERSISTENT, module_number);
+        ZEND_CONSTANT_SET_FLAGS(&_constant, CONST_CS | CONST_PERSISTENT, module_number);
 #endif
 
         // register the zval
