@@ -53,13 +53,14 @@ public:
 
         // initialize all elements to null
         _argv[i].name = nullptr;
-        _argv[i].type = 0;
         _argv[i].is_variadic = false;
         _argv[i].pass_by_reference = false;
 
         // initialize the extra argument prior to 7.2
 #if PHP_VERSION_ID < 70200
         _argv[i].class_name = nullptr;
+#else
+        _argv[i].type = 0;
 #endif
     }
 
