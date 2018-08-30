@@ -1140,18 +1140,12 @@ bool Value::isCallable() const
  */
 zend_class_entry *Value::classEntry(bool allowString) const
 {
-    // are we a reference
-    if (isReference())
-    {
-        // we go through the reference to retrieve the object
-        return Z_OBJCE_P(Z_REFVAL_P(_val));
-    }
-
     // is this an object
-    else if (isObject())
+    if (isObject())
     {
-        // class entry can be easily found
-        return Z_OBJCE_P(_val);
+        // class entry can be easily found, we try to dereference here if our
+        // value is a reference to an object
+        return Z_OBJCE_P(_val.dereference());
     }
 
     else
@@ -1795,11 +1789,9 @@ HashMember<std::string> Value::operator[](const char *key)
  */
 Base *Value::implementation() const
 {
-    // are we a reference
-    if (isReference()) return ObjectImpl::find(Z_REFVAL_P(_val))->object();
-
-    // must be an object
-    if (isObject()) return ObjectImpl::find(_val)->object();
+    // must be an object, we try to dereference because we might be a reference
+    // to an object
+    if (isObject()) return ObjectImpl::find(_val.dereference())->object();
 
     // retrieve the mixed object that contains the base
     return nullptr;
