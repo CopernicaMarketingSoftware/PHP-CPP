@@ -98,6 +98,10 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
 #if PHP_VERSION_ID < 70200
         _argv[_argc + 1].class_name = reinterpret_cast<const char*>(this);
 #else
+        // @todo    this is broken. the zend engine, from 7.2 onwards copies over
+        //          the struct and slices of the last element, because the num_args
+        //          is incorrect in their view. another place to put this may be
+        //          hiding it behind the fname
         _argv[_argc + 1].type = reinterpret_cast<zend_type>(this);
 #endif
 
@@ -123,33 +127,29 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
  */
 void Callable::initialize(zend_internal_function_info *info, const char *classname) const
 {
+    // initialize all common elements
+    info->required_num_args = _required;
+    info->return_reference = false;
+    info->_is_variadic = false;
+
+    // the structure has been slightly altered since php7.2
 #if PHP_VERSION_ID < 70200
     // store the classname
     info->class_name = classname;
 
     // number of required arguments, and the expected return type
-    info->required_num_args = _required;
     info->type_hint = (unsigned char)_return;
-
-    // we do not support return-by-reference
-    info->return_reference = false;
 
     // since php 5.6 there are _allow_null and _is_variadic properties. It's
     // not exactly clear what they do (@todo find this out) so for now we set
     // them to false
     info->allow_null = false;
-    info->_is_variadic = false;
 #else
-    info->required_num_args = _required;
-    info->return_reference = false;
-    info->_is_variadic = false;
-
-    if (_return == Type::Object) {
-        info->type = reinterpret_cast<zend_type>(classname);
-    }
-    else {
-        info->type = ZEND_TYPE_ENCODE(static_cast<unsigned char>(_return), 0);
-    }
+    // if we can return a class, we can simply provide the classname as const char *
+    if (_return == Type::Object) info->type = reinterpret_cast<zend_type>(classname);
+    
+    // otherwise, we have to encode the type
+    else info->type = ZEND_TYPE_ENCODE(static_cast<unsigned char>(_return), 0);
 #endif
 }
 

@@ -4,3 +4,5 @@
 *.txt
 *.a.*
 *.so.*
+shared/
+static/
