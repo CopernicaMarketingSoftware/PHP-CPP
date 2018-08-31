@@ -25,6 +25,10 @@ env:
   - COMPILER_PKG=clang++-5 COMPILER=clang++-5.0
   - COMPILER_PKG=clang++-6 COMPILER=clang++-6.0
 
+matrix:
+  allow_failures:
+    - php: nightly
+
 before_install:
   # install access to all gcc compilers
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
