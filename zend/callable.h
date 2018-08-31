@@ -39,7 +39,7 @@ public:
     {
         // the first record is initialized with information about the function,
         // so we skip that here
-        int i=1;
+        int i = 1;
 
         // loop through the arguments
         for (auto &argument : arguments)
@@ -51,10 +51,14 @@ public:
             fill(&_argv[i++], argument);
         }
 
-        // initialize the extra argument
+        // initialize all elements to null
+        _argv[i].name = nullptr;
+        _argv[i].is_variadic = false;
+        _argv[i].pass_by_reference = false;
+
+        // initialize the extra argument prior to 7.2
 #if PHP_VERSION_ID < 70200
         _argv[i].class_name = nullptr;
-        _argv[i].name       = nullptr;
 #else
         _argv[i].type = 0;
 #endif
@@ -176,6 +180,7 @@ protected:
         if (arg.type() == Type::Object) info->class_name = arg.classname();
         else info->class_name = nullptr;
 
+        // whether or not we allow null
         info->allow_null = arg.allowNull();
 #endif
 
@@ -205,25 +210,35 @@ protected:
             case Type::Float:       info->type = ZEND_TYPE_ENCODE(IS_DOUBLE, arg.allowNull());    break;  // floating-point values welcome too
             case Type::String:      info->type = ZEND_TYPE_ENCODE(IS_STRING, arg.allowNull());    break;  // accept strings, should auto-cast objects with __toString as well
             case Type::Array:       info->type = ZEND_TYPE_ENCODE(IS_ARRAY, arg.allowNull());     break;  // array of anything (individual members cannot be restricted)
-            case Type::Object:                                                                            // must be an object of the given classname
-                if (arg.classname()) {
-                    if (!arg.allowNull()) {
-                        info->type = reinterpret_cast<zend_type>(arg.classname());
-                    }
-                    else {
-                        /// FIXME this leaks, although this happens only once during startup / MINIT
-                        /// Probably not critical
+            case Type::Object:                                                            // if there is a classname and the argument is not nullable, it's simply the classname
+                if (arg.classname() && !arg.allowNull()) info->type = reinterpret_cast<zend_type>(arg.classname());
 
-                        const char* orig = arg.classname();
-                        std::size_t len  = std::strlen(orig);
-                        char* newname    = new char[len + 2]; // trailing NUL and heading ?
-                        newname[0] = '?';
-                        std::memcpy(newname + 1, orig, len + 1 /* Trailing NUL */);
-                    }
+                // otherwise, we need to prepend the character '?'
+                else if (arg.classname() && arg.allowNull())
+                {
+                    // @todo    the code below leaks memory; the string should be 
+                    //          held at another level. however, this only happens on 
+                    //          initialization and therefore is non-critical. still, 
+                    //          it should be fixed.
+
+                    // find the length of the classname
+                    size_t length = std::strlen(arg.classname());
+
+                    // create a copy of the string, plus the ? and a null character.
+                    char *name = new char[length + 2];
+
+                    // set the ?
+                    name[0] = '?';
+                    
+                    // copy over the string and the terminating null character
+                    memcpy(name + 1, arg.classname(), length + 1);
+
+                    // assign the string
+                    info->type = reinterpret_cast<zend_type>(name);
                 }
-                else {
-                    info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
-                }
+
+                // we simply require the type to be any object
+                else info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
 
                 break;
 
@@ -238,6 +253,7 @@ protected:
         // support methods and functions with a fixed number of arguments.
         info->is_variadic = false;
 
+        // whether or not to pass the argument by reference
         info->pass_by_reference = arg.byReference();
     }
 

@@ -1354,8 +1354,13 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     {
         // install iterator functions
         entry.get_iterator = &ClassImpl::getIterator;
+
+        // prior to 7.3, the iterator functions were statically allocated.
 #if PHP_VERSION_ID < 70300
         entry.iterator_funcs.funcs = IteratorImpl::functions();
+#else
+        // from 7.3 and up, we may have to allocate it ourself
+        //entry.iterator_funcs_ptr = calloc(1, sizeof(zend_class_iterator_funcs));
 #endif
     }
 

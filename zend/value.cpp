@@ -1054,6 +1054,16 @@ bool Value::isFloat() const
 }
 
 /**
+ *  Are we a reference?
+ *  @return bool
+ */
+bool Value::isReference() const
+{
+    // check our pointer if we are a reference
+    return Z_ISREF_P(_val);
+}
+
+/**
  *  Are we an object? This will also check if we're a reference to an object
  *  @return bool
  */
@@ -1138,9 +1148,11 @@ zend_class_entry *Value::classEntry(bool allowString) const
     // is this an object
     if (isObject())
     {
-        // class entry can be easily found
-        return Z_OBJCE_P(_val);
+        // class entry can be easily found, we try to dereference here if our
+        // value is a reference to an object
+        return Z_OBJCE_P(_val.dereference());
     }
+
     else
     {
         // the value is not an object, is this allowed?
@@ -1782,11 +1794,12 @@ HashMember<std::string> Value::operator[](const char *key)
  */
 Base *Value::implementation() const
 {
-    // must be an object
-    if (!isObject()) return nullptr;
+    // must be an object, we try to dereference because we might be a reference
+    // to an object
+    if (isObject()) return ObjectImpl::find(_val.dereference())->object();
 
     // retrieve the mixed object that contains the base
-    return ObjectImpl::find(_val)->object();
+    return nullptr;
 }
 
 /**

@@ -398,6 +398,7 @@ public:
     bool isBool()       const;
     bool isString()     const;
     bool isFloat()      const;
+    bool isReference()  const;
     bool isObject()     const;
     bool isArray()      const;
     bool isScalar()     const { return isNull() || isNumeric() || isBool() || isString() || isFloat(); }
