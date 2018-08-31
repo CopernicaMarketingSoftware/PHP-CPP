@@ -158,9 +158,13 @@ Value::Value(struct _zval_struct *val, bool ref)
         // retrieve the reference
         zend_reference *ref = Z_REF_P(val);
 
+#if PHP_VERSION_ID < 70300
         // increment refcount
         ++GC_REFCOUNT(ref);
-
+#else
+	// increment refcount
+        GC_ADDREF(ref);
+#endif
         // store the reference in our value
         ZVAL_REF(_val, ref);
     }
@@ -237,9 +241,13 @@ Value Value::makeReference()
     // retriece the reference
     zend_reference *ref = Z_REF_P(from);
 
+#if PHP_VERSION_ID < 70300
     // increment reference count
     GC_REFCOUNT(ref)++;
-
+#else
+    // increment reference count
+    GC_ADDREF(ref);
+#endif
     // copy the reference
     ZVAL_REF(to, ref);
 
