@@ -1198,8 +1198,8 @@ protected:
     /**
      *  Functions that need access to the privates
      */
-    friend Value constant(const char *name, size_t size);
-    friend bool  define(const char *name, size_t size, const Value &value);
+    friend PHPCPP_EXPORT Value constant(const char *name, size_t size);
+    friend PHPCPP_EXPORT bool  define(const char *name, size_t size, const Value &value);
 
     /**
      *  The Globals and Member classes can access the zval directly
@@ -1221,8 +1221,8 @@ protected:
     /**
      *  Friend functions which have to access that zval directly
      */
-    friend Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
-    friend Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Error error);
+    friend Value PHPCPP_EXPORT set_exception_handler(const std::function<Value(Parameters &params)> &handler);
+    friend Value PHPCPP_EXPORT set_error_handler(const std::function<Value(Parameters &params)> &handler, Error error);
 };
 
 /**

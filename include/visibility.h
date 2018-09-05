@@ -13,18 +13,33 @@
 
 #if defined _WIN32 || defined __CYGWIN__
     #ifdef BUILDING_PHPCPP
-        #ifdef __GNUC__
-            #define PHPCPP_EXPORT __attribute__ ((dllexport))
-        #else
-            #define PHPCPP_EXPORT __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+        #ifdef BUILDING_SHARED
+            #ifdef __GNUC__
+                #define PHPCPP_EXPORT __attribute__ ((dllexport))
+            #else
+                #define PHPCPP_EXPORT __declspec(dllexport) // Note: actually gcc seems to also supports this syntax.
+            #endif
+        #else /* build static library */
+          #define PHPCPP_EXPORT
         #endif
+        #define DLL_EXPORT
     #else
-        #ifdef __GNUC__
-            #define DLL_EXPORT __attribute__ ((dllimport))
-        #else
-            #define DLL_EXPORT __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+        #ifdef BUILDING_SHARED
+            #ifdef __GNUC__
+                #define DLL_EXPORT __attribute__ ((dllimport))
+            #else
+                #define DLL_EXPORT __declspec(dllimport) // Note: actually gcc seems to also supports this syntax.
+            #endif
+        #else /* build static library */
+            #define DLL_EXPORT
         #endif
+        #define PHPCPP_EXPORT
     #endif
 #else
-    #define PHPCPP_EXPORT __attribute__ ((visibility ("default")))
+    #ifdef BUILDING_SHARED
+        #define PHPCPP_EXPORT __attribute__ ((visibility ("default")))
+    #else /* build static library */
+        #define PHPCPP_EXPORT
+    #endif
+    #define DLL_EXPORT
 #endif
