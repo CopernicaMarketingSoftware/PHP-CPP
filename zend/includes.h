@@ -43,6 +43,7 @@
 #include <zend_ini.h>
 #include <zend_closures.h>
 #include <SAPI.h>
+#include <php_streams.h>
 
 /**
  *  We don't work with older versions of PHP
@@ -69,6 +70,7 @@
 #include "../include/ini.h"
 #include "../include/exception.h"
 #include "../include/fatalerror.h"
+#include "../include/stream.h"
 #include "../include/streams.h"
 #include "../include/type.h"
 #include "../include/errors.h"

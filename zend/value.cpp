@@ -324,6 +324,21 @@ void Value::invalidate()
 }
 
 /**
+ *  Get resource stream (if found)
+ *  @param  stream
+ */
+void Value::getStream(php_stream **stream) const
+{
+    // zval type must be Type::Resource
+    if (type() != Type::Resource)
+    {
+        return;
+    }
+    zval *return_value = NULL;
+    php_stream_from_zval(*stream, _val);
+}
+
+/**
  *  Retrieve the refcount
  *  @return int
  */
@@ -334,6 +349,17 @@ int Value::refcount() const
 
     // we are, retrieve the count
     return Z_REFCOUNT_P(_val);
+}
+
+/**
+ *  Find out whether or not the Resource-typed zval contains a php_stream pointer
+ *  @return bool
+ */
+bool Value::isStreamResource() const
+{
+    php_stream *stream = NULL;
+    getStream(&stream);
+	return stream != NULL;
 }
 
 /**
@@ -1333,6 +1359,17 @@ const char *Value::rawValue() const
 double Value::floatValue() const
 {
     return zval_get_double(_val);
+}
+
+/**
+ *  Retrieve the value as stream
+ *  @return Stream
+ */
+Stream *Value::stream() const
+{
+    php_stream *stream = NULL;
+    getStream(&stream);
+	return new Stream(stream);
 }
 
 /**

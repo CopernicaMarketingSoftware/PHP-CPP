@@ -23,6 +23,9 @@
  */
 #include "zval.h"
 
+struct _php_stream;
+typedef struct _php_stream php_stream;
+
 /**
  *  Set up namespace
  */
@@ -32,6 +35,7 @@ namespace Php {
  *  Forward definitions
  */
 class Base;
+class Stream;
 class ValueIterator;
 class Parameters;
 template <class Type> class HashMember;
@@ -403,6 +407,7 @@ public:
     bool isArray()      const;
     bool isScalar()     const { return isNull() || isNumeric() || isBool() || isString() || isFloat(); }
     bool isCallable()   const;
+    bool isStreamResource() const;
 
     /**
      *  Get access to the raw buffer - you can use this for direct reading and
@@ -453,6 +458,12 @@ public:
      *  @return double
      */
     double floatValue() const;
+
+    /**
+     *  Retrieve the value as stream
+     *  @return Stream
+     */
+    Stream *stream() const;
 
     /**
      *  Convert the object to a vector
@@ -713,6 +724,15 @@ public:
     operator double () const
     {
         return floatValue();
+    }
+
+    /**
+     *  Cast to a stream object
+     *  @return Stream *
+     */
+    operator Stream * () const
+    {
+        return stream();
     }
 
     /**
@@ -1160,6 +1180,16 @@ protected:
      *  Invalidate the object - so that it will not be destructed
      */
     void invalidate();
+
+    /**
+     *  Get resource stream (if found)
+     *
+     *  This method will attempt to load a php_stream pointer from the zval,
+     *  if the zval type is Type::Resource.
+     *
+     *  @param  php_stream
+     */
+    void getStream(php_stream **stream) const;
 
     /**
      *  Set a certain property without running any checks (you must already know
