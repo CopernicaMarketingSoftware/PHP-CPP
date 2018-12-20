@@ -8,6 +8,7 @@ PROJECT(phpcpp)
 # PHPCPP_ARCH           Set to "x86_64" if architecture and PHP was compiled under x64 or "x86" for 32 bit
 # PHPCPP_PHP_PATH       The path to PHP sources
 
+set(CMAKE_CXX_STANDARD 11)
 LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
 
 IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
@@ -24,6 +25,10 @@ ADD_DEFINITIONS(-D_MSC_STDINT_H_)
 ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
 ADD_DEFINITIONS(-DBUILDING_PHPCPP)
 ADD_DEFINITIONS(-DZEND_WIN32_KEEP_INLINE)
+
+IF (NOT EXISTS "${PHPCPP_PHP_PATH}/main/php.h")
+  message(SEND_ERROR "The PHPCPP_PHP_PATH variable does not contain PHP sources path")
+ENDIF()
 
 IF (MSVC)
   # Should compile MSVC runtime static or dll
