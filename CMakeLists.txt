@@ -5,6 +5,7 @@ PROJECT(phpcpp)
 # Use CMake File with following options
 # PHPCPP_COMPILE_TS     Set flag if PHP was compiled with thread safe
 # PHPCPP_MSVCRT_STATIC  Set flag if you want to compile the MSVC runtime as a static library
+# PHPCPP_SHARED         Set flag if you want to compile shared library
 # PHPCPP_ARCH           Set to "x86_64" if architecture and PHP was compiled under x64 or "x86" for 32 bit
 # PHPCPP_PHP_PATH       The path to PHP sources
 
