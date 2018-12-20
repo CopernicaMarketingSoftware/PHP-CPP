@@ -86,3 +86,43 @@
     be added to it.
 </p>
 
+
+<h2 id="cmake">Compiling using cmake</h2>
+<p>
+    You could use PHP-CPP as a part of your project. You can install it into your source tree using command
+</p>
+<p>
+<pre class="language-bash"><code>git submodule add git://github.com/CopernicaMarketingSoftware/PHP-CPP.git
+</code></pre>
+</p>
+<p>
+    For example, part of your CMakeLists.txt may look like this:
+</p>
+<p>
+<pre class="language-cmake"><code>FIND_PROGRAM(PHP_CONFIG NAMES php-config)
+
+execute_process(
+    COMMAND ${PHP_CONFIG} --include-dir
+    OUTPUT_VARIABLE PHPCPP_PHP_PATH
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+)
+# or: SET(PHPCPP_PHP_PATH "/usr/include/php/20160303" CACHE STRING "")
+SET(PHPCPP_ARCH "x86_64" CACHE STRING "")
+
+add_subdirectory(PHP-CPP)
+target_link_libraries(YourTarget PRIVATE phpcpp)
+</code></pre>
+</p>
+<p>
+    For full list of options look through CMakeLists.txt file comments.
+</p>
+<p>
+    Or you could compile and install PHP-CPP using Makefile and then reference it in your CMakeLists.txt like this:
+</p>
+
+<p>
+<pre class="language-cmake"><code>find_library(phpcpp REQUIRED)
+target_link_libraries(YourTarget PRIVATE phpcpp)
+</code></pre>
+</p>
+
