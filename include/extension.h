@@ -86,7 +86,7 @@ public:
      *  @return Extension   Same object to allow chaining
      */
     Extension &onShutdown(const Callback &callback);
-
+    
     /**
      *  Register a callback that is called at the beginning of each pageview/request
      *
@@ -118,50 +118,27 @@ public:
      *  @param  ini         The php.ini setting
      *  @return Extension   Same object to allow chaining
      */
-    Extension &add(Ini &&ini)
-    {
-        // skip when locked
-        if (locked()) return *this;
-
-        // and add it to the list of classes
-        _ini_entries.emplace_back(new Ini(std::move(ini)));
-
-        // allow chaining
-        return *this;
-    }
+    Extension &add(Ini &&ini);
 
     /**
      *  Add a ini entry to the extension by copying it
      *  @param  ini         The php.ini setting
      *  @param  Extension   Same object to allow chaining
      */
-    Extension &add(const Ini &ini)
-    {
-        // skip when locked
-        if (locked()) return *this;
-
-        // and add it to the list of classes
-        _ini_entries.emplace_back(new Ini(ini));
-
-        // allow chaining
-        return *this;
-    }
+    Extension &add(const Ini &ini);
 
     /**
      *  Because the add function exists in both the Namespace base class
      *  as well as this extended Extension class, we have to tell the compiler
-     *  that the add methods from the base are accessible too
+     *  that the add methods from the base are accessble too
      */
     using Namespace::add;
-
+    
     /**
      *  The total number of php.ini variables
      *  @return size_t
      */
-    size_t iniVariables() const
-    {
-        return _ini_entries.size();
-    }
+    size_t iniVariables() const;
 
     /**
      *  Apply a callback to each php.ini variable
@@ -170,11 +147,7 @@ public:
      *
      *  @param  callback
      */
-    void iniVariables(const std::function<void(Ini &ini)> &callback)
-    {
-        // loop through the entries and apply the callback to each one
-        for (auto ini : _ini_entries) callback(*ini);
-    }
+    void iniVariables(const std::function<void(Ini &ini)> &callback);
 
     /**
      *  Retrieve the module pointer
@@ -213,13 +186,6 @@ private:
      *  @var std::unique_ptr<ExtensionImpl>
      */
     std::unique_ptr<ExtensionImpl> _impl;
-
-    /**
-     *  Ini entry defined by the extension
-     *  @var    list
-     */
-    std::list<std::shared_ptr<Ini>> _ini_entries;
-
 };
 
 /**

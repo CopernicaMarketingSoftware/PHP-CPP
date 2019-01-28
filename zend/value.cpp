@@ -158,9 +158,13 @@ Value::Value(struct _zval_struct *val, bool ref)
         // retrieve the reference
         zend_reference *ref = Z_REF_P(val);
 
+#if PHP_VERSION_ID < 70300
         // increment refcount
         ++GC_REFCOUNT(ref);
-
+#else
+	// increment refcount
+        GC_ADDREF(ref);
+#endif
         // store the reference in our value
         ZVAL_REF(_val, ref);
     }
@@ -237,9 +241,13 @@ Value Value::makeReference()
     // retriece the reference
     zend_reference *ref = Z_REF_P(from);
 
+#if PHP_VERSION_ID < 70300
     // increment reference count
     GC_REFCOUNT(ref)++;
-
+#else
+    // increment reference count
+    GC_ADDREF(ref);
+#endif
     // copy the reference
     ZVAL_REF(to, ref);
 
@@ -1049,6 +1057,16 @@ bool Value::isFloat() const
 }
 
 /**
+ *  Are we a reference?
+ *  @return bool
+ */
+bool Value::isReference() const
+{
+    // check our pointer if we are a reference
+    return Z_ISREF_P(_val);
+}
+
+/**
  *  Are we an object? This will also check if we're a reference to an object
  *  @return bool
  */
@@ -1133,9 +1151,11 @@ zend_class_entry *Value::classEntry(bool allowString) const
     // is this an object
     if (isObject())
     {
-        // class entry can be easily found
-        return Z_OBJCE_P(_val);
+        // class entry can be easily found, we try to dereference here if our
+        // value is a reference to an object
+        return Z_OBJCE_P(_val.dereference());
     }
+
     else
     {
         // the value is not an object, is this allowed?
@@ -1777,11 +1797,12 @@ HashMember<std::string> Value::operator[](const char *key)
  */
 Base *Value::implementation() const
 {
-    // must be an object
-    if (!isObject()) return nullptr;
+    // must be an object, we try to dereference because we might be a reference
+    // to an object
+    if (isObject()) return ObjectImpl::find(_val.dereference())->object();
 
     // retrieve the mixed object that contains the base
-    return ObjectImpl::find(_val)->object();
+    return nullptr;
 }
 
 /**

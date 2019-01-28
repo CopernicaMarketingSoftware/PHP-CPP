@@ -90,12 +90,18 @@ bool define(const char *name, size_t size, const Value &value)
         zval_copy_ctor(&constant.value);
     }
 
+    // before 7.3 constants could simply be set
+#if PHP_VERSION_ID < 70300
     // constants are case sensitive (but not persistent, because this is a user
     // space constant!)
     constant.flags = CONST_CS;
-
-    // as module number we use a fake module number
     constant.module_number = PHP_USER_CONSTANT;
+#else
+    // constants are case sensitive (but not persistent, because this is a user
+    // space constant!)
+    // as module number we use a fake module number
+    ZEND_CONSTANT_SET_FLAGS(&constant, CONST_CS, PHP_USER_CONSTANT);
+#endif
 
     // register the constant
     return zend_register_constant(&constant) == SUCCESS;

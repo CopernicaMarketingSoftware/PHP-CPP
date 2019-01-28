@@ -4,7 +4,7 @@
  *  Implementation file for the ClassImpl class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2019 Copernica BV
  */
 #include "includes.h"
 #include <cstring>
@@ -92,7 +92,7 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
 {
     // retrieve the originally called (and by us allocated) function object
     auto *data = (CallData *)execute_data->func;
-    zend_internal_function *func = &data->func;
+    auto *func = &data->func;
 
     // retrieve the function name
     const char *name = ZSTR_VAL(func->function_name);
@@ -211,16 +211,19 @@ zend_function *ClassImpl::getMethod(zend_object **object, zend_string *method, c
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
 
-    // we're going to set all properties
+    // set all properties
     function->type = ZEND_INTERNAL_FUNCTION;
-    function->module = nullptr;
-    function->handler = &ClassImpl::callMethod;
-    function->arg_info = nullptr;
-    function->num_args = 0;
+    function->arg_flags[0]      = 0;
+    function->arg_flags[1]      = 0;
+    function->arg_flags[2]      = 0;
+    function->fn_flags          = ZEND_ACC_CALL_VIA_HANDLER;
+    function->function_name     = method;
+    function->scope             = entry;
+    function->prototype         = nullptr;
+    function->num_args          = 0;
     function->required_num_args = 0;
-    function->scope = entry;
-    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
-    function->function_name = method;
+    function->arg_info          = nullptr;
+    function->handler           = &ClassImpl::callMethod;
 
     // store pointer to ourselves
     data->self = self(entry);
@@ -252,16 +255,19 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
 
-    // we're going to set all properties
+    // set all properties for the function
     function->type = ZEND_INTERNAL_FUNCTION;
-    function->module = nullptr;
-    function->handler = ClassImpl::callMethod;
-    function->arg_info = nullptr;
-    function->num_args = 0;
+    function->arg_flags[0]      = 0;
+    function->arg_flags[1]      = 0;
+    function->arg_flags[2]      = 0;
+    function->fn_flags          = ZEND_ACC_CALL_VIA_HANDLER;
+    function->function_name     = nullptr;
+    function->scope             = nullptr;
+    function->prototype         = nullptr;
+    function->num_args          = 0;
     function->required_num_args = 0;
-    function->scope = nullptr;
-    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
-    function->function_name = method;
+    function->arg_info          = nullptr;
+    function->handler           = &ClassImpl::callMethod;
 
     // store pointer to ourselves
     data->self = self(entry);
@@ -293,16 +299,19 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
 
-    // we're going to set all properties
+    // we're going to set all properties of the zend_internal_function struct
     function->type = ZEND_INTERNAL_FUNCTION;
-    function->module = nullptr;
-    function->handler = &ClassImpl::callInvoke;
-    function->arg_info = nullptr;
-    function->num_args = 0;
+    function->arg_flags[0]      = 0;
+    function->arg_flags[1]      = 0;
+    function->arg_flags[2]      = 0;
+    function->fn_flags          = ZEND_ACC_CALL_VIA_HANDLER;
+    function->function_name     = nullptr;
+    function->scope             = *entry_ptr;
+    function->prototype         = nullptr;
+    function->num_args          = 0;
     function->required_num_args = 0;
-    function->scope = *entry_ptr;
-    function->fn_flags = ZEND_ACC_CALL_VIA_HANDLER;
-    function->function_name = nullptr;
+    function->arg_info          = nullptr;
+    function->handler           = &ClassImpl::callInvoke;
 
     // store pointer to ourselves (note that the entry_ptr is useless
     // inside this function as it is always uninitialized for some reason)
@@ -1310,7 +1319,7 @@ const struct _zend_function_entry *ClassImpl::entries()
     zend_function_entry *last = &_entries[i];
 
     // all should be set to zero
-    memset(last, 0, sizeof(*last));
+    memset(last, 0, sizeof(zend_function_entry));
 
     // done
     return _entries;
@@ -1354,7 +1363,14 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     {
         // install iterator functions
         entry.get_iterator = &ClassImpl::getIterator;
+
+        // prior to 7.3, the iterator functions were statically allocated.
+#if PHP_VERSION_ID < 70300
         entry.iterator_funcs.funcs = IteratorImpl::functions();
+#else
+        // from 7.3 and up, we may have to allocate it ourself
+        //entry.iterator_funcs_ptr = calloc(1, sizeof(zend_class_iterator_funcs));
+#endif
     }
 
     // for serializable classes, we install callbacks for serializing and unserializing

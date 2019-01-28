@@ -197,10 +197,16 @@ public:
             _constant.name = zend_string_init(_name, ::strlen(_name), 1);
         }
 
+        // before 7.3 constants could simply be set
+#if PHP_VERSION_ID < 70300
         // set all the other constant properties
         _constant.flags = CONST_CS | CONST_PERSISTENT;
         _constant.module_number = module_number;
-
+#else
+        // from 7.3 onwards there is a macro for setting the constant flags and module number
+        ZEND_CONSTANT_SET_FLAGS(&_constant, CONST_CS | CONST_PERSISTENT, module_number);
+#endif
+      
         // register the zval
         zend_register_constant(&_constant);
     }
