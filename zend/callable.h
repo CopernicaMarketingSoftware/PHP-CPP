@@ -5,7 +5,7 @@
  *  API.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013 - 2019 Copernica BV
  */
 
 /**
@@ -112,7 +112,6 @@ public:
     /**
      *  Fill a function entry
      *  @param  entry       Entry to be filled
-     *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      *  @param  flags       Access flags
      */
@@ -121,7 +120,6 @@ public:
     /**
      *  Fill function info
      *  @param  info        Info object to be filled
-     *  @param  ns          Active namespace
      *  @param  classname   Optional class name
      */
     void initialize(zend_internal_function_info *info, const char *classname = nullptr) const;
@@ -211,37 +209,9 @@ protected:
             case Type::String:      info->type = ZEND_TYPE_ENCODE(IS_STRING, arg.allowNull());    break;  // accept strings, should auto-cast objects with __toString as well
             case Type::Array:       info->type = ZEND_TYPE_ENCODE(IS_ARRAY, arg.allowNull());     break;  // array of anything (individual members cannot be restricted)
             case Type::Object:                                                            // if there is a classname and the argument is not nullable, it's simply the classname
-                if (arg.classname() && !arg.allowNull()) info->type = reinterpret_cast<zend_type>(arg.classname());
-
-                // otherwise, we need to prepend the character '?'
-                else if (arg.classname() && arg.allowNull())
-                {
-                    // @todo    the code below leaks memory; the string should be 
-                    //          held at another level. however, this only happens on 
-                    //          initialization and therefore is non-critical. still, 
-                    //          it should be fixed.
-
-                    // find the length of the classname
-                    size_t length = std::strlen(arg.classname());
-
-                    // create a copy of the string, plus the ? and a null character.
-                    char *name = new char[length + 2];
-
-                    // set the ?
-                    name[0] = '?';
-                    
-                    // copy over the string and the terminating null character
-                    memcpy(name + 1, arg.classname(), length + 1);
-
-                    // assign the string
-                    info->type = reinterpret_cast<zend_type>(name);
-                }
-
-                // we simply require the type to be any object
-                else info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
-
+                if (!arg.classname()) info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
+                else info->type = ZEND_TYPE_ENCODE_CLASS(arg.classname(), arg.allowNull());
                 break;
-
             case Type::Callable:    info->type = ZEND_TYPE_ENCODE(IS_CALLABLE, arg.allowNull());  break;  // anything that can be invoked
             default:                info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // if not specified we allow anything
 #endif

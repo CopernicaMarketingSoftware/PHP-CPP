@@ -4,7 +4,7 @@
  *  Implementation for the function class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013 - 2019 Copernica BV
  */
 #include "includes.h"
 
@@ -145,11 +145,11 @@ void Callable::initialize(zend_internal_function_info *info, const char *classna
     // them to false
     info->allow_null = false;
 #else
-    // if we can return a class, we can simply provide the classname as const char *
-    if (_return == Type::Object) info->type = reinterpret_cast<zend_type>(classname);
-    
-    // otherwise, we have to encode the type
-    else info->type = ZEND_TYPE_ENCODE(static_cast<unsigned char>(_return), 0);
+    // the properties that are available on php 7.2 and higher
+    info->required_num_args = _required;
+    info->return_reference = false;
+    info->_is_variadic = false;
+    info->type = ZEND_TYPE_ENCODE((int)_return, true);
 #endif
 }
 
