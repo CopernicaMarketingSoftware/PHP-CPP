@@ -5,7 +5,7 @@
  *  exist for a class.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2019 Copernica BV
  */
 
 /**
@@ -303,10 +303,10 @@ public:
 
     /**
      *  Method that returns information about the __invoke() method
-     *  @param  object
-     *  @param  entry
-     *  @param  func
-     *  @param  object_ptr
+     *  @param  object      The object on which the method is called
+     *  @param  entry       Class entry holding class properties
+     *  @param  func        Function to be filled
+     *  @param  object_ptr  To be filled with the object on which the method is to be called
      *  @return int
      */
     static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr);

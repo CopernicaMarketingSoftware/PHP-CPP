@@ -4,7 +4,7 @@
  *  Implementation file for the constant class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2015 Copernica BV
+ *  @copyright 2015 - 2019 Copernica BV
  */
 
 /**
@@ -188,7 +188,7 @@ public:
 
             // copy the entire namespace name, separator and constant name
             ::strncpy(ZSTR_VAL(_constant.name), prefix.c_str(), prefix.size());
-            ::strncpy(ZSTR_VAL(_constant.name) + prefix.size(), "\\", 1);
+            ::strcpy (ZSTR_VAL(_constant.name) + prefix.size(), "\\");
             ::strncpy(ZSTR_VAL(_constant.name) + prefix.size() + 1, _name, namelen + 1);
         }
         else

@@ -106,9 +106,6 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
     // the function could throw an exception
     try
     {
-        // wrap the return value
-        Value result(return_value, true);
-
         // construct parameters
         ParametersImpl params(getThis(), ZEND_NUM_ARGS());
 
@@ -116,8 +113,10 @@ void ClassImpl::callMethod(INTERNAL_FUNCTION_PARAMETERS)
         Base *base = params.object();
 
         // is this a static, or a non-static call?
-        if (base) result = meta->callCall(base, name, params);
-        else result = meta->callCallStatic(name, params);
+        Php::Value result = base ? meta->callCall(base, name, params) : meta->callCallStatic(name, params);
+
+        // return a full copy of the zval, and do not destruct it
+        RETVAL_ZVAL(result._val, 1, 0);
     }
     catch (const NotImplemented &exception)
     {
@@ -151,9 +150,6 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
     // the function could throw an exception
     try
     {
-        // wrap the return value
-        Value result(return_value, true);
-
         // construct parameters
         ParametersImpl params(getThis(), ZEND_NUM_ARGS());
 
@@ -161,7 +157,10 @@ void ClassImpl::callInvoke(INTERNAL_FUNCTION_PARAMETERS)
         Base *base = params.object();
 
         // call the actual __invoke method on the base object
-        result = meta->callInvoke(base, params);
+        auto result = meta->callInvoke(base, params);
+
+        // return a full copy of the zval, and do not destruct it
+        RETVAL_ZVAL(result._val, 1, 0);
     }
     catch (const NotImplemented &exception)
     {
@@ -212,7 +211,7 @@ zend_function *ClassImpl::getMethod(zend_object **object, zend_string *method, c
     auto *function = &data->func;
 
     // set all properties
-    function->type = ZEND_INTERNAL_FUNCTION;
+    function->type              = ZEND_INTERNAL_FUNCTION;
     function->arg_flags[0]      = 0;
     function->arg_flags[1]      = 0;
     function->arg_flags[2]      = 0;
@@ -256,7 +255,7 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
     auto *function = &data->func;
 
     // set all properties for the function
-    function->type = ZEND_INTERNAL_FUNCTION;
+    function->type              = ZEND_INTERNAL_FUNCTION;
     function->arg_flags[0]      = 0;
     function->arg_flags[1]      = 0;
     function->arg_flags[2]      = 0;
@@ -300,7 +299,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     auto *function = &data->func;
 
     // we're going to set all properties of the zend_internal_function struct
-    function->type = ZEND_INTERNAL_FUNCTION;
+    function->type              = ZEND_INTERNAL_FUNCTION;
     function->arg_flags[0]      = 0;
     function->arg_flags[1]      = 0;
     function->arg_flags[2]      = 0;
