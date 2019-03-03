@@ -32,7 +32,7 @@ namespace Php {
 /**
  *  Class definition
  */
-class Stream
+class PHPCPP_EXPORT Stream
 {
 private:
     /**
