@@ -4,7 +4,7 @@
  *  Startup include file to compile the phpcpp library
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 Copernica BV
+ *  @copyright 2013 - 2019 Copernica BV
  */
 
 /**
@@ -104,6 +104,7 @@
 #include "../include/script.h"
 #include "../include/file.h"
 #include "../include/function.h"
+#include "../include/stream.h"
 
 /**
  *  Common header files for internal use only

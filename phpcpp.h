@@ -3,7 +3,7 @@
  *
  *  Library to build PHP extensions with CPP
  *
- *  @copyright 2013 CopernicA BV
+ *  @copyright 2013 - 2019 Copernica BV
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
 
@@ -72,5 +72,6 @@
 #include <phpcpp/script.h>
 #include <phpcpp/file.h>
 #include <phpcpp/function.h>
+#include <phpcpp/stream.h>
 
 #endif /* phpcpp.h */
