@@ -15,8 +15,8 @@
 /**
  *  Public include files
  */
-#include "../include/visibility.h"
-#include "../include/modifiers.h"
+#include "../include/phpcpp/visibility.h"
+#include "../include/phpcpp/modifiers.h"
 
 /**
  *  Generic implementation header files

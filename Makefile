@@ -228,7 +228,7 @@ install:
 	${MKDIR} ${INSTALL_HEADERS}/phpcpp
 	${MKDIR} ${INSTALL_LIB}
 	${CP} phpcpp.h ${INSTALL_HEADERS}
-	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
+	${CP} include/phpcpp/*.h ${INSTALL_HEADERS}/phpcpp
 	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
 		${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
 		${LN} ${INSTALL_LIB}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
