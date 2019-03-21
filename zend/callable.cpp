@@ -61,7 +61,7 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
         {
             // get the result
             Value result(callable->invoke(params));
-
+            
             // return a full copy of the zval, and do not destruct it
             RETVAL_ZVAL(result._val, 1, 0);
         }

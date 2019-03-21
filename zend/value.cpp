@@ -770,20 +770,15 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     if (call_user_function_ex(CG(function_table), (zval*) object, method, &retval, argc, argv, 1, nullptr) != SUCCESS)
     {
         // throw an exception, the function does not exist
-        // @todo this is not an exception but an error
-        throw Exception("Invalid call to "+Value(method).stringValue());
+        throw Error("Invalid call to "+Value(method).stringValue());
 
         // unreachable, but let's return at least something to prevent compiler warnings
         return nullptr;
     }
     else
     {
-        // was an exception thrown inside the function? In that case we throw a C++ new exception
-        // to give the C++ code the chance to catch it
-        // @todo remove this
-        //if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
-
-        // rethrow the exception to the extension
+        // the state object checks if a new exception is added to the stack, which means
+        // that an exception or error occured during the call to php space
         state.rethrow();
 
         // leap out if nothing was returned
