@@ -5,7 +5,7 @@
  *  within PHP
  *
  *  @author Martijn Otto <martijn.otto@copernica.com>
- *  @copyright 2016 Copernica B.V.
+ *  @copyright 2016 - 2019 Copernica B.V.
  */
 
 /**
@@ -58,11 +58,10 @@ private:
     static Parameters parameters(struct _zend_execute_data *execute_data);
 
     /**
-     *  Handle exceptions
-     *
-     *  @param  exception   The exception to handle
+     *  Handle throwables
+     *  @param  throwable       The object to handle
      */
-    static void handle(Exception &exception);
+    static void handle(Throwable &throwable);
 
     /**
      *  Yield (return) the given value

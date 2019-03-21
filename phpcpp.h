@@ -35,8 +35,9 @@
 #include <phpcpp/version.h>
 #include <phpcpp/inivalue.h>
 #include <phpcpp/ini.h>
+#include <phpcpp/throwable.h>
 #include <phpcpp/exception.h>
-#include <phpcpp/fatalerror.h>
+#include <phpcpp/error.h>
 #include <phpcpp/streams.h>
 #include <phpcpp/errors.h>
 #include <phpcpp/type.h>

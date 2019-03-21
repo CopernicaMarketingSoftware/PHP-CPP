@@ -22,7 +22,7 @@
  *
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013, 2014 Copernica BV
+ *  @copyright 2013 - 2019 Copernica BV
  */
 #include "includes.h"
 #include "string.h"
@@ -184,7 +184,7 @@ Value::Value(const Base *object)
     auto *impl = object->implementation();
 
     // do we have a handle?
-    if (!impl) throw FatalError("Assigning an unassigned object to a variable");
+    if (!impl) throw Error("Assigning an unassigned object to a variable");
 
     // set it to an object and increase refcount
     ZVAL_OBJ(_val, impl->php());
@@ -761,15 +761,16 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     // the return zval
     zval retval;
 
-    // the current exception
-    zend_object *oldException = EG(exception);
-
+    // remember current state of the PHP engine
+    State state;
+    
     // call the function
     // we're casting the const away here, object is only const so we can call this method
     // from const methods after all..
     if (call_user_function_ex(CG(function_table), (zval*) object, method, &retval, argc, argv, 1, nullptr) != SUCCESS)
     {
         // throw an exception, the function does not exist
+        // @todo this is not an exception but an error
         throw Exception("Invalid call to "+Value(method).stringValue());
 
         // unreachable, but let's return at least something to prevent compiler warnings
@@ -779,12 +780,16 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     {
         // was an exception thrown inside the function? In that case we throw a C++ new exception
         // to give the C++ code the chance to catch it
-        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
+        // @todo remove this
+        //if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
+
+        // rethrow the exception to the extension
+        state.rethrow();
 
         // leap out if nothing was returned
         if (Z_ISUNDEF(retval)) return nullptr;
 
-        // wrap the retval in a value
+        // wrap the retval in a val
         Php::Value result(&retval);
 
         // destruct the retval (this just decrements the refcounter, which is ok, because
@@ -1105,26 +1110,23 @@ Value &Value::setType(Type type) &
     // if this is not a reference variable, we should detach it to implement copy on write
     SEPARATE_ZVAL_IF_NOT_REF(_val);
 
-    // run the conversion, when it fails we throw a fatal error which will
-    // in the end result in a zend_error() call. This FatalError class is necessary
-    // because a direct call to zend_error() will do a longjmp() which may not
-    // clean up the C++ objects created by the extension
+    // run the conversion, when it fails we throw a fatal error that ends up in PHP space
     switch (type) {
-    case Type::Undefined:       throw FatalError{ "Cannot make a variable undefined"                                 }; break;
-    case Type::Null:            convert_to_null(_val);                                                                  break;
-    case Type::Numeric:         convert_to_long(_val);                                                                  break;
-    case Type::Float:           convert_to_double(_val);                                                                break;
-    case Type::Bool:            convert_to_boolean(_val);                                                               break;
-    case Type::False:           convert_to_boolean(_val); ZVAL_FALSE(_val);                                             break;
-    case Type::True:            convert_to_boolean(_val); ZVAL_TRUE(_val);                                              break;
-    case Type::Array:           convert_to_array(_val);                                                                 break;
-    case Type::Object:          convert_to_object(_val);                                                                break;
-    case Type::String:          convert_to_string(_val);                                                                break;
-    case Type::Resource:        throw FatalError{ "Resource types cannot be handled by the PHP-CPP library"          }; break;
-    case Type::Constant:        throw FatalError{ "Constant types cannot be assigned to a PHP-CPP library variable"  }; break;
-    case Type::ConstantAST:     throw FatalError{ "Constant types cannot be assigned to a PHP-CPP library variable"  }; break;
-    case Type::Callable:        throw FatalError{ "Callable types cannot be assigned to a PHP-CPP library variable"  }; break;
-    case Type::Reference:       throw FatalError{ "Reference types cannot be assigned to a PHP-CPP library variable" }; break;
+    case Type::Undefined:       throw Error{ "Cannot make a variable undefined"                                 }; break;
+    case Type::Null:            convert_to_null(_val);                                                             break;
+    case Type::Numeric:         convert_to_long(_val);                                                             break;
+    case Type::Float:           convert_to_double(_val);                                                           break;
+    case Type::Bool:            convert_to_boolean(_val);                                                          break;
+    case Type::False:           convert_to_boolean(_val); ZVAL_FALSE(_val);                                        break;
+    case Type::True:            convert_to_boolean(_val); ZVAL_TRUE(_val);                                         break;
+    case Type::Array:           convert_to_array(_val);                                                            break;
+    case Type::Object:          convert_to_object(_val);                                                           break;
+    case Type::String:          convert_to_string(_val);                                                           break;
+    case Type::Resource:        throw Error{ "Resource types cannot be handled by the PHP-CPP library"          }; break;
+    case Type::Constant:        throw Error{ "Constant types cannot be assigned to a PHP-CPP library variable"  }; break;
+    case Type::ConstantAST:     throw Error{ "Constant types cannot be assigned to a PHP-CPP library variable"  }; break;
+    case Type::Callable:        throw Error{ "Callable types cannot be assigned to a PHP-CPP library variable"  }; break;
+    case Type::Reference:       throw Error{ "Reference types cannot be assigned to a PHP-CPP library variable" }; break;
     }
 
     // done

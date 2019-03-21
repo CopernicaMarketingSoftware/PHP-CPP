@@ -44,7 +44,7 @@ Value set_exception_handler(const std::function<Value(Parameters &params)> &hand
 /**
  *  Set a std::function as a php error handler
  */
-Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Error error)
+Value set_error_handler(const std::function<Value(Parameters &params)> &handler, ErrorType error)
 {
     // create the functor which wraps our callback
     Function functor(handler);
@@ -69,7 +69,7 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
 /**
  *  Modify the error reporting level, will return the old error reporting level.
  */
-Value error_reporting(Error error)
+Value error_reporting(ErrorType error)
 {
     // store the old error reporting value
     Value output(EG(error_reporting));

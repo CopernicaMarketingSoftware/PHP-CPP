@@ -70,14 +70,13 @@ Parameters ZendCallable::parameters(struct _zend_execute_data *execute_data)
 }
 
 /**
- *  Handle exceptions
- *
- *  @param  exception   The exception to handle
+ *  Handle throwables
+ *  @param  throwable       The object to handle
  */
-void ZendCallable::handle(Exception &exception)
+void ZendCallable::handle(Throwable &throwable)
 {
-    // pass it on to the exception handler
-    process(exception);
+    // pass to user space
+    throwable.rethrow();
 }
 
 /**

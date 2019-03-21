@@ -1,12 +1,21 @@
 /**
- *  Exception.h
- *  Implementation of Php Exceptions.
+ *  Throwable.h
+ *
+ *  Base class for exceptions and errors, where an error is a runtime
+ *  problem with the program (like file-does-not-exist), and an error
+ *  is a more fatal programming problem (like call-to-private-method).
  *
  *  @author Jasper van Eck <jasper.vaneck@copernica.com>
- *  @copyright 2013, 2014 Copernica BV
+ *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
+ *  @copyright 2013 - 2019 Copernica BV
  */
 #include <exception>
 #include <string>
+
+/**
+ *  Forward declarations
+ */
+struct _zend_object;
 
 /**
  *  Set up namespace
@@ -16,114 +25,48 @@ namespace Php {
 /**
  *  Class definition
  */
-class PHPCPP_EXPORT Exception : public std::exception
+class PHPCPP_EXPORT Throwable : public std::runtime_error
 {
 protected:
     /**
-     *  The exception message
-     *  @var    char*
+     *  The exception code
+     *  @var long int
      */
-    std::string _message;
+    long int _code = -1;
+    
+
+protected:
+    /**
+     *  Protected constructor - only derived classes can instantiate
+     *  @param  message     The exception message
+     */
+    Throwable(const std::string &message) : std::runtime_error(message) {}
+    
+    /**
+     *  Another protected constructor
+     *  @param  object
+     */
+    Throwable(struct _zend_object *object);
 
 public:
     /**
-     *  Constructor
-     *
-     *  @param  message The exception message
-     */
-    Exception(std::string message) : _message(std::move(message)) {}
-
-    /**
      *  Destructor
      */
-    virtual ~Exception() = default;
-
+    virtual ~Throwable() = default;
+    
     /**
-     *  Overridden what method
-     *  @return const char *
+     *  Rethrow the exception / make sure that it ends up in PHP space
      */
-    virtual const char *what() const _NOEXCEPT override
-    {
-        return _message.c_str();
-    }
-
+    virtual void rethrow() = 0;
+     
     /**
-     *  Returns the message of the exception.
-     *  @return &string
+     *  Returns the exception code
+     *  @return The exception code
      */
-    const std::string &message() const throw()
+    long int code() const _NOEXCEPT
     {
-        return _message;
-    }
-
-    /**
-     * Returns the exception code
-     *
-     *  @note   This only works if the exception was originally
-     *          thrown in PHP userland. If the native() member
-     *          function returns true, this function will not
-     *          be able to correctly provide the filename.
-     *
-     * @return The exception code
-     */
-    virtual long int code() const _NOEXCEPT
-    {
-        return -1;
-    }
-
-    /**
-     *  Retrieve the filename the exception was thrown in
-     *
-     *  @note   This only works if the exception was originally
-     *          thrown in PHP userland. If the native() member
-     *          function returns true, this function will not
-     *          be able to correctly provide the filename.
-     *
-     *  @return The filename the exception was thrown in
-     */
-    virtual const std::string& file() const _NOEXCEPT
-    {
-        // we don't know the file the exception is from
-        static std::string file{ "<filename unknown>" };
-
-        // return the missing filename
-        return file;
-    }
-
-    /**
-     *  Retrieve the line at which the exception was thrown
-     *
-     *  @note   This only works if the exception was originally
-     *          thrown in PHP userland. If the native() member
-     *          function returns true, this function will not
-     *          be able to correctly provide the line number.
-     *
-     *  @return The line number the exception was thrown at
-     */
-    virtual long int line() const _NOEXCEPT
-    {
-        // we don't know the file the exception is from
-        return -1;
-    }
-
-    /**
-     *  Is this a native exception (one that was thrown from C++ code)
-     *  @return bool
-     */
-    virtual bool native() const
-    {
-        // yes, it is native
-        return true;
-    }
-
-    /**
-     *  Report this error as a fatal error
-     *  @return bool
-     */
-    virtual bool report() const
-    {
-        // this is not done here
-        return false;
+        // expose the code
+        return _code;
     }
 };
 

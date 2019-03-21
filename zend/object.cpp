@@ -2,7 +2,7 @@
  *  Object.cpp
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2019 Copernica BV
  */
 #include "includes.h"
 #include "string.h"
@@ -30,12 +30,9 @@ Object::Object(const char *name, Base *base) : Value()
     {
         // this is a brand new object that should be allocated, the C++ instance
         // is already there (created by the extension) but it is not yet stored
-        // in PHP, find out the classname first (we use the FatalError class
-        // here because this function is called from C++ context, and zend_error()
-        // would cause a longjmp() which does not clean up C++ objects created
-        // by the extension).
+        // in PHP, find out the classname first
         auto *entry = zend_fetch_class(String{ name }, ZEND_FETCH_CLASS_SILENT);
-        if (!entry) throw FatalError(std::string("Unknown class name ") + name);
+        if (!entry) throw Error(std::string("Unknown class name ") + name);
 
         // construct an implementation (this will also set the implementation
         // member in the base object), this is a self-destructing object that
@@ -106,12 +103,9 @@ Object::Object(const Value &value) : Value()
  */
 bool Object::instantiate(const char *name)
 {
-    // convert the name into a class_entry (we use the FatalError class
-    // here because this function is called from C++ context, and zend_error()
-    // would cause a longjmp() which does not clean up C++ objects created
-    // by the extension).
+    // convert the name into a class_entry
     auto *entry = zend_fetch_class(String{ name }, ZEND_FETCH_CLASS_SILENT);
-    if (!entry) throw FatalError(std::string("Unknown class name ") + name);
+    if (!entry) throw Error(std::string("Unknown class name ") + name);
 
     // initiate the zval (which was already allocated in the base constructor)
     object_init_ex(_val, entry);

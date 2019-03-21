@@ -6,7 +6,7 @@
  *  Better use the Php::Script of Php::File classes.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2019 Copernica BV
  */
 
 /**
@@ -81,15 +81,15 @@ public:
         EG(no_extensions) = 1;
         if (!EG(current_execute_data)->symbol_table) zend_rebuild_symbol_table();
 
-        // the current exception
-        auto *oldException = EG(exception);
+        // the current exception state
+        State state;
 
         // execute the code
         zend_execute(_opcodes, &retval);
 
         // was an exception thrown inside the eval()'ed code? In that case we
         // throw a C++ new exception to give the C++ code the chance to catch it
-        if (oldException != EG(exception) && EG(exception)) throw OrigException(EG(exception));
+        state.rethrow();
 
         // we're ready if there is no return value
         if (ZVAL_IS_NULL(&retval)) return nullptr;

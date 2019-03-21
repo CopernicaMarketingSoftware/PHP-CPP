@@ -5,7 +5,7 @@
  *  Php::Base objects into regular Php::Value instances
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2019 Copernica BV
  */
 
 /**
@@ -109,7 +109,7 @@ public:
     virtual Value &setType(Type type) & override
     {
         // throw exception if things are going wrong
-        if (type != Type::Object) throw FatalError("Changing type of a fixed object variable");
+        if (type != Type::Object) throw Error("Changing type of a fixed object variable");
 
         // call base
         return Value::setType(type);
@@ -126,7 +126,7 @@ public:
         if (this == &value) return *this;
 
         // type must be valid
-        if (value.type() != Type::Object) throw FatalError("Assigning a non-object to an object variable");
+        if (value.type() != Type::Object) throw Error("Assigning a non-object to an object variable");
 
         // call base
         Value::operator=(value);
@@ -146,7 +146,7 @@ public:
         if (this == &value) return *this;
 
         // type must be valid
-        if (value.type() != Type::Object) throw FatalError("Moving a non-object to an object variable");
+        if (value.type() != Type::Object) throw Error("Moving a non-object to an object variable");
 
         // call base
         Value::operator=(std::move(value));
