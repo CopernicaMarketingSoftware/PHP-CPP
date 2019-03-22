@@ -44,7 +44,7 @@ Value set_exception_handler(const std::function<Value(Parameters &params)> &hand
 /**
  *  Set a std::function as a php error handler
  */
-Value set_error_handler(const std::function<Value(Parameters &params)> &handler, ErrorType error)
+Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Message message)
 {
     // create the functor which wraps our callback
     Function functor(handler);
@@ -60,7 +60,7 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
 
     // copy our zval into the user_error_handler
     ZVAL_COPY_VALUE(&EG(user_error_handler), value);
-    EG(user_error_handler_error_reporting) = (int) error;
+    EG(user_error_handler_error_reporting) = (int) message;
 
     // return the original handler
     return output;
@@ -69,7 +69,7 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
 /**
  *  Modify the error reporting level, will return the old error reporting level.
  */
-Value error_reporting(ErrorType error)
+Value error_reporting(Message message)
 {
     // store the old error reporting value
     Value output(EG(error_reporting));
@@ -78,7 +78,7 @@ Value error_reporting(ErrorType error)
     char str[21];
 
     // write the level into this buffer
-    int size = sprintf(str, "%d", (int) error);
+    int size = sprintf(str, "%d", (int) message);
 
     // if we failed for some reason we bail out
     if (size < 0) return false;

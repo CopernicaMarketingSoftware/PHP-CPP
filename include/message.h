@@ -1,10 +1,10 @@
 /**
- *  Errors.h
+ *  Message.h
  *
- *  In this file an enumeration type is defined with all error flags.
+ *  In this file an enumeration type is defined with all error-message flags.
  *
  *  @author Toon Schoenmakers <toon.schoenmakers@copernica.com>
- *  @copyright 2015 Copernica BV
+ *  @copyright 2015 - 2019 Copernica BV
  */
 
 /**
@@ -15,7 +15,7 @@ namespace Php {
 /**
  *  Supported types of errors, this is mostly a copy from Zend/zend_errors.h
  */
-enum class ErrorType : int {
+enum class Message : int {
     Error                =   (1 << 0L),
     Warning              =   (1 << 1L),
     Parse                =   (1 << 2L),
