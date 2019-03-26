@@ -64,6 +64,7 @@ protected:
         strcpy((char *)_classname + 1, classname);
     }
 
+public:
     /**
      *  Is this a required argument?
      *  @return bool
