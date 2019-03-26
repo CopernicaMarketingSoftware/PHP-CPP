@@ -8,7 +8,7 @@
  *  classes instead.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013, 2014 Copernica BV
+ *  @copyright 2013 - 2019 Copernica BV
  */
 
 /**
@@ -25,7 +25,11 @@ public:
     /**
      *  Destructor
      */
-    virtual ~Argument() = default;
+    virtual ~Argument()
+    {
+        // deallocate data if needed (we should not do this, memory buffer must be preserved for the duration of the program)
+        // if (_nullable) delete[] _classname;
+    }
 
 protected:
     /**
@@ -47,9 +51,19 @@ protected:
      *  @param  byref       Is this a reference argument?
      */
     Argument(const char *name, const char *classname, bool nullable = true, bool required = true, bool byref = false) :
-        _name(name), _type(Type::Object), _classname(classname), _nullable(nullable), _required(required), _byReference(byref) {}
+        _name(name), _type(Type::Object), _classname(classname), _nullable(nullable), _required(required), _byReference(byref) 
+    {
+        // for nullable classes, zend uses a "?name" encoding, so we need some extra space
+        if (!_nullable) return;
+        
+        // allocate extra space
+        _classname = new char[::strlen(classname) + 2];
+        
+        // copy the data
+        strcpy((char *)_classname, "?");
+        strcpy((char *)_classname + 1, classname);
+    }
 
-public:
     /**
      *  Is this a required argument?
      *  @return bool
@@ -83,6 +97,15 @@ public:
      *  @return const char *
      */
     const char *classname() const
+    {
+        return _nullable ? _classname + 1 : _classname;
+    }
+    
+    /**
+     *  The internal classname, with the encoding whether it is nullable
+     *  @return const char *
+     */
+    const char *encoded() const
     {
         return _classname;
     }

@@ -210,7 +210,7 @@ protected:
             case Type::Array:       info->type = ZEND_TYPE_ENCODE(IS_ARRAY, arg.allowNull());     break;  // array of anything (individual members cannot be restricted)
             case Type::Object:                                                            // if there is a classname and the argument is not nullable, it's simply the classname
                 if (!arg.classname()) info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
-                else info->type = ZEND_TYPE_ENCODE_CLASS(arg.classname(), arg.allowNull());
+                else info->type = (zend_type)arg.encoded();
                 break;
             case Type::Callable:    info->type = ZEND_TYPE_ENCODE(IS_CALLABLE, arg.allowNull());  break;  // anything that can be invoked
             default:                info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // if not specified we allow anything
