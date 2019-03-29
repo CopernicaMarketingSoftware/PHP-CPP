@@ -10,7 +10,8 @@ php:
   - 7.0
   - 7.1
   - 7.2
-  - nightly # doesn't work yet on PHP 7.3! not building.
+  - 7.3
+  - nightly # doesn't work yet on PHP 7.4! not building.
 
 
 # setting the env is the easiest, because it will mix with all the separate php versions (travis does this)
