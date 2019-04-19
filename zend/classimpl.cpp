@@ -1406,6 +1406,10 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // otherwise report an error
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
+    
+    // we may have to expose the Traversable or Serializable interfaces
+    if (_base->traversable()) zend_class_implements(_entry, 1, zend_ce_traversable);    
+    if (_base->serializable()) zend_class_implements(_entry, 1, zend_ce_serializable);    
 
     // this pointer has to be copied to temporary pointer, as &this causes compiler error
     ClassImpl *impl = this;
