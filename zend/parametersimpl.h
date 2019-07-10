@@ -29,10 +29,10 @@ public:
         reserve(argc);
 
         // array to store all the arguments in
-        zval arguments[argc];
+        SmallVector<zval> arguments{argc};
 
         // retrieve the arguments
-        zend_get_parameters_array_ex(argc, arguments);
+        zend_get_parameters_array_ex(argc, &arguments[0]);
 
         // loop through the arguments
         for (uint32_t i=0; i<argc; i++)

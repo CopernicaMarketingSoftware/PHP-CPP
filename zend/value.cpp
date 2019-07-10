@@ -763,7 +763,7 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
 
     // remember current state of the PHP engine
     State state;
-    
+
     // call the function
     // we're casting the const away here, object is only const so we can call this method
     // from const methods after all..
@@ -892,13 +892,13 @@ Value Value::call(const char *name)
 Value Value::exec(int argc, Value *argv) const
 {
     // array of zvals to execute
-    zval params[argc];
+    SmallVector<zval> params{argc};
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
 
     // call helper function
-    return do_exec(nullptr, _val, argc, params);
+    return do_exec(nullptr, _val, argc, &params[0]);
 }
 
 /**
@@ -914,13 +914,13 @@ Value Value::exec(const char *name, int argc, Value *argv) const
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    SmallVector<zval> params{argc};
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
 
     // call helper function
-    return do_exec(_val, method._val, argc, params);
+    return do_exec(_val, method._val, argc, &params[0]);
 }
 
 /**
@@ -936,13 +936,13 @@ Value Value::exec(const char *name, int argc, Value *argv)
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    SmallVector<zval> params{argc};
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
 
     // call helper function
-    return do_exec(_val, method._val, argc, params);
+    return do_exec(_val, method._val, argc, &params[0]);
 }
 
 /**
