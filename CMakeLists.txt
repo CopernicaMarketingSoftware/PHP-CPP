@@ -122,7 +122,7 @@ SET(PHPCPP_ZEND_SOURCES
   zend/exists.cpp
   zend/extension.cpp
   zend/extensionimpl.cpp
-  zend/fatalerror.cpp
+  # zend/fatalerror.cpp
   zend/file.cpp
   zend/function.cpp
   zend/functor.cpp
@@ -175,7 +175,7 @@ SET(PHPCPP_ZEND_HEADERS
   zend/numericmember.h
   zend/objectimpl.h
   zend/opcodes.h
-  zend/origexception.h
+  # zend/origexception.h
   zend/parametersimpl.h
   zend/property.h
   zend/string.h
@@ -200,10 +200,10 @@ SET(PHPCPP_HEADERS_INCLUDE
   include/constant.h
   include/countable.h
   include/deprecated.h
-  include/errors.h
+  include/error.h
   include/exception.h
   include/extension.h
-  include/fatalerror.h
+  # include/fatalerror.h
   include/file.h
   include/function.h
   include/global.h
