@@ -527,7 +527,7 @@ zend_object *ClassImpl::cloneObject(zval *val)
     // a copy constructor). Because this function is directly called from the
     // Zend engine, we can call zend_error() (which does a longjmp()) to throw
     // an exception back to the Zend engine)
-    if (!cpp) zend_error(E_ERROR, "Unable to clone %s", entry->name);
+    if (!cpp) zend_error(E_ERROR, "Unable to clone %s", entry->name->val);
 
     // store the object
     auto *new_object = new ObjectImpl(entry, cpp, impl->objectHandlers(), 1);
@@ -915,7 +915,7 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, void **cache_s
  *  @param  cache_slot      The cache slot used
  *  @return zval
  */
-void ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cache_slot)
+PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cache_slot)
 {
     // retrieve the object and class
     Base *base = ObjectImpl::find(object)->object();
@@ -946,7 +946,13 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cach
         else
         {
             // check if it could be set
-            if (iter->second->set(base, value)) return;
+            if (iter->second->set(base, value)) {
+#if PHP_VERSION_ID >= 70400
+                return value;
+#else
+                return;
+#endif
+	    }
 
             // read-only property
             zend_error(E_ERROR, "Unable to write to read-only property %s", (const char *)key);
@@ -955,16 +961,30 @@ void ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cach
     catch (const NotImplemented &exception)
     {
         // __set() function was not overridden by user, check if there is a default
-        if (!std_object_handlers.write_property) return;
+        if (!std_object_handlers.write_property) {
+#if PHP_VERSION_ID >= 70400
+                return value;
+#else
+                return;
+#endif
+        }
 
         // call the default
         std_object_handlers.write_property(object, name, value, cache_slot);
+#if PHP_VERSION_ID >= 70400
+        return value;
+#else
+       return;
+#endif
     }
     catch (Throwable &throwable)
     {
         // object was not caught by the extension, let it end up in user space
         throwable.rethrow();
     }
+#if PHP_VERSION_ID >= 70400
+    return value;
+#endif
 }
 
 /**
@@ -1150,7 +1170,7 @@ zend_object *ClassImpl::createObject(zend_class_entry *entry)
     // report error on failure, because this function is called directly from the
     // Zend engine, we can call zend_error() here (which does a longjmp() back to
     // the Zend engine)
-    if (!cpp) zend_error(E_ERROR, "Unable to instantiate %s", entry->name);
+    if (!cpp) zend_error(E_ERROR, "Unable to instantiate %s", entry->name->val);
 
     // create the object in the zend engine
     auto *object = new ObjectImpl(entry, cpp, impl->objectHandlers(), 1);
@@ -1428,7 +1448,11 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     _entry->info.user.doc_comment = _self;
 
     // set access types flags for class
+#if PHP_VERSION_ID >= 70400
+    _entry->ce_flags |= (int)_type;
+#else
     _entry->ce_flags = (int)_type;
+#endif
 
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);
