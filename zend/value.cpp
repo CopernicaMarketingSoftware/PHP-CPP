@@ -1499,9 +1499,12 @@ bool Value::contains(const char *key, int size) const
     }
     else if (isObject())
     {
+#if PHP_VERSION_ID >= 70400
         // retrieve the object pointer and check whether the property we are trying to retrieve
+        if (zend_check_property_access(Z_OBJ_P(_val), String(key, size), 0) == FAILURE) return false;
+#else
         if (zend_check_property_access(Z_OBJ_P(_val), String(key, size)) == FAILURE) return false;
-
+#endif
         // check if the 'has_property' method is available for this object
         auto *has_property = Z_OBJ_HT_P(_val)->has_property;
 
