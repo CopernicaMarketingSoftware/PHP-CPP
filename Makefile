@@ -35,7 +35,11 @@ UNAME 				:= 	$(shell uname)
 ifeq ($(UNAME), Darwin)
   INSTALL_PREFIX		=	/usr/local
 else
+ifeq ($(UNAME), FreeBSD)
+  INSTALL_PREFIX		=	/usr/local
+else
   INSTALL_PREFIX		=	/usr
+endif
 endif
 
 INSTALL_HEADERS			=	${INSTALL_PREFIX}/include
