@@ -36,7 +36,11 @@ ifeq ($(UNAME), Darwin)
   INSTALL_PREFIX		=	/usr/local
 else
 ifeq ($(UNAME), FreeBSD)
+ifdef PREFIX
+  INSTALL_PREFIX		=	$(PREFIX)
+else
   INSTALL_PREFIX		=	/usr/local
+endif
 else
   INSTALL_PREFIX		=	/usr
 endif
