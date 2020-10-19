@@ -5,6 +5,56 @@ SHLIB=		phpcpp
 SHLIB_MAJOR=	2.2.1
 MAN=
 
+INCS=	phpcpp.h
+INCS+=	include/argument.h
+INCS+=	include/array.h
+INCS+=	include/arrayaccess.h
+INCS+=	include/base.h
+INCS+=	include/byref.h
+INCS+=	include/byval.h
+INCS+=	include/call.h
+INCS+=	include/class.h
+INCS+=	include/classbase.h
+INCS+=	include/classtype.h
+INCS+=	include/constant.h
+INCS+=	include/countable.h
+INCS+=	include/deprecated.h
+INCS+=	include/error.h
+INCS+=	include/exception.h
+INCS+=	include/extension.h
+INCS+=	include/file.h
+INCS+=	include/function.h
+INCS+=	include/global.h
+INCS+=	include/globals.h
+INCS+=	include/hashmember.h
+INCS+=	include/hashparent.h
+INCS+=	include/ini.h
+INCS+=	include/inivalue.h
+INCS+=	include/interface.h
+INCS+=	include/iterator.h
+INCS+=	include/message.h
+INCS+=	include/modifiers.h
+INCS+=	include/namespace.h
+INCS+=	include/noexcept.h
+INCS+=	include/object.h
+INCS+=	include/parameters.h
+INCS+=	include/platform.h
+INCS+=	include/script.h
+INCS+=	include/serializable.h
+INCS+=	include/stream.h
+INCS+=	include/streams.h
+INCS+=	include/super.h
+INCS+=	include/thread_local.h
+INCS+=	include/throwable.h
+INCS+=	include/traversable.h
+INCS+=	include/type.h
+INCS+=	include/value.h
+INCS+=	include/valueiterator.h
+INCS+=	include/version.h
+INCS+=	include/visibility.h
+INCS+=	include/zendcallable.h
+INCS+=	include/zval.h
+
 # common
 SRCS=	modifiers.cpp
 
@@ -58,6 +108,9 @@ LDFLAGS+=	${PHP_LDFLAGS}
 .if defined(PREFIX)
 LIBDIR=		${PREFIX}/lib
 INCLUDEDIR=	${PREFIX}/include
+.else
+LIBDIR=		/usr/local/lib
+INCLUDEDIR=	/usr/local/include/phpcpp
 .endif
 
 .include <bsd.lib.mk>
