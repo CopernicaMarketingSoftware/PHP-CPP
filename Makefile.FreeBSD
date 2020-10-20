@@ -2,7 +2,7 @@
 .PATH:		${.CURDIR}/zend
 
 SHLIB=		phpcpp
-SHLIB_MAJOR=	2.2.1
+SHLIB_MAJOR=	2.2.0
 MAN=
 
 INCS=	phpcpp.h
