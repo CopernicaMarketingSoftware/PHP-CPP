@@ -63,6 +63,7 @@ SRCS+=	base.cpp
 SRCS+=	callable.cpp
 SRCS+=	classbase.cpp
 SRCS+=	classimpl.cpp
+SRCS+=	common_streambuf.cpp
 SRCS+=	constant.cpp
 SRCS+=	constantfuncs.cpp
 SRCS+=	error.cpp
