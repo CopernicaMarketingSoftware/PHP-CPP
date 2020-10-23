@@ -1,5 +1,5 @@
-.PATH:		${.CURDIR}/common
 .PATH:		${.CURDIR}/zend
+.PATH:		${.CURDIR}/common
 
 SHLIB=		phpcpp
 SHLIB_MAJOR=	2.2.0
