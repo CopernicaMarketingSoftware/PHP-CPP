@@ -360,6 +360,8 @@ zend_object_handlers *ClassImpl::objectHandlers()
     _handlers.has_property = &ClassImpl::hasProperty;
     _handlers.unset_property = &ClassImpl::unsetProperty;
 
+    _handlers.get_property_ptr_ptr = &ClassImpl::getPropertyPtrPtr;
+
     // when a method is called (__call and __invoke)
     _handlers.get_method = &ClassImpl::getMethod;
     _handlers.get_closure = &ClassImpl::getClosure;
@@ -649,6 +651,46 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type, zval *rv)
 
         // call default
         return std_object_handlers.read_dimension(object, offset, type, rv);
+    }
+}
+/**
+ *  Function that is called when the object property is used for write operations in PHP
+ *
+ *  This is the object->property[x]=y operation in PHP, and mapped to the getPropertyPtrPtr() method
+ *  of the ArrayAccess PropertyPtrPtr
+ *
+ *  @param  object          The object on which it is called
+ *  @param  member          The name of the property
+ *  @param  type            The type of operation 0 - read, 1 - write
+ *  @return zval*
+ */
+zval *ClassImpl::getPropertyPtrPtr(zval *object, zval *member, int type, void **cache_slot)
+{
+    PropertyPtrPtr *p_ptr_ptr = dynamic_cast<PropertyPtrPtr*>(ObjectImpl::find(object)->object());
+    if (p_ptr_ptr)
+    {
+        try
+        {
+            Php::Value res = p_ptr_ptr->getPropertyPtrPtr(member, type);
+            return res.detach(true);
+        }
+        catch (Throwable &throwable)
+        {
+            // object was not caught by the extension, let it end up in user space
+            throwable.rethrow();
+
+            // unreachable
+            return Value(nullptr).detach(false);
+        }
+
+    }
+    else
+    {
+        // ArrayAccess not implemented, check if there is a default handler
+        if (!std_object_handlers.get_property_ptr_ptr) return nullptr;
+
+        // call default
+        return std_object_handlers.get_property_ptr_ptr(object, member, type, cache_slot);
     }
 }
 

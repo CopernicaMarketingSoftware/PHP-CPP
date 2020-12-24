@@ -235,6 +235,8 @@ public:
      */
     static zend_object_handlers *objectHandlers(zend_class_entry *entry);
 
+    static zval *getPropertyPtrPtr(zval *object, zval *member, int type, void **cache_slot);
+
     /**
      *  Function to create a new iterator to iterate over an object
      *  @param  entry                   The class entry
