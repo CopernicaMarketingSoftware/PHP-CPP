@@ -36,9 +36,12 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
 #else
     // Sanity check
     assert(info[argc].type != 0 && info[argc].name == nullptr);
-
     // the callable we are retrieving
+#if PHP_VERSION_ID < 80000
     Callable *callable = reinterpret_cast<Callable*>(info[argc].type);
+#else
+    Callable *callable = reinterpret_cast<Callable*>(info[argc].type.ptr);
+#endif
 #endif
 
     // check if sufficient parameters were passed (for some reason this check
@@ -99,10 +102,10 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
         _argv[_argc + 1].class_name = reinterpret_cast<const char*>(this);
 #else
         // @todo    this is broken. the zend engine, from 7.2 onwards copies over
-        //          the struct and slices of the last element, because the num_args
+        //          the struct and slices off the last element, because the num_args
         //          is incorrect in their view. another place to put this may be
         //          hiding it behind the fname
-        _argv[_argc + 1].type = reinterpret_cast<zend_type>(this);
+       _argv[_argc + 1].type = ZEND_TYPE_INIT_PTR(this, IS_PTR, true, 0);
 #endif
 
         // we use our own invoke method, which does a lookup
@@ -129,8 +132,10 @@ void Callable::initialize(zend_internal_function_info *info, const char *classna
 {
     // initialize all common elements
     info->required_num_args = _required;
+#if PHP_VERSION_ID < 80000
     info->return_reference = false;
     info->_is_variadic = false;
+#endif
 
     // the structure has been slightly altered since php7.2
 #if PHP_VERSION_ID < 70200
@@ -147,9 +152,18 @@ void Callable::initialize(zend_internal_function_info *info, const char *classna
 #else
     // the properties that are available on php 7.2 and higher
     info->required_num_args = _required;
+#if PHP_VERSION_ID < 80000
     info->return_reference = false;
     info->_is_variadic = false;
     info->type = ZEND_TYPE_ENCODE((int)_return, true);
+#else
+    if ((int)_return) {
+        info->type = (zend_type)ZEND_TYPE_INIT_CODE((int)_return, true, 0);
+    } else {
+        info->type = (zend_type)ZEND_TYPE_INIT_NONE(0);
+    }
+
+#endif
 #endif
 }
 

@@ -12,6 +12,12 @@
  */
 namespace Php {
 
+#if PHP_VERSION_ID < 80000
+#define ZEND_RESULT_OR_INT int
+#else
+#define ZEND_RESULT_OR_INT zend_result
+#endif
+
 /**
  *  Class definition
  */
@@ -157,23 +163,23 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
-    static int processStartup(int type, int module_number);
-    
+    static ZEND_RESULT_OR_INT processStartup(int type, int module_number);
+
     /**
      *  Function that is called when the extension is about to be stopped
      *  @param  type        Module type
      *  @param  number      Module number
      *  @return int
      */
-    static int processShutdown(int type, int module_number);
-    
+    static ZEND_RESULT_OR_INT processShutdown(int type, int module_number);
+
     /**
      *  Function that is called when a request starts
      *  @param  type        Module type
      *  @param  number      Module number
      *  @return int         0 on success
      */
-    static int processRequest(int type, int module_number);
+    static ZEND_RESULT_OR_INT processRequest(int type, int module_number);
 
     /**
      *  Function that is called when a request is ended
@@ -181,7 +187,7 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
-    static int processIdle(int type, int module_number);
+    static ZEND_RESULT_OR_INT processIdle(int type, int module_number);
 
     /**
      *  Function that is called when the PHP engine initializes with a different PHP-CPP
@@ -190,7 +196,7 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
-    static int processMismatch(int type, int module_number);
+    static ZEND_RESULT_OR_INT processMismatch(int type, int module_number);
 };
 
 /**

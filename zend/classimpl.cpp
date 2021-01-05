@@ -285,7 +285,11 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
  *  @param  object_ptr
  *  @return int
  */
-int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
+#if PHP_VERSION_ID < 80000
+int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
+#else
+int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
+#endif
 {
     // it is really unbelievable how the Zend engine manages to implement every feature
     // in a complete different manner. You would expect the __invoke() and the
@@ -315,7 +319,11 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
 
     // store pointer to ourselves (note that the entry_ptr is useless
     // inside this function as it is always uninitialized for some reason)
+#if PHP_VERSION_ID < 80000
     data->self = self(Z_OBJCE_P(object));
+#else
+    data->self = self(object->ce);
+#endif
 
     // assign this dynamically allocated variable to the func parameter
     // the cast is ok, because zend_internal_function is a member of the
@@ -324,7 +332,11 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
 
     // the object_ptr should be filled with the object on which the method is
     // called (otherwise the Zend engine tries to call the method statically)
+#if PHP_VERSION_ID < 80000
     *object_ptr = Z_OBJ_P(object);
+#else
+    *object_ptr = object;
+#endif
 
     // done
     return SUCCESS;
@@ -373,7 +385,11 @@ zend_object_handlers *ClassImpl::objectHandlers()
     _handlers.cast_object = &ClassImpl::cast;
 
     // method to compare two objects
+#if PHP_VERSION_ID < 80000
     _handlers.compare_objects = &ClassImpl::compare;
+#else
+    _handlers.compare = &ClassImpl::compare;
+#endif
 
     // set the offset between our class implementation and
     // the zend_object member in the allocated structure
@@ -426,10 +442,17 @@ int ClassImpl::compare(zval *val1, zval *val2)
     catch (const NotImplemented &exception)
     {
         // it was not implemented, do we have a default?
+#if PHP_VERSION_ID < 80000
         if (!std_object_handlers.compare_objects) return 1;
 
         // call default
         return std_object_handlers.compare_objects(val1, val2);
+#else
+        if (!std_object_handlers.compare) return 1;
+
+        // call default
+        return std_object_handlers.compare(val1, val2);
+#endif
     }
     catch (Throwable &throwable)
     {
@@ -448,14 +471,17 @@ int ClassImpl::compare(zval *val1, zval *val2)
  *  @param  type
  *  @return int
  */
-int ClassImpl::cast(zval *val, zval *retval, int type)
+int ClassImpl::cast(ZEND_OBJECT_OR_ZVAL val, zval *retval, int type)
 {
     // get the base c++ object
     Base *object = ObjectImpl::find(val)->object();
 
     // retrieve the class entry linked to this object
+#if PHP_VERSION_ID < 80000
     auto *entry = Z_OBJCE_P(val);
-
+#else
+    auto *entry = val->ce;
+#endif
     // we need the C++ class meta-information object
     ClassBase *meta = self(entry)->_base;
 
@@ -508,11 +534,14 @@ int ClassImpl::cast(zval *val, zval *retval, int type)
  *  @param  val             The object to be cloned
  *  @return zend_object     The object to be created
  */
-zend_object *ClassImpl::cloneObject(zval *val)
+zend_object *ClassImpl::cloneObject(ZEND_OBJECT_OR_ZVAL val)
 {
     // retrieve the class entry linked to this object
+#if PHP_VERSION_ID < 80000
     auto *entry = Z_OBJCE_P(val);
-
+#else
+    auto *entry = val->ce;
+#endif
     // we need the C++ class meta-information object
     ClassImpl *impl = self(entry);
     ClassBase *meta = impl->_base;
@@ -554,7 +583,7 @@ zend_object *ClassImpl::cloneObject(zval *val)
  *  @param  count
  *  @return int
  */
-int ClassImpl::countElements(zval *object, zend_long *count)
+int ClassImpl::countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count)
 {
     // does it implement the countable interface?
     Countable *countable = dynamic_cast<Countable*>(ObjectImpl::find(object)->object());
@@ -602,7 +631,7 @@ int ClassImpl::countElements(zval *object, zend_long *count)
  *  @param  rv              Pointer to where to store the data
  *  @return zval
  */
-zval *ClassImpl::readDimension(zval *object, zval *offset, int type, zval *rv)
+zval *ClassImpl::readDimension(ZEND_OBJECT_OR_ZVAL object, zval *offset, int type, zval *rv)
 {
     // what to do with the type?
     //
@@ -664,7 +693,7 @@ zval *ClassImpl::readDimension(zval *object, zval *offset, int type, zval *rv)
  *  @param  value           The new value
  *  @return zval
  */
-void ClassImpl::writeDimension(zval *object, zval *offset, zval *value)
+void ClassImpl::writeDimension(ZEND_OBJECT_OR_ZVAL object, zval *offset, zval *value)
 {
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object)->object());
@@ -705,7 +734,7 @@ void ClassImpl::writeDimension(zval *object, zval *offset, zval *value)
  *  @param  check_empty     Was this an isset() call, or an empty() call?
  *  @return bool
  */
-int ClassImpl::hasDimension(zval *object, zval *member, int check_empty)
+int ClassImpl::hasDimension(ZEND_OBJECT_OR_ZVAL object, zval *member, int check_empty)
 {
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object)->object());
@@ -754,7 +783,7 @@ int ClassImpl::hasDimension(zval *object, zval *member, int check_empty)
  *  @param  object          The object on which it is called
  *  @param  member          The member to remove
  */
-void ClassImpl::unsetDimension(zval *object, zval *member)
+void ClassImpl::unsetDimension(ZEND_OBJECT_OR_ZVAL object, zval *member)
 {
     // does it implement the arrayaccess interface?
     ArrayAccess *arrayaccess = dynamic_cast<ArrayAccess*>(ObjectImpl::find(object)->object());
@@ -835,7 +864,7 @@ zval *ClassImpl::toZval(Value &&value, int type, zval *rv)
  *  @param  rv              Pointer to where to store the data
  *  @return val
  */
-zval *ClassImpl::readProperty(zval *object, zval *name, int type, void **cache_slot, zval *rv)
+zval *ClassImpl::readProperty(ZEND_OBJECT_OR_ZVAL object, ZEND_STRING_OR_ZVAL name, int type, void **cache_slot, zval *rv)
 {
     // what to do with the type?
     //
@@ -858,7 +887,11 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, void **cache_s
     Base *base = ObjectImpl::find(object)->object();
 
     // retrieve the class entry linked to this object
+#if PHP_VERSION_ID < 80000
     auto *entry = Z_OBJCE_P(object);
+#else
+    auto *entry = object->ce;
+#endif
 
     // we need the C++ class meta-information object
     ClassImpl *impl = self(entry);
@@ -916,13 +949,17 @@ zval *ClassImpl::readProperty(zval *object, zval *name, int type, void **cache_s
  *  @param  cache_slot      The cache slot used
  *  @return zval
  */
-PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(zval *object, zval *name, zval *value, void **cache_slot)
+PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(ZEND_OBJECT_OR_ZVAL object, ZEND_STRING_OR_ZVAL name, zval *value, void **cache_slot)
 {
     // retrieve the object and class
     Base *base = ObjectImpl::find(object)->object();
 
     // retrieve the class entry linked to this object
+#if PHP_VERSION_ID < 80000
     auto *entry = Z_OBJCE_P(object);
+#else
+    auto *entry = object->ce;
+#endif
 
     // we need the C++ class meta-information object
     ClassImpl *impl = self(entry);
@@ -1007,7 +1044,7 @@ PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(zval *object, zval *name, z
  *  @param  cache_slot      The cache slot used
  *  @return bool
  */
-int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, void **cache_slot)
+int ClassImpl::hasProperty(ZEND_OBJECT_OR_ZVAL object, ZEND_STRING_OR_ZVAL name, int has_set_exists, void **cache_slot)
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __isset method
@@ -1017,7 +1054,11 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, void **
         Base *base = ObjectImpl::find(object)->object();
 
         // retrieve the class entry linked to this object
+#if PHP_VERSION_ID < 80000
         auto *entry = Z_OBJCE_P(object);
+#else
+        auto *entry = object->ce;
+#endif
 
         // we need the C++ class meta-information object
         ClassImpl *impl = self(entry);
@@ -1071,15 +1112,18 @@ int ClassImpl::hasProperty(zval *object, zval *name, int has_set_exists, void **
  *  @param  member          The member to remove
  *  @param  cache_slot      The cache slot used
  */
-void ClassImpl::unsetProperty(zval *object, zval *member, void **cache_slot)
+void ClassImpl::unsetProperty(ZEND_OBJECT_OR_ZVAL object, ZEND_STRING_OR_ZVAL member, void **cache_slot)
 {
     // the default implementation throws an exception, if we catch that
     // we know for sure that the user has not overridden the __unset method
     try
     {
         // retrieve the class entry linked to this object
+#if PHP_VERSION_ID < 80000
         auto *entry = Z_OBJCE_P(object);
-
+#else
+        auto *entry = object->ce;
+#endif
         // we need the C++ class meta-information object
         ClassImpl *impl = self(entry);
 

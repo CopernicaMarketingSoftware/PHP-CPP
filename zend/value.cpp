@@ -392,12 +392,14 @@ Value& Value::operator=(struct _zval_struct* value)
     // If the destination is refcounted
     if (Z_REFCOUNTED_P(to))
     {
+#if PHP_VERSION_ID < 80000
         // objects can have their own assignment handler
         if (Z_TYPE_P(to) == IS_OBJECT && Z_OBJ_HANDLER_P(to, set))
         {
             Z_OBJ_HANDLER_P(to, set)(to, value);
             return *this;
         }
+#endif
 
         // If to and from are the same, there is nothing left to do
         if (to == value) return *this;
@@ -767,7 +769,11 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     // call the function
     // we're casting the const away here, object is only const so we can call this method
     // from const methods after all..
+#if PHP_VERSION_ID < 80000
     if (call_user_function_ex(CG(function_table), (zval*) object, method, &retval, argc, argv, 1, nullptr) != SUCCESS)
+#else
+    if (call_user_function(CG(function_table), (zval*) object, method, &retval, argc, argv) != SUCCESS)
+#endif
     {
         // throw an exception, the function does not exist
         throw Error("Invalid call to "+Value(method).stringValue());
@@ -1353,9 +1359,13 @@ int Value::size() const
 
         // create a variable to hold the result
         zend_long result;
-
+#if PHP_VERSION_ID < 80000
         // call the function
         return Z_OBJ_HT_P(_val)->count_elements(_val, &result) == SUCCESS ? result : 0;
+#else
+        zend_object *zobj = Z_OBJ_P(_val);
+        return Z_OBJ_HT_P(_val)->count_elements(zobj, &result) == SUCCESS ? result : 0;
+#endif
     }
 
     // not an array, return string size if this is a string
@@ -1511,12 +1521,22 @@ bool Value::contains(const char *key, int size) const
         // leap out if no 'has_property' function is not set (which should normally not occur)
         if (!has_property) return false;
 
+#if PHP_VERSION_ID < 80000
         // the property must be a zval, turn the key into a value
         Value property(key, size);
 
         // call the has_property() method (0 means: check whether property exists and is not NULL,
         // this is not really what we want, but the closest to the possible values of that parameter)
         return has_property(_val, property._val, 0, nullptr);
+#else
+        int retval = 0;
+        zend_string *tmp_str;
+        tmp_str = zend_string_init(key, size, 0);
+        retval = has_property(Z_OBJ_P(_val), tmp_str, 0, nullptr);
+        zend_string_release(tmp_str);
+        return retval;
+#endif
+
     }
     else
     {
@@ -1587,8 +1607,13 @@ Value Value::get(const char *key, int size) const
         zend_class_entry* scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
 #endif
         // read the property
+#if PHP_VERSION_ID < 80000
         zval *property = zend_read_property(scope, _val, key, size, 0, &rv);
+#else
+        zend_object *zobj = Z_OBJ_P(_val); 
+        zval *property = zend_read_property(scope, zobj, key, size, 0, &rv);
 
+#endif
         // wrap in value
         return Value(property);
     }
@@ -1661,7 +1686,12 @@ void Value::setRaw(const char *key, int size, const Value &value)
 #else
         zend_class_entry* scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
 #endif
+#if PHP_VERSION_ID < 80000
         zend_update_property(scope, _val, key, size, value._val);
+#else
+        zend_update_property(scope, Z_OBJ_P(_val), key, size, value._val);
+#endif
+
     }
     else
     {

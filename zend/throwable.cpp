@@ -30,8 +30,12 @@ static std::string convert(zend_object *object)
     ZVAL_OBJ(&properties, object);
 
     // retrieve the message, filename, error code and line number
+#if PHP_VERSION_ID < 80000
     auto message = zval_get_string(zend_read_property(Z_OBJCE(properties), &properties, ZEND_STRL("message"), 1, &tmp));
-    
+#else
+    auto message = zval_get_string(zend_read_property(Z_OBJCE(properties), object, ZEND_STRL("message"), 1, &tmp));
+#endif
+
     // copy message to a string
     std::string result(ZSTR_VAL(message), ZSTR_LEN(message));
 
@@ -55,7 +59,11 @@ Throwable::Throwable(zend_object *object) : std::runtime_error(convert(object))
     ZVAL_OBJ(&properties, object);
 
     // retrieve the error code
+#if PHP_VERSION_ID < 80000
     _code = zval_get_long(zend_read_property(Z_OBJCE(properties), &properties, ZEND_STRL("code"), 1, &result));
+#else
+    _code = zval_get_long(zend_read_property(Z_OBJCE(properties), object, ZEND_STRL("code"), 1, &result));
+#endif
 }
 
 /**
