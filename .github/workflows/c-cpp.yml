@@ -21,7 +21,7 @@ jobs:
       with:
         php-version: ${{ matrix.php }}
     - name: Setup Compilers
-      run: apt install $COMPILER
+      run: sudo apt install $COMPILER
       env:
         COMPILER: ${{ matrix.compiler }}
     - name: make
