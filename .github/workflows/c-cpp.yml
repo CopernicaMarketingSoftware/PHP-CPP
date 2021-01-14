@@ -13,13 +13,20 @@ jobs:
       matrix:
         os: [ ubuntu-16.04, ubuntu-18.04, ubuntu-20.04 ]
         php: [ '7.4' ]
+        compiler: [g++-8, g++-9, clang-10, clang-11 ]
     steps:
     - uses: actions/checkout@v2
     - name: Setup PHP
       uses: shivammathur/setup-php@v2
       with:
         php-version: ${{ matrix.php }}
+    - name: Setup Compilers
+      run: apt install $COMPILER
+      env:
+        COMPILER: ${{ matrix.compiler }}
     - name: make
-      run: make
+      run: make COMPILER=$COMPILER
+      env:
+        COMPILER: ${{ matrix.compiler }}
     - name: make install
       run: sudo make install
