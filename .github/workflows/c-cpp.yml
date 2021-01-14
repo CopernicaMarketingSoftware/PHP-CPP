@@ -12,8 +12,8 @@ jobs:
     strategy:
       matrix:
         os: [ ubuntu-16.04, ubuntu-18.04, ubuntu-20.04 ]
-        php: [ '7.4' ]
-        compiler: [g++-8, g++-9, g++-10, clang-9, clang-10 ]
+        php: [ 7.2, 7.3, 7.4 ]
+        compiler: [ g++-8, g++-9, g++-10, clang-9, clang-10 ]
         exclude:
           - os: ubuntu-16.04
             compiler: g++-10
