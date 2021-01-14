@@ -16,11 +16,11 @@ jobs:
         compiler: [g++-8, g++-9, clang-10, clang-11 ]
         exclude:
           - os: ubuntu-18.04
-            node: clang-11
+            compiler: clang-11
           - os: ubuntu-16.04
-            node: clang-10
+            compiler: clang-10
           - os: ubuntu-16.04
-            node: clang-11
+            compiler: clang-11
     steps:
     - uses: actions/checkout@v2
     - name: Setup PHP
