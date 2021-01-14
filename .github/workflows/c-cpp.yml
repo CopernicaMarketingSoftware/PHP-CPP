@@ -15,14 +15,10 @@ jobs:
         php: [ '7.4', '8.0' ]
     steps:
     - uses: actions/checkout@v2
-    - name: install PHP
-      run: > 
-          sudo apt install software-properties-common && \
-          sudo add-apt-repository ppa:ondrej/php && \
-          sudo apt-get update \
-          sudo apt-get install php$PHP_VERSION php$PHP_VERSION-dev
-      env:
-        PHP_VERSION: ${{ matrix.php }}
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: ${{ matrix.php }}
     - name: make
       run: make
     - name: make install
