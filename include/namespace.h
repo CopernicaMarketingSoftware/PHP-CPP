@@ -156,6 +156,19 @@ public:
         return *this;
     }
 
+    Namespace &add(const ClassBase &type)
+    {
+        // skip when locked
+        if (locked()) return *this;
+
+        // and add it to the list of classes
+        _classes.push_back(std::unique_ptr<ClassBase>(new ClassBase(type)));
+
+        // allow chaining
+        return *this;
+    }
+
+
     /**
      *  Add an interface to the namespace by moving it
      *  @param  interface   The interface properties

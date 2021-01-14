@@ -24,7 +24,7 @@ namespace Php {
  *  Class definition of the class
  */
 template <typename T>
-class PHPCPP_EXPORT Class : private ClassBase
+class PHPCPP_EXPORT Class : public ClassBase
 {
 public:
     /**
@@ -301,6 +301,8 @@ public:
      */
     template<typename CLASS>
     Class<T> &extends(const Class<CLASS> &base) { ClassBase::extends(base); return *this; }
+
+    Class<T> &extends(const ClassBase &base) { ClassBase::extends(base); return *this; }
 
 private:
     /**
