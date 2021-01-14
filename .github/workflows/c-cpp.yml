@@ -1,0 +1,25 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: install PHP
+      run: > 
+          sudo apt install software-properties-common && \
+          sudo add-apt-repository ppa:ondrej/php && \
+          sudo apt-get update \
+          sudo apt-get install php7.4 php7.4-dev
+    - name: make
+      run: make
+    - name: make install
+      run: sudo make install
