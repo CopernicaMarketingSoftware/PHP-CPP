@@ -101,7 +101,7 @@ endif
 #   you want to leave that flag out on production servers).
 #
 
-COMPILER_FLAGS			=	-Wall -c -std=c++11 -fvisibility=hidden -DBUILDING_PHPCPP -Wno-write-strings -MD
+COMPILER_FLAGS			=	-Wall -c -std=c++17 -fvisibility=hidden -DBUILDING_PHPCPP -Wno-write-strings -MD
 SHARED_COMPILER_FLAGS	=	-fpic
 STATIC_COMPILER_FLAGS	=
 PHP_COMPILER_FLAGS		=	${COMPILER_FLAGS} `${PHP_CONFIG} --includes`

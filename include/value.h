@@ -22,6 +22,7 @@
  *  Dependencies
  */
 #include "zval.h"
+#include <unordered_map>
 
 /**
  *  Set up namespace
@@ -108,6 +109,17 @@ public:
      */
     template <typename T>
     Value(const std::map<std::string,T> &value) : Value(Type::Array)
+    {
+        // set all elements
+        for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
+    }
+
+    /**
+     *  Constructor from a unordered_map (this will create an associative array)
+     *  @param  value
+     */
+    template <typename T>
+    Value(const std::unordered_map<std::string,T> &value) : Value(Type::Array)
     {
         // set all elements
         for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
@@ -449,6 +461,12 @@ public:
     std::string stringValue() const;
 
     /**
+     *  Retrieve the value as a string
+     *  @return string
+     */
+    std::string_view stringViewValue() const;
+
+    /**
      *  Retrieve the value as decimal
      *  @return double
      */
@@ -541,6 +559,40 @@ public:
 
         // result variable
         std::map<std::string,T> result;
+
+        // iterate over the values
+        iterate([&result](const Value &key, const Value &value) {
+
+            // first convert the value to the appropriate type (otherwise
+            // compiler errors occur)
+            T val = value;
+
+            // add the value to the array
+            result[key] = val;
+        });
+
+        // done
+        return result;
+    }
+
+    /**
+     *  Convert the object to a unordered_map with string index and Php::Value value
+     *  @return std::unordered_map
+     */
+    std::unordered_map<std::string,Php::Value> uo_mapValue() const;
+
+    /**
+     *  Convert the object to a unordered_map with string index and a specific type as value
+     *  @return std::unordered_map
+     */
+    template <typename T>
+    std::unordered_map<std::string,T> uo_mapValue() const
+    {
+        // must be an array or an object, otherwise the map is empty
+        if (!isArray() && !isObject()) return std::unordered_map<std::string,T>();
+
+        // result variable
+        std::unordered_map<std::string,T> result;
 
         // iterate over the values
         iterate([&result](const Value &key, const Value &value) {
@@ -692,6 +744,14 @@ public:
     {
         return stringValue();
     }
+    /**
+     *  Cast to a string
+     *  @return string
+     */
+    operator std::string_view () const
+    {
+        return stringViewValue();
+    }
 
     /**
      *  Cast to byte array
@@ -746,12 +806,31 @@ public:
 
     /**
      *  Convert the object to a map with string index and Php::Value value
+     *  @return std::unordered_map
+     */
+    operator std::unordered_map<std::string,Php::Value> () const
+    {
+        return uo_mapValue();
+    }
+
+    /**
+     *  Convert the object to a map with string index and Php::Value value
      *  @return std::map
      */
     template <typename T>
     operator std::map<std::string,T> () const
     {
         return mapValue<T>();
+    }
+
+    /**
+     *  Convert the object to a map with string index and Php::Value value
+     *  @return std::map
+     */
+    template <typename T>
+    operator std::unordered_map<std::string,T> () const
+    {
+        return uo_mapValue<T>();
     }
 
     /**

@@ -1296,6 +1296,18 @@ std::string Value::stringValue() const
 }
 
 /**
+ *  Retrieve the value as string
+ *  @return string
+ */
+std::string_view Value::stringViewValue() const
+{
+    zend_string* s  = zval_get_string(_val);
+    std::string_view ret(ZSTR_VAL(s), ZSTR_LEN(s));
+    zend_string_release(s);
+    return ret;
+}
+
+/**
  *  Access to the raw buffer
  *  @return char *
  */
@@ -1838,7 +1850,7 @@ std::string Value::debugZval() const
  */
 std::ostream &operator<<(std::ostream &stream, const Value &value)
 {
-    return stream << value.stringValue();
+    return stream << value.stringViewValue();
 }
 
 /**
