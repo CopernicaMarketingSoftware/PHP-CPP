@@ -1130,7 +1130,9 @@ void ClassImpl::destructObject(zend_object *object)
     }
     catch (const NotImplemented &exception)
     {
-        // fallback on the default destructor call
+        // fallback on the default destructor call in case a derived object
+        // of Base throws this. The default implementation will call this
+        // function in any case.
         zend_objects_destroy_object(object);
     }
     catch (Throwable &throwable)
