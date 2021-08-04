@@ -17,9 +17,8 @@ namespace Php {
  */
 void Base::__destruct() const
 {
-    // throw exception, so that the PHP-CPP library will check if the user
-    // somehow registered an explicit __destruct method
-    throw NotImplemented();
+    // destroy the object by default
+    zend_objects_destroy_object(_impl->php());
 }
 
 /**
