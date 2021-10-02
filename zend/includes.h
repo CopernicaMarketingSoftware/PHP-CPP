@@ -43,6 +43,7 @@
 #include <zend_ini.h>
 #include <zend_closures.h>
 #include <SAPI.h>
+#include "ext/standard/info.h"
 
 /**
  *  We don't work with older versions of PHP
