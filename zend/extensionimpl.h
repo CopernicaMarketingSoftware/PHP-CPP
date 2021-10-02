@@ -184,6 +184,13 @@ private:
     static int processIdle(int type, int module_number);
 
     /**
+     *  Function that is called when phpinfo() is invoked
+     *  @param  zend_module_entry   Pointer to zend_module_entry
+     *  @return void
+     */
+    static void processInfo(zend_module_entry* zend_module);
+
+    /**
      *  Function that is called when the PHP engine initializes with a different PHP-CPP
      *  version for the libphpcpp.so file than the version the extension was compiled for
      *  @param  type        Module type

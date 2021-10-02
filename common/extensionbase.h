@@ -43,7 +43,13 @@ protected:
      *  @var    Callback
      */
     Callback _onIdle;
-    
+
+    /**
+     *  Callback that is called by PHP when phpinfo() is called
+     *  @var    Callback
+     */
+    Callback _onInfo;
+
     /**
      *  Callback that is called right before the engine is closing down
      *  @var    Callback
@@ -129,6 +135,17 @@ public:
         // copy callback
         _onIdle = callback;
     }
+
+    /**
+     *  Register a callback that is called when phpinfo() is called
+     *
+     *  @param  callback
+     */
+    void onInfo(const Callback &callback)
+    {
+        // copy callback
+        _onInfo = callback;
+	}	
 };
 
 /**
