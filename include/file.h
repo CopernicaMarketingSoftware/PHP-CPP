@@ -43,6 +43,15 @@ public:
     File(const char *name) : File(name, ::strlen(name)) {}
 
     /**
+     *  Alternative constructor with zend_string filename
+     *  and size of the string
+     *
+     *  @param  name        the filename
+     *  @param  size        size of the filename
+     */
+    File(const _zend_string *name, size_t size);
+
+    /**
      *  Alternative constructor with a string object
      *  @param  name        the filename
      */
