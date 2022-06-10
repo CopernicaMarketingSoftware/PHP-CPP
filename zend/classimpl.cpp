@@ -1366,8 +1366,11 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     // initialize the class entry
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
 
-    // we need a special constructor
-    entry.create_object = &ClassImpl::createObject;
+    // we need a special constructor, but only for real classes, not for interfaces.
+    // (in fact: from php 7.4 onwards the create_object method is part of union 
+    // together with the interface_gets_implemented method, which causes a crash
+    // when the create_object property is set for an interface)
+    if (_type != ClassType::Interface) entry.create_object = &ClassImpl::createObject;
 
     // register function that is called for static method calls
     entry.get_static_method = &ClassImpl::getStaticMethod;
@@ -1419,7 +1422,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         _entry = zend_register_internal_class(&entry);
     }
 
-    // register the classes
+    // register the interfaces
     for (auto &interface : _interfaces)
     {
         // register this interface
