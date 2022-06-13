@@ -4,7 +4,7 @@
  *  Startup include file to compile the phpcpp library
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 - 2019 Copernica BV
+ *  @copyright 2013 - 2022 Copernica BV
  */
 
 /**
@@ -117,6 +117,7 @@
  *  Specific zend implementation  files for internal use only
  */
 #include "init.h"
+#include "classtype.h"
 #include "callable.h"
 #include "nativefunction.h"
 #include "method.h"

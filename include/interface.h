@@ -1,7 +1,7 @@
 /**
  *  Interface.h
  *
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2022 Copernica BV
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
 
@@ -20,12 +20,12 @@ public:
      *  Constructor
      *  @param  name
      */
-    Interface(const char *name) : ClassBase(name, ClassType::Interface) {}
+    Interface(const char *name);
 
     /**
      *  Destructor
      */
-    virtual ~Interface() {}
+    virtual ~Interface() = default;
 
     /**
      *  Add a - of course abstract - method to the interface
