@@ -1366,9 +1366,6 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     // initialize the class entry
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
 
-    // set access types flags for class
-    _entry->ce_flags |= (int)_type;
-    
     // we need a special constructor, but only for real classes, not for interfaces.
     // (in fact: from php 7.4 onwards the create_object method is part of union 
     // together with the interface_gets_implemented method, which causes a crash
@@ -1424,7 +1421,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // register the class
         _entry = zend_register_internal_class(&entry);
     }
-
+    
     // register the interfaces
     for (auto &interface : _interfaces)
     {
@@ -1438,6 +1435,9 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     // we may have to expose the Traversable or Serializable interfaces
     if (_base->traversable()) zend_class_implements(_entry, 1, zend_ce_traversable);    
     if (_base->serializable()) zend_class_implements(_entry, 1, zend_ce_serializable);    
+
+    // instal the right modifier (to make the class an interface, abstract class, etc)
+    _entry->ce_flags |= uint64_t(_type);
 
     // this pointer has to be copied to temporary pointer, as &this causes compiler error
     ClassImpl *impl = this;
