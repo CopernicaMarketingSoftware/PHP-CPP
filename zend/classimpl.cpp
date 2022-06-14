@@ -1366,6 +1366,9 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     // initialize the class entry
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
 
+    // set access types flags for class
+    _entry->ce_flags |= (int)_type;
+    
     // we need a special constructor, but only for real classes, not for interfaces.
     // (in fact: from php 7.4 onwards the create_object method is part of union 
     // together with the interface_gets_implemented method, which causes a crash
@@ -1451,13 +1454,6 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
 
     // install the doc_comment
     _entry->info.user.doc_comment = _self;
-
-    // set access types flags for class
-#if PHP_VERSION_ID >= 70400
-    _entry->ce_flags |= (int)_type;
-#else
-    _entry->ce_flags = (int)_type;
-#endif
 
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);
