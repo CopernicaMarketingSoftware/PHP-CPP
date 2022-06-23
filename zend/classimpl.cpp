@@ -8,6 +8,7 @@
  */
 #include "includes.h"
 #include <cstring>
+#include <algorithm>
 
 /**
  *  Set up namespace
@@ -1312,6 +1313,16 @@ const struct _zend_function_entry *ClassImpl::entries()
 {
     // already initialized?
     if (_entries) return _entries;
+
+    // if the class is serializable
+    if (_base->serializable())
+    {
+        // we first check if the class already has a registered serialize method
+        auto result = std::find_if(_methods.begin(), _methods.end(), [](std::shared_ptr<Method> method){ return method->name() == "serialize"; });
+        if (result == _methods.end()) { /* we need to insert the serialize method ourselves */ }
+        result = std::find_if(_methods.begin(), _methods.end(), [](std::shared_ptr<Method> method){ return method->name() == "unserialize"; });
+        if (result == _methods.end()) { /* we need to insert the unserialize method ourselves */ }
+    }
 
     // allocate memory for the functions
     _entries = new zend_function_entry[_methods.size() + 1];
