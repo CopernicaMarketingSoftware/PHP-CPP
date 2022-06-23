@@ -128,10 +128,7 @@ public:
      *  Name of the function
      *  @return const std::string&
      */
-    const std::string &name() const
-    {
-        return _name;
-    }
+    const std::string &name() const { return _name; }
 
 protected:
 
