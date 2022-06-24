@@ -1330,9 +1330,6 @@ const struct _zend_function_entry *ClassImpl::entries()
     // if the class is serializable
     if (_base->serializable())
     {
-        // i register the methods as abstract, though when they are called it seems to call the methods set in
-        // ClassImpl::Initialize below, so this works to bypass the 7.4 requirement that the functions are defined.
-
         // add the serialize method if the class does not have one defined yet
         if (!hasMethod("serialize")) method("serialize");
         // add the unserialize method if the class does not have one defined yet
