@@ -1302,6 +1302,19 @@ int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned
 }
 
 /**
+ *  Helper method to check if a function is registered for this instance
+ *  @param name         name of the function to check for
+ *  @return bool        Wether the function exists or not
+ */
+bool ClassImpl::hasMethod(const char* name) const
+{
+    // find the method
+    auto result = std::find_if(_methods.begin(), _methods.end(), [name](std::shared_ptr<Method> method){ return method->name() == name; });
+    // return wether its found or not
+    return result != _methods.end();
+}
+
+/**
  *  Retrieve an array of zend_function_entry objects that hold the
  *  properties for each method. This method is called at extension
  *  startup time to register all methods.
@@ -1317,11 +1330,13 @@ const struct _zend_function_entry *ClassImpl::entries()
     // if the class is serializable
     if (_base->serializable())
     {
-        // we first check if the class already has a registered serialize method
-        auto result = std::find_if(_methods.begin(), _methods.end(), [](std::shared_ptr<Method> method){ return method->name() == "serialize"; });
-        if (result == _methods.end()) { /* we need to insert the serialize method ourselves */ }
-        result = std::find_if(_methods.begin(), _methods.end(), [](std::shared_ptr<Method> method){ return method->name() == "unserialize"; });
-        if (result == _methods.end()) { /* we need to insert the unserialize method ourselves */ }
+        // i register the methods as abstract, though when they are called it seems to call the methods set in
+        // ClassImpl::Initialize below, so this works to bypass the 7.4 requirement that the functions are defined.
+
+        // add the serialize method if the class does not have one defined yet
+        if (!hasMethod("serialize")) method("serialize");
+        // add the unserialize method if the class does not have one defined yet
+        if (!hasMethod("unserialize")) method("unserialize", 0, {Php::ByVal("serialized")});
     }
 
     // allocate memory for the functions
