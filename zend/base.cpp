@@ -3,7 +3,7 @@
  *
  *  Implementation file for the base of all classes
  *
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2022 Copernica BV
  */
 #include "includes.h"
 
@@ -216,6 +216,51 @@ int Base::__compare(const Base &that) const
     // unreachable code
     return 1;
 }
+
+/**
+ *  Method that is called when an explicit call to $object->serialize() is made
+ *  Note that a call to serialize($object) does not end up in this function, but
+ *  is handled by the user-space implementation of Serializable::serialize()).
+ *  @return Php::Value
+ */
+Php::Value Base::__serialize()
+{
+    // 'this' refers to a Php::Base class, but we expect that is also implements the Serializable
+    // interface (otherwise we would never have registered the __serialize function as a callback)
+    auto *serializable = dynamic_cast<Serializable*>(this);
+
+    // this one should not fail
+    if (serializable == nullptr) return "";
+
+    // pass the call to the interface
+    return serializable->serialize();
+}
+
+/**
+ *  Method that is called when an explicit call to $object->unserialize() is made
+ *  Note that a call to unserialize($string) does not end up in this function, but
+ *  is handled by the user-space implementation of Serializable::unserialize()).
+ *  @param params       The passed parameters
+ */
+void Base::__unserialize(Php::Parameters &params)
+{
+    // 'this' refers to a Php::Base class, but we expect that is also implements the Serializable
+    // interface (otherwise we would never have registered the __serialize function as a callback)
+    auto *serializable = dynamic_cast<Serializable*>(this);
+
+    // this one should not fail
+    if (serializable == nullptr) return;
+
+    // the passed in parameter
+    Php::Value param = params[0];
+
+    // make sure the parameter is indeed a string
+    param.setType(Type::String);
+
+    // pass the call to the interface
+    serializable->unserialize(param.rawValue(), param.size());
+}
+
 
 /**
  *  End namespace

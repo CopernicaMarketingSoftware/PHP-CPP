@@ -113,6 +113,13 @@ private:
     const zend_function_entry *entries();
 
     /**
+     *  Helper method to check if a function is registered for this instance
+     *  @param name         name of the function to check for
+     *  @return bool        Wether the function exists or not
+     */
+    bool hasMethod(const char* name) const;
+
+    /**
      *  Helper method to turn a property into a zval
      *
      *  @param  value   The value to convert to a zval

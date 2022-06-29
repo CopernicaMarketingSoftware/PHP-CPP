@@ -8,6 +8,7 @@
  */
 #include "includes.h"
 #include <cstring>
+#include <algorithm>
 
 /**
  *  Set up namespace
@@ -1301,6 +1302,19 @@ int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned
 }
 
 /**
+ *  Helper method to check if a function is registered for this instance
+ *  @param name         name of the function to check for
+ *  @return bool        Wether the function exists or not
+ */
+bool ClassImpl::hasMethod(const char* name) const
+{
+    // find the method
+    auto result = std::find_if(_methods.begin(), _methods.end(), [name](std::shared_ptr<Method> method){ return method->name() == name; });
+    // return wether its found or not
+    return result != _methods.end();
+}
+
+/**
  *  Retrieve an array of zend_function_entry objects that hold the
  *  properties for each method. This method is called at extension
  *  startup time to register all methods.
@@ -1313,8 +1327,19 @@ const struct _zend_function_entry *ClassImpl::entries()
     // already initialized?
     if (_entries) return _entries;
 
+    // the number of entries that need to be allocated
+    size_t entrycount = _methods.size();
+
+    // if the class is serializable, we might need some extra methods
+    if (_base->serializable())
+    {
+        // add the serialize method if the class does not have one defined yet
+        if (!hasMethod("serialize")) entrycount += 1;
+        if (!hasMethod("unserialize")) entrycount += 1;
+    }
+
     // allocate memory for the functions
-    _entries = new zend_function_entry[_methods.size() + 1];
+    _entries = new zend_function_entry[entrycount + 1];
 
     // keep iterator counter
     int i = 0;
@@ -1327,6 +1352,19 @@ const struct _zend_function_entry *ClassImpl::entries()
 
         // let the function fill the entry
         method->initialize(entry, _name);
+    }
+
+    // if the class is serializable, we might need some extra methods
+    if (_base->serializable())
+    {
+        // the method objectneed to stay in scope for the lifetime of the script (because the register a pointer
+        // to an internal string buffer) -- so we create them as static variables
+        static Method serialize("serialize", &Base::__serialize, 0, {});
+        static Method unserialize("unserialize", &Base::__unserialize, 0, { ByVal("input", Type::Undefined, true) });
+
+        // register the serialize and unserialize method in case this was not yet done in PHP user space
+        if (!hasMethod("serialize")) serialize.initialize(&_entries[i++], _name);
+        if (!hasMethod("unserialize")) unserialize.initialize(&_entries[i++], _name);
     }
 
     // last entry should be set to all zeros
