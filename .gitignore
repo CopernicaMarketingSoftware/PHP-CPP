@@ -6,3 +6,4 @@
 *.so.*
 shared/
 static/
+.vscode/
