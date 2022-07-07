@@ -1357,6 +1357,7 @@ const struct _zend_function_entry *ClassImpl::entries()
         method->initialize(entry, _name);
     }
 
+    // if the class is countable, we might need to add some extra methods
     if (_base->countable())
     {
         // the method objectneed to stay in scope for the lifetime of the script (because the register a pointer
