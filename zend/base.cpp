@@ -261,6 +261,24 @@ void Base::__unserialize(Php::Parameters &params)
     serializable->unserialize(param.rawValue(), param.size());
 }
 
+/**
+ *  Method that is called when an explicit call to $object->count() is made
+ *  Note that a call to unserialize($string) does not end up in this function, but
+ *  is handled by the user-space implementation of Serializable::count()).
+ *  @param params       The passed parameters
+ */
+Php::Value Base::__count(Php::Parameters &params)
+{
+    // 'this' refers to a Php::Base class, but we expect that is also implements the Countable
+    // interface (otherwise we would never have registered the __count function as a callback)
+    auto *countable = dynamic_cast<Countable*>(this);
+
+    // this one should not fail
+    if (countable == nullptr) return -1;
+
+    // pass the call to the interface
+    return countable->count();
+}
 
 /**
  *  End namespace

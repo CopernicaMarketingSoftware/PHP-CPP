@@ -124,6 +124,7 @@ public:
      */
     virtual bool traversable()  const { return false; }
     virtual bool serializable() const { return false; }
+    virtual bool countable()    const { return false; }
     virtual bool clonable()     const { return false; }
 
     /**
