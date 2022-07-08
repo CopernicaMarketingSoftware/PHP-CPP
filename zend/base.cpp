@@ -274,7 +274,7 @@ Php::Value Base::__count(Php::Parameters &params)
     auto *countable = dynamic_cast<Countable*>(this);
 
     // this one should not fail
-    if (countable == nullptr) return -1;
+    if (countable == nullptr) return 0;
 
     // pass the call to the interface
     return countable->count();
