@@ -406,6 +406,16 @@ private:
     }
 
     /**
+     *  Is this a countable class?
+     *  @return bool
+     */
+    virtual bool countable() const override
+    {
+        // check if the templated class overrides from the Countable class
+        return std::is_base_of<Countable,T>::value;
+    }
+
+    /**
      *  Call the __clone method
      *  @param  base
      */

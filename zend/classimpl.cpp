@@ -1330,6 +1330,9 @@ const struct _zend_function_entry *ClassImpl::entries()
     // the number of entries that need to be allocated
     size_t entrycount = _methods.size();
 
+    // if the class is countable, we might need some extra methods
+    if (_base->countable() && !hasMethod("count")) entrycount += 1;
+
     // if the class is serializable, we might need some extra methods
     if (_base->serializable())
     {
@@ -1352,6 +1355,17 @@ const struct _zend_function_entry *ClassImpl::entries()
 
         // let the function fill the entry
         method->initialize(entry, _name);
+    }
+
+    // if the class is countable, we might need to add some extra methods
+    if (_base->countable())
+    {
+        // the method objectneed to stay in scope for the lifetime of the script (because the register a pointer
+        // to an internal string buffer) -- so we create them as static variables
+        static Method count("count", &Base::__count, 0, {});
+
+        // register the serialize and unserialize method in case this was not yet done in PHP user space
+        if (!hasMethod("count")) count.initialize(&_entries[i++], _name);
     }
 
     // if the class is serializable, we might need some extra methods

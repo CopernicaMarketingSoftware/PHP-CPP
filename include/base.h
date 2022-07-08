@@ -277,6 +277,14 @@ public:
      */
     void __unserialize(Php::Parameters &params);
 
+    /**
+     *  Method that is called when an explicit call to $object->count() is made
+     *  Note that a call to count($string) does not end up in this function, but
+     *  is handled by the user-space implementation of Countable::count()).
+     *  @param params       The passed parameters
+     */
+    Php::Value __count(Php::Parameters &params);
+
 
 private:
     /**
