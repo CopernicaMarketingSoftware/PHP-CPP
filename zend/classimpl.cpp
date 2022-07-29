@@ -328,7 +328,7 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
 
     // done
     return SUCCESS;
-};
+}
 
 /**
  *  Retrieve pointer to our own object handlers
@@ -1198,7 +1198,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
 
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object)->object());
-    
+
     // use might throw an exception in the getIterator() function
     try
     {
@@ -1209,10 +1209,10 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
         // the iteraters itself, we can no longer let c++ allocate the buffer + object
         // directly, so we first allocate the buffer, which is going to be cleaned up by php)
         auto *buffer = emalloc(sizeof(IteratorImpl));
-    
+
         // and then we use placement-new to allocate the implementation
         auto *wrapper = new(buffer)IteratorImpl(object, userspace);
-        
+
         // done
         return wrapper->implementation();
     }
@@ -1428,7 +1428,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     entry.get_static_method = &ClassImpl::getStaticMethod;
 
     // for traversable classes we install a special method to get the iterator
-    if (_base->traversable()) 
+    if (_base->traversable())
     {
         // install iterator functions
         entry.get_iterator = &ClassImpl::getIterator;
@@ -1483,10 +1483,10 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // otherwise report an error
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
-    
+
     // we may have to expose the Traversable or Serializable interfaces
-    if (_base->traversable()) zend_class_implements(_entry, 1, zend_ce_traversable);    
-    if (_base->serializable()) zend_class_implements(_entry, 1, zend_ce_serializable);    
+    if (_base->traversable()) zend_class_implements(_entry, 1, zend_ce_traversable);
+    if (_base->serializable()) zend_class_implements(_entry, 1, zend_ce_serializable);
 
     // instal the right modifier (to make the class an interface, abstract class, etc)
     _entry->ce_flags |= uint64_t(_type);

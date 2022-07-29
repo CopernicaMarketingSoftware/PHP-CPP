@@ -116,6 +116,7 @@
 /**
  *  Specific zend implementation  files for internal use only
  */
+#include "smallvector.h"
 #include "init.h"
 #include "classtype.h"
 #include "callable.h"
