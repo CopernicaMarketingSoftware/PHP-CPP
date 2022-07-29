@@ -1221,6 +1221,38 @@ bool Value::derivedFrom(const char *classname, size_t size, bool allowString) co
 }
 
 /**
+ *  Check if the variable holds something that is list
+ *  @return bool
+ */ 
+bool Value::isList() const
+{
+    // must be an array
+    if (!isArray()) return false;
+
+    // get the number of elements
+    ulong count = zend_hash_num_elements(Z_ARRVAL_P(_val));
+
+    // zero length array
+    if (count == 0) return true;
+
+    // count == 1 and a[0] exists
+    if (count == 1 && contains(0)) return true;
+
+    // a[0] exists, a[count - 1] exists and the next index is count
+    return contains(0) && contains(count - 1) &&
+           zend_hash_next_free_element(Z_ARRVAL_P(_val)) == count;
+}
+
+/**
+ *  Check if the variable holds something that is ref
+ *  @return bool
+ */ 
+bool Value::isRef() const
+{
+    return Z_ISREF_P(_val);
+}
+
+/**
  *  Make a clone of the type
  *  @return Value
  */

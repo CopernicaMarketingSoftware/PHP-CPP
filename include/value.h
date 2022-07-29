@@ -403,6 +403,9 @@ public:
     bool isArray()      const;
     bool isScalar()     const { return isNull() || isNumeric() || isBool() || isString() || isFloat(); }
     bool isCallable()   const;
+    bool isList()       const;
+    bool isMap()        const { return type() == Type::Array && !isList(); }
+    bool isRef()        const;
 
     /**
      *  Get access to the raw buffer - you can use this for direct reading and
