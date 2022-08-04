@@ -7,3 +7,5 @@
 shared/
 static/
 .vscode/
+.idea/
+cmake-build-debug/
