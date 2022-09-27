@@ -65,7 +65,8 @@ public:
      *  Constructor from an initializer list
      *  @param  value
      */
-    Array(const std::initializer_list<Value> &value) : Value(value) {}
+    template <typename T>
+    Array(const std::initializer_list<T> &value) : Value(value) {}
 
 // end of visual c++ check
 #   endif

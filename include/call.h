@@ -19,9 +19,9 @@ extern PHPCPP_EXPORT    bool  class_exists(const char *classname, size_t size, b
 static inline           bool  class_exists(const char *classname, bool autoload = true) { return class_exists(classname, strlen(classname), autoload); }
 static inline           bool  class_exists(const std::string &classname, bool autoload = true) { return class_exists(classname.c_str(), classname.size(), autoload); }
 extern PHPCPP_EXPORT    Value constant(const char *constant);
-extern PHPCPP_EXPORT    Value constant(const char *constant, size_t size);
+extern /*PHPCPP_EXPORT*/Value constant(const char *constant, size_t size);
 extern PHPCPP_EXPORT    Value constant(const std::string &constant);
-extern PHPCPP_EXPORT    bool  define(const char *name, size_t size, const Value &value);
+extern /*PHPCPP_EXPORT*/bool  define(const char *name, size_t size, const Value &value);
 extern PHPCPP_EXPORT    bool  define(const char *name, const Value &value);
 extern PHPCPP_EXPORT    bool  define(const std::string &name, const Value &value);
 extern PHPCPP_EXPORT    bool  defined(const char *constant);
@@ -46,8 +46,8 @@ extern PHPCPP_EXPORT    Value require(const char *filename);
 static inline           Value require(const std::string &filename) { return require(filename.c_str()); }
 extern PHPCPP_EXPORT    Value require_once(const char *filename);
 static inline           Value require_once(const std::string &filename) { return require_once(filename.c_str()); }
-extern PHPCPP_EXPORT    Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
-extern PHPCPP_EXPORT    Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Message message = Message::All);
+extern /*PHPCPP_EXPORT*/Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
+extern /*PHPCPP_EXPORT*/Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Message message = Message::All);
 extern PHPCPP_EXPORT    Value error_reporting(Message message);
 extern PHPCPP_EXPORT    const char *sapi_name();
 
@@ -133,4 +133,3 @@ static inline Value isset(const HashMember<Value> &member) { return member.exist
  *  End of namespace
  */
 }
-

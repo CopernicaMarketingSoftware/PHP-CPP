@@ -24,7 +24,7 @@ namespace Php {
  *  Class definition of the class
  */
 template <typename T>
-class PHPCPP_EXPORT Class : private ClassBase
+class /*PHPCPP_EXPORT*/ Class : private ClassBase
 {
 public:
     /**

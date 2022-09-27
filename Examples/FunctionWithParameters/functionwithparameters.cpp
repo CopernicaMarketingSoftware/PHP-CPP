@@ -1,14 +1,14 @@
 /**
  *  functionwithparameters.cpp
  *  @author Jasper van Eck<jasper.vaneck@copernica.com>
- * 
+ *
  *  An example file to show the working of a function call with parameters.
  */
 
 /**
  *  Default Cpp libraries
  */
- 
+
 #include <string>
 #include <iostream>
 
@@ -45,7 +45,7 @@ Php::Value my_with_defined_parameters_function(Php::Parameters &params)
     {
         cout << "Parameter " << i << ": " << params[i] << endl;
     }
-    
+
     return params[0] + params[1];
 }
 
@@ -86,38 +86,47 @@ void my_with_defined_object_parameters_function(Php::Parameters &params)
 }
 
 // Symbols are exported according to the "C" language
-extern "C" 
+extern "C"
 {
     // export the "get_module" function that will be called by the Zend engine
-    PHPCPP_EXPORT void *get_module()
+    MODULE_EXPORT void *get_module()
     {
         // create extension
-        static Php::Extension extension("my_function_with_parameters","1.0");
-        
+        static Php::Extension extension("my_function_with_parameters", "1.0");
+
         // add function, with undefined parameters, to extension
-        extension.add<my_with_undefined_parameters_function>("my_with_undefined_parameters_function");
-        
+        extension.add("my_with_undefined_parameters_function",
+            &Php::ZendCallable::invoke<my_with_undefined_parameters_function>);
+
         // add function, with defined numeric parameters, to extension
-        extension.add<my_with_defined_parameters_function>("my_with_defined_parameters_function", {
-            Php::ByVal("x", Php::Type::Numeric),
-            Php::ByVal("y", Php::Type::Numeric)
+        extension.add("my_with_defined_parameters_function",
+            &Php::ZendCallable::invoke<my_with_defined_parameters_function>,
+            {
+                Php::ByVal("x", Php::Type::Numeric),
+                Php::ByVal("y", Php::Type::Numeric)
             });
-        
+
         // add function, with defined parameter by reference, to extension
-        extension.add<my_with_defined_parameters_reference_function>("my_with_defined_parameters_reference_function", {
-            Php::ByRef("string", Php::Type::String)
+        extension.add("my_with_defined_parameters_reference_function",
+            &Php::ZendCallable::invoke<my_with_defined_parameters_reference_function>,
+            {
+                Php::ByRef("string", Php::Type::String)
             });
-        
+
         // add function, with defined array parameter, to extension
-        extension.add<my_with_defined_array_parameters_function>("my_with_defined_array_parameters_function", {
-            Php::ByVal("array", Php::Type::Array)
+        extension.add("my_with_defined_array_parameters_function",
+            &Php::ZendCallable::invoke<my_with_defined_array_parameters_function>,
+            {
+                Php::ByVal("array", Php::Type::Array)
             });
-        
+
         // add function, with defined object parameter, to extension
-        extension.add<my_with_defined_object_parameters_function>("my_with_defined_object_parameters_function", {
-            Php::ByVal("myClassObjVar", "MyPhpClass")
+        extension.add("my_with_defined_object_parameters_function",
+            &Php::ZendCallable::invoke<my_with_defined_object_parameters_function>,
+            {
+                Php::ByVal("myClassObjVar", "MyPhpClass")
             });
-        
+
         // return the extension module
         return extension.module();
     }

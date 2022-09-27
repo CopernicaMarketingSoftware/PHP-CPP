@@ -40,19 +40,19 @@ public:
      *
      *  @param  name        the filename
      */
-    File(const char *name) : File(name, ::strlen(name)) {}
+    File(const char *name);
 
     /**
      *  Alternative constructor with a string object
      *  @param  name        the filename
      */
-    File(const std::string &name) : File(name.c_str(), name.size()) {}
+    File(const std::string &name);
 
     /**
      *  Alternative constructor with a Value object
      *  @param  name        the filename
      */
-    File(const Value &value) : File(value.stringValue()) {}
+    File(const Value &value);
 
     /**
      *  Destructor
