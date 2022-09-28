@@ -4,16 +4,15 @@ set(PHPCPP_VERSION 2.3.5)
 
 project(phpcpp VERSION ${PHPCPP_VERSION} LANGUAGES CXX)
 
-message(STATUS "Build php-cpp ${PHPCPP_VERSION}")
 
+# Common build options
+# -----------------------------------------------------------------------------
 # Build php-cpp as shared/static library
-option(PHPCPP_BUILD_SHARED  "Build shared library"  OFF)
-option(PHPCPP_BUILD_EXAMPLE "Build example"         ON)
+option(PHPCPP_BUILD_SHARED  "Build shared library"  ON)
+option(PHPCPP_BUILD_EXAMPLE "Build examples"        ON)
 option(PHPCPP_INSTALL       "Generate the install"  ON)
 
-set(PHPCPP_SOURCE_DIR ${PROJECT_SOURCE_DIR})
 
-# -----------------------------------------------------------------------------
 # Windows build options
 # -----------------------------------------------------------------------------
 # On Windows, the path to PHP devel pack, download from https://windows.php.net/download/
@@ -29,7 +28,6 @@ if(NOT PHPCPP_COMPILE_TS)
 endif()
 
 
-# -----------------------------------------------------------------------------
 # Non windows build options
 # -----------------------------------------------------------------------------
 # Non windows, try detect php with php-config
@@ -44,11 +42,29 @@ if(NOT WIN32)
 endif()
 
 
+# Miscs php-cpp variables
+# -----------------------------------------------------------------------------
+if(PHPCPP_BUILD_SHARED)
+   message(STATUS "Build php-cpp ${PHPCPP_VERSION} shared library...")
+else()
+   message(STATUS "Build php-cpp ${PHPCPP_VERSION} static library...")
+endif()
+
+set(PHPCPP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+message(STATUS "PHPCPP_SOURCE_DIR     ${PHPCPP_SOURCE_DIR}")
+
+if(PHPCPP_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+   # we are master project
+   set(PHPCPP_OUTPUT_DIR ${PHPCPP_SOURCE_DIR}/_output)
+else()
+   set(PHPCPP_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/_output)
+endif()
+
+
 # Include headers and sources list
 include(cmake/sources.cmake)
 
 
-# -----------------------------------------------------------------------------
 # phpcpp-common
 # -----------------------------------------------------------------------------
 add_library(phpcpp-common STATIC)
@@ -99,7 +115,6 @@ endif()
 target_compile_features(phpcpp-common PRIVATE cxx_std_11)
 
 
-# -----------------------------------------------------------------------------
 # phpcpp library
 # -----------------------------------------------------------------------------
 if(PHPCPP_BUILD_SHARED)
@@ -132,13 +147,22 @@ target_sources(phpcpp
 target_compile_features(phpcpp PUBLIC cxx_std_11 )
 
 
-# Build examples
+# Prepare phpcpp header files for dependend projects and building examples
+# publish PHPCPP_INCLUDE_DIR variable to outside world
 # -----------------------------------------------------------------------------
-if(PHPCPP_BUILD_EXAMPLE)
-   # Prepare phpcpp header files for building samples
-   file(COPY phpcpp.h DESTINATION ${CMAKE_BINARY_DIR}/phpcpp_include)
-   file(COPY include/ DESTINATION ${CMAKE_BINARY_DIR}/phpcpp_include/phpcpp)
+set(PHPCPP_INCLUDE_DIR "${CMAKE_BINARY_DIR}/phpcpp_include")
+file(COPY phpcpp.h DESTINATION ${PHPCPP_INCLUDE_DIR})
+file(COPY include/ DESTINATION ${PHPCPP_INCLUDE_DIR}/phpcpp)
 
+if(NOT PHPCPP_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+   set(PHPCPP_INCLUDE_DIR ${PHPCPP_INCLUDE_DIR} PARENT_SCOPE)
+endif()
+message(STATUS "PHPCPP_INCLUDE_DIR    ${PHPCPP_INCLUDE_DIR}")
+
+
+# Build examples
+#-----------------------------------------------------------------------------
+if(PHPCPP_BUILD_EXAMPLE)
    message(STATUS "Generating examples")
    add_subdirectory(Examples)
 endif()
@@ -156,29 +180,28 @@ if(PHPCPP_INSTALL)
 endif()
 
 
-# Output folder
+# Copy binaries, resources to _output folder
 # -----------------------------------------------------------------------------
+set(OUTPUT_LIBDIR "${PHPCPP_OUTPUT_DIR}/lib_static")
 if (PHPCPP_BUILD_SHARED)
-  set (OUTPUT_LIBDIR "_output/lib_shared")
-else()
-  set (OUTPUT_LIBDIR "_output/lib_static")
+  set(OUTPUT_LIBDIR "${PHPCPP_OUTPUT_DIR}/lib_shared")
 endif()
 
-# Copy output dir to _output dir
+# Copy build output dir to _output dir
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E make_directory ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:phpcpp> ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:phpcpp-common> ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release> )
+   COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:phpcpp> ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:phpcpp-common> ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release> )
 
 if(WIN32 AND PHPCPP_BUILD_SHARED)
    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:phpcpp> ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>)
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:phpcpp> ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>)
 endif()
 
 # Copy headers to _output dir
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include ${PHPCPP_SOURCE_DIR}/_output/include/phpcpp )
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include ${PHPCPP_OUTPUT_DIR}/include/phpcpp )
 
 # Copy phpcpp.h to _output dir
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/phpcpp.h ${PHPCPP_SOURCE_DIR}/_output/include )
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/phpcpp.h ${PHPCPP_OUTPUT_DIR}/include )

@@ -17,7 +17,7 @@ SET (SAMPLE_PHPFILE_DEST ${SAMPLE_NAME}.php)
 
 add_library(${SAMPLE_NAME} MODULE )
 target_sources(${SAMPLE_NAME} PRIVATE ${SAMPLE_SOURCES} )
-target_include_directories(${SAMPLE_NAME} PRIVATE ${CMAKE_BINARY_DIR}/phpcpp_include)
+target_include_directories(${SAMPLE_NAME} PRIVATE ${PHPCPP_INCLUDE_DIR})
 target_link_libraries(${SAMPLE_NAME} PRIVATE phpcpp)
 
 if(WIN32)
@@ -30,22 +30,21 @@ else()
 endif()
 
 
+
+# Copy binaries, resources to _output folder
 # -----------------------------------------------------------------------------
-# Output folder
-# -----------------------------------------------------------------------------
+set(OUTPUT_EXTDIR "${PHPCPP_OUTPUT_DIR}/ext_static")
 if (PHPCPP_BUILD_SHARED)
-  set (OUTPUT_LIBDIR "_output/ext_shared")
-else()
-  set (OUTPUT_LIBDIR "_output/ext_static")
+  set(OUTPUT_EXTDIR "${PHPCPP_OUTPUT_DIR}/ext_shared")
 endif()
 
 # Copy extension to _output dir
 add_custom_command(TARGET ${SAMPLE_NAME} POST_BUILD
-   COMMAND ${CMAKE_COMMAND} -E make_directory ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
-   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${SAMPLE_NAME}> ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release> )
+   COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_EXTDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:${SAMPLE_NAME}> ${OUTPUT_EXTDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release> )
 
 # Copy php sample to _output dir
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_PHPFILE})
    add_custom_command(TARGET ${SAMPLE_NAME} POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_PHPFILE} ${PHPCPP_SOURCE_DIR}/${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>/${SAMPLE_PHPFILE_DEST} )
+      COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/${SAMPLE_PHPFILE} ${OUTPUT_EXTDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>/${SAMPLE_PHPFILE_DEST} )
 endif()
