@@ -1,41 +1,100 @@
 cmake_minimum_required(VERSION 3.11-3.18)
 
 set(PHPCPP_VERSION 2.3.5)
-
 project(phpcpp VERSION ${PHPCPP_VERSION} LANGUAGES CXX)
 
 
-# Common build options
 # -----------------------------------------------------------------------------
-# Build php-cpp as shared/static library
-option(PHPCPP_BUILD_SHARED  "Build shared library"  ON)
-option(PHPCPP_BUILD_EXAMPLE "Build examples"        ON)
-option(PHPCPP_INSTALL       "Generate the install"  ON)
-
-
-# Windows build options
+#                       Configurable options
+#
+# Uncomment and set the value, or set directly with cmake
 # -----------------------------------------------------------------------------
-# On Windows, the path to PHP devel pack, download from https://windows.php.net/download/
-set(PHP_DEV_PATH         "d:/dev/cpp_php/ts/php-7.4.30-devel-vc15-x64")
-# Set flag if PHP was compiled with thread safe
-set(PHPCPP_COMPILE_TS    TRUE)
+#set(PHPCPP_BUILD_SHARED   TRUE)  # Build static or shared library
+#set(PHPCPP_BUILD_EXAMPLES TRUE)  # Build example extensions
+#set(PHPCPP_INSTALL        TRUE)  # Generate install target
+
+# On Linux, uncomment to set different php-config filename 
+#set(PHP_CONFIG_FILENAME "php-config")
+
+# Options for building on Windows with MSVC
+# -----------------------------------------------------------------------------
+# PHP devel pack dir, download from https://windows.php.net/download/
+#set(PHP_DEV_DIR         "d:/dev/cpp_php/ts/php-7.4.30-devel-vc15-x64")
+# Set to TRUE if PHP was compiled with thread safe
+#set(PHPCPP_COMPILE_TS    TRUE)
 # Set to "x86_64" if architecture and PHP was compiled under x64 or "x86" for 32 bit
-set(PHPCPP_ARCH          "x86_64")
-set(PHP_LIBNAME          "php7ts.lib")
+#set(PHPCPP_ARCH          "x86_64")
 
-if(NOT PHPCPP_COMPILE_TS)
-   set(PHP_LIBNAME       "php7.lib")
+
+
+# -----------------------------------------------------------------------------
+# Default values
+# -----------------------------------------------------------------------------
+# Build static or shared library
+if(NOT DEFINED PHPCPP_BUILD_SHARED)
+   set(PHPCPP_BUILD_SHARED   TRUE)
+endif()
+
+# Build example extensions
+if(NOT DEFINED PHPCPP_BUILD_EXAMPLES)
+   set(PHPCPP_BUILD_EXAMPLES TRUE)
+endif()
+
+# Generate library install target
+if(NOT DEFINED PHPCPP_INSTALL)
+   set(PHPCPP_INSTALL        TRUE)
 endif()
 
 
-# Non windows build options
-# -----------------------------------------------------------------------------
-# Non windows, try detect php with php-config
-if(NOT WIN32)
+if(PHPCPP_BUILD_SHARED)
+   message(STATUS "Build PHP-CPP ${PHPCPP_VERSION} shared library...")
+else()
+   message(STATUS "Build PHP-CPP ${PHPCPP_VERSION} static library...")
+endif()
+
+
+if(WIN32)
+   # Windows build options
+   if(NOT DEFINED PHP_DEV_DIR)
+      message(FATAL_ERROR   "PHP development dir variable PHP_DEV_DIR not defined!")
+   endif()
+
+   if(NOT DEFINED PHPCPP_COMPILE_TS)
+      message(FATAL_ERROR   "PHP threading(TS/NTS) variable PHPCPP_COMPILE_TS not defined!")
+   endif()
+
+   if(NOT DEFINED PHPCPP_ARCH)
+      message(FATAL_ERROR   "PHP architecture variable PHPCPP_ARCH not defined!")
+   endif()
+
+   # PHP library dir
+   set(PHP_LIB_DIR          "${PHP_DEV_DIR}/lib")
+   # PHP library file name
+   set(PHP_LIB_NAME         "php7ts")
+   if(NOT PHPCPP_COMPILE_TS)
+      set(PHP_LIB_NAME      "php7")
+   endif()
+
+   message(STATUS "PHP_LIB_DIR           ${PHP_LIB_DIR}")
+   message(STATUS "PHPCPP_ARCH           ${PHPCPP_ARCH}")
+   message(STATUS "PHPCPP_COMPILE_TS     ${PHPCPP_COMPILE_TS}")
+
+else()
+   # Non windows, try detect php with php-config
    include(cmake/utils.cmake)
-   find_php_dev()
-   if(NOT php_DEV_FOUND)
-      message(FATAL_ERROR "PHP development is not found!")
+
+   if(NOT DEFINED PHP_CONFIG_FILENAME)
+      find_php_dev(php-config) # use default php-config
+   else()
+      find_php_dev(${PHP_CONFIG_FILENAME})
+   endif()
+
+   if(NOT PHP_DEV_FOUND)
+      message(FATAL_ERROR "PHP development not found!")
+   endif()
+
+   if(PHP_VERSION_NUMBER LESS 70000)
+      message(FATAL_ERROR "PHP-CPP works only with PHP 7")
    endif()
 
    include(GNUInstallDirs)
@@ -44,12 +103,6 @@ endif()
 
 # Miscs php-cpp variables
 # -----------------------------------------------------------------------------
-if(PHPCPP_BUILD_SHARED)
-   message(STATUS "Build php-cpp ${PHPCPP_VERSION} shared library...")
-else()
-   message(STATUS "Build php-cpp ${PHPCPP_VERSION} static library...")
-endif()
-
 set(PHPCPP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
 message(STATUS "PHPCPP_SOURCE_DIR     ${PHPCPP_SOURCE_DIR}")
 
@@ -75,11 +128,11 @@ target_sources(phpcpp-common
 
 if(WIN32)
    target_include_directories(phpcpp-common
-      PUBLIC ${PHP_DEV_PATH}/include
-      PUBLIC ${PHP_DEV_PATH}/include/main
-      PUBLIC ${PHP_DEV_PATH}/include/Zend
-      PUBLIC ${PHP_DEV_PATH}/include/TSRM
-      PUBLIC ${PHP_DEV_PATH}/include/ext )
+      PUBLIC ${PHP_DEV_DIR}/include
+      PUBLIC ${PHP_DEV_DIR}/include/main
+      PUBLIC ${PHP_DEV_DIR}/include/Zend
+      PUBLIC ${PHP_DEV_DIR}/include/TSRM
+      PUBLIC ${PHP_DEV_DIR}/include/ext )
 
    #target_compile_definitions(phpcpp-common
    #   PUBLIC $<$<CONFIG:Debug>:ZEND_DEBUG=1>$<$<CONFIG:Release>:ZEND_DEBUG=0> )
@@ -90,7 +143,7 @@ if(WIN32)
       target_compile_definitions(phpcpp-common PUBLIC ZTS )
    endif()
 
-   if(${PHPCPP_ARCH} STREQUAL "x86")
+   if("x86" STREQUAL ${PHPCPP_ARCH})
       target_compile_definitions(phpcpp-common PUBLIC _USE_32BIT_TIME_T )
    endif()
 
@@ -109,7 +162,7 @@ if(WIN32)
 else() # not win32
    target_compile_definitions(phpcpp-common PRIVATE BUILDING_PHPCPP)
    target_compile_options(phpcpp-common PRIVATE -fpic -c -fvisibility=hidden -Wno-write-strings -MD -Wall )
-   target_include_directories(phpcpp-common PUBLIC ${php_INCLUDE_DIRS})
+   target_include_directories(phpcpp-common PUBLIC ${PHP_INCLUDE_DIRS})
 endif()
 
 target_compile_features(phpcpp-common PRIVATE cxx_std_11)
@@ -120,7 +173,7 @@ target_compile_features(phpcpp-common PRIVATE cxx_std_11)
 if(PHPCPP_BUILD_SHARED)
    add_library(phpcpp SHARED)
    if(NOT MSVC)
-      target_link_options(phpcpp PRIVATE -shared ${php_LDFLAGS})
+      target_link_options(phpcpp PRIVATE -shared ${PHP_LDFLAGS})
    endif()
 else()
    add_library(phpcpp STATIC)
@@ -132,8 +185,8 @@ if(WIN32)
    if(PHPCPP_BUILD_SHARED)
       target_compile_definitions(phpcpp PRIVATE BUILDING_PHPCPP)
    endif()
-
-   target_link_libraries(phpcpp PUBLIC "${PHP_DEV_PATH}/lib/${PHP_LIBNAME}" )
+   target_link_directories(phpcpp PUBLIC ${PHP_LIB_DIR})
+   target_link_libraries(phpcpp PUBLIC ${PHP_LIB_NAME} )
 else()
    target_compile_definitions(phpcpp PRIVATE BUILDING_PHPCPP)
    target_compile_options(phpcpp PRIVATE -fpic -c -fvisibility=hidden -Wno-write-strings -MD -Wall )
@@ -162,7 +215,7 @@ message(STATUS "PHPCPP_INCLUDE_DIR    ${PHPCPP_INCLUDE_DIR}")
 
 # Build examples
 #-----------------------------------------------------------------------------
-if(PHPCPP_BUILD_EXAMPLE)
+if(PHPCPP_BUILD_EXAMPLES)
    message(STATUS "Generating examples")
    add_subdirectory(Examples)
 endif()
