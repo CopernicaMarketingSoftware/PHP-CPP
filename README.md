@@ -1,3 +1,12 @@
+NOTE
+=====
+
+This is a fork of the original library by Copernica Marketing Software. Though we should be grateful to them for the generation of this wonderful project, it seems that they have lost interest in it and are not really keeping it updated, having only merged a handful of PRs in the last years and not having updated it for PHP 8.
+
+The aim of this fork is to have a maintained version which incorporates the different PRs that the users might add with fixes and new features and to keep the library updated so that it works with the latest PHP versions. We don't plan to actively develop this library, we will be just adding these updates.
+
+Please do not create Pull Requests or Issues against this fork. Create them against the original library and we will take care of picking them from there. We want to make sure that any updates and fixes are also available for the users of the original library.
+
 PHP-CPP
 =======
 
