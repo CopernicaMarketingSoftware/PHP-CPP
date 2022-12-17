@@ -305,7 +305,11 @@ int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_funct
     function->arg_flags[1]      = 0;
     function->arg_flags[2]      = 0;
     function->fn_flags          = ZEND_ACC_CALL_VIA_HANDLER;
-    function->function_name     = zend_empty_string;            // should not be null, as this is free'ed by zend when doing exception handling
+#if PHP_VERSION_ID >= 70200
+        function->function_name     = zend_empty_string;            // should not be null, as this is free'ed by zend when doing exception handling
+#else
+        function->function_name     = CG(empty_string);            // should not be null, as this is free'ed by zend when doing exception handling
+#endif
     function->scope             = *entry_ptr;
     function->prototype         = nullptr;
     function->num_args          = 0;
