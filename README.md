@@ -10,7 +10,7 @@ Please do not create Pull Requests or Issues against this fork. Create them agai
 PHP-CPP
 =======
 
-[![Build Status](https://travis-ci.org/CopernicaMarketingSoftware/PHP-CPP.svg?branch=master)](https://travis-ci.org/CopernicaMarketingSoftware/PHP-CPP)
+[![Build Status](https://github.com/CopernicaMarketingSoftware/PHP-CPP/actions/workflows/github-actions.yml/badge.svg)](https://github.com/CopernicaMarketingSoftware/PHP-CPP/actions/workflows/github-actions.yml/badge.svg)
 
 The PHP-CPP library is a C++ library for developing PHP extensions. It offers a collection
 of well documented and easy-to-use classes that can be used and extended to build native
