@@ -892,7 +892,7 @@ Value Value::call(const char *name)
 Value Value::exec(int argc, Value *argv) const
 {
     // array of zvals to execute
-    zval params[argc];
+    zval* params = static_cast<zval*>(alloca(argc * sizeof(zval)));
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -914,7 +914,7 @@ Value Value::exec(const char *name, int argc, Value *argv) const
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    zval* params = static_cast<zval*>(alloca(argc * sizeof(zval)));
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -936,7 +936,7 @@ Value Value::exec(const char *name, int argc, Value *argv)
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    zval* params = static_cast<zval*>(alloca(argc * sizeof(zval)));
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
