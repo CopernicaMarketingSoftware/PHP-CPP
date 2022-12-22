@@ -34,19 +34,14 @@ extern "C"
         // create extension
         static Php::Extension extension("my_test_ext","0.1a");
 
+        // define classes
+        Php::Class<MyTestExt> MyTestExt("my_test_ext");
+        MyTestExt.method<&MyTestExt::__construct>("__construct",Php::Private);
+        MyTestExt.property("version", "v0.01-alpha", Php::Const);
+        MyTestExt.property("PI", 3.14159265, Php::Const);
+        MyTestExt.property("IMISNULL", Php::Const);
         // add the custom class ot the extension
-        extension.add(
-            "MyTestClass",
-            Php::Class<MyTestExt>({
-
-                // Private PHP constructor! You can't instance object of MyTestClass
-                Php::Private("__construct", Php::Method<MyTestExt>(&MyTestExt::__construct)),
-
-                Php::Const("version", "v0.01-alpha"),
-                Php::Const("PI", 3.14159265),
-                Php::Const("IMISNULL"),
-            })
-        );
+        extension.add(MyTestExt);
 
         // return the extension module
         return extension.module();

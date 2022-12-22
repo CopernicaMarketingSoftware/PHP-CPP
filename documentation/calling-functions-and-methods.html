@@ -79,7 +79,7 @@ extern "C" {
         static Php::Extension extension("my_extension", "1.0");
         
         // add the example function so that it can be called from PHP scripts
-        extension.add("example_function", example_function);
+        extension.add<example_function>("example_function" );
         
         // return the extension details
         return extension;
