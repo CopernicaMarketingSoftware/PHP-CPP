@@ -189,7 +189,11 @@ public:
      *  @return zend_object             Object info
      */
     static zend_object *createObject(zend_class_entry *entry);
+#if PHP_VERSION_ID < 80000
     static zend_object *cloneObject(zval *val);
+#else
+    static zend_object *cloneObject(zend_object *val);
+#endif
     static void destructObject(zend_object *object);
     static void freeObject(zend_object *object);
 
@@ -212,7 +216,11 @@ public:
      *  @param  count
      *  @return int
      */
+#if PHP_VERSION_ID < 80000
     static int countElements(zval *object, zend_long *count);
+#else
+    static int countElements(zend_object *object, zend_long *count);
+#endif
 
     /**
      *  Function that is called when the object is used as an array in PHP
@@ -224,10 +232,17 @@ public:
      *  @param  check_empty     ????
      *  @return zval
      */
+#if PHP_VERSION_ID < 80000
     static zval *readDimension(zval *object, zval *offset, int type, zval *rv);
     static void writeDimension(zval *object, zval *offset, zval *value);
     static int  hasDimension(zval *object, zval *offset, int check_empty);
     static void unsetDimension(zval *object, zval *offset);
+#else
+    static zval *readDimension(zend_object *object, zval *offset, int type, zval *rv);
+    static void writeDimension(zend_object *object, zval *offset, zval *value);
+    static int  hasDimension(zend_object *object, zval *offset, int check_empty);
+    static void unsetDimension(zend_object *object, zval *offset);
+#endif
 
     /**
      *  Retrieve pointer to our own object handlers
@@ -261,7 +276,11 @@ public:
      *  @param  rv              Pointer to where to store the data
      *  @return zval
      */
+#if PHP_VERSION_ID < 80000
     static zval *readProperty(zval *object, zval *name, int type, void **cache_slot, zval *rv);
+#else
+    static zval *readProperty(zend_object *object, zend_string *name, int type, void **cache_slot, zval *rv);
+#endif
 
     /**
      *  Function that is called when a property is set / updated
@@ -272,7 +291,11 @@ public:
      *  @param  cache_slot      The cache slot used
      *  @return zval*
      */
+#if PHP_VERSION_ID < 80000
     static PHP_WRITE_PROP_HANDLER_TYPE writeProperty(zval *object, zval *name, zval *value, void **cache_slot);
+#else
+    static PHP_WRITE_PROP_HANDLER_TYPE writeProperty(zend_object *object, zend_string *name, zval *value, void **cache_slot);
+#endif
 
     /**
      *  Function that is called to check whether a certain property is set
@@ -283,7 +306,11 @@ public:
      *  @param  cache_slot      The cache slot used
      *  @return bool
      */
+#if PHP_VERSION_ID < 80000
     static int hasProperty(zval *object, zval *name, int has_set_exists, void **cache_slot);
+#else
+    static int hasProperty(zend_object *object, zend_string *name, int has_set_exists, void **cache_slot);
+#endif
 
     /**
      *  Function that is called when a property is removed from the project
@@ -292,7 +319,11 @@ public:
      *  @param  member          The member to remove
      *  @param  cache_slot      The cache slot used
      */
+#if PHP_VERSION_ID < 80000
     static void unsetProperty(zval *object, zval *member, void **cache_slot);
+#else
+    static void unsetProperty(zend_object *object, zend_string *member, void **cache_slot);
+#endif
 
     /**
      *  Method that returns information about the function signature of a undefined method
@@ -322,7 +353,11 @@ public:
      *  @param  object_ptr  To be filled with the object on which the method is to be called
      *  @return int
      */
+#if PHP_VERSION_ID < 80000
     static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr);
+#else
+    static int getClosure(zend_object *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr, zend_bool check_only);
+#endif
 
     /**
      *  Function to cast the object to a different type
@@ -331,7 +366,11 @@ public:
      *  @param  type
      *  @return int
      */
+#if PHP_VERSION_ID < 80000
     static int cast(zval *object, zval *retval, int type);
+#else
+    static int cast(zend_object *object, zval *retval, int type);
+#endif
 
     /**
      *  Function to compare two objects

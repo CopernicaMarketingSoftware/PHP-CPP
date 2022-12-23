@@ -26,6 +26,7 @@ namespace Php {
  */
 zend_op_array *Script::compile(const char *name, const char *phpcode, size_t size)
 {
+#if PHP_VERSION_ID < 80000
     // Sadly, there is not a simple Zend function to compile a string into opcodes,
     // so we basically copy the code that we found in zend_execute_API.c inside
     // the zend_eval_stringl() function into this file here. However, the code
@@ -38,6 +39,18 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
     
     // compile the string
     return zend_compile_string(source._val, (char *)name);
+#else
+    zend_string *source;
+    source = zend_string_init(phpcode, size, 0);
+
+    // remember the old compiler options, and set new compiler options
+    CompilerOptions options(ZEND_COMPILE_DEFAULT_FOR_EVAL);
+
+    // compile the string
+    zend_op_array *result = zend_compile_string(source, (char *)name);
+    zend_string_release(source);
+    return result;
+#endif
 }
 
 /**
