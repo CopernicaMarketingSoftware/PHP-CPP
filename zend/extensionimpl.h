@@ -157,7 +157,11 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
+#if PHP_VERSION_ID < 80000
     static int processStartup(int type, int module_number);
+#else
+    static zend_result processStartup(int type, int module_number);
+#endif
     
     /**
      *  Function that is called when the extension is about to be stopped
@@ -165,7 +169,11 @@ private:
      *  @param  number      Module number
      *  @return int
      */
+#if PHP_VERSION_ID < 80000
     static int processShutdown(int type, int module_number);
+#else
+    static zend_result processShutdown(int type, int module_number);
+#endif
     
     /**
      *  Function that is called when a request starts
@@ -173,7 +181,11 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
+#if PHP_VERSION_ID < 80000
     static int processRequest(int type, int module_number);
+#else
+    static zend_result processRequest(int type, int module_number);
+#endif
 
     /**
      *  Function that is called when a request is ended
@@ -181,7 +193,11 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
+#if PHP_VERSION_ID < 80000
     static int processIdle(int type, int module_number);
+#else
+    static zend_result processIdle(int type, int module_number);
+#endif
 
     /**
      *  Function that is called when the PHP engine initializes with a different PHP-CPP
@@ -190,7 +206,11 @@ private:
      *  @param  number      Module number
      *  @return int         0 on success
      */
+#if PHP_VERSION_ID < 80000
     static int processMismatch(int type, int module_number);
+#else
+    static zend_result processMismatch(int type, int module_number);
+#endif
 };
 
 /**
