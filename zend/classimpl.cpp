@@ -287,6 +287,8 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
  */
 #if PHP_VERSION_ID < 80000
 int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
+#elif PHP_VERSION_ID > 80200
+zend_result ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
 #else
 int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
 #endif
@@ -471,7 +473,11 @@ int ClassImpl::compare(zval *val1, zval *val2)
  *  @param  type
  *  @return int
  */
+#if PHP_VERSION_ID >= 80200
+zend_result ClassImpl::cast(ZEND_OBJECT_OR_ZVAL val, zval *retval, int type)
+#else
 int ClassImpl::cast(ZEND_OBJECT_OR_ZVAL val, zval *retval, int type)
+#endif
 {
     // get the base c++ object
     Base *object = ObjectImpl::find(val)->object();
@@ -583,7 +589,11 @@ zend_object *ClassImpl::cloneObject(ZEND_OBJECT_OR_ZVAL val)
  *  @param  count
  *  @return int
  */
+#if PHP_VERSION_ID >= 80200
+zend_result ClassImpl::countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count)
+#else
 int ClassImpl::countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count)
+#endif
 {
     // does it implement the countable interface?
     Countable *countable = dynamic_cast<Countable*>(ObjectImpl::find(object)->object());

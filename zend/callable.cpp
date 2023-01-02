@@ -35,7 +35,7 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     Callable *callable = reinterpret_cast<Callable*>(info[argc].class_name);
 #else
     // Sanity check
-    assert(info[argc].type != 0 && info[argc].name == nullptr);
+    assert(ZEND_TYPE_IS_SET(info[argc].type) && info[argc].name == nullptr);
     // the callable we are retrieving
 #if PHP_VERSION_ID < 80000
     Callable *callable = reinterpret_cast<Callable*>(info[argc].type);
