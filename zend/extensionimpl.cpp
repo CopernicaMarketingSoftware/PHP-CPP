@@ -190,6 +190,28 @@ zend_result ExtensionImpl::processIdle(int type, int module_number)
 }
 
 /**
+ *  Function that is called when when PHP invokes phpinfo()
+ *  @param  zend_module_entry  Pointer to zend_module_entry
+ *  @return void
+ */
+void ExtensionImpl::processInfo(zend_module_entry* zend_module)
+{
+    // get the extension
+    auto *extension = find(zend_module->module_number);
+
+    // is the callback registered?
+    if (extension->_onInfo) {
+        extension->_onInfo();
+    } else {
+        // if not we display the standard info displayed by PHP
+        php_info_print_table_start();
+        php_info_print_table_row(2, "Version", zend_module->version);
+        php_info_print_table_end();
+        DISPLAY_INI_ENTRIES();
+    }
+}
+
+/**
  *  Function that is called when the PHP engine initializes with a different PHP-CPP
  *  version for the libphpcpp.so file than the version the extension was compiled for
  *  @param  type        Module type
@@ -238,7 +260,7 @@ ExtensionImpl::ExtensionImpl(Extension *data, const char *name, const char *vers
     _entry.module_shutdown_func = &ExtensionImpl::processShutdown; // shutdown function for the whole extension
     _entry.request_startup_func = &ExtensionImpl::processRequest;  // startup function per request
     _entry.request_shutdown_func = &ExtensionImpl::processIdle;    // shutdown function per request
-    _entry.info_func = NULL;                                       // information for retrieving info
+    _entry.info_func = &ExtensionImpl::processInfo;                // information for retrieving info
     _entry.version = version;                                      // version string
     _entry.globals_size = 0;                                       // size of the global variables
     _entry.globals_ctor = NULL;                                    // constructor for global variables

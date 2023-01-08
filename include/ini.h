@@ -96,6 +96,14 @@ public:
      */
     void fill(struct _zend_ini_entry_def *ini_entry, int module_number);
 
+	/**
+	 *  Return name of ini setting - Use Php::ini_get_orig() to get MASTER VALUE and send this method's return value
+	 *  as parameter or Php::ini_get() to get LOCAL VALUE and send this method's return value as parameter
+	 *  @return string
+	 */ 
+    std::string name() {
+        return _name;
+    }
 
 private:
     /**
