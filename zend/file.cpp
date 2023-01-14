@@ -28,8 +28,16 @@ namespace Php {
  */
 File::File(const char *name, size_t size)
 {
+#if PHP_VERSION_ID >= 80100
+    zend_string *file_name;
+
+    file_name = zend_string_init(name, size, 0);
+    _path = zend_resolve_path(file_name);
+    zend_string_release(file_name);
+#else
     // resolve the path
     _path = zend_resolve_path(name, size);
+#endif
 }
 
 /**
@@ -54,22 +62,27 @@ bool File::compile()
     if (_opcodes) return _opcodes->valid();
 
     // we are going to open the file
-    zend_file_handle fileHandle;
+    zend_file_handle file_handle;
 
     // open the file
-    if (zend_stream_open(ZSTR_VAL(_path), &fileHandle) == FAILURE) return false;
+#if PHP_VERSION_ID >= 80100
+    zend_stream_init_filename_ex(&file_handle, _path);
+    if (zend_stream_open(&file_handle) == FAILURE) return false;
+#else
+    if (zend_stream_open(ZSTR_VAL(_path), &file_handle) == FAILURE) return false;
+#endif
 
     // make sure the path name is stored in the handle (@todo: is this necessary? do we need the copy?)
-    if (!fileHandle.opened_path) fileHandle.opened_path = zend_string_copy(_path);
+    if (!file_handle.opened_path) file_handle.opened_path = zend_string_copy(_path);
 
     // we need temporary compiler options
     CompilerOptions options(ZEND_COMPILE_DEFAULT);
 
     // create the opcodes
-    _opcodes.reset(new Opcodes(zend_compile_file(&fileHandle, ZEND_INCLUDE)));
+    _opcodes.reset(new Opcodes(zend_compile_file(&file_handle, ZEND_INCLUDE)));
 
     // close the file handle
-    zend_destroy_file_handle(&fileHandle);
+    zend_destroy_file_handle(&file_handle);
 
     // done
     return _opcodes->valid();
