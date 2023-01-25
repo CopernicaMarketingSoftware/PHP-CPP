@@ -286,9 +286,11 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
  *  @return int
  */
 #if PHP_VERSION_ID < 80000
-    int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
+int ClassImpl::getClosure(zval *object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
+#elif PHP_VERSION_ID < 80200
+int ClassImpl::getClosure(zend_object *object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
 #else
-    int ClassImpl::getClosure(zend_object *object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
+zend_result ClassImpl::getClosure(zend_object *object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
 #endif
 {
     // it is really unbelievable how the Zend engine manages to implement every feature
@@ -310,9 +312,9 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
     function->arg_flags[2]      = 0;
     function->fn_flags          = ZEND_ACC_CALL_VIA_HANDLER;
 #if PHP_VERSION_ID >= 70200
-        function->function_name     = zend_empty_string;            // should not be null, as this is free'ed by zend when doing exception handling
+    function->function_name     = zend_empty_string;            // should not be null, as this is free'ed by zend when doing exception handling
 #else
-        function->function_name     = CG(empty_string);            // should not be null, as this is free'ed by zend when doing exception handling
+    function->function_name     = CG(empty_string);            // should not be null, as this is free'ed by zend when doing exception handling
 #endif
     function->scope             = *entry_ptr;
     function->prototype         = nullptr;
@@ -485,8 +487,10 @@ int ClassImpl::compare(zval *val1, zval *val2)
  */
 #if PHP_VERSION_ID < 80000
 int ClassImpl::cast(zval *val, zval *retval, int type)
-#else
+#elif PHP_VERSION_ID < 80200
 int ClassImpl::cast(zend_object *val, zval *retval, int type)
+#else
+zend_result ClassImpl::cast(zend_object *val, zval *retval, int type)
 #endif
 {
     // get the base c++ object
@@ -606,8 +610,10 @@ zend_object *ClassImpl::cloneObject(zend_object *val)
  */
 #if PHP_VERSION_ID < 80000
 int ClassImpl::countElements(zval *object, zend_long *count)
-#else
+#elif PHP_VERSION_ID < 80200
 int ClassImpl::countElements(zend_object *object, zend_long *count)
+#else
+zend_result ClassImpl::countElements(zend_object *object, zend_long *count)
 #endif
 {
     // does it implement the countable interface?

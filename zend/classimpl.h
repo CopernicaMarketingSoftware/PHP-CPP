@@ -218,8 +218,10 @@ public:
      */
 #if PHP_VERSION_ID < 80000
     static int countElements(zval *object, zend_long *count);
-#else
+#elif PHP_VERSION_ID < 80200
     static int countElements(zend_object *object, zend_long *count);
+#else
+    static zend_result countElements(zend_object *object, zend_long *count);
 #endif
 
     /**
@@ -355,8 +357,10 @@ public:
      */
 #if PHP_VERSION_ID < 80000
     static int getClosure(zval *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr);
-#else
+#elif PHP_VERSION_ID < 80200
     static int getClosure(zend_object *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr, zend_bool check_only);
+#else
+    static zend_result getClosure(zend_object *object, zend_class_entry **entry, zend_function **func, zend_object **object_ptr, zend_bool check_only);
 #endif
 
     /**
@@ -368,8 +372,10 @@ public:
      */
 #if PHP_VERSION_ID < 80000
     static int cast(zval *object, zval *retval, int type);
-#else
+#elif PHP_VERSION_ID < 80200
     static int cast(zend_object *object, zval *retval, int type);
+#else
+    static zend_result cast(zend_object *object, zval *retval, int type);
 #endif
 
     /**

@@ -47,7 +47,11 @@ zend_op_array *Script::compile(const char *name, const char *phpcode, size_t siz
     CompilerOptions options(ZEND_COMPILE_DEFAULT_FOR_EVAL);
 
     // compile the string
+#if PHP_VERSION_ID < 80200
     zend_op_array *result = zend_compile_string(source, (char *)name);
+#else
+    zend_op_array *result = zend_compile_string(source, (char *)name, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
+#endif
     zend_string_release(source);
     return result;
 #endif
