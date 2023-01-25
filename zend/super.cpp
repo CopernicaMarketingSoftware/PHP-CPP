@@ -5,7 +5,7 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  */
 #include "includes.h"
-#include "string.h"
+#include "strings.h"
 
 /**
  *  Set up namespace

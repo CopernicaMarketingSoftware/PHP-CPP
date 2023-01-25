@@ -41,7 +41,7 @@ int StreamBuf::sync()
     }
     
     // reset the buffer
-    pbump(-size);
+    pbump(size);
     
     // done
     return 0;

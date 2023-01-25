@@ -75,7 +75,7 @@ private:
                 auto iter = _handles.begin();
                 
                 // remove the handle
-                DL_UNLOAD(*iter);
+                DL_UNLOAD((HMODULE) * iter);
                 
                 // remove from set
                 _handles.erase(iter);
@@ -99,7 +99,7 @@ private:
         void add(const char *module)
         {
             // insert the handle
-            _handles.insert(DL_LOAD(module));
+            _handles.insert(DL_LOAD((LPCWSTR)module));
         }
     };
 
@@ -126,7 +126,7 @@ public:
         ExtensionPath path(module);
         
         // load the module
-        _handle = DL_LOAD(path);
+        _handle = DL_LOAD((LPCWSTR)*path);
         
         // handle should be valid
         if (!_handle) return;
