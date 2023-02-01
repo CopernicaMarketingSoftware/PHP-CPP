@@ -3,7 +3,7 @@ PHP-CPP-cmake
 This is a fork of PHP-CPP, with goal to enable
 building PHP-CPP with Cmake on Windows and Linux.
 
-Change lists: [Modifications.md](https://github.com/jefrisibarani/PHP-CPP-cmake/blob/master/Modifications.md)
+Changes list: [Modifications.md](https://github.com/jefrisibarani/PHP-CPP-cmake/blob/master/Modifications.md)
 
 Sample PHP-CPP extension project: [PHP-CPP-SampleExtension](https://github.com/jefrisibarani/PHP-CPP-SampleExtension)
 
@@ -55,14 +55,27 @@ cmake --build build_shared_r
 
 ## Successfully built on the following hosts:
 
-***Windows 11***
+***Windows 11 (10.0.22000)***
 - Cmake version 3.22.2
-- Visual Studio 2017 (v141)
+- Visual Studio 2017 (v14.16)
 - MSVC 14.16.27023
 - Windows SDK Version 10.0.19041.0
 - PHP 7.4.30 (TS) with development package from https://windows.php.net/download/
 
 ***CentOS 7.9***
 - CMake 3.17.5
-- GCC 7.3.1 from  devtoolset-7
+- GCC 7.3.1 from devtoolset-7
+- GCC 11.2.1 from devtoolset-11
 - PHP 7.2.34 (NTS)
+
+***Windows 10 (10.0.19045)***
+- Cmake version 3.22.2
+- Visual Studio 2022 (v14.34)
+- MSVC 19.34.31937.0
+- Windows SDK Version 10.0.22000.0
+- PHP 7.4.30 (TS) with development package from https://windows.php.net/download/
+
+***Ubuntu Server 20.04.5***
+- CMake 3.25.2
+- GCC 9.4.0
+- PHP 7.4.33 (NTS)

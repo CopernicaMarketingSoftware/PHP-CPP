@@ -6,6 +6,9 @@ REM
 REM Adapt the paths PHP_DEV_DIR, PHPCPP_COMPILE_TS and PHPCPP_ARCH
 REM Run this script from project root dir
 REM
+REM To build with Visual Studio 2022, replace "Visual Studio 15 2017"
+REM On line 24 and 54 with "Visual Studio 17 2022" 
+REM
 REM Author: jefrisibarani@gmail.com
 REM
 
