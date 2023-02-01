@@ -5,6 +5,7 @@
  *  An example file to show the working of an extension.
  */
 // library include
+#include <iostream>
 #include <phpcpp.h>
 
 /**

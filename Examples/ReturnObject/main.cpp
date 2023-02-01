@@ -1,3 +1,4 @@
+#include <iostream>
 #include <phpcpp.h>
 #include "master.h"
 #include "child.h"

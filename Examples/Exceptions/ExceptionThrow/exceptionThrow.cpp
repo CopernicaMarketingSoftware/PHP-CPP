@@ -10,6 +10,7 @@
 /**
  *  Libraries used.
  */
+#include <iostream>
 #include <phpcpp.h>
 
 /**
