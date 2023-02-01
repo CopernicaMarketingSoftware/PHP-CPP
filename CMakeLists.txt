@@ -13,7 +13,7 @@ project(phpcpp VERSION ${PHPCPP_VERSION} LANGUAGES CXX)
 #set(PHPCPP_BUILD_EXAMPLES TRUE)  # Build example extensions
 #set(PHPCPP_INSTALL        TRUE)  # Generate install target
 
-# On Linux, uncomment to set different php-config filename 
+# On Linux, uncomment to set different php-config filename
 #set(PHP_CONFIG_FILENAME "php-config")
 
 # Options for building on Windows with MSVC
@@ -97,6 +97,7 @@ else()
       message(FATAL_ERROR "PHP-CPP works only with PHP 7")
    endif()
 
+   message(STATUS "PHP_VERSION           ${PHP_VERSION}")
    include(GNUInstallDirs)
 endif()
 
@@ -197,7 +198,7 @@ target_sources(phpcpp
    PRIVATE ${PHPCPP_ZEND_HEADERS}
    PRIVATE ${PHPCPP_ZEND_SOURCES} )
 
-target_compile_features(phpcpp PUBLIC cxx_std_11 )
+target_compile_features(phpcpp PRIVATE cxx_std_11 )
 
 
 # Prepare phpcpp header files for dependend projects and building examples

@@ -9,7 +9,7 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 - 2019 Copernica BV
  */
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 /**

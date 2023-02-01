@@ -607,7 +607,7 @@ public:
      */
     virtual bool contains(const std::string &key) const override
     {
-        return contains(key.c_str(), key.size());
+        return contains(key.c_str(), static_cast<int>(key.size()));
     }
 
     /**

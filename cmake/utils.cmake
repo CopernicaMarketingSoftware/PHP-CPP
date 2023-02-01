@@ -62,19 +62,32 @@ function(find_php_dev phpcfg)
       endif()
 
 
-      set(PHP_DEV_FOUND    TRUE PARENT_SCOPE)
-      set(PHP_INCLUDE_DIRS ${php_INCLUDE_DIRS} PARENT_SCOPE)
-      set(PHP_DEPENDS_LIBS ${php_DEPENDS_LIBS} PARENT_SCOPE)
-      set(PHP_LDFLAGS      ${php_LDFLAGS}      PARENT_SCOPE)
-      set(PHP_VERNUMBER    ${php_VERNUMBER}    PARENT_SCOPE)
+      # get version string
+      execute_process(COMMAND ${PHP_CONFIG} --version
+         OUTPUT_VARIABLE php_CONFIG_VERSTRING
+         RESULT_VARIABLE RET
+         ERROR_QUIET )
+
+      if(RET EQUAL 0)
+         string(STRIP "${php_CONFIG_VERSTRING}" php_VERSTRING)
+      endif()
+
+
+      set(PHP_DEV_FOUND      TRUE                PARENT_SCOPE)
+      set(PHP_INCLUDE_DIRS   ${php_INCLUDE_DIRS} PARENT_SCOPE)
+      set(PHP_DEPENDS_LIBS   ${php_DEPENDS_LIBS} PARENT_SCOPE)
+      set(PHP_LDFLAGS        ${php_LDFLAGS}      PARENT_SCOPE)
+      set(PHP_VERSION_NUMBER ${php_VERNUMBER}    PARENT_SCOPE)
+      set(PHP_VERSION        ${php_VERSTRING}    PARENT_SCOPE)
 
    else()
 
       set(PHP_DEV_FOUND      FALSE PARENT_SCOPE)
-      set(PHP_INCLUDE_DIRS   "" PARENT_SCOPE)
-      set(PHP_DEPENDS_LIBS   "" PARENT_SCOPE)
-      set(PHP_LDFLAGS        "" PARENT_SCOPE)
-      set(PHP_VERSION_NUMBER "" PARENT_SCOPE)
+      set(PHP_INCLUDE_DIRS   ""    PARENT_SCOPE)
+      set(PHP_DEPENDS_LIBS   ""    PARENT_SCOPE)
+      set(PHP_LDFLAGS        ""    PARENT_SCOPE)
+      set(PHP_VERSION_NUMBER ""    PARENT_SCOPE)
+      set(PHP_VERSION        ""    PARENT_SCOPE)
 
    endif(PHP_CONFIG)
 
