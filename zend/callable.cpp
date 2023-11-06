@@ -100,6 +100,12 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
         // install ourselves in the extra argument
 #if PHP_VERSION_ID < 70200
         _argv[_argc + 1].class_name = reinterpret_cast<const char*>(this);
+#elif PHP_VERSION_ID < 80000
+        // @todo    this is broken. the zend engine, from 7.2 onwards copies over
+        //          the struct and slices off the last element, because the num_args
+        //          is incorrect in their view. another place to put this may be
+        //          hiding it behind the fname
+       _argv[_argc + 1].type = reinterpret_cast<zend_type>(this);
 #else
         // @todo    this is broken. the zend engine, from 7.2 onwards copies over
         //          the struct and slices off the last element, because the num_args

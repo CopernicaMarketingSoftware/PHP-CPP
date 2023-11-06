@@ -27,11 +27,21 @@ namespace Php {
  *  @param  size        length of the filename
  */
 File::File(const char *name, size_t size)
- {
+{
+#if PHP_VERSION_ID < 80000
+    // resolve the path
+    _path = zend_resolve_path(name, size);    
+#else
+    // first convert the path, then read it
     zend_string *tmp_str = zend_string_init(name, size, 0);
     _path = zend_resolve_path(tmp_str);
+#endif
 }
 
+/**
+ *  Constructor based on zend_string
+ */
+#if PHP_VERSION_ID >= 80000
 File::File(const _zend_string *name, size_t size)
 {
     /**
@@ -42,6 +52,7 @@ File::File(const _zend_string *name, size_t size)
     zend_string *tmp_str = zend_string_init_fast(ZSTR_VAL(name), ZSTR_LEN(name));
     _path = zend_resolve_path(tmp_str);
 }
+#endif
 
 /**
  *  Destructor
@@ -67,6 +78,7 @@ bool File::compile()
     // we are going to open the file
     zend_file_handle fileHandle;
 
+#if PHP_VERSION_ID > 80000
     /**
      *  zend_stream_open now only accepts the fileHandle object
      *  Filename must now be set through the object path.
@@ -75,6 +87,10 @@ bool File::compile()
 
     // open the file
     if (zend_stream_open(&fileHandle) == FAILURE) return false;
+#else
+    // open the file
+    if (zend_stream_open(ZSTR_VAL(_path), &fileHandle) == FAILURE) return false;   
+#endif
 
     // make sure the path name is stored in the handle (@todo: is this necessary? do we need the copy?)
     if (!fileHandle.opened_path) fileHandle.opened_path = zend_string_copy(_path);
