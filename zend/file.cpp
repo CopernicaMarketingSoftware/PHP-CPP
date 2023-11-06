@@ -26,33 +26,16 @@ namespace Php {
  *  @param  name        the filename
  *  @param  size        length of the filename
  */
-File::File(const char *name, size_t size)
+File::File(const char *name, size_t size) : _original(zend_string_init(name, size, 0))
 {
 #if PHP_VERSION_ID < 80000
     // resolve the path
     _path = zend_resolve_path(name, size);    
 #else
     // first convert the path, then read it
-    zend_string *tmp_str = zend_string_init(name, size, 0);
-    _path = zend_resolve_path(tmp_str);
+    _path = zend_resolve_path(_original);
 #endif
 }
-
-/**
- *  Constructor based on zend_string
- */
-#if PHP_VERSION_ID >= 80000
-File::File(const _zend_string *name, size_t size)
-{
-    /**
-     * Assign `const` zend_string as a non-const variable to resolve typing error.
-     * error: invalid conversion from ‘const zend_string*’ {aka ‘const _zend_string*’} to ‘zend_string*’ {aka ‘_zend_string*’}
-     * zend_resolve_path now only accepts the filename argument.
-     */
-    zend_string *tmp_str = zend_string_init_fast(ZSTR_VAL(name), ZSTR_LEN(name));
-    _path = zend_resolve_path(tmp_str);
-}
-#endif
 
 /**
  *  Destructor
@@ -61,6 +44,9 @@ File::~File()
 {
     // clean up path name
     if (_path) zend_string_release(_path);
+    
+    // clean up original path
+    if (_original) zend_string_release(_original);
 }
 
 /**
