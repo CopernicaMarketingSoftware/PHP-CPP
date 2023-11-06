@@ -1747,7 +1747,7 @@ void Value::unset(int index)
     if (!isArray()) return;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_NOREF(_val);
+    SEPARATE_ZVAL_IF_NOT_REF(_val);
 
     // remove the index
     zend_hash_index_del(Z_ARRVAL_P(_val.dereference()), index);
