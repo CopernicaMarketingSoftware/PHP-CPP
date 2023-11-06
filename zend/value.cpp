@@ -27,6 +27,7 @@
 #include "includes.h"
 #include "string.h"
 #include "lowercase.h"
+#include "macros.h"
 
 /**
  *  Set up namespace
