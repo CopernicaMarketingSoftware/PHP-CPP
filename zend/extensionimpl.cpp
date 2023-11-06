@@ -107,7 +107,11 @@ static ExtensionImpl *find(int number)
  *  @param  number      Module number
  *  @return int         0 on success
  */
+#if PHP_VERSION_ID < 80000
 int ExtensionImpl::processStartup(int type, int module_number)
+#else
+zend_result ExtensionImpl::processStartup(int type, int module_number)
+#endif
 {
     // initialize and allocate the "global" variables
     ZEND_INIT_MODULE_GLOBALS(phpcpp, init_globals, NULL); 
@@ -116,7 +120,7 @@ int ExtensionImpl::processStartup(int type, int module_number)
     auto *extension = find(module_number);
 
     // initialize the extension
-    return BOOL2SUCCESS(extension->initialize(module_number));
+    return extension->initialize(module_number) ? SUCCESS : FAILURE;
 }
 
 /**
@@ -125,7 +129,7 @@ int ExtensionImpl::processStartup(int type, int module_number)
  *  @param  number      Module number
  *  @return int
  */
-int ExtensionImpl::processShutdown(int type, int module_number)
+ZEND_RESULT_OR_INT ExtensionImpl::processShutdown(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
@@ -134,7 +138,7 @@ int ExtensionImpl::processShutdown(int type, int module_number)
     number2extension.erase(module_number);
 
     // done
-    return BOOL2SUCCESS(extension->shutdown(module_number));
+    return extension->shutdown(module_number) ? SUCCESS:FAILURE;
 }
 
 /**
@@ -143,7 +147,7 @@ int ExtensionImpl::processShutdown(int type, int module_number)
  *  @param  number      Module number
  *  @return int         0 on success
  */
-int ExtensionImpl::processRequest(int type, int module_number)
+ZEND_RESULT_OR_INT ExtensionImpl::processRequest(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
@@ -152,7 +156,7 @@ int ExtensionImpl::processRequest(int type, int module_number)
     if (extension->_onRequest) extension->_onRequest();
     
     // done
-    return BOOL2SUCCESS(true);
+    return SUCCESS;
 }
 
 /**
@@ -161,7 +165,7 @@ int ExtensionImpl::processRequest(int type, int module_number)
  *  @param  number      Module number
  *  @return int         0 on success
  */
-int ExtensionImpl::processIdle(int type, int module_number)
+ZEND_RESULT_OR_INT ExtensionImpl::processIdle(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
@@ -170,7 +174,7 @@ int ExtensionImpl::processIdle(int type, int module_number)
     if (extension->_onIdle) extension->_onIdle();
     
     // done
-    return BOOL2SUCCESS(true);
+    return SUCCESS;
 }
 
 /**
@@ -180,7 +184,7 @@ int ExtensionImpl::processIdle(int type, int module_number)
  *  @param  number      Module number
  *  @return int         0 on success
  */
-int ExtensionImpl::processMismatch(int type, int module_number)
+ZEND_RESULT_OR_INT ExtensionImpl::processMismatch(int type, int module_number)
 {
     // get the extension
     auto *extension = find(module_number);
@@ -189,7 +193,7 @@ int ExtensionImpl::processMismatch(int type, int module_number)
     warning << "Version mismatch between PHP-CPP and extension " << extension->name() << " " << extension->version() << " (recompile needed?)" << std::endl;
     
     // done
-    return BOOL2SUCCESS(true);
+    return SUCCESS;
 }
 
 /**

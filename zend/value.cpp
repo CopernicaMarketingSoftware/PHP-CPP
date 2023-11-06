@@ -392,12 +392,14 @@ Value& Value::operator=(struct _zval_struct* value)
     // If the destination is refcounted
     if (Z_REFCOUNTED_P(to))
     {
+#if PHP_VERSION_ID < 80000
         // objects can have their own assignment handler
         if (Z_TYPE_P(to) == IS_OBJECT && Z_OBJ_HANDLER_P(to, set))
         {
             Z_OBJ_HANDLER_P(to, set)(to, value);
             return *this;
         }
+#endif
 
         // If to and from are the same, there is nothing left to do
         if (to == value) return *this;
@@ -767,7 +769,11 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     // call the function
     // we're casting the const away here, object is only const so we can call this method
     // from const methods after all..
+#if PHP_VERSION_ID < 80000
     if (call_user_function_ex(CG(function_table), (zval*) object, method, &retval, argc, argv, 1, nullptr) != SUCCESS)
+#else
+    if (call_user_function(CG(function_table), (zval*) object, method, &retval, argc, argv) != SUCCESS)
+#endif
     {
         // throw an exception, the function does not exist
         throw Error("Invalid call to "+Value(method).stringValue());
@@ -845,7 +851,11 @@ bool Value::isCallable(const char *name)
     if (!(func->common.fn_flags & ZEND_ACC_CALL_VIA_TRAMPOLINE)) return true;
 
     // check the result ("Returns true to the fake Closure's __invoke")
+#if PHP_VERSION_ID < 80200
     bool result = func->common.scope == zend_ce_closure && zend_string_equals_literal(methodname.value(), ZEND_INVOKE_FUNC_NAME);
+#else
+    bool result = func->common.scope == zend_ce_closure && zend_string_equals_cstr(methodname.value(), ZEND_INVOKE_FUNC_NAME, ::strlen(ZEND_INVOKE_FUNC_NAME));
+#endif
 
     // free resources (still don't get this code, copied from zend_builtin_functions.c)
     zend_string_release(func->common.function_name);
@@ -1103,7 +1113,7 @@ Value &Value::setType(Type type) &
     if (this->type() == type) return *this;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    SEPARATE_ZVAL_NOREF(_val);
 
     // run the conversion, when it fails we throw a fatal error that ends up in PHP space
     switch (type) {
@@ -1353,9 +1363,13 @@ int Value::size() const
 
         // create a variable to hold the result
         zend_long result;
-
+#if PHP_VERSION_ID < 80000
         // call the function
         return Z_OBJ_HT_P(_val)->count_elements(_val, &result) == SUCCESS ? result : 0;
+#else
+        zend_object *zobj = Z_OBJ_P(_val);
+        return Z_OBJ_HT_P(_val)->count_elements(zobj, &result) == SUCCESS ? result : 0;
+#endif
     }
 
     // not an array, return string size if this is a string
@@ -1511,12 +1525,22 @@ bool Value::contains(const char *key, int size) const
         // leap out if no 'has_property' function is not set (which should normally not occur)
         if (!has_property) return false;
 
+#if PHP_VERSION_ID < 80000
         // the property must be a zval, turn the key into a value
         Value property(key, size);
 
         // call the has_property() method (0 means: check whether property exists and is not NULL,
         // this is not really what we want, but the closest to the possible values of that parameter)
         return has_property(_val, property._val, 0, nullptr);
+#else
+        int retval = 0;
+        zend_string *tmp_str;
+        tmp_str = zend_string_init(key, size, 0);
+        retval = has_property(Z_OBJ_P(_val), tmp_str, 0, nullptr);
+        zend_string_release(tmp_str);
+        return retval;
+#endif
+
     }
     else
     {
@@ -1587,8 +1611,13 @@ Value Value::get(const char *key, int size) const
         zend_class_entry* scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
 #endif
         // read the property
+#if PHP_VERSION_ID < 80000
         zval *property = zend_read_property(scope, _val, key, size, 0, &rv);
+#else
+        zend_object *zobj = Z_OBJ_P(_val); 
+        zval *property = zend_read_property(scope, zobj, key, size, 0, &rv);
 
+#endif
         // wrap in value
         return Value(property);
     }
@@ -1604,7 +1633,7 @@ Value Value::get(const char *key, int size) const
 void Value::setRaw(int index, const Value &value)
 {
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    SEPARATE_ZVAL_NOREF(_val);
 
     // add the value (this will decrement refcount on any current variable)
     add_index_zval(_val, index, value._val);
@@ -1653,7 +1682,7 @@ void Value::setRaw(const char *key, int size, const Value &value)
     if (isObject())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // update the property
 #if PHP_VERSION_ID < 70100
@@ -1661,12 +1690,17 @@ void Value::setRaw(const char *key, int size, const Value &value)
 #else
         zend_class_entry* scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
 #endif
+#if PHP_VERSION_ID < 80000
         zend_update_property(scope, _val, key, size, value._val);
+#else
+        zend_update_property(scope, Z_OBJ_P(_val), key, size, value._val);
+#endif
+
     }
     else
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // add the value (this will reduce the refcount of the current value)
         add_assoc_zval_ex(_val, key, size, value._val);
@@ -1712,7 +1746,7 @@ void Value::unset(int index)
     if (!isArray()) return;
 
     // if this is not a reference variable, we should detach it to implement copy on write
-    SEPARATE_ZVAL_IF_NOT_REF(_val);
+    SEPARATE_ZVAL_NOREF(_val);
 
     // remove the index
     zend_hash_index_del(Z_ARRVAL_P(_val.dereference()), index);
@@ -1729,7 +1763,7 @@ void Value::unset(const char *key, int size)
     if (isObject())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // in the zend header files, unsetting properties is redirected to setting it to null...
         add_property_null_ex(_val, key, size);
@@ -1737,7 +1771,7 @@ void Value::unset(const char *key, int size)
     else if (isArray())
     {
         // if this is not a reference variable, we should detach it to implement copy on write
-        SEPARATE_ZVAL_IF_NOT_REF(_val);
+        SEPARATE_ZVAL_NOREF(_val);
 
         // remove the index
         zend_hash_del(Z_ARRVAL_P(_val.dereference()), String(key, size));

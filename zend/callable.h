@@ -53,13 +53,14 @@ public:
 
         // initialize all elements to null
         _argv[i].name = nullptr;
+#if PHP_VERSION_ID < 80000
         _argv[i].is_variadic = false;
         _argv[i].pass_by_reference = false;
-
+#endif
         // initialize the extra argument prior to 7.2
 #if PHP_VERSION_ID < 70200
         _argv[i].class_name = nullptr;
-#else
+#elif PHP_VERSION_ID < 80000
         _argv[i].type = 0;
 #endif
     }
@@ -203,6 +204,26 @@ protected:
             case Type::Object:      info->type_hint = IS_OBJECT;    break;  // must be an object of the given classname
             case Type::Callable:    info->type_hint = IS_CALLABLE;  break;  // anything that can be invoked
             default:                info->type_hint = IS_UNDEF;     break;  // if not specified we allow anything
+#elif PHP_VERSION_ID >= 80000
+            case Type::Undefined:   info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_UNDEF, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // undefined means we'll accept any type
+            case Type::Null:        info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_UNDEF, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // this is likely an error, what good would accepting NULL be? accept anything
+            case Type::False:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // accept true as well ;)
+            case Type::True:        info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // accept false as well
+            case Type::Bool:        info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // any bool will do, true, false, the options are limitless
+            case Type::Numeric:     info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_LONG, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));      break;  // accept integers here
+            case Type::Float:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_DOUBLE, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));    break;  // floating-point values welcome too
+            case Type::String:      info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));    break;  // accept strings, should auto-cast objects with __toString as well
+            case Type::Array:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_ARRAY, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // array of anything (individual members cannot be restricted)
+            case Type::Object:
+                if (arg.classname()) {
+                    info->type = (zend_type) ZEND_TYPE_INIT_CLASS(arg.encoded(), arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
+                    break;
+                }
+                info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_OBJECT, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
+                break;
+            case Type::Callable:    info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_CALLABLE, arg.allowNull(), 0);  break;  // anything that can be invoke
+
+           default:                info->type = ZEND_TYPE_INIT_CODE(IS_UNDEF, 0, _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // if not specified we allow anything
 #else
             case Type::Undefined:   info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // undefined means we'll accept any type
             case Type::Null:        info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // this is likely an error, what good would accepting NULL be? accept anything
@@ -221,7 +242,7 @@ protected:
             default:                info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // if not specified we allow anything
 #endif
         }
-
+#if PHP_VERSION_ID < 80000
         // from PHP 5.6 and onwards, an is_variadic property can be set, this
         // specifies whether this argument is the first argument that specifies
         // the type for a variable length list of arguments. For now we only
@@ -230,6 +251,7 @@ protected:
 
         // whether or not to pass the argument by reference
         info->pass_by_reference = arg.byReference();
+#endif
     }
 
     /**
