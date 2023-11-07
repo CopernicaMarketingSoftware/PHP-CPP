@@ -7,9 +7,9 @@
  *
  *  @author Jasper van Eck <jasper.vaneck@copernica.com>
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 - 2019 Copernica BV
+ *  @copyright 2013 - 2023 Copernica BV
  */
-#include <exception>
+#include <stdexcept>
 #include <string>
 
 /**
