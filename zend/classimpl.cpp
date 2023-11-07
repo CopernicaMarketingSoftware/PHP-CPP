@@ -1538,9 +1538,26 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
     
-    // we may have to expose the Traversable or Serializable interfaces
-    if (_base->traversable()) zend_class_implements(_entry, 1, zend_ce_traversable);    
-    if (_base->serializable()) zend_class_implements(_entry, 1, zend_ce_serializable);    
+    // we may have to expose the Traversable
+    if (_base->traversable()) 
+    {
+#if PHP_VERSION_ID < 80000
+        // up to php 7.x we can implement just the Traversable method (strictly speaking, it does not seem
+        // to be a user-space concern whether a class is traversable because of "iterator" or "iteratoraggregate"
+        zend_class_implements(_entry, 1, zend_ce_traversable);
+#else
+        // from php 8.0 an error occurs if a class just implements traversable, without being an explicit
+        // subclass of Iterator or IteratorAggregate -- so we implement the iteraroraggregate instead
+        zend_class_implements(_entry, 1, zend_ce_aggregate);
+#endif
+    }
+    
+    // check if the Serializable interface
+    if (_base->serializable())
+    {
+        // add the Seriablable interface
+        zend_class_implements(_entry, 1, zend_ce_serializable);
+    }
 
     // instal the right modifier (to make the class an interface, abstract class, etc)
     _entry->ce_flags |= uint64_t(_type);
