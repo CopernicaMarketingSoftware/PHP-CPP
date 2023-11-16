@@ -205,8 +205,8 @@ protected:
             case Type::Callable:    info->type_hint = IS_CALLABLE;  break;  // anything that can be invoked
             default:                info->type_hint = IS_UNDEF;     break;  // if not specified we allow anything
 #elif PHP_VERSION_ID >= 80000
-            case Type::Undefined:   info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_UNDEF, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // undefined means we'll accept any type
-            case Type::Null:        info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_UNDEF, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // this is likely an error, what good would accepting NULL be? accept anything
+            case Type::Undefined:   info->type = (zend_type) ZEND_TYPE_INIT_NONE(_ZEND_ARG_INFO_FLAGS((unsigned int)arg.byReference(), 0, 0));                  break;  // undefined means we'll accept any type
+            case Type::Null:        info->type = (zend_type) ZEND_TYPE_INIT_NONE(_ZEND_ARG_INFO_FLAGS((unsigned int)arg.byReference(), 0, 0));                  break;  // this is likely an error, what good would accepting NULL be? accept anything
             case Type::False:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // accept true as well ;)
             case Type::True:        info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // accept false as well
             case Type::Bool:        info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // any bool will do, true, false, the options are limitless
