@@ -287,10 +287,10 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
  */
 #if PHP_VERSION_ID < 80000
 int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr)
-#elif PHP_VERSION_ID > 80200
-zend_result ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
-#else
+#elif PHP_VERSION_ID < 80200
 int ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
+#else
+zend_result ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry **entry_ptr, zend_function **func, zend_object **object_ptr, zend_bool check_only)
 #endif
 {
     // it is really unbelievable how the Zend engine manages to implement every feature
@@ -473,10 +473,10 @@ int ClassImpl::compare(zval *val1, zval *val2)
  *  @param  type
  *  @return int
  */
-#if PHP_VERSION_ID >= 80200
-zend_result ClassImpl::cast(ZEND_OBJECT_OR_ZVAL val, zval *retval, int type)
-#else
+#if PHP_VERSION_ID < 80200
 int ClassImpl::cast(ZEND_OBJECT_OR_ZVAL val, zval *retval, int type)
+#else
+zend_result ClassImpl::cast(ZEND_OBJECT_OR_ZVAL val, zval *retval, int type)
 #endif
 {
     // get the base c++ object
@@ -589,10 +589,10 @@ zend_object *ClassImpl::cloneObject(ZEND_OBJECT_OR_ZVAL val)
  *  @param  count
  *  @return int
  */
-#if PHP_VERSION_ID >= 80200
-zend_result ClassImpl::countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count)
-#else
+#if PHP_VERSION_ID < 80200
 int ClassImpl::countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count)
+#else
+zend_result ClassImpl::countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count)
 #endif
 {
     // does it implement the countable interface?
@@ -995,12 +995,12 @@ PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(ZEND_OBJECT_OR_ZVAL object,
         {
             // check if it could be set
             if (iter->second->set(base, value)) {
-#if PHP_VERSION_ID >= 70400
-                return value;
-#else
+#if PHP_VERSION_ID < 70400
                 return;
+#else
+                return value;
 #endif
-	    }
+            }
 
             // read-only property
             zend_error(E_ERROR, "Unable to write to read-only property %s", (const char *)key);
@@ -1010,19 +1010,19 @@ PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(ZEND_OBJECT_OR_ZVAL object,
     {
         // __set() function was not overridden by user, check if there is a default
         if (!std_object_handlers.write_property) {
-#if PHP_VERSION_ID >= 70400
-                return value;
+#if PHP_VERSION_ID < 70400
+            return;
 #else
-                return;
+            return value;
 #endif
         }
 
         // call the default
         std_object_handlers.write_property(object, name, value, cache_slot);
-#if PHP_VERSION_ID >= 70400
-        return value;
+#if PHP_VERSION_ID < 70400
+        return;
 #else
-       return;
+        return value;
 #endif
     }
     catch (Throwable &throwable)
@@ -1030,7 +1030,9 @@ PHP_WRITE_PROP_HANDLER_TYPE ClassImpl::writeProperty(ZEND_OBJECT_OR_ZVAL object,
         // object was not caught by the extension, let it end up in user space
         throwable.rethrow();
     }
-#if PHP_VERSION_ID >= 70400
+#if PHP_VERSION_ID < 70400
+    return;
+#else
     return value;
 #endif
 }
@@ -1252,7 +1254,7 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
 
     // retrieve the traversable object
     Traversable *traversable = dynamic_cast<Traversable*>(ObjectImpl::find(object)->object());
-    
+
     // use might throw an exception in the getIterator() function
     try
     {
@@ -1263,10 +1265,10 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
         // the iteraters itself, we can no longer let c++ allocate the buffer + object
         // directly, so we first allocate the buffer, which is going to be cleaned up by php)
         auto *buffer = emalloc(sizeof(IteratorImpl));
-    
+
         // and then we use placement-new to allocate the implementation
         auto *wrapper = new(buffer)IteratorImpl(object, userspace);
-        
+
         // done
         return wrapper->implementation();
     }
@@ -1473,7 +1475,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     INIT_CLASS_ENTRY_EX(entry, _name.c_str(), _name.size(), entries());
 
     // we need a special constructor, but only for real classes, not for interfaces.
-    // (in fact: from php 7.4 onwards the create_object method is part of union 
+    // (in fact: from php 7.4 onwards the create_object method is part of union
     // together with the interface_gets_implemented method, which causes a crash
     // when the create_object property is set for an interface)
     if (_type != ClassType::Interface) entry.create_object = &ClassImpl::createObject;
@@ -1482,7 +1484,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     entry.get_static_method = &ClassImpl::getStaticMethod;
 
     // for traversable classes we install a special method to get the iterator
-    if (_base->traversable()) 
+    if (_base->traversable())
     {
         // install iterator functions
         entry.get_iterator = &ClassImpl::getIterator;
@@ -1527,7 +1529,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // register the class
         _entry = zend_register_internal_class(&entry);
     }
-    
+
     // register the interfaces
     for (auto &interface : _interfaces)
     {
@@ -1537,9 +1539,9 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // otherwise report an error
         else std::cerr << "Derived class " << name() << " is initialized before base class " << interface->name() << ": interface is ignored" << std::endl;
     }
-    
+
     // we may have to expose the Traversable
-    if (_base->traversable()) 
+    if (_base->traversable())
     {
 #if PHP_VERSION_ID < 80000
         // up to php 7.x we can implement just the Traversable method (strictly speaking, it does not seem
@@ -1551,7 +1553,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         zend_class_implements(_entry, 1, zend_ce_aggregate);
 #endif
     }
-    
+
     // check if the Serializable interface
     if (_base->serializable())
     {

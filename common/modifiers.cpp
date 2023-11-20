@@ -20,21 +20,21 @@ namespace Php {
 /**
  *  The modifiers are constants
  */
-#if PHP_VERSION_ID >= 70400
-const int Static    =   0x10;
-const int Abstract  =   0x40;
-const int Final     =   0x20;
-const int Public    =   0x01;
-const int Protected =   0x02;
-const int Private   =   0x04;
-const int Const     =   0;
-#else
+#if PHP_VERSION_ID < 70400
 const int Static    =   0x01;
 const int Abstract  =   0x02;
 const int Final     =   0x04;
 const int Public    =   0x100;
 const int Protected =   0x200;
 const int Private   =   0x400;
+const int Const     =   0;
+#else
+const int Static    =   0x10;
+const int Abstract  =   0x40;
+const int Final     =   0x20;
+const int Public    =   0x01;
+const int Protected =   0x02;
+const int Private   =   0x04;
 const int Const     =   0;
 #endif
 

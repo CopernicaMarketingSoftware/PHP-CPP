@@ -37,11 +37,11 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
     // Sanity check
     assert(ZEND_TYPE_IS_SET(info[argc].type) && info[argc].name == nullptr);
     // the callable we are retrieving
-#if PHP_VERSION_ID < 80000
+# if PHP_VERSION_ID < 80000
     Callable *callable = reinterpret_cast<Callable*>(info[argc].type);
-#else
+# else
     Callable *callable = reinterpret_cast<Callable*>(info[argc].type.ptr);
-#endif
+# endif
 #endif
 
     // check if sufficient parameters were passed (for some reason this check
@@ -64,7 +64,7 @@ void Callable::invoke(INTERNAL_FUNCTION_PARAMETERS)
         {
             // get the result
             Value result(callable->invoke(params));
-            
+
             // return a full copy of the zval, and do not destruct it
             RETVAL_ZVAL(result._val, 1, 0);
         }
