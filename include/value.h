@@ -558,6 +558,12 @@ public:
     }
 
     /**
+     *  Get array keys, or object property names, include private & protected properties
+     *  @return std::vector
+     */
+    std::vector<Php::Value> keys() const;
+    
+    /**
      *  Define the iterator type
      */
     typedef ValueIterator iterator;

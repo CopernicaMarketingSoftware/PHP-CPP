@@ -1411,6 +1411,61 @@ std::map<std::string,Php::Value> Value::mapValue() const
 }
 
 /**
+ *  Get array keys, or object property names, include private & protected properties
+ *  @return std::vector
+ */
+std::vector<Php::Value> Value::keys() const {
+    if (!isArray() && !isObject()) return std::vector<Php::Value>();
+
+    std::vector<Php::Value> result;
+
+    HashTable *table = isArray() ? Z_ARRVAL_P(_val) : Z_OBJPROP_P(_val);
+
+    result.reserve(zend_hash_num_elements(table));
+
+    Bucket *position = nullptr;
+
+    // move to first position
+    zend_hash_internal_pointer_reset_ex(table, &position);
+
+    do {
+
+        // zval to read the current key in
+        Value key;
+
+#if PHP_VERSION_ID >= 50500
+        // read in the current key
+        zend_hash_get_current_key_zval_ex(table, key._val, &position);
+
+        // if the key is set to NULL, it means that the object is not at a valid position
+        if (key.isNull()) continue;
+#else
+        // php 5.3 and php 5.4 need a different implementation because the function
+        // zend_hash_get_current_key_zval_ex is missing in php 5.3, declare variables
+        // we need for storing the key in
+        char *string_key;
+        unsigned int str_len;
+        unsigned long num_key;
+
+        // get the current key
+        int type = zend_hash_get_current_key_ex(table, &string_key, &str_len, &num_key, 0, &position);
+
+        // if key is not found, the iterator is at an invalid position
+        if (type == HASH_KEY_NON_EXISTANT) continue;
+
+        // numeric keys are the easiest ones
+        if (type == HASH_KEY_IS_LONG) key = (int64_t)num_key;
+        else key = std::string(string_key, str_len - 1);
+#endif
+        result.push_back(std::move(key));
+
+    // move the iterator forward
+    } while (zend_hash_move_forward_ex(table, &position) == SUCCESS);
+
+    return result;
+}
+
+/**
  *  Internal helper method to retrieve an iterator
  *  @param  begin       Should the iterator start at the begin
  *  @return iterator
