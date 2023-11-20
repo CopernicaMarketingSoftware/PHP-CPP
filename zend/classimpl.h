@@ -13,17 +13,17 @@
  */
 namespace Php {
 
-#if PHP_VERSION_ID >= 70400
-#	define PHP_WRITE_PROP_HANDLER_TYPE zval *
+#if PHP_VERSION_ID < 70400
+# define PHP_WRITE_PROP_HANDLER_TYPE void
 #else
-#	define PHP_WRITE_PROP_HANDLER_TYPE void
+# define PHP_WRITE_PROP_HANDLER_TYPE zval *
 #endif
 #if PHP_VERSION_ID < 80000
-#define ZEND_OBJECT_OR_ZVAL zval *
-#define ZEND_STRING_OR_ZVAL zval *
+# define ZEND_OBJECT_OR_ZVAL zval *
+# define ZEND_STRING_OR_ZVAL zval *
 #else
-#define ZEND_OBJECT_OR_ZVAL zend_object *
-#define ZEND_STRING_OR_ZVAL zend_string *
+# define ZEND_OBJECT_OR_ZVAL zend_object *
+# define ZEND_STRING_OR_ZVAL zend_string *
 #endif
 /**
  *  Class definition
@@ -218,10 +218,10 @@ public:
      *  @param  count
      *  @return int
      */
-#if PHP_VERSION_ID >= 80200
-    static zend_result countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count);
-#else
+#if PHP_VERSION_ID < 80200
     static int countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count);
+#else
+    static zend_result countElements(ZEND_OBJECT_OR_ZVAL object, zend_long *count);
 #endif
     /**
      *  Function that is called when the object is used as an array in PHP
@@ -346,10 +346,10 @@ public:
      *  @param  type
      *  @return int
      */
-#if PHP_VERSION_ID >= 80200
-    static zend_result cast(ZEND_OBJECT_OR_ZVAL object, zval *retval, int type);
-#else
+#if PHP_VERSION_ID < 80200
     static int cast(ZEND_OBJECT_OR_ZVAL object, zval *retval, int type);
+#else
+    static zend_result cast(ZEND_OBJECT_OR_ZVAL object, zval *retval, int type);
 #endif
 
     /**

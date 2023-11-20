@@ -204,7 +204,23 @@ protected:
             case Type::Object:      info->type_hint = IS_OBJECT;    break;  // must be an object of the given classname
             case Type::Callable:    info->type_hint = IS_CALLABLE;  break;  // anything that can be invoked
             default:                info->type_hint = IS_UNDEF;     break;  // if not specified we allow anything
-#elif PHP_VERSION_ID >= 80000
+#elif PHP_VERSION_ID < 80000
+            case Type::Undefined:   info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // undefined means we'll accept any type
+            case Type::Null:        info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // this is likely an error, what good would accepting NULL be? accept anything
+            case Type::False:       info->type = ZEND_TYPE_ENCODE(_IS_BOOL, arg.allowNull());     break;  // accept true as well ;)
+            case Type::True:        info->type = ZEND_TYPE_ENCODE(_IS_BOOL, arg.allowNull());     break;  // accept false as well
+            case Type::Bool:        info->type = ZEND_TYPE_ENCODE(_IS_BOOL, arg.allowNull());     break;  // any bool will do, true, false, the options are limitless
+            case Type::Numeric:     info->type = ZEND_TYPE_ENCODE(IS_LONG, arg.allowNull());      break;  // accept integers here
+            case Type::Float:       info->type = ZEND_TYPE_ENCODE(IS_DOUBLE, arg.allowNull());    break;  // floating-point values welcome too
+            case Type::String:      info->type = ZEND_TYPE_ENCODE(IS_STRING, arg.allowNull());    break;  // accept strings, should auto-cast objects with __toString as well
+            case Type::Array:       info->type = ZEND_TYPE_ENCODE(IS_ARRAY, arg.allowNull());     break;  // array of anything (individual members cannot be restricted)
+            case Type::Object:                                                            // if there is a classname and the argument is not nullable, it's simply the classname
+                if (!arg.classname()) info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
+                else info->type = (zend_type)arg.encoded();
+                break;
+            case Type::Callable:    info->type = ZEND_TYPE_ENCODE(IS_CALLABLE, arg.allowNull());  break;  // anything that can be invoked
+            default:                info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // if not specified we allow anything
+#else
             case Type::Undefined:   info->type = (zend_type) ZEND_TYPE_INIT_NONE(_ZEND_ARG_INFO_FLAGS((unsigned int)arg.byReference(), 0, 0));                  break;  // undefined means we'll accept any type
             case Type::Null:        info->type = (zend_type) ZEND_TYPE_INIT_NONE(_ZEND_ARG_INFO_FLAGS((unsigned int)arg.byReference(), 0, 0));                  break;  // this is likely an error, what good would accepting NULL be? accept anything
             case Type::False:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(_IS_BOOL, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // accept true as well ;)
@@ -224,22 +240,6 @@ protected:
             case Type::Callable:    info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_CALLABLE, arg.allowNull(), 0);  break;  // anything that can be invoke
 
            default:                info->type = ZEND_TYPE_INIT_CODE(IS_UNDEF, 0, _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // if not specified we allow anything
-#else
-            case Type::Undefined:   info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // undefined means we'll accept any type
-            case Type::Null:        info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // this is likely an error, what good would accepting NULL be? accept anything
-            case Type::False:       info->type = ZEND_TYPE_ENCODE(_IS_BOOL, arg.allowNull());     break;  // accept true as well ;)
-            case Type::True:        info->type = ZEND_TYPE_ENCODE(_IS_BOOL, arg.allowNull());     break;  // accept false as well
-            case Type::Bool:        info->type = ZEND_TYPE_ENCODE(_IS_BOOL, arg.allowNull());     break;  // any bool will do, true, false, the options are limitless
-            case Type::Numeric:     info->type = ZEND_TYPE_ENCODE(IS_LONG, arg.allowNull());      break;  // accept integers here
-            case Type::Float:       info->type = ZEND_TYPE_ENCODE(IS_DOUBLE, arg.allowNull());    break;  // floating-point values welcome too
-            case Type::String:      info->type = ZEND_TYPE_ENCODE(IS_STRING, arg.allowNull());    break;  // accept strings, should auto-cast objects with __toString as well
-            case Type::Array:       info->type = ZEND_TYPE_ENCODE(IS_ARRAY, arg.allowNull());     break;  // array of anything (individual members cannot be restricted)
-            case Type::Object:                                                            // if there is a classname and the argument is not nullable, it's simply the classname
-                if (!arg.classname()) info->type = ZEND_TYPE_ENCODE(IS_OBJECT, arg.allowNull());
-                else info->type = (zend_type)arg.encoded();
-                break;
-            case Type::Callable:    info->type = ZEND_TYPE_ENCODE(IS_CALLABLE, arg.allowNull());  break;  // anything that can be invoked
-            default:                info->type = ZEND_TYPE_ENCODE(IS_UNDEF, arg.allowNull());     break;  // if not specified we allow anything
 #endif
         }
 #if PHP_VERSION_ID < 80000

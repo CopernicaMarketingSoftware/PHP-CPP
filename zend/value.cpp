@@ -163,7 +163,7 @@ Value::Value(struct _zval_struct *val, bool ref)
         // increment refcount
         ++GC_REFCOUNT(ref);
 #else
-	// increment refcount
+        // increment refcount
         GC_ADDREF(ref);
 #endif
         // store the reference in our value
@@ -315,7 +315,7 @@ Php::Zval Value::detach(bool keeprefcount)
 void Value::invalidate()
 {
     // do nothing if object is already undefined
-	if (Z_TYPE_P(_val) == IS_UNDEF) return;
+    if (Z_TYPE_P(_val) == IS_UNDEF) return;
 
     // call destructor
     zval_ptr_dtor(_val);
@@ -766,7 +766,7 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
 
     // remember current state of the PHP engine
     State state;
-    
+
     // call the function
     // we're casting the const away here, object is only const so we can call this method
     // from const methods after all..
@@ -1514,11 +1514,11 @@ bool Value::contains(const char *key, int size) const
     }
     else if (isObject())
     {
-#if PHP_VERSION_ID >= 70400
         // retrieve the object pointer and check whether the property we are trying to retrieve
-        if (zend_check_property_access(Z_OBJ_P(_val), String(key, size), 0) == FAILURE) return false;
-#else
+#if PHP_VERSION_ID < 70400
         if (zend_check_property_access(Z_OBJ_P(_val), String(key, size)) == FAILURE) return false;
+#else
+        if (zend_check_property_access(Z_OBJ_P(_val), String(key, size), 0) == FAILURE) return false;
 #endif
         // check if the 'has_property' method is available for this object
         auto *has_property = Z_OBJ_HT_P(_val)->has_property;
@@ -1615,7 +1615,7 @@ Value Value::get(const char *key, int size) const
 #if PHP_VERSION_ID < 80000
         zval *property = zend_read_property(scope, _val, key, size, 0, &rv);
 #else
-        zend_object *zobj = Z_OBJ_P(_val); 
+        zend_object *zobj = Z_OBJ_P(_val);
         zval *property = zend_read_property(scope, zobj, key, size, 0, &rv);
 
 #endif
