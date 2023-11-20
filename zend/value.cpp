@@ -292,7 +292,7 @@ Value::~Value()
 Php::Zval Value::detach(bool keeprefcount)
 {
     // the return value
-    Php::Zval result;
+    Php::Zval result {};
 
     // copy the value
     ZVAL_COPY_VALUE(result, _val);
