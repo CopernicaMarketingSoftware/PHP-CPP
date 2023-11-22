@@ -190,6 +190,7 @@ SET(PHPCPP_HEADERS_INCLUDE
   include/argument.h
   include/array.h
   include/arrayaccess.h
+  include/propertyptrptr.h
   include/base.h
   include/byref.h
   include/byval.h

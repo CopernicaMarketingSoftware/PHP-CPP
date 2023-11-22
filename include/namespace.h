@@ -156,6 +156,11 @@ public:
         return *this;
     }
 
+    std::shared_ptr<ClassBase> getLastClass() {
+        return _classes.back();
+    }
+
+
     /**
      *  Add an interface to the namespace by moving it
      *  @param  interface   The interface properties
