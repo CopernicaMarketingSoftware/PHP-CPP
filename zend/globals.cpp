@@ -7,7 +7,7 @@
  *  @copyright 2013 Copernica BV
  */
 #include "includes.h"
-#include "string.h"
+#include "strings.h"
 
 /**
  *  Namespace

@@ -11,6 +11,7 @@
  */
 #include <stdexcept>
 #include <string>
+#include <iostream>
 
 /**
  *  Forward declarations

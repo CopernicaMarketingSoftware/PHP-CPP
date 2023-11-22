@@ -24,8 +24,11 @@
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
  *  @copyright 2013 - 2019 Copernica BV
  */
+
+#pragma warning (disable : 4703)
+
 #include "includes.h"
-#include "string.h"
+#include "strings.h"
 #include "lowercase.h"
 #include "macros.h"
 
@@ -903,7 +906,9 @@ Value Value::call(const char *name)
 Value Value::exec(int argc, Value *argv) const
 {
     // array of zvals to execute
-    zval params[argc];
+    //zval params[argc];
+
+    zval* params = new zval[argc];
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -925,7 +930,9 @@ Value Value::exec(const char *name, int argc, Value *argv) const
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    //zval params[argc];
+
+    zval* params = new zval[argc];
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -947,7 +954,9 @@ Value Value::exec(const char *name, int argc, Value *argv)
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    //zval params[argc];
+
+    zval* params = new zval[argc];
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
