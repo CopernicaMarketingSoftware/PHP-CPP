@@ -311,6 +311,11 @@ zend_result ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry *
     function->arg_flags[1]      = 0;
     function->arg_flags[2]      = 0;
     function->fn_flags          = ZEND_ACC_CALL_VIA_HANDLER;
+#if PHP_VERSION_ID < 70200
+    zend_string *zend_empty_string = zend_string_alloc(sizeof("")-1, 1);
+    ZSTR_VAL(zend_empty_string)[0] = '\0';
+    ZSTR_LEN(zend_empty_string) = 0;
+#endif
     function->function_name     = zend_empty_string;            // should not be null, as this is free'ed by zend when doing exception handling
     function->scope             = *entry_ptr;
     function->prototype         = nullptr;
