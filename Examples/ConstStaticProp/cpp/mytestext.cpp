@@ -29,7 +29,7 @@ public:
 extern "C"
 {
     // export the "get_module" function that will be called by the Zend engine
-    PHPCPP_EXPORT void *get_module()
+    MODULE_EXPORT void *get_module()
     {
         // create extension
         static Php::Extension extension("my_test_ext","0.1a");

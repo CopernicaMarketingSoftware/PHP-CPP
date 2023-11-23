@@ -7,3 +7,5 @@
 shared/
 static/
 .vscode/
+build/
+_output/

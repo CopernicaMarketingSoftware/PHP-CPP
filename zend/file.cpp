@@ -37,6 +37,31 @@ File::File(const char *name, size_t size) : _original(zend_string_init(name, siz
 #endif
 }
 
+/*
+Constructor implemented in .cpp file , not in .h because
+MSVC Shared build error LNK2019: unresolved external symbol "const Php::File::`vftable'" (??_7File@Php@@6B@)
+referenced in function "public: __cdecl Php::File::File(class std::basic_string<char,struct std::char_traits<char>,class std::allocator<char> > const &)" (??0File@Php@@QEAA@AEBV?$basic_string@DU?$char_traits@D@std@@V?$allocator@D@2@@std@@@Z)
+*/
+
+/**
+ *  Alternative constructor with just a filename
+ *
+ *  @param  name        the filename
+ */
+File::File(const char *name) : File(name, ::strlen(name)) {}
+
+/**
+ *  Alternative constructor with a string object
+ *  @param  name        the filename
+ */
+File::File(const std::string &name) : File(name.c_str(), name.size()) {}
+
+/**
+ *  Alternative constructor with a Value object
+ *  @param  name        the filename
+ */
+File::File(const Value &value) : File(value.stringValue()) {}
+
 /**
  *  Destructor
  */
@@ -160,4 +185,3 @@ Value File::once()
  *  End of namespace
  */
 }
-

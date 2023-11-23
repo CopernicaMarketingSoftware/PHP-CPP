@@ -1,265 +1,261 @@
-CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
+cmake_minimum_required(VERSION 3.11-3.18)
 
-PROJECT(phpcpp)
+set(PHPCPP_VERSION 2.3.5)
+project(phpcpp VERSION ${PHPCPP_VERSION} LANGUAGES CXX)
 
-# Use CMake File with following options
-# PHPCPP_COMPILE_TS     Set flag if PHP was compiled with thread safe
-# PHPCPP_MSVCRT_STATIC  Set flag if you want to compile the MSVC runtime as a static library
-# PHPCPP_ARCH           Set to "x86_64" if architecture and PHP was compiled under x64 or "x86" for 32 bit
-# PHPCPP_PHP_PATH       The path to PHP sources
 
-LIST(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR})
+# -----------------------------------------------------------------------------
+#                       Configurable options
+#
+# Uncomment and set the value, or set directly with cmake
+# -----------------------------------------------------------------------------
+#set(PHPCPP_BUILD_SHARED   TRUE)  # Build static or shared library
+#set(PHPCPP_BUILD_EXAMPLES TRUE)  # Build example extensions
+#set(PHPCPP_INSTALL        TRUE)  # Generate install target
 
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-    ADD_DEFINITIONS(-DZEND_DEBUG=1)
-ELSE()
-    ADD_DEFINITIONS(-DZEND_DEBUG=0)
-ENDIF()
+# On Linux, uncomment to set different php-config filename
+#set(PHP_CONFIG_FILENAME "php-config")
 
-IF (PHPCPP_COMPILE_TS)
-  ADD_DEFINITIONS(-DZTS)
-ENDIF()
+# Options for building on Windows with MSVC
+# -----------------------------------------------------------------------------
+# PHP devel pack dir, download from https://windows.php.net/download/
+#set(PHP_DEV_DIR         "d:/dev/cpp_php/ts/php-7.4.30-devel-vc15-x64")
+# Set to TRUE if PHP was compiled with thread safe
+#set(PHPCPP_COMPILE_TS    TRUE)
+# Set to "x86_64" if architecture and PHP was compiled under x64 or "x86" for 32 bit
+#set(PHPCPP_ARCH          "x86_64")
 
-ADD_DEFINITIONS(-D_MSC_STDINT_H_)
-ADD_DEFINITIONS(-D_CRT_SECURE_NO_WARNINGS)
-ADD_DEFINITIONS(-DBUILDING_PHPCPP)
-ADD_DEFINITIONS(-DZEND_WIN32_KEEP_INLINE)
 
-IF (MSVC)
-  # Should compile MSVC runtime static or dll
-  IF (PHPCPP_MSVCRT_STATIC)
-    MESSAGE("Compile PHPCPP with static runtime")
 
-    SET(CMAKE_CXX_FLAGS_RELEASE         "${CMAKE_CXX_FLAGS_RELEASE} /MT")
-    SET(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG} /MTd")
-    SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MT")
+# -----------------------------------------------------------------------------
+# Default values
+# -----------------------------------------------------------------------------
+# Build static or shared library
+if(NOT DEFINED PHPCPP_BUILD_SHARED)
+   set(PHPCPP_BUILD_SHARED   TRUE)
+endif()
 
-  ELSE()
-    MESSAGE("Compile PHPCPP with dynamic runtime")
+# Build example extensions
+if(NOT DEFINED PHPCPP_BUILD_EXAMPLES)
+   set(PHPCPP_BUILD_EXAMPLES TRUE)
+endif()
 
-    SET(CMAKE_CXX_FLAGS_RELEASE         "${CMAKE_CXX_FLAGS_RELEASE} /MD")
-    SET(CMAKE_CXX_FLAGS_DEBUG           "${CMAKE_CXX_FLAGS_DEBUG} /MDd")
-    SET(CMAKE_CXX_FLAGS_RELWITHDEBINFO  "${CMAKE_CXX_FLAGS_RELWITHDEBINFO} /MD")
+# Generate library install target
+if(NOT DEFINED PHPCPP_INSTALL)
+   set(PHPCPP_INSTALL        TRUE)
+endif()
 
-  ENDIF()
 
-  IF (${PHPCPP_ARCH} STREQUAL "x86_64")
-    ADD_DEFINITIONS(-DPHP_WIN32 -DZEND_WIN32)
-  ELSE()
-    ADD_DEFINITIONS(-DPHP_WIN32 -DZEND_WIN32 -D_USE_32BIT_TIME_T)
-  ENDIF()
+if(PHPCPP_BUILD_SHARED)
+   message(STATUS "Build PHP-CPP ${PHPCPP_VERSION} shared library...")
+else()
+   message(STATUS "Build PHP-CPP ${PHPCPP_VERSION} static library...")
+endif()
 
-  SET(ADDITIONAL_COMPILER_FLAGS "/W3")
-  SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${ADDITIONAL_COMPILER_FLAGS}")
-ENDIF ()
 
-INCLUDE_DIRECTORIES(
-  "${PHPCPP_PHP_PATH}/"
-  "${PHPCPP_PHP_PATH}/main"
-  "${PHPCPP_PHP_PATH}/Zend"
-  "${PHPCPP_PHP_PATH}/TSRM"
-  "${PHPCPP_PHP_PATH}/ext"
-  "${PHPCPP_PHP_PATH}/build/main"
-  "${PHPCPP_PHP_PATH}/build/Zend"
-)
-SET(PHP_LIBS "php")
-SET(PHP_LIB_PATH "")
+if(WIN32)
+   # Windows build options
+   if(NOT DEFINED PHP_DEV_DIR)
+      message(FATAL_ERROR   "PHP development dir variable PHP_DEV_DIR not defined!")
+   endif()
 
-IF (${PHPCPP_ARCH} STREQUAL "x86_64")
-  SET(PHP_LIB_PATH "x64/")
-ENDIF()
+   if(NOT DEFINED PHPCPP_COMPILE_TS)
+      message(FATAL_ERROR   "PHP threading(TS/NTS) variable PHPCPP_COMPILE_TS not defined!")
+   endif()
 
-IF(CMAKE_BUILD_TYPE MATCHES DEBUG)
-  IF (PHPCPP_COMPILE_TS)
-    SET(PHP_LIBS      ${PHP_LIBS} "php7ts_debug")
-    SET(PHP_LIB_PATH  "${PHP_LIB_PATH}Debug_TS")
-  ELSE()
-    SET(PHP_LIBS      ${PHP_LIBS} "php7_debug")
-    SET(PHP_LIB_PATH  "${PHP_LIB_PATH}Debug")
-  ENDIF()
-ELSE()
-  IF (PHPCPP_COMPILE_TS)
-    SET(PHP_LIBS      ${PHP_LIBS} "php7ts")
-    SET(PHP_LIB_PATH  "${PHP_LIB_PATH}Release_TS")
-  ELSE()
-    SET(PHP_LIBS      ${PHP_LIBS} "php7")
-    SET(PHP_LIB_PATH  "${PHP_LIB_PATH}Release")
-  ENDIF()
-ENDIF()
+   if(NOT DEFINED PHPCPP_ARCH)
+      message(FATAL_ERROR   "PHP architecture variable PHPCPP_ARCH not defined!")
+   endif()
 
-SET(PHPCPP_COMMON_SOURCES
-  common/modifiers.cpp
-  common/streambuf.cpp
-)
+   # PHP library dir
+   set(PHP_LIB_DIR          "${PHP_DEV_DIR}/lib")
+   # PHP library file name
+   set(PHP_LIB_NAME         "php7ts")
+   if(NOT PHPCPP_COMPILE_TS)
+      set(PHP_LIB_NAME      "php7")
+   endif()
 
-SET(PHPCPP_COMMON_HEADERS
-  common/extensionbase.h
-  common/includes.h
-  common/streambuf.h
-)
+   message(STATUS "PHP_LIB_DIR           ${PHP_LIB_DIR}")
+   message(STATUS "PHPCPP_ARCH           ${PHPCPP_ARCH}")
+   message(STATUS "PHPCPP_COMPILE_TS     ${PHPCPP_COMPILE_TS}")
 
-ADD_LIBRARY(phpcpp-common STATIC
-  ${PHPCPP_COMMON_HEADERS}
-  ${PHPCPP_COMMON_SOURCES}
-)
+else()
+   # Non windows, try detect php with php-config
+   include(cmake/utils.cmake)
 
-set_target_properties(phpcpp-common
-  PROPERTIES
-  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-)
+   if(NOT DEFINED PHP_CONFIG_FILENAME)
+      find_php_dev(php-config) # use default php-config
+   else()
+      find_php_dev(${PHP_CONFIG_FILENAME})
+   endif()
 
-SET(PHPCPP_ZEND_SOURCES
-  zend/base.cpp
-  zend/callable.cpp
-  zend/classbase.cpp
-  zend/classimpl.cpp
-  zend/constant.cpp
-  zend/constantfuncs.cpp
-  zend/eval.cpp
-  zend/exception_handler.cpp
-  zend/exists.cpp
-  zend/extension.cpp
-  zend/extensionimpl.cpp
-  # zend/fatalerror.cpp
-  zend/file.cpp
-  zend/function.cpp
-  zend/functor.cpp
-  zend/global.cpp
-  zend/globals.cpp
-  zend/hashmember.cpp
-  zend/ini.cpp
-  zend/inivalue.cpp
-  zend/iteratorimpl.cpp
-  zend/members.cpp
-  zend/module.cpp
-  zend/namespace.cpp
-  zend/object.cpp
-  zend/sapi.cpp
-  zend/script.cpp
-  zend/streambuf.cpp
-  zend/streams.cpp
-  zend/super.cpp
-  zend/value.cpp
-  zend/valueiterator.cpp
-  zend/zendcallable.cpp
-  zend/zval.cpp
-)
+   if(NOT PHP_DEV_FOUND)
+      message(FATAL_ERROR "PHP development not found!")
+   endif()
 
-SET(PHPCPP_ZEND_HEADERS
-  zend/arithmetic.h
-  zend/boolmember.h
-  zend/callable.h
-  zend/classimpl.h
-  zend/compileroptions.h
-  zend/constantimpl.h
-  zend/delayedfree.h
-  zend/executestate.h
-  zend/extensionimpl.h
-  zend/extensionpath.h
-  zend/floatmember.h
-  zend/functor.h
-  zend/hashiterator.h
-  zend/includes.h
-  zend/init.h
-  zend/invaliditerator.h
-  zend/iteratorimpl.h
-  zend/lowercase.h
-  zend/member.h
-  zend/method.h
-  zend/module.h
-  zend/nativefunction.h
-  zend/notimplemented.h
-  zend/nullmember.h
-  zend/numericmember.h
-  zend/objectimpl.h
-  zend/opcodes.h
-  # zend/origexception.h
-  zend/parametersimpl.h
-  zend/property.h
-  zend/string.h
-  zend/stringmember.h
-  zend/symbol.h
-  zend/symbol.h
-  zend/traverseiterator.h
-  zend/valueiteratorimpl.h
-)
+   if(PHP_VERSION_NUMBER LESS 70000)
+      message(FATAL_ERROR "PHP-CPP works only with PHP 7")
+   endif()
 
-SET(PHPCPP_HEADERS_INCLUDE
-  include/argument.h
-  include/array.h
-  include/arrayaccess.h
-  include/base.h
-  include/byref.h
-  include/byval.h
-  include/call.h
-  include/class.h
-  include/classbase.h
-  include/classtype.h
-  include/constant.h
-  include/countable.h
-  include/deprecated.h
-  include/error.h
-  include/exception.h
-  include/extension.h
-  # include/fatalerror.h
-  include/file.h
-  include/function.h
-  include/global.h
-  include/globals.h
-  include/hashmember.h
-  include/hashparent.h
-  include/ini.h
-  include/inivalue.h
-  include/interface.h
-  include/iterator.h
-  include/modifiers.h
-  include/namespace.h
-  include/noexcept.h
-  include/object.h
-  include/parameters.h
-  include/platform.h
-  include/script.h
-  include/serializable.h
-  include/streams.h
-  include/super.h
-  include/thread_local.h
-  include/traversable.h
-  include/type.h
-  include/value.h
-  include/valueiterator.h
-  include/version.h
-  include/visibility.h
-  include/zendcallable.h
-  include/zval.h
-)
+   message(STATUS "PHP_VERSION           ${PHP_VERSION}")
+   include(GNUInstallDirs)
+endif()
 
-LINK_DIRECTORIES(${PHP_LIB_PATH})
 
-IF (PHPCPP_SHARED)
-  ADD_LIBRARY(phpcpp SHARED
-    ${PHPCPP_HEADERS_INCLUDE}
-    ${PHPCPP_ZEND_HEADERS}
-    ${PHPCPP_ZEND_SOURCES}
-    phpcpp.h
-  )
+# Miscs php-cpp variables
+# -----------------------------------------------------------------------------
+set(PHPCPP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR} )
+message(STATUS "PHPCPP_SOURCE_DIR     ${PHPCPP_SOURCE_DIR}")
 
-  TARGET_LINK_LIBRARIES(phpcpp phpcpp-common ${PHP_LIBS})
-ELSE()
-  ADD_LIBRARY(phpcpp STATIC
-    ${PHPCPP_HEADERS_INCLUDE}
-    ${PHPCPP_ZEND_HEADERS}
-    ${PHPCPP_ZEND_SOURCES}
-    phpcpp.h
-  )
+if(PHPCPP_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+   # we are master project
+   set(PHPCPP_OUTPUT_DIR ${PHPCPP_SOURCE_DIR}/_output)
+else()
+   set(PHPCPP_OUTPUT_DIR ${CMAKE_SOURCE_DIR}/_output)
+endif()
 
-  TARGET_LINK_LIBRARIES(phpcpp STATIC phpcpp-common ${PHP_LIBS})
-ENDIF()
 
-SET_TARGET_PROPERTIES(phpcpp
-  PROPERTIES
-  ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-  LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-  RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-)
+# Include headers and sources list
+include(cmake/sources.cmake)
+
+
+# phpcpp-common
+# -----------------------------------------------------------------------------
+add_library(phpcpp-common STATIC)
+
+target_sources(phpcpp-common
+   PUBLIC  ${PHPCPP_COMMON_HEADERS}
+   PRIVATE ${PHPCPP_COMMON_SOURCES} )
+
+if(WIN32)
+   target_include_directories(phpcpp-common
+      PUBLIC ${PHP_DEV_DIR}/include
+      PUBLIC ${PHP_DEV_DIR}/include/main
+      PUBLIC ${PHP_DEV_DIR}/include/Zend
+      PUBLIC ${PHP_DEV_DIR}/include/TSRM
+      PUBLIC ${PHP_DEV_DIR}/include/ext )
+
+   #target_compile_definitions(phpcpp-common
+   #   PUBLIC $<$<CONFIG:Debug>:ZEND_DEBUG=1>$<$<CONFIG:Release>:ZEND_DEBUG=0> )
+   # Always use PHP release build
+   target_compile_definitions(phpcpp-common PUBLIC ZEND_DEBUG=0 )
+
+   if(PHPCPP_COMPILE_TS)
+      target_compile_definitions(phpcpp-common PUBLIC ZTS )
+   endif()
+
+   if("x86" STREQUAL ${PHPCPP_ARCH})
+      target_compile_definitions(phpcpp-common PUBLIC _USE_32BIT_TIME_T )
+   endif()
+
+   target_compile_definitions(phpcpp-common
+      PUBLIC PHP_WIN32
+      PUBLIC ZEND_WIN32
+      PUBLIC ZEND_WIN32_KEEP_INLINE )
+
+   if(MSVC)
+      target_compile_definitions(phpcpp-common
+         PUBLIC _MSC_STDINT_H_
+         PUBLIC _CRT_SECURE_NO_WARNINGS
+         PRIVATE W3 )
+   endif()
+
+else() # not win32
+   target_compile_definitions(phpcpp-common PRIVATE BUILDING_PHPCPP)
+   target_compile_options(phpcpp-common PRIVATE -fpic -c -fvisibility=hidden -Wno-write-strings -MD -Wall )
+   target_include_directories(phpcpp-common PUBLIC ${PHP_INCLUDE_DIRS})
+endif()
+
+target_compile_features(phpcpp-common PRIVATE cxx_std_11)
+
+
+# phpcpp library
+# -----------------------------------------------------------------------------
+if(PHPCPP_BUILD_SHARED)
+   add_library(phpcpp SHARED)
+   if(NOT MSVC)
+      target_link_options(phpcpp PRIVATE -shared ${PHP_LDFLAGS})
+   endif()
+else()
+   add_library(phpcpp STATIC)
+endif()
+
+target_link_libraries(phpcpp PRIVATE phpcpp-common)
+
+if(WIN32)
+   if(PHPCPP_BUILD_SHARED)
+      target_compile_definitions(phpcpp PRIVATE BUILDING_PHPCPP)
+   endif()
+   target_link_directories(phpcpp PUBLIC ${PHP_LIB_DIR})
+   target_link_libraries(phpcpp PUBLIC ${PHP_LIB_NAME} )
+else()
+   target_compile_definitions(phpcpp PRIVATE BUILDING_PHPCPP)
+   target_compile_options(phpcpp PRIVATE -fpic -c -fvisibility=hidden -Wno-write-strings -MD -Wall )
+endif()
+
+target_sources(phpcpp
+   PRIVATE ${PHPCPP_HEADERS_FILES}
+   PRIVATE ${PHPCPP_ZEND_HEADERS}
+   PRIVATE ${PHPCPP_ZEND_SOURCES} )
+
+target_compile_features(phpcpp PRIVATE cxx_std_11 )
+
+
+# Prepare phpcpp header files for dependend projects and building examples
+# publish PHPCPP_INCLUDE_DIR variable to outside world
+# -----------------------------------------------------------------------------
+set(PHPCPP_INCLUDE_DIR "${CMAKE_BINARY_DIR}/phpcpp_include")
+file(COPY phpcpp.h DESTINATION ${PHPCPP_INCLUDE_DIR})
+file(COPY include/ DESTINATION ${PHPCPP_INCLUDE_DIR}/phpcpp)
+
+if(NOT PHPCPP_SOURCE_DIR STREQUAL CMAKE_SOURCE_DIR)
+   set(PHPCPP_INCLUDE_DIR ${PHPCPP_INCLUDE_DIR} PARENT_SCOPE)
+endif()
+message(STATUS "PHPCPP_INCLUDE_DIR    ${PHPCPP_INCLUDE_DIR}")
+
+
+# Build examples
+#-----------------------------------------------------------------------------
+if(PHPCPP_BUILD_EXAMPLES)
+   message(STATUS "Generating examples")
+   add_subdirectory(Examples)
+endif()
+
+
+# Install
+# -----------------------------------------------------------------------------
+if(PHPCPP_INSTALL)
+   message(STATUS "Generating install")
+   install(FILES phpcpp.h DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/")
+   install(DIRECTORY include/ DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/phpcpp/")
+
+   install( TARGETS phpcpp-common phpcpp
+      LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR} )
+endif()
+
+
+# Copy binaries, resources to _output folder
+# -----------------------------------------------------------------------------
+set(OUTPUT_LIBDIR "${PHPCPP_OUTPUT_DIR}/lib_static")
+if (PHPCPP_BUILD_SHARED)
+  set(OUTPUT_LIBDIR "${PHPCPP_OUTPUT_DIR}/lib_shared")
+endif()
+
+# Copy build output dir to _output dir
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+   COMMAND ${CMAKE_COMMAND} -E make_directory ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:phpcpp> ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>
+   COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_FILE:phpcpp-common> ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release> )
+
+if(WIN32 AND PHPCPP_BUILD_SHARED)
+   add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+      COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_LINKER_FILE:phpcpp> ${OUTPUT_LIBDIR}/$<$<CONFIG:Debug>:debug>$<$<CONFIG:Release>:release>)
+endif()
+
+# Copy headers to _output dir
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/include ${PHPCPP_OUTPUT_DIR}/include/phpcpp )
+
+# Copy phpcpp.h to _output dir
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/phpcpp.h ${PHPCPP_OUTPUT_DIR}/include )

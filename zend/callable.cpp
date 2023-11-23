@@ -93,7 +93,7 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
     {
         // that's nice, we simply install the callback
         // no need to store any data in a lookup map
-        entry->handler = _callback;
+        entry->handler = (zif_handler)_callback;
     }
     else
     {
@@ -116,7 +116,7 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
 
         // we use our own invoke method, which does a lookup
         // in the map we just installed ourselves in
-        entry->handler = &Callable::invoke;
+        entry->handler = (zif_handler)&Callable::invoke;
     }
 
     // fill the members of the entity, and hide a pointer to the current object in the name

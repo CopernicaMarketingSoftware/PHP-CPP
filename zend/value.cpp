@@ -199,6 +199,32 @@ Value::Value(const Base *object)
 Value::Value(const IniValue &value) : Value((const char *)value) {}
 
 /**
+ *  Construct to a specific type
+ *  @param  value
+ */
+Value::Value(Type type) : Value() { setType(type); }
+
+// old visual c++ environments have no support for initializer lists
+#if !defined(_MSC_VER) || _MSC_VER >= 1800
+
+/**
+ *  Constructor from an initializer list
+ *  @param  value
+ */
+template <typename T>
+Value::Value(const std::initializer_list<T> &value) : Value(Type::Array)
+{
+    // index
+    int i = 0;
+
+    // set all elements
+    for (auto &elem : value) setRaw(i++, elem);
+}
+
+// end of visual c++ check
+#endif
+
+/**
  *  Copy constructor
  *  @param  value
  */
@@ -776,6 +802,9 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     if (call_user_function(CG(function_table), (zval*) object, method, &retval, argc, argv) != SUCCESS)
 #endif
     {
+        if (argv != nullptr)
+           delete[] argv;
+
         // throw an exception, the function does not exist
         throw Error("Invalid call to "+Value(method).stringValue());
 
@@ -784,6 +813,9 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
     }
     else
     {
+       if (argv != nullptr)
+          delete[] argv;
+
         // the state object checks if a new exception is added to the stack, which means
         // that an exception or error occured during the call to php space
         state.rethrow();
@@ -903,7 +935,7 @@ Value Value::call(const char *name)
 Value Value::exec(int argc, Value *argv) const
 {
     // array of zvals to execute
-    zval params[argc];
+    zval* params = new zval[argc];
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -925,7 +957,7 @@ Value Value::exec(const char *name, int argc, Value *argv) const
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    zval* params = new zval[argc];
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -947,7 +979,7 @@ Value Value::exec(const char *name, int argc, Value *argv)
     Value method(name);
 
     // array of zvals to execute
-    zval params[argc];
+    zval* params = new zval[argc];
 
     // convert all the values
     for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
@@ -1880,4 +1912,3 @@ std::ostream &operator<<(std::ostream &stream, const Value &value)
  *  End of namespace
  */
 }
-

@@ -21,14 +21,14 @@ namespace Php {
 /**
  *  Define the out and err objects
  */
-extern thread_local PHPCPP_EXPORT std::ostream out;
-extern thread_local PHPCPP_EXPORT std::ostream error;
-extern thread_local PHPCPP_EXPORT std::ostream notice;
-extern thread_local PHPCPP_EXPORT std::ostream warning;
-extern thread_local PHPCPP_EXPORT std::ostream deprecated;
+// NOTE: PHPCPP_EXPORT causes MSVC Compiler Error C2492 in Shared build
+extern thread_local /*PHPCPP_EXPORT*/ std::ostream out;
+extern thread_local /*PHPCPP_EXPORT*/ std::ostream error;
+extern thread_local /*PHPCPP_EXPORT*/ std::ostream notice;
+extern thread_local /*PHPCPP_EXPORT*/ std::ostream warning;
+extern thread_local /*PHPCPP_EXPORT*/ std::ostream deprecated;
 
 /**
  *  End namespace
  */
 }
-

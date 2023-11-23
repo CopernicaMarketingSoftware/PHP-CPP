@@ -11,11 +11,15 @@
 /**
  *  Macro to be able to support MSVC compiler
  */
+
 #ifndef _NOEXCEPT
 # ifndef _MSC_VER
 #  define _NOEXCEPT noexcept
 # else
-#  define _NOEXCEPT __declspec(nothrow)
+#  if _MSC_VER >= 1400
+#    define _NOEXCEPT noexcept
+#  else
+#    define _NOEXCEPT __declspec(nothrow)
+#  endif
 # endif
 #endif
-

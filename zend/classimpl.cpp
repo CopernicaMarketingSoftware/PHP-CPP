@@ -223,7 +223,7 @@ zend_function *ClassImpl::getMethod(zend_object **object, zend_string *method, c
     function->num_args          = 0;
     function->required_num_args = 0;
     function->arg_info          = nullptr;
-    function->handler           = &ClassImpl::callMethod;
+    function->handler           = (zif_handler)&ClassImpl::callMethod;
 
     // store pointer to ourselves
     data->self = self(entry);
@@ -267,7 +267,7 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
     function->num_args          = 0;
     function->required_num_args = 0;
     function->arg_info          = nullptr;
-    function->handler           = &ClassImpl::callMethod;
+    function->handler           = (zif_handler)&ClassImpl::callMethod;
 
     // store pointer to ourselves
     data->self = self(entry);
@@ -322,7 +322,7 @@ zend_result ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry *
     function->num_args          = 0;
     function->required_num_args = 0;
     function->arg_info          = nullptr;
-    function->handler           = &ClassImpl::callInvoke;
+    function->handler           = (zif_handler)&ClassImpl::callInvoke;
 
     // store pointer to ourselves (note that the entry_ptr is useless
     // inside this function as it is always uninitialized for some reason)

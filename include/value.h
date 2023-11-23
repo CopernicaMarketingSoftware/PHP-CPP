@@ -66,7 +66,7 @@ public:
      *  Construct to a specific type
      *  @param  value
      */
-    Value(Type type) : Value() { setType(type); }
+    Value(Type type);
 
     /**
      *  Constructors from a vector (this will create an array)
@@ -90,14 +90,7 @@ public:
      *  @param  value
      */
     template <typename T>
-    Value(const std::initializer_list<T> &value) : Value(Type::Array)
-    {
-        // index
-        int i = 0;
-
-        // set all elements
-        for (auto &elem : value) setRaw(i++, elem);
-    }
+    Value(const std::initializer_list<T> &value);
 
     // end of visual c++ check
 #   endif
@@ -614,7 +607,7 @@ public:
      */
     virtual bool contains(const std::string &key) const override
     {
-        return contains(key.c_str(), key.size());
+        return contains(key.c_str(), static_cast<int>(key.size()));
     }
 
     /**

@@ -1,7 +1,7 @@
 /**
  *  cppclassinphp.cpp
  *  @author Jasper van Eck<jasper.vaneck@copernica.com>
- * 
+ *
  *  An example file to show the working of using a C++ class in PHP.
  */
 
@@ -15,7 +15,7 @@ class MyCustomClass : public Php::Base // , public Php::Countable
 {
 private:
     int _x = 3;
-    
+
 public:
     MyCustomClass()
     {
@@ -31,7 +31,7 @@ public:
     {
         std::cout << "MyCustomClass::MyCustomClass copy constructor" << std::endl;
     }
-    
+
     virtual ~MyCustomClass()
     {
         std::cout << "MyCustomClass::~MyCustomClass" << std::endl;
@@ -46,7 +46,7 @@ public:
     {
         std::cout << "MyCustomClass::__destruct" << std::endl;
     }
-    
+
     virtual Php::Value count() //override
     {
         return 33;
@@ -62,12 +62,12 @@ public:
             std::cout << "key: " << i.first << " \t\tval: " << i.second << std::endl;
         }
     }
-    
+
     Php::Value myMethod(Php::Parameters &params)
     {
         // check number of parameters
         if (params.size() != 1) throw Php::Exception("Invalid number of parameters supplied");
-        
+
         std::cout << "myMethod is called for object " << _x << std::endl;
 
         std::cout << "property1: " << property("property1") << std::endl;
@@ -84,23 +84,23 @@ public:
 
         // show it
         std::cout << "current time: " << now.call("format", "Y-m-d H:i:s") << std::endl;
-        
+
         std::cout << "construct " << params[0] << std::endl;
 
         // construct a new class
         Php::Object obj(params[0]);
 
         std::cout << "return " << params[0] << std::endl;
-        
-        
-        
-        
+
+
+
+
         // return it
         return obj;
-        
-        
+
+
    //     std::cout << "get property1 " << value()["property1"] << std::endl;
-   //     
+   //
    //     // set it to something else
    //     value().set("property1", "new value");
    //
@@ -109,27 +109,27 @@ public:
 };
 
 // Symbols are exported according to the "C" language
-extern "C" 
+extern "C"
 {
     // export the "get_module" function that will be called by the Zend engine
-    PHPCPP_EXPORT void *get_module()
+    MODULE_EXPORT void *get_module()
     {
         // create extension
         static Php::Extension extension("Cpp_classes_in_php","1.0");
-        
+
         // build an interface
         Php::Interface interface("MyInterface");
-        
+
         // add methods to the interface
         interface.method("method1");
         interface.method("method2");
-        
+
         // add the interface to the extension
         extension.add(interface);
-        
+
         // we are going to define a class
         Php::Class<MyCustomClass> customClass("MyClass");
-        
+
         // add methods to it
         customClass.method<&MyCustomClass::myMethod>("myMethod", Php::Final, {});
         customClass.method<&MyCustomClass::myMethod>("myMethod2");
@@ -142,10 +142,10 @@ extern "C"
         customClass.method<&MyCustomClass::loop>("loopObject", {
             Php::ByVal("obj", Php::Type::Object)
         });
-        
+
         // add the class to the extension
         extension.add(customClass);
-        
+
         // return the extension module
         return extension;
     }
