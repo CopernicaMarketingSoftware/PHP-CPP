@@ -28,6 +28,13 @@ Then check out our other solutions:
 * MailerQ MTA (www.mailerq.com)
 * Responsive Email web service (www.responsiveemail.com)
 
+MAINTAINED FORK AVAILABLE
+=========================
+
+This repository has been forked into a version which will be maintained and updated properly with any new PRs and kept up to date with newly releases PHP versions. You can find this fork here: 
+
+https://github.com/fast-debug/PHP-CPP
+
 The power of PHP-CPP
 ====================
 
