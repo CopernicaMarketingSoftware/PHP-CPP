@@ -114,6 +114,14 @@ public:
     Extension &onIdle(const Callback &callback);
 
     /**
+     *  Register a callback that is called when PHP invokes phpinfo()
+     *
+     *  @param  callback    Function to be called
+     *  @return Extension   Same object to allow chaining
+     */
+    Extension &onInfo(const Callback &callback);
+
+    /**
      *  Add a ini entry to the extension by moving it
      *  @param  ini         The php.ini setting
      *  @return Extension   Same object to allow chaining
