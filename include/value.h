@@ -79,7 +79,7 @@ public:
         int i = 0;
 
         // set all elements
-        for (auto &elem : input) setRaw(i++, elem);
+        for (const auto &elem : input) setRaw(i++, static_cast<(const Value&)>(elem));
     }
 
     // old visual c++ environments have no support for initializer lists
@@ -96,7 +96,7 @@ public:
         int i = 0;
 
         // set all elements
-        for (auto &elem : value) setRaw(i++, elem);
+        for (const auto &elem : value) setRaw(i++, static_cast<(const Value&)>(elem));
     }
 
     // end of visual c++ check
@@ -110,7 +110,7 @@ public:
     Value(const std::map<std::string,T> &value) : Value(Type::Array)
     {
         // set all elements
-        for (auto &iter : value) setRaw(iter.first.c_str(), iter.first.size(), iter.second);
+        for (const auto &iter : value) setRaw(iter.first.c_str(), static_cast<int>(iter.first.size()), static_cast<(const Value&)>(iter.second));
     }
 
     /**
