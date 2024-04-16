@@ -60,6 +60,7 @@ public:
     Value(char value);
     Value(const std::string &value);
     Value(const char *value, int size = -1);
+    Value(struct _zend_string *value);
     Value(double value);
     Value(const IniValue &value);
 
