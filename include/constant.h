@@ -44,6 +44,7 @@ public:
      * @param value Constant's value
      */
     Constant(const char *name, bool value);
+    Constant(const char *name, const void *value) = delete;
 
     /**
      * Constructor to create a constant for a 32-bit integer

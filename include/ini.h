@@ -61,6 +61,7 @@ public:
      */
     Ini(const char *name, bool value, const Place place = Place::All) :
         _name(name), _value(bool2str(value)), _place(place) {}
+    Ini(const char *name, const void *value, const Place place = Place::All) = delete;
 
     /**
      *  Constructors for integer values
