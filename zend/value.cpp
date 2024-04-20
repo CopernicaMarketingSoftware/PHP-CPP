@@ -1335,6 +1335,33 @@ const char *Value::rawValue() const
 }
 
 /**
+ *  Helper function for string comparison
+ *  @param  value
+ *  @return int
+ */
+int Value::strcmp(const char *value) const
+{
+    // we need the string representation
+    zend_string *s  = zval_get_string(_val);
+    
+    // remember size of the two strings
+    size_t valuelen = ::strlen(value);
+    size_t slen = ZSTR_LEN(s);
+    
+    // get the result for comparing the initial, overlapping, bytes
+    auto result = strncmp(ZSTR_VAL(s), value, std::min(valuelen, slen));
+
+    // we no longer need the string
+    zend_string_release(s);
+    
+    // if there are differences, we can expose thosw
+    if (result != 0) return result;
+    
+    // the shorter string comes first
+    return slen - valuelen;
+}
+
+/**
  *  Retrieve the value as decimal
  *  @return double
  */

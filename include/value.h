@@ -335,12 +335,12 @@ public:
      *  Comparison operators for hardcoded strings
      *  @param  value
      */
-    bool operator==(const char *value) const { return ::strcmp(rawValue(), value) == 0; }
-    bool operator!=(const char *value) const { return ::strcmp(rawValue(), value) != 0; }
-    bool operator<=(const char *value) const { return ::strcmp(rawValue(), value) <= 0; }
-    bool operator>=(const char *value) const { return ::strcmp(rawValue(), value) >= 0; }
-    bool operator< (const char *value) const { return ::strcmp(rawValue(), value) <  0; }
-    bool operator> (const char *value) const { return ::strcmp(rawValue(), value) >  0; }
+    bool operator==(const char *value) const { return strcmp(value) == 0; }
+    bool operator!=(const char *value) const { return strcmp(value) != 0; }
+    bool operator<=(const char *value) const { return strcmp(value) <= 0; }
+    bool operator>=(const char *value) const { return strcmp(value) >= 0; }
+    bool operator< (const char *value) const { return strcmp(value) <  0; }
+    bool operator> (const char *value) const { return strcmp(value) >  0; }
 
     /**
      *  Comparison operators for hardcoded Value
@@ -423,6 +423,13 @@ public:
      *  @return const char *
      */
     const char *rawValue() const;
+
+    /**
+     *  Helper function for string comparison
+     *  @param  value
+     *  @return int
+     */
+    int strcmp(const char *value) const;
 
     /**
      *  Retrieve the value as number
