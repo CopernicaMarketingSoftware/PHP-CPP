@@ -129,6 +129,25 @@ Value::Value(const char *value, int size)
 }
 
 /**
+ *  Constructor based on zend_string
+ *  @param  value
+ */
+Value::Value(struct _zend_string *value)
+{
+    // is there a value?
+    if (value)
+    {
+        // create a string zval
+        ZVAL_STRINGL(_val, value->val, value->len);
+    }
+    else
+    {
+        // store null
+        ZVAL_NULL(_val);
+    }
+}
+
+/**
  *  Constructor based on decimal value
  *  @param  value
  */

@@ -56,9 +56,11 @@ public:
     Value(int32_t value);
     Value(int64_t value);
     Value(bool value);
+    Value(const void *value) = delete;
     Value(char value);
     Value(const std::string &value);
     Value(const char *value, int size = -1);
+    Value(struct _zend_string *value);
     Value(double value);
     Value(const IniValue &value);
 
@@ -174,6 +176,7 @@ public:
     Value &operator=(int32_t value);
     Value &operator=(int64_t value);
     Value &operator=(bool value);
+    Value &operator=(const void *value) = delete;
     Value &operator=(char value);
     Value &operator=(const std::string &value);
     Value &operator=(const char *value);
@@ -191,6 +194,7 @@ public:
     Value &operator+=(int32_t value);
     Value &operator+=(int64_t value);
     Value &operator+=(bool value);
+    Value &operator+=(const void *value) = delete;
     Value &operator+=(char value);
     Value &operator+=(const std::string &value);
     Value &operator+=(const char *value);
@@ -206,6 +210,7 @@ public:
     Value &operator-=(int32_t value);
     Value &operator-=(int64_t value);
     Value &operator-=(bool value);
+    Value &operator-=(const void *value) = delete;
     Value &operator-=(char value);
     Value &operator-=(const std::string &value);
     Value &operator-=(const char *value);
@@ -221,6 +226,7 @@ public:
     Value &operator*=(int32_t value);
     Value &operator*=(int64_t value);
     Value &operator*=(bool value);
+    Value &operator*=(const void *value) = delete;
     Value &operator*=(char value);
     Value &operator*=(const std::string &value);
     Value &operator*=(const char *value);
@@ -236,6 +242,7 @@ public:
     Value &operator/=(int32_t value);
     Value &operator/=(int64_t value);
     Value &operator/=(bool value);
+    Value &operator/=(const void *value) = delete;
     Value &operator/=(char value);
     Value &operator/=(const std::string &value);
     Value &operator/=(const char *value);
@@ -251,6 +258,7 @@ public:
     Value &operator%=(int32_t value);
     Value &operator%=(int64_t value);
     Value &operator%=(bool value);
+    Value &operator%=(const void *value) = delete;
     Value &operator%=(char value);
     Value &operator%=(const std::string &value);
     Value &operator%=(const char *value);
@@ -266,6 +274,7 @@ public:
     Value operator+(int32_t value);
     Value operator+(int64_t value);
     Value operator+(bool value);
+    Value operator+(const void *value) = delete;
     Value operator+(char value);
     Value operator+(const std::string &value);
     Value operator+(const char *value);
@@ -281,6 +290,7 @@ public:
     Value operator-(int32_t value);
     Value operator-(int64_t value);
     Value operator-(bool value);
+    Value operator-(const void *value) = delete;
     Value operator-(char value);
     Value operator-(const std::string &value);
     Value operator-(const char *value);
@@ -296,6 +306,7 @@ public:
     Value operator*(int32_t value);
     Value operator*(int64_t value);
     Value operator*(bool value);
+    Value operator*(const void *value) = delete;
     Value operator*(char value);
     Value operator*(const std::string &value);
     Value operator*(const char *value);
@@ -311,6 +322,7 @@ public:
     Value operator/(int32_t value);
     Value operator/(int64_t value);
     Value operator/(bool value);
+    Value operator/(const void *value) = delete;
     Value operator/(char value);
     Value operator/(const std::string &value);
     Value operator/(const char *value);
@@ -326,6 +338,7 @@ public:
     Value operator%(int32_t value);
     Value operator%(int64_t value);
     Value operator%(bool value);
+    Value operator%(const void *value) = delete;
     Value operator%(char value);
     Value operator%(const std::string &value);
     Value operator%(const char *value);
@@ -333,6 +346,10 @@ public:
 
     /**
      *  Comparison operators for hardcoded strings
+     *
+     *  Note that this works only for string values,
+     *  other values segfaults!
+     *
      *  @param  value
      */
     bool operator==(const char *value) const { return strcmp(value) == 0; }

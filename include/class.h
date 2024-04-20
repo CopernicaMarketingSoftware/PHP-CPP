@@ -227,6 +227,7 @@ public:
     Class<T> &property(const char *name, const char *value,        int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, const std::string &value, int flags = Public) { ClassBase::property(name, value, flags); return *this; }
     Class<T> &property(const char *name, bool value,               int flags = Public) { ClassBase::property(name, value, flags); return *this; }
+    Class<T> &property(const char *name, const void *value,        int flags = Public) = delete;
     Class<T> &property(const char *name, double value,             int flags = Public) { ClassBase::property(name, value, flags); return *this; }
 
     /**

@@ -191,6 +191,7 @@ public:
     HashMember &operator+=(int32_t value)               { return operator=(this->value() + value); }
     HashMember &operator+=(int64_t value)               { return operator=(this->value() + value); }
     HashMember &operator+=(bool value)                  { return operator=(this->value() + value); }
+    HashMember &operator+=(const void *value)           = delete;
     HashMember &operator+=(char value)                  { return operator=(this->value() + value); }
     HashMember &operator+=(const std::string &value)    { return operator=(this->value() + value); }
     HashMember &operator+=(const char *value)           { return operator=(this->value() + value); }
@@ -206,6 +207,7 @@ public:
     HashMember &operator-=(int32_t value)               { return operator=(this->value() - value); }
     HashMember &operator-=(int64_t value)               { return operator=(this->value() - value); }
     HashMember &operator-=(bool value)                  { return operator=(this->value() - value); }
+    HashMember &operator-=(const void *value)           = delete;
     HashMember &operator-=(char value)                  { return operator=(this->value() - value); }
     HashMember &operator-=(const std::string &value)    { return operator=(this->value() - value); }
     HashMember &operator-=(const char *value)           { return operator=(this->value() - value); }
@@ -221,6 +223,7 @@ public:
     HashMember &operator*=(int32_t value)               { return operator=(this->value() * value); }
     HashMember &operator*=(int64_t value)               { return operator=(this->value() * value); }
     HashMember &operator*=(bool value)                  { return operator=(this->value() * value); }
+    HashMember &operator*=(const void *value)           = delete;
     HashMember &operator*=(char value)                  { return operator=(this->value() * value); }
     HashMember &operator*=(const std::string &value)    { return operator=(this->value() * value); }
     HashMember &operator*=(const char *value)           { return operator=(this->value() * value); }
@@ -236,6 +239,7 @@ public:
     HashMember &operator/=(int32_t value)               { return operator=(this->value() / value); }
     HashMember &operator/=(int64_t value)               { return operator=(this->value() / value); }
     HashMember &operator/=(bool value)                  { return operator=(this->value() / value); }
+    HashMember &operator/=(const void *value)           = delete;
     HashMember &operator/=(char value)                  { return operator=(this->value() / value); }
     HashMember &operator/=(const std::string &value)    { return operator=(this->value() / value); }
     HashMember &operator/=(const char *value)           { return operator=(this->value() / value); }
@@ -251,6 +255,7 @@ public:
     HashMember &operator%=(int32_t value)               { return operator=(this->value() % value); }
     HashMember &operator%=(int64_t value)               { return operator=(this->value() % value); }
     HashMember &operator%=(bool value)                  { return operator=(this->value() % value); }
+    HashMember &operator%=(const void *value)           = delete;
     HashMember &operator%=(char value)                  { return operator=(this->value() % value); }
     HashMember &operator%=(const std::string &value)    { return operator=(this->value() % value); }
     HashMember &operator%=(const char *value)           { return operator=(this->value() % value); }
@@ -266,6 +271,7 @@ public:
     Value operator+(int32_t value)              { return this->value() + value; }
     Value operator+(int64_t value)              { return this->value() + value; }
     Value operator+(bool value)                 { return this->value() + value; }
+    Value operator+(const void *value)          = delete;
     Value operator+(char value)                 { return this->value() + value; }
     Value operator+(const std::string &value)   { return this->value() + value; }
     Value operator+(const char *value)          { return this->value() + value; }
@@ -281,6 +287,7 @@ public:
     Value operator-(int32_t value)              { return this->value() - value; }
     Value operator-(int64_t value)              { return this->value() - value; }
     Value operator-(bool value)                 { return this->value() - value; }
+    Value operator-(const void *value)          = delete;
     Value operator-(char value)                 { return this->value() - value; }
     Value operator-(const std::string &value)   { return this->value() - value; }
     Value operator-(const char *value)          { return this->value() - value; }
@@ -296,6 +303,7 @@ public:
     Value operator*(int32_t value)              { return this->value() * value; }
     Value operator*(int64_t value)              { return this->value() * value; }
     Value operator*(bool value)                 { return this->value() * value; }
+    Value operator*(const void *value)          = delete;
     Value operator*(char value)                 { return this->value() * value; }
     Value operator*(const std::string &value)   { return this->value() * value; }
     Value operator*(const char *value)          { return this->value() * value; }
@@ -311,6 +319,7 @@ public:
     Value operator/(int32_t value)              { return this->value() / value; }
     Value operator/(int64_t value)              { return this->value() / value; }
     Value operator/(bool value)                 { return this->value() / value; }
+    Value operator/(const void *value)          = delete;
     Value operator/(char value)                 { return this->value() / value; }
     Value operator/(const std::string &value)   { return this->value() / value; }
     Value operator/(const char *value)          { return this->value() / value; }
@@ -326,6 +335,7 @@ public:
     Value operator%(int32_t value)              { return this->value() % value; }
     Value operator%(int64_t value)              { return this->value() % value; }
     Value operator%(bool value)                 { return this->value() % value; }
+    Value operator%(const void *value)          = delete;
     Value operator%(char value)                 { return this->value() % value; }
     Value operator%(const std::string &value)   { return this->value() % value; }
     Value operator%(const char *value)          { return this->value() % value; }
