@@ -1401,6 +1401,13 @@ const struct _zend_function_entry *ClassImpl::entries()
         if (!hasMethod("serialize")) entrycount += 1;
         if (!hasMethod("unserialize")) entrycount += 1;
     }
+    
+    // if the class is iterable, we might need some extra methods
+    if (_base->traversable())
+    {
+        // add the getIterator method if the class does not have one defined yet
+        if (!hasMethod("getIterator")) entrycount += 1;
+    }
 
     // allocate memory for the functions
     _entries = new zend_function_entry[entrycount + 1];
@@ -1432,7 +1439,7 @@ const struct _zend_function_entry *ClassImpl::entries()
     // if the class is serializable, we might need some extra methods
     if (_base->serializable())
     {
-        // the method objectneed to stay in scope for the lifetime of the script (because the register a pointer
+        // the method object need to stay in scope for the lifetime of the script (because the register a pointer
         // to an internal string buffer) -- so we create them as static variables
         static Method serialize("serialize", &Base::__serialize, 0, {});
         static Method unserialize("unserialize", &Base::__unserialize, 0, { ByVal("input", Type::Undefined, true) });
@@ -1440,6 +1447,17 @@ const struct _zend_function_entry *ClassImpl::entries()
         // register the serialize and unserialize method in case this was not yet done in PHP user space
         if (!hasMethod("serialize")) serialize.initialize(&_entries[i++], _name);
         if (!hasMethod("unserialize")) unserialize.initialize(&_entries[i++], _name);
+    }
+    
+    // if the class is traverable, we might need extra methods too (especially on php 8.1, maybe also 8.0?)
+    if (_base->traversable())
+    {
+        // the method object need to stay in scope for the lifetime of the script (because the register a pointer
+        // to an internal string buffer) -- so we create them as static variables
+        static Method getIterator("getIterator", &Base::__getIterator, 0, {});
+
+        // register the serialize and unserialize method in case this was not yet done in PHP user space
+        if (!hasMethod("getIterator")) getIterator.initialize(&_entries[i++], _name);
     }
 
     // last entry should be set to all zeros

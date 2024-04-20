@@ -2,7 +2,7 @@
  *  Base class for defining your own objects
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 - 2022 Copernica BV
+ *  @copyright 2013 - 2024 Copernica BV
  */
 
 /**
@@ -284,6 +284,14 @@ public:
      *  @param params       The passed parameters
      */
     Php::Value __count(Php::Parameters &params);
+
+    /**
+     *  Method that is called when an explicit call to $object->getIterator() is
+     *  made, AND that is called when running on PHP 8 and higher (because somehow
+     *  the get_iterator function is skipped by PHP 8 for non-internal classes)?
+     *  @return Php::Value
+     */
+    Php::Value __getIterator();
 
 
 private:
