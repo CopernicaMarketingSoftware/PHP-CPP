@@ -27,6 +27,14 @@ BUILD_DIR			=	build
 UNAME 				:= 	$(shell uname)
 
 #
+#   If you do not want to run LDCONFIG, then set LDCONFIG to empty string.
+#   alternatively you can provide another command to register libraries
+#   after installation.
+#
+
+LDCONFIG	=	$(shell which ldconfig 2>/dev/null)
+
+#
 #   Installation directory
 #
 #   When you install the PHP-CPP library, it will place a number of C++ *.h
@@ -229,9 +237,7 @@ install:
 		${CP} ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/ && \
 		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
 	fi
-	if `which ldconfig`; then \
-		ldconfig; \
-	fi
+	${LDCONFIG}
 
 uninstall:
 	${RM} ${INSTALL_HEADERS}/phpcpp*
