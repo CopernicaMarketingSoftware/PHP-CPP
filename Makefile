@@ -75,8 +75,10 @@ VERSION					=	2.4.3
 #   you can change that here.
 #
 
-PHP_SHARED_LIBRARY		=	libphpcpp.so.$(VERSION)
-PHP_STATIC_LIBRARY		=	libphpcpp.a.$(VERSION)
+LIBRARY_NAME			=	libphpcpp
+
+PHP_SHARED_LIBRARY		=	${LIBRARY_NAME}.so.$(VERSION)
+PHP_STATIC_LIBRARY		=	${LIBRARY_NAME}.a.$(VERSION)
 
 
 #
@@ -200,7 +202,7 @@ phpcpp: ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ${BUILD_DIR}/${PHP_STATIC_LIBRARY}
 	@echo "Build complete."
 
 ${BUILD_DIR}/${PHP_SHARED_LIBRARY}: build_directories ${COMMON_OBJECTS} ${PHP_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -Wl,${LINKER_SONAME_OPTION},libphpcpp.so.$(SONAME) -o $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
+	${LINKER} ${PHP_LINKER_FLAGS} -Wl,${LINKER_SONAME_OPTION},${LIBRARY_NAME}.so.$(SONAME) -o $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
 
 ${BUILD_DIR}/${PHP_STATIC_LIBRARY}: build_directories ${COMMON_OBJECTS} ${PHP_OBJECTS}
 	${ARCHIVER} $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
@@ -230,16 +232,16 @@ install:
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
 	if [ -e ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ]; then \
 		${CP} ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/ && \
-		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME) && \
-		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/${LIBRARY_NAME}.so.$(SONAME) && \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/${LIBRARY_NAME}.so; \
 	fi
 	if [ -e ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ]; then \
 		${CP} ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/ && \
-		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
+		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/${LIBRARY_NAME}.a; \
 	fi
 	${LDCONFIG}
 
 uninstall:
 	${RM} ${INSTALL_HEADERS}/phpcpp*
-	${RM} ${INSTALL_LIB}/libphpcpp.*
+	${RM} ${INSTALL_LIB}/${LIBRARY_NAME}.*
 
