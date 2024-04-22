@@ -220,13 +220,13 @@ install:
 	${MKDIR} ${INSTALL_LIB}
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	if [ -e ${BUILD_DIR}${PHP_SHARED_LIBRARY} ]; then \
-		${CP} ${BUILD_DIR}}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
+	if [ -e ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ]; then \
+		${CP} ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/ && \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME) && \
 		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
 	fi
-	if [ -e ${BUILD_DIR}${PHP_STATIC_LIBRARY} ]; then \
-		${CP} ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/; \
+	if [ -e ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ]; then \
+		${CP} ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/ && \
 		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
 	fi
 	if `which ldconfig`; then \
