@@ -2,10 +2,9 @@ CPP             = g++
 RM              = rm -f
 CPP_FLAGS       = -Wall -c -I. -O2 -std=c++11
 
-PREFIX			= /usr
-PHP_CONFIG      = php-config
+PHP_CONFIG      = $(shell which php-config)
 LIBRARY_DIR		= $(shell ${PHP_CONFIG} --extension-dir)
-PHP_CONFIG_DIR	= /etc/php5/cli/conf.d
+PHP_CONFIG_DIR	= $(shell ${PHP_CONFIG} --ini-dir)
 
 LD              = g++
 LD_FLAGS        = -Wall -shared -O2 
@@ -28,5 +27,9 @@ ${OBJECTS}:
 		${CPP} ${CPP_FLAGS} -fpic -o $@ ${@:%.o=%.cpp}
 
 install:
-		cp -f ${RESULT} ${LIBRARY_DIR}
-		cp -f ${PHPINIFILE}	${PHP_CONFIG_DIR}
+		cp -f ${RESULT} ${LIBRARY_DIR}/
+		cp -f ${PHPINIFILE}	${PHP_CONFIG_DIR}/
+
+uninstall:
+		rm ${LIBRARY_DIR}/${RESULT}
+		rm ${PHP_CONFIG_DIR}/${PHPINIFILE}
