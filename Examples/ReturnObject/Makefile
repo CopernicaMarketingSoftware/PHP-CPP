@@ -29,7 +29,7 @@ NAME				=	returnobject
 #	one for each extension. Use this variable to specify this directory.
 #
 
-INI_DIR				=	/etc/php5/mods-available/
+INI_DIR				=	$(shell php-config --ini-dir)
 
 
 #
