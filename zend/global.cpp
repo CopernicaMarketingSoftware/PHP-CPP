@@ -97,7 +97,29 @@ Global &Global::update()
 }
 
 /**
+ *  Update the underlying value forcefully
+ *  @return Value
+ */
+Global &Global::force_update()
+{
+    // make sure the global already exists
+    if (! _exists) return update();
+
+    // remove the old value
+    zend_symtable_del_ind(&EG(symbol_table), _name);
+
+    // add one extra reference because the variable now is a global var too
+    Z_TRY_ADDREF_P(_val);
+
+    // update the internal symtable
+    zend_symtable_update_ind(&EG(symbol_table), _name, _val);
+
+    _exists = true;
+
+    return *this;
+}
+
+/**
  *  End of namespace
  */
 }
-
