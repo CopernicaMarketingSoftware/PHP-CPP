@@ -4,7 +4,7 @@
  *  Implementation file for the ClassImpl class
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 - 2019 Copernica BV
+ *  @copyright 2014 - 2024 Copernica BV
  */
 #include "includes.h"
 #include <cstring>
@@ -207,7 +207,10 @@ zend_function *ClassImpl::getMethod(zend_object **object, zend_string *method, c
     // had an implementation here that used a static variable, and that worked too,
     // but we'll follow thread safe implementation of the Zend engine here, although
     // it is strange to allocate and free memory in one and the same method call (free()
-    // call happens in call_method())
+    // call happens in call_method()) (2024-10-13 extra info: the method_exists() 
+    // function and our own Value::isCallable() method expect this to be emalloc()-
+    // allocated buffer, because they both call zend_free_trampoline() (which is
+    // effectively an efree() call) on the returned function-structure)
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
 
