@@ -50,7 +50,7 @@ INSTALL_LIB				=	${INSTALL_PREFIX}/lib
 #
 
 SONAME					=	2.4
-VERSION					=	2.4.3
+VERSION					=	2.4.4
 
 
 #
