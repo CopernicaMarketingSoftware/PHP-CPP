@@ -22,12 +22,13 @@
  *
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 - 2019 Copernica BV
+ *  @copyright 2019 - 2024 Copernica BV
  */
 #include "includes.h"
 #include "string.h"
 #include "lowercase.h"
 #include "macros.h"
+#include "execarguments.h"
 
 /**
  *  Set up namespace
@@ -823,6 +824,19 @@ static Value do_exec(const zval *object, zval *method, int argc, zval *argv)
 }
 
 /**
+ *  Helper function that runs the actual call
+ *  @param  object      The object to call it on
+ *  @param  method      The function or method to call
+ *  @param  args        The parameters
+ *  @return Value
+ */
+static Value do_exec(const zval *object, zval *method, ExecArguments &args)
+{
+    // pass on
+    return do_exec(object, method, args.argc(), args.argv());
+}
+
+/**
  *  Call the function in PHP
  *  We have ten variants of this function, depending on the number of parameters
  *  This call operator is only useful when the variable represents a callable
@@ -919,16 +933,13 @@ Value Value::call(const char *name)
  *  @param  argv        The parameters
  *  @return Value
  */
-Value Value::exec(int argc, Value *argv) const
+Value Value::exec(int argc, Value argv[]) const
 {
     // array of zvals to execute
-    zval* params = static_cast<zval*>(alloca(argc * sizeof(zval)));
-
-    // convert all the values
-    for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
-
+    ExecArguments args(argc, argv);
+    
     // call helper function
-    return do_exec(nullptr, _val, argc, params);
+    return do_exec(nullptr, _val, args);
 }
 
 /**
@@ -944,13 +955,10 @@ Value Value::exec(const char *name, int argc, Value *argv) const
     Value method(name);
 
     // array of zvals to execute
-    zval* params = static_cast<zval*>(alloca(argc * sizeof(zval)));
-
-    // convert all the values
-    for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
+    ExecArguments args(argc, argv);
 
     // call helper function
-    return do_exec(_val, method._val, argc, params);
+    return do_exec(_val, method._val, args);
 }
 
 /**
@@ -966,13 +974,10 @@ Value Value::exec(const char *name, int argc, Value *argv)
     Value method(name);
 
     // array of zvals to execute
-    zval* params = static_cast<zval*>(alloca(argc * sizeof(zval)));
-
-    // convert all the values
-    for(int i = 0; i < argc; i++) { params[i] = *argv[i]._val; }
+    ExecArguments args(argc, argv);
 
     // call helper function
-    return do_exec(_val, method._val, argc, params);
+    return do_exec(_val, method._val, args);
 }
 
 /**

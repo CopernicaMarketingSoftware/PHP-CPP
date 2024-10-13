@@ -15,7 +15,7 @@
  *  this class.
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2013 - 2019 Copernica BV
+ *  @copyright 2013 - 2024 Copernica BV
  */
 
 /**
@@ -1133,7 +1133,7 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(int argc, Value *argv) const;
+    Value exec(int argc, Value argv[]) const;
 
     /**
      *  Call method with a number of parameters
@@ -1142,8 +1142,8 @@ private:
      *  @param  argv        The parameters
      *  @return Value
      */
-    Value exec(const char *name, int argc, Value *argv) const;
-    Value exec(const char *name, int argc, Value *argv);
+    Value exec(const char *name, int argc, Value argv[]) const;
+    Value exec(const char *name, int argc, Value argv[]);
 
     /**
      *  Refcount - the number of references to the value
@@ -1242,6 +1242,7 @@ protected:
     friend class Script;
     friend class ConstantImpl;
     friend class Stream;
+    friend class ExecArguments;
 
     /**
      *  Friend functions which have to access that zval directly
