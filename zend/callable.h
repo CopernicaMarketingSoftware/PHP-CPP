@@ -232,7 +232,8 @@ protected:
             case Type::Array:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_ARRAY, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // array of anything (individual members cannot be restricted)
             case Type::Object:
                 if (arg.classname()) {
-                    info->type = (zend_type) ZEND_TYPE_INIT_CLASS(arg.encoded(), arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
+                    zend_string *className = zend_string_init(arg.encoded(), std::strlen(arg.encoded()), 1);
+                    info->type = (zend_type) ZEND_TYPE_INIT_CLASS(className, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
                     break;
                 }
                 info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_OBJECT, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
