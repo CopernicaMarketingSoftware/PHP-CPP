@@ -67,7 +67,7 @@ bool File::compile()
 #if PHP_VERSION_ID < 80100
 
     // open the file
-    if (zend_stream_open(ZSTR_VAL(_path), &fileHandle) == FAILURE) return false;
+    if (zend_stream_open(ZSTR_VAL(_path), &filehandle) == FAILURE) return false;
 
 #else
 
