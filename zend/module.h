@@ -179,17 +179,23 @@ public:
         // this is not possible if the module is invalid in the first place
         if (!valid()) return false;
         
+#if PHP_VERSION_ID < 80400
         // the Zend engine sets a number of properties in the entry class, we do that here too
         // note that it would be better to call zend_next_free_module() to find the next module
         // number, but some users complain that this function is not always available
         _entry->type = MODULE_TEMPORARY;
         _entry->module_number = zend_hash_num_elements(&module_registry) + 1;
+#endif
         _entry->handle = _handle;
         
         // @todo does loading an extension even work in a multi-threading setup?
         
         // register the module, this apparently returns a copied entry pointer
+#if PHP_VERSION_ID < 80400
         auto *entry = zend_register_module_ex(_entry);
+#else
+        auto *entry = zend_register_module_ex(_entry, MODULE_TEMPORARY);
+#endif
 
         // forget the entry, so that a new call to start() will fail too
         _entry = nullptr;

@@ -68,7 +68,11 @@ void IteratorImpl::destructor(zend_object_iterator *iter)
  *  @param  iter
  *  @return int
  */
+#if PHP_VERSION_ID < 80400
 int IteratorImpl::valid(zend_object_iterator *iter)
+#else
+zend_result IteratorImpl::valid(zend_object_iterator *iter)
+#endif
 {
     // check if valid
     return self(iter)->valid() ? SUCCESS : FAILURE;
