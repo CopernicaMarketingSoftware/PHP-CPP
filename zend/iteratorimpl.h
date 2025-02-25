@@ -121,7 +121,11 @@ private:
      *  @param  iter
      *  @return int
      */
+#if PHP_VERSION_ID < 80400
     static int valid(zend_object_iterator *iter);
+#else
+    static zend_result valid(zend_object_iterator *iter);
+#endif
 
     /**
      *  Fetch the current item
