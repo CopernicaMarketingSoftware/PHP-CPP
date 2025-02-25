@@ -87,7 +87,7 @@ Value error_reporting(Message message)
     static String entry{ "error_reporting" };
 
     // alter the ini on the fly
-    zend_alter_ini_entry(entry, String(str, size), ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
+    zend_alter_ini_entry_chars(entry, str, size, ZEND_INI_USER, ZEND_INI_STAGE_RUNTIME);
 
     // return the output
     return output;
