@@ -68,7 +68,7 @@ void IteratorImpl::destructor(zend_object_iterator *iter)
  *  @param  iter
  *  @return int
  */
-int IteratorImpl::valid(zend_object_iterator *iter)
+zend_result IteratorImpl::valid(zend_object_iterator *iter)
 {
     // check if valid
     return self(iter)->valid() ? SUCCESS : FAILURE;

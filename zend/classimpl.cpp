@@ -56,14 +56,14 @@ static ClassImpl *self(zend_class_entry *entry)
      *  the string, in case PHP tries to read it) and after that the pointer
      *  and we leave the doc_comment_len at 0.
      */
-    while (entry->parent && (entry->info.user.doc_comment == nullptr || ZSTR_LEN(entry->info.user.doc_comment) > 0))
+    while (entry->parent && (entry->doc_comment == nullptr || ZSTR_LEN(entry->doc_comment) > 0))
     {
         // we did not create this class entry, but luckily we have a parent
         entry = entry->parent;
     }
 
     // retrieve the comment (it has a pointer hidden in it to the ClassBase object)
-    const char *comment = ZSTR_VAL(entry->info.user.doc_comment);
+    const char *comment = ZSTR_VAL(entry->doc_comment);
 
     // the first byte of the comment is an empty string (null character), but
     // the next bytes contain a pointer to the ClassBase class
@@ -1604,7 +1604,7 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
     std::memcpy(ZSTR_VAL(_self) + 1, &impl, sizeof(impl));
 
     // install the doc_comment
-    _entry->info.user.doc_comment = _self;
+    _entry->doc_comment = _self;
 
     // declare all member variables
     for (auto &member : _members) member->initialize(_entry);

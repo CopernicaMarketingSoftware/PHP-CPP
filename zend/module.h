@@ -189,7 +189,7 @@ public:
         // @todo does loading an extension even work in a multi-threading setup?
         
         // register the module, this apparently returns a copied entry pointer
-        auto *entry = zend_register_module_ex(_entry);
+        auto *entry = zend_register_module_ex(_entry, MODULE_TEMPORARY);
 
         // forget the entry, so that a new call to start() will fail too
         _entry = nullptr;

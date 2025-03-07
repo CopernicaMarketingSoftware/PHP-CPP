@@ -121,7 +121,7 @@ private:
      *  @param  iter
      *  @return int
      */
-    static int valid(zend_object_iterator *iter);
+    static zend_result valid(zend_object_iterator *iter);
 
     /**
      *  Fetch the current item
