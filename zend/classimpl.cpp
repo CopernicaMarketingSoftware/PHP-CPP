@@ -23,8 +23,11 @@ ClassImpl::~ClassImpl()
     // destruct the entries
     delete[] _entries;
 
+    // PHP 8.4 frees doc_comment if not null, so skip.
+#if PHP_VERSION_ID < 80400
     // free the stored pointer
     if (_self) zend_string_release(_self);
+#endif
 }
 
 /**
