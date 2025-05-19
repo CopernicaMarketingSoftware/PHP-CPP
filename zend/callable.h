@@ -232,7 +232,14 @@ protected:
             case Type::Array:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_ARRAY, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // array of anything (individual members cannot be restricted)
             case Type::Object:
                 if (arg.classname()) {
+#if PHP_VERSION_ID < 83000
+                    // up to to 8.3 the type-names were normally given as "const char *"
                     info->type = (zend_type) ZEND_TYPE_INIT_CLASS(arg.encoded(), arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
+#else
+                    // since 8.3 a zend_string* is required, or a compile time "literal string" -- we fake the system by calling "ZEND_TYPE_INIT_CLASS_CONST"
+                    // to pretend that the name is not a zend_string* but a compile-time "const char *" (in reality it is a const char * stored in a std::string)
+                    info->type = (zend_type) ZEND_TYPE_INIT_CLASS_CONST(arg.encoded(), arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
+#endif
                     break;
                 }
                 info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_OBJECT, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
