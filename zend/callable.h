@@ -232,7 +232,7 @@ protected:
             case Type::Array:       info->type = (zend_type) ZEND_TYPE_INIT_CODE(IS_ARRAY, arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));     break;  // array of anything (individual members cannot be restricted)
             case Type::Object:
                 if (arg.classname()) {
-#if PHP_VERSION_ID < 83000
+#if PHP_VERSION_ID < 80300
                     // up to to 8.3 the type-names were normally given as "const char *"
                     info->type = (zend_type) ZEND_TYPE_INIT_CLASS(arg.encoded(), arg.allowNull(), _ZEND_ARG_INFO_FLAGS(arg.byReference(), 0, 0));
 #else
