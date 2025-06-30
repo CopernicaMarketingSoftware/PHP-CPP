@@ -124,6 +124,10 @@ void Callable::initialize(zend_function_entry *entry, const char *classname, int
     entry->arg_info = _argv.get();
     entry->num_args = _argc;
     entry->flags = flags;
+#if PHP_VERSION_ID >= 80400
+    entry->frameless_function_infos = nullptr;
+    entry->doc_comment = nullptr;
+#endif
 
     // we should fill the first argument as well
     initialize((zend_internal_function_info*)_argv.get(), classname);
