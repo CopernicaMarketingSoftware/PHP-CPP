@@ -225,6 +225,9 @@ zend_function *ClassImpl::getMethod(zend_object **object, zend_string *method, c
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
 
+    // reset everything to zero (in case future PHP versions add more fields)
+    memset(function, 0, sizeof(*function));
+
     // set all properties
     function->type              = ZEND_INTERNAL_FUNCTION;
     function->arg_flags[0]      = 0;
@@ -268,6 +271,9 @@ zend_function *ClassImpl::getStaticMethod(zend_class_entry *entry, zend_string *
     // allocate data holding information about the function
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
+
+    // reset everything to zero (in case future PHP versions add more fields)
+    memset(function, 0, sizeof(*function));
 
     // set all properties for the function
     function->type              = ZEND_INTERNAL_FUNCTION;
@@ -318,6 +324,9 @@ zend_result ClassImpl::getClosure(ZEND_OBJECT_OR_ZVAL object, zend_class_entry *
     // with all information about the function
     auto *data = (CallData *)emalloc(sizeof(CallData));
     auto *function = &data->func;
+
+    // reset everything to zero (in case future PHP versions add more fields)
+    memset(function, 0, sizeof(*function));
 
     // we're going to set all properties of the zend_internal_function struct
     function->type              = ZEND_INTERNAL_FUNCTION;
