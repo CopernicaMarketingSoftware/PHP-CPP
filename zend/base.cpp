@@ -223,7 +223,7 @@ int Base::__compare(const Base &that) const
  *  is handled by the user-space implementation of Serializable::serialize()).
  *  @return Php::Value
  */
-Php::Value Base::__serialize()
+Php::Value Base::serialize()
 {
     // 'this' refers to a Php::Base class, but we expect that is also implements the Serializable
     // interface (otherwise we would never have registered the __serialize function as a callback)
@@ -242,7 +242,7 @@ Php::Value Base::__serialize()
  *  is handled by the user-space implementation of Serializable::unserialize()).
  *  @param params       The passed parameters
  */
-void Base::__unserialize(Php::Parameters &params)
+void Base::unserialize(Php::Parameters &params)
 {
     // 'this' refers to a Php::Base class, but we expect that is also implements the Serializable
     // interface (otherwise we would never have registered the __serialize function as a callback)

@@ -267,7 +267,7 @@ public:
      *  is handled by the user-space implementation of Serializable::serialize()).
      *  @return Php::Value
      */
-    Php::Value __serialize();
+    Php::Value serialize();
 
     /**
      *  Method that is called when an explicit call to $object->unserialize() is made
@@ -275,7 +275,7 @@ public:
      *  is handled by the user-space implementation of Serializable::unserialize()).
      *  @param params       The passed parameters
      */
-    void __unserialize(Php::Parameters &params);
+    void unserialize(Php::Parameters &params);
 
     /**
      *  Method that is called when an explicit call to $object->count() is made

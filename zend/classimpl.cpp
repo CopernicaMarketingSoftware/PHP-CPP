@@ -1464,8 +1464,8 @@ const struct _zend_function_entry *ClassImpl::entries()
     {
         // the method object need to stay in scope for the lifetime of the script (because the register a pointer
         // to an internal string buffer) -- so we create them as static variables
-        static Method serialize("serialize", &Base::__serialize, 0, {});
-        static Method unserialize("unserialize", &Base::__unserialize, 0, { ByVal("input", Type::Undefined, true) });
+        static Method serialize("serialize", &Base::serialize, 0, {});
+        static Method unserialize("unserialize", &Base::unserialize, 0, { ByVal("input", Type::Undefined, true) });
 
         // register the serialize and unserialize method in case this was not yet done in PHP user space
         if (!hasMethod("serialize")) serialize.initialize(&_entries[i++], _name);
@@ -1542,14 +1542,6 @@ zend_class_entry *ClassImpl::initialize(ClassBase *base, const std::string &pref
         // from 7.3 and up, we may have to allocate it ourself
         //entry.iterator_funcs_ptr = calloc(1, sizeof(zend_class_iterator_funcs));
 #endif
-    }
-
-    // for serializable classes, we install callbacks for serializing and unserializing
-    if (_base->serializable())
-    {
-        // add handlers to serialize and unserialize
-        entry.serialize = &ClassImpl::serialize;
-        entry.unserialize = &ClassImpl::unserialize;
     }
 
     // do we have a base class?
