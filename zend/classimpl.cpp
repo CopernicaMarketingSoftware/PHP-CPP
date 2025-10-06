@@ -1397,7 +1397,7 @@ int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned
         // get the base object
         Base *base = dynamic_cast<Base*>(ObjectImpl::find(object)->object());
         
-        // we are going to check if the serialize method was overridden in user-space
+        // we are going to check if the unserialize method was overridden in user-space
         zend_function *func = (zend_function *)zend_hash_str_find_ptr(&entry->function_table, "unserialize", sizeof("unserialize")-1);
 
         // do we have a user-space alternative?
@@ -1406,7 +1406,7 @@ int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned
             // construct object to make the call
             Php::Object self(entry, base);
             
-            // makek the unserialize call
+            // make the unserialize call
             self.call("unserialize", Php::Value((const char *)buffer, buf_len));
         }
         else
