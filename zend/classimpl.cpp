@@ -1320,20 +1320,53 @@ zend_object_iterator *ClassImpl::getIterator(zend_class_entry *entry, zval *obje
  */
 int ClassImpl::serialize(zval *object, unsigned char **buffer, size_t *buf_len, zend_serialize_data *data)
 {
-    // get the serializable object
-    Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(object)->object());
-
     // user may throw an exception in the serialize() function
     try
     {
-        // call the serialize method on the object
-        auto value = serializable->serialize();
+        // get the base object
+        Base *base = dynamic_cast<Base*>(ObjectImpl::find(object)->object());
 
-        // allocate the buffer, and copy the data into it (the zend engine will
-        // (hopefully) clean up the data for us - the default serialize method does
-        // it like this too)
-        *buffer = (unsigned char*)estrndup(value.c_str(), value.size());
-        *buf_len = value.size();
+        // get the class-entry
+        zend_class_entry *ce = Z_OBJCE_P(object);
+        
+        // we are going to check if the serialize method was overridden in user-space
+        zend_function *func = (zend_function *)zend_hash_str_find_ptr(&ce->function_table, "serialize", sizeof("serialize")-1);
+
+        // do we have a user-space alternative?
+        if (func && func->type == ZEND_USER_FUNCTION) 
+        {
+            // construct object to make the call
+            Php::Object self(ce, base);
+            
+            // get the serialized string
+            auto value = self.call("serialize");
+            
+            // make sure the returned value is indeed a string
+            value.setType(Type::String);
+
+            // allocate the buffer, and copy the data into it (the zend engine will
+            // (hopefully) clean up the data for us - the default serialize method does
+            // it like this too)
+            *buffer = (unsigned char*)estrndup(value.rawValue(), value.size());
+            *buf_len = value.size();
+        }
+        else
+        {
+            // get the base object
+            Serializable *serializable = dynamic_cast<Serializable*>(base);
+
+            // call the serialize method on the object
+            auto value = serializable->serialize();
+
+            // allocate the buffer, and copy the data into it (the zend engine will
+            // (hopefully) clean up the data for us - the default serialize method does
+            // it like this too)
+            *buffer = (unsigned char*)estrndup(value.c_str(), value.size());
+            *buf_len = value.size();
+        }
+
+        // done
+        return SUCCESS;
     }
     catch (Throwable &throwable)
     {
@@ -1343,9 +1376,6 @@ int ClassImpl::serialize(zval *object, unsigned char **buffer, size_t *buf_len, 
         // unreachable
         return FAILURE;
     }
-
-    // done
-    return SUCCESS;
 }
 
 /**
@@ -1358,17 +1388,38 @@ int ClassImpl::serialize(zval *object, unsigned char **buffer, size_t *buf_len, 
  */
 int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned char *buffer, size_t buf_len, zend_unserialize_data *data)
 {
-    // create the PHP object
-    object_init_ex(object, entry);
-
-    // turn this into a serializale
-    Serializable *serializable = dynamic_cast<Serializable*>(ObjectImpl::find(object)->object());
-
-    // user may throw an exception in the serialize() function
+    // user may throw an exception in the unserialize() function
     try
     {
-        // call the unserialize method on it
-        serializable->unserialize((const char *)buffer, buf_len);
+        // create the PHP object
+        object_init_ex(object, entry);
+        
+        // get the base object
+        Base *base = dynamic_cast<Base*>(ObjectImpl::find(object)->object());
+        
+        // we are going to check if the unserialize method was overridden in user-space
+        zend_function *func = (zend_function *)zend_hash_str_find_ptr(&entry->function_table, "unserialize", sizeof("unserialize")-1);
+
+        // do we have a user-space alternative?
+        if (func && func->type == ZEND_USER_FUNCTION) 
+        {
+            // construct object to make the call
+            Php::Object self(entry, base);
+            
+            // make the unserialize call
+            self.call("unserialize", Php::Value((const char *)buffer, buf_len));
+        }
+        else
+        {
+            // turn this into a serializale
+            Serializable *serializable = dynamic_cast<Serializable*>(base);
+
+            // call the unserialize method on it
+            serializable->unserialize((const char *)buffer, buf_len);
+        }
+
+        // done
+        return SUCCESS;
     }
     catch (Throwable &throwable)
     {
@@ -1380,9 +1431,6 @@ int ClassImpl::unserialize(zval *object, zend_class_entry *entry, const unsigned
         // unreachable
         return FAILURE;
     }
-
-    // done
-    return SUCCESS;
 }
 
 /**
