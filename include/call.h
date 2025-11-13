@@ -4,7 +4,7 @@
  *  This file holds a function to call a PHP function
  *
  *  @author Emiel Bruijntjes <emiel.bruijntjes@copernica.com>
- *  @copyright 2014 Copernica BV
+ *  @copyright 2014 - 2025 Copernica BV
  */
 
 /**
@@ -49,6 +49,7 @@ static inline           Value require_once(const std::string &filename) { return
 extern PHPCPP_EXPORT    Value set_exception_handler(const std::function<Value(Parameters &params)> &handler);
 extern PHPCPP_EXPORT    Value set_error_handler(const std::function<Value(Parameters &params)> &handler, Message message = Message::All);
 extern PHPCPP_EXPORT    Value error_reporting(Message message);
+extern PHPCPP_EXPORT    Value error_reporting();
 extern PHPCPP_EXPORT    const char *sapi_name();
 
 /**

@@ -67,6 +67,15 @@ Value set_error_handler(const std::function<Value(Parameters &params)> &handler,
 }
 
 /**
+ *  Return the current error reporting leven
+ */
+Value error_reporting()
+{
+    // expose current level
+    return EG(error_reporting);
+}
+
+/**
  *  Modify the error reporting level, will return the old error reporting level.
  */
 Value error_reporting(Message message)
