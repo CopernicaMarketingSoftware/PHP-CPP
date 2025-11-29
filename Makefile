@@ -16,9 +16,23 @@
 #   libraries and the path to the binary file. If your php-config is not
 #   installed in the default directory, you can change that here.
 #
+#   If you use environment with multiple PHP versions (e.g. debian), you need
+#   to specify name or path of php-config utility that matches targeted php
+#   version. If you want to build for multiple PHP versions, then also consider
+#   changing BUILD_DIR variable, so that builds for each version are separated
+#
 
 PHP_CONFIG			=	php-config
+BUILD_DIR			=	build
 UNAME 				:= 	$(shell uname)
+
+#
+#   If you do not want to run LDCONFIG, then set LDCONFIG to empty string.
+#   alternatively you can provide another command to register libraries
+#   after installation.
+#
+
+LDCONFIG	=	$(shell which ldconfig 2>/dev/null)
 
 #
 #   Installation directory
@@ -61,8 +75,10 @@ VERSION					=	2.4.13
 #   you can change that here.
 #
 
-PHP_SHARED_LIBRARY		=	libphpcpp.so.$(VERSION)
-PHP_STATIC_LIBRARY		=	libphpcpp.a.$(VERSION)
+LIBRARY_NAME			=	libphpcpp
+
+PHP_SHARED_LIBRARY		=	${LIBRARY_NAME}.so.$(VERSION)
+PHP_STATIC_LIBRARY		=	${LIBRARY_NAME}.a.$(VERSION)
 
 
 #
@@ -157,14 +173,14 @@ PHP_SOURCES				=	$(wildcard zend/*.cpp)
 #   library. We also use a Makefile function here that takes all source files.
 #
 
-COMMON_OBJECTS	=	$(COMMON_SOURCES:%.cpp=build/%.o)
-PHP_OBJECTS		=	$(PHP_SOURCES:%.cpp=build/%.o)
+COMMON_OBJECTS	=	$(COMMON_SOURCES:%.cpp=${BUILD_DIR}/%.o)
+PHP_OBJECTS		=	$(PHP_SOURCES:%.cpp=${BUILD_DIR}/%.o)
 
 #
 #   Dependencies
 #
 
-DEPENDENCIES            =   $(wildcard build/common/*.d) $(wildcard build/zend/*.d)
+DEPENDENCIES            =   $(wildcard ${BUILD_DIR}/common/*.d) $(wildcard ${BUILD_DIR}/zend/*.d)
 
 #
 #   End of the variables section. Here starts the list of instructions and
@@ -181,30 +197,30 @@ release: COMPILER_FLAGS +=	-O2
 release: LINKER_FLAGS	+=  -O2
 release: phpcpp
 
-phpcpp: ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
+phpcpp: ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ${BUILD_DIR}/${PHP_STATIC_LIBRARY}
 	@echo
 	@echo "Build complete."
 
-${PHP_SHARED_LIBRARY}: build_directories ${COMMON_OBJECTS} ${PHP_OBJECTS}
-	${LINKER} ${PHP_LINKER_FLAGS} -Wl,${LINKER_SONAME_OPTION},libphpcpp.so.$(SONAME) -o $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
+${BUILD_DIR}/${PHP_SHARED_LIBRARY}: build_directories ${COMMON_OBJECTS} ${PHP_OBJECTS}
+	${LINKER} ${PHP_LINKER_FLAGS} -Wl,${LINKER_SONAME_OPTION},${LIBRARY_NAME}.so.$(SONAME) -o $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
 
-${PHP_STATIC_LIBRARY}: build_directories ${COMMON_OBJECTS} ${PHP_OBJECTS}
+${BUILD_DIR}/${PHP_STATIC_LIBRARY}: build_directories ${COMMON_OBJECTS} ${PHP_OBJECTS}
 	${ARCHIVER} $@ ${COMMON_OBJECTS} ${PHP_OBJECTS}
 
 build_directories:
-	${MKDIR} build/common
-	${MKDIR} build/zend
+	${MKDIR} ${BUILD_DIR}/common
+	${MKDIR} ${BUILD_DIR}/zend
 
 clean:
-	${RM} build ${PHP_SHARED_LIBRARY} ${PHP_STATIC_LIBRARY}
+	${RM} ${BUILD_DIR}
 	find -name *.o | xargs ${RM}
 	find -name *.d | xargs ${RM}
 
 ${COMMON_OBJECTS}:
-	${COMPILER} ${COMPILER_FLAGS} -o $@ ${@:build/%.o=%.cpp}
+	${COMPILER} ${COMPILER_FLAGS} -o $@ ${@:${BUILD_DIR}/%.o=%.cpp}
 
 ${PHP_OBJECTS}:
-	${COMPILER} ${COMPILER_FLAGS} -o $@ ${@:build/%.o=%.cpp}
+	${COMPILER} ${COMPILER_FLAGS} -o $@ ${@:${BUILD_DIR}/%.o=%.cpp}
 
 
 # The if statements below must be seen as single line by make
@@ -214,19 +230,18 @@ install:
 	${MKDIR} ${INSTALL_LIB}
 	${CP} phpcpp.h ${INSTALL_HEADERS}
 	${CP} include/*.h ${INSTALL_HEADERS}/phpcpp
-	if [ -e ${PHP_SHARED_LIBRARY} ]; then \
-		${CP} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so.$(SONAME); \
-		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/libphpcpp.so; \
+	if [ -e ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ]; then \
+		${CP} ${BUILD_DIR}/${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/ && \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/${LIBRARY_NAME}.so.$(SONAME) && \
+		${LN} ${PHP_SHARED_LIBRARY} ${INSTALL_LIB}/${LIBRARY_NAME}.so; \
 	fi
-	if [ -e ${PHP_STATIC_LIBRARY} ]; then ${CP} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/; \
-		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/libphpcpp.a; \
+	if [ -e ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ]; then \
+		${CP} ${BUILD_DIR}/${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/ && \
+		${LN} ${PHP_STATIC_LIBRARY} ${INSTALL_LIB}/${LIBRARY_NAME}.a; \
 	fi
-	if `which ldconfig`; then \
-		ldconfig; \
-	fi
+	${LDCONFIG}
 
 uninstall:
 	${RM} ${INSTALL_HEADERS}/phpcpp*
-	${RM} ${INSTALL_LIB}/libphpcpp.*
+	${RM} ${INSTALL_LIB}/${LIBRARY_NAME}.*
 
