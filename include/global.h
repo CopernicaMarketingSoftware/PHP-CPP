@@ -97,6 +97,7 @@ public:
     Global &operator=(const T &value)
     {
         Value::operator=(value);
+
         return update();
     }
 
@@ -109,11 +110,12 @@ public:
      */
     virtual void set(int index, const Value &value) override
     {
-        // update current object
-        update();
-
         // call base
         Value::set(index, value);
+
+        // update current object
+        _exists = false;
+        update();
     }
 
     /**
@@ -126,11 +128,12 @@ public:
      */
     virtual void set(const char *key, int size, const Value &value) override
     {
-        // update current object
-        update();
-
         // call base
         Value::set(key, size, value);
+
+        // update current object
+        _exists = false;
+        update();
     }
 
 
