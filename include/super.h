@@ -28,7 +28,8 @@ public:
      *  @param  index   index number
      *  @param  name    name of the variable in PHP
      */
-    Super(int index, const char *name) : _index(index), _name(name) {}
+    template<size_t N>
+    Super(int index, const char(&name)[N]) : _index(index), _name(name), _length(N-1) {}
 
     /**
      *  Destructor
@@ -101,6 +102,12 @@ private:
      *  @var    name
      */
     const char *_name;
+
+    /**
+    *  Length of the variable in PHP
+    *  @var    name
+    */
+    size_t _length;
 
     /**
      *  Turn the object into a value object
