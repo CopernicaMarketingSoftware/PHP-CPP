@@ -70,8 +70,9 @@ bool define(const char *name, size_t size, const Value &value)
     // the constant structure from the zend engine
     zend_constant constant;
 
-    // copy the name - we don't decrease the refcount here on purpose
-    constant.name = zend_string_init(name, size, 1);
+    // copy the name - allocated per request, because the constant is registered
+    // below without CONST_PERSISTENT and the engine efree()s the name again
+    constant.name = zend_string_init(name, size, 0);
 
     // only scalar values can be used for constants
     if (value.isScalar())

@@ -81,8 +81,10 @@ public:
      */
     ConstantImpl(const char *name, const char *value, size_t len) : _name(name)
     {
-        // initialize the zval
-        ZVAL_STRINGL(&_constant.value, value, len);
+        // initialize the zval - the string is allocated persistently, because the
+        // constant is registered with CONST_PERSISTENT and is freed along the
+        // persistent path (ZVAL_STRINGL() would use the request allocator)
+        ZVAL_STR(&_constant.value, zend_string_init(value, len, 1));
     }
 
     /**
@@ -92,8 +94,8 @@ public:
      */
     ConstantImpl(const char *name, const char *value) : _name(name)
     {
-        // initialize the zval
-        ZVAL_STRINGL(&_constant.value, value, ::strlen(value));
+        // initialize the zval (persistently allocated, see above)
+        ZVAL_STR(&_constant.value, zend_string_init(value, ::strlen(value), 1));
     }
 
     /**
@@ -103,14 +105,22 @@ public:
      */
     ConstantImpl(const char *name, const std::string &value) : _name(name)
     {
-        // initialize the zval
-        ZVAL_STRINGL(&_constant.value, value.c_str(), value.size());
+        // initialize the zval (persistently allocated, see above)
+        ZVAL_STR(&_constant.value, zend_string_init(value.c_str(), value.size(), 1));
     }
 
     /**
      *  Destructor
      */
-    virtual ~ConstantImpl() {}
+    virtual ~ConstantImpl()
+    {
+        // the string value was allocated by us (see the constructors above) and we
+        // hold on to our own reference for the entire lifetime of this object - the
+        // zend engine gets a reference of its own in initialize(). this also covers
+        // the constants that are never registered at all: class constants are copied
+        // into the class by addTo(), and never pass through initialize()
+        if (Z_TYPE(_constant.value) == IS_STRING) zend_string_release(Z_STR(_constant.value));
+    }
 
     /**
      *  Add the constant to a class
@@ -145,6 +155,7 @@ public:
         case IS_TRUE:
             // set boolean true
             clss.property(_name, true, Php::Const);
+            break;
 
         case IS_STRING:
             // set a string constant
@@ -206,9 +217,31 @@ public:
         // from 7.3 onwards there is a macro for setting the constant flags and module number
         ZEND_CONSTANT_SET_FLAGS(&_constant, CONST_CS | CONST_PERSISTENT, module_number);
 #endif
-      
-        // register the zval
-        zend_register_constant(&_constant);
+
+        // the engine takes over ownership of the value, so we give it a reference of
+        // its own and keep ours - a Php::Constant that is added to more than one
+        // namespace shares a single implementation object, so this method can be
+        // called multiple times for the same value
+        if (Z_TYPE(_constant.value) == IS_STRING) zend_string_addref(Z_STR(_constant.value));
+
+        // register the zval (the return type changed from a status code to a pointer)
+#if PHP_VERSION_ID >= 80500
+        bool registered = zend_register_constant(&_constant) != NULL;
+#else
+        bool registered = zend_register_constant(&_constant) == SUCCESS;
+#endif
+
+        // if the constant was already defined the engine has released the name and
+        // raised a warning, but for persistent constants it leaves the value alone,
+        // so we have to hand back the reference that was not taken after all
+        if (!registered)
+        {
+            // release the reference that we took above
+            if (Z_TYPE(_constant.value) == IS_STRING) zend_string_release(Z_STR(_constant.value));
+
+            // the name was freed by the engine, do not keep a dangling pointer around
+            _constant.name = nullptr;
+        }
     }
 
 private:
