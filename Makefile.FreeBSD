@@ -1,0 +1,117 @@
+.PATH:		${.CURDIR}/zend
+.PATH:		${.CURDIR}/common
+
+SHLIB=		phpcpp
+SHLIB_MAJOR=	2.2.0
+MAN=
+
+INCS=	phpcpp.h
+INCS+=	include/argument.h
+INCS+=	include/array.h
+INCS+=	include/arrayaccess.h
+INCS+=	include/base.h
+INCS+=	include/byref.h
+INCS+=	include/byval.h
+INCS+=	include/call.h
+INCS+=	include/class.h
+INCS+=	include/classbase.h
+INCS+=	include/classtype.h
+INCS+=	include/constant.h
+INCS+=	include/countable.h
+INCS+=	include/deprecated.h
+INCS+=	include/error.h
+INCS+=	include/exception.h
+INCS+=	include/extension.h
+INCS+=	include/file.h
+INCS+=	include/function.h
+INCS+=	include/global.h
+INCS+=	include/globals.h
+INCS+=	include/hashmember.h
+INCS+=	include/hashparent.h
+INCS+=	include/ini.h
+INCS+=	include/inivalue.h
+INCS+=	include/interface.h
+INCS+=	include/iterator.h
+INCS+=	include/message.h
+INCS+=	include/modifiers.h
+INCS+=	include/namespace.h
+INCS+=	include/noexcept.h
+INCS+=	include/object.h
+INCS+=	include/parameters.h
+INCS+=	include/platform.h
+INCS+=	include/script.h
+INCS+=	include/serializable.h
+INCS+=	include/stream.h
+INCS+=	include/streams.h
+INCS+=	include/super.h
+INCS+=	include/thread_local.h
+INCS+=	include/throwable.h
+INCS+=	include/traversable.h
+INCS+=	include/type.h
+INCS+=	include/value.h
+INCS+=	include/valueiterator.h
+INCS+=	include/version.h
+INCS+=	include/visibility.h
+INCS+=	include/zendcallable.h
+INCS+=	include/zval.h
+
+# common
+SRCS=	modifiers.cpp
+
+# zend
+SRCS+=	base.cpp
+SRCS+=	callable.cpp
+SRCS+=	classbase.cpp
+SRCS+=	classimpl.cpp
+SRCS+=	common_streambuf.cpp
+SRCS+=	constant.cpp
+SRCS+=	constantfuncs.cpp
+SRCS+=	error.cpp
+SRCS+=	eval.cpp
+SRCS+=	exception.cpp
+SRCS+=	exception_handler.cpp
+SRCS+=	exists.cpp
+SRCS+=	extension.cpp
+SRCS+=	extensionimpl.cpp
+SRCS+=	file.cpp
+SRCS+=	function.cpp
+SRCS+=	functor.cpp
+SRCS+=	global.cpp
+SRCS+=	globals.cpp
+SRCS+=	hashmember.cpp
+SRCS+=	ini.cpp
+SRCS+=	inivalue.cpp
+SRCS+=	iteratorimpl.cpp
+SRCS+=	members.cpp
+SRCS+=	module.cpp
+SRCS+=	namespace.cpp
+SRCS+=	object.cpp
+SRCS+=	sapi.cpp
+SRCS+=	script.cpp
+SRCS+=	stream.cpp
+SRCS+=	streambuf.cpp
+SRCS+=	streams.cpp
+SRCS+=	super.cpp
+SRCS+=	throwable.cpp
+SRCS+=	value.cpp
+SRCS+=	valueiterator.cpp
+SRCS+=	zendcallable.cpp
+SRCS+=	zval.cpp
+
+CFLAGS+=	-std=c++11 -DBUILDING_PHPCPP -MD -Wno-write-strings -fvisibility=hidden
+
+PHP_CONFIG=	php-config
+PHP_CFLAGS!=	${PHP_CONFIG} --includes
+PHP_LDFLAGS!=	${PHP_CONFIG} --ldflags
+CFLAGS+=	${PHP_CFLAGS}
+LDFLAGS+=	${PHP_LDFLAGS}
+
+.if defined(PREFIX)
+LIBDIR=		${PREFIX}/lib
+INCLUDEDIR=	${PREFIX}/include
+.else
+LIBDIR=		/usr/local/lib
+INCLUDEDIR=	/usr/local/include/phpcpp
+.endif
+
+.include <bsd.lib.mk>
