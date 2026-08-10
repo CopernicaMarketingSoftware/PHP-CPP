@@ -75,7 +75,7 @@ private:
                 auto iter = _handles.begin();
                 
                 // remove the handle
-                DL_UNLOAD(*iter);
+                DL_UNLOAD(static_cast<DL_HANDLE>(*iter));
                 
                 // remove from set
                 _handles.erase(iter);
@@ -151,7 +151,7 @@ public:
     virtual ~Module()
     {
         // if the handle is still valid, we have to unload it
-      if (_handle) DL_UNLOAD((DL_HANDLE)_handle);
+      if (_handle) DL_UNLOAD(static_cast<DL_HANDLE>(_handle));
     }
     
     /**
