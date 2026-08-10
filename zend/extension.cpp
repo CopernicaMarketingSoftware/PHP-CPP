@@ -80,6 +80,20 @@ Extension &Extension::onIdle(const Callback &callback)
 }
 
 /**
+ *  Register a function to be called when the PHP engine invokes phpinfo()
+ *  @param  callback
+ *  @return Extension
+ */
+Extension &Extension::onInfo(const Callback &callback)
+{
+    // pass on to the implementation
+    _impl->onInfo(callback);
+
+    // allow chaining
+    return *this;
+}
+
+/**
  *  Retrieve the module pointer
  * 
  *  This is the memory address that should be exported by the get_module()
