@@ -62,7 +62,7 @@ public:
         if (!_iter) return;
 
         // call the iterator destructor
-        if (_iter) _iter->funcs->dtor(_iter);
+        if (_iter) zend_iterator_dtor(_iter);
     }
 
     /**
@@ -198,7 +198,7 @@ private:
         if (!_iter) return false;
 
         // reset the iterator
-        _iter->funcs->dtor(_iter);
+        zend_iterator_dtor(_iter);
 
         // set back to null
         _iter = nullptr;
