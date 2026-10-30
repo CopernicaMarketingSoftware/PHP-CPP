@@ -467,6 +467,11 @@ int ClassImpl::compare(zval *val1, zval *val2)
     // prevent exceptions
     try
     {
+#if PHP_VERSION_ID >= 80000
+        // PHP 8 calls this handler when only one of the operands is an object, leave such comparisons to the default handler
+        if (Z_TYPE_P(val1) != IS_OBJECT || Z_TYPE_P(val2) != IS_OBJECT) throw NotImplemented();
+#endif
+
         // retrieve the class entry linked to this object
         auto *entry = Z_OBJCE_P(val1);
 
