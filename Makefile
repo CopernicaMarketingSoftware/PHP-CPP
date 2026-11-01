@@ -50,8 +50,7 @@ INSTALL_LIB				=	${INSTALL_PREFIX}/lib
 #
 
 SONAME					=	2.4
-VERSION					=	2.4.16
-
+VERSION					=	2.4.17
 
 #
 #   Name of the target library name and config-generator
