@@ -36,8 +36,13 @@ public:
         // create the iterator
         _iter = entry->get_iterator(entry, object, false);
 
-        // rewind the iterator
-        _iter->funcs->rewind(_iter);
+        // rewind the iterator, the rewind and get_current_key callbacks are optional in the Zend
+        // iterator API (the DOM iterators have no rewind), the engine's foreach checks for that too
+        if (_iter->funcs->rewind) _iter->funcs->rewind(_iter);
+
+        // some iterators use the position that the engine keeps in the iterator, as their key or to find the
+        // next element (the DOM iterators), the first element is at position 0
+        _iter->index = 0;
 
         // read the first key/value pair
         read();
@@ -83,6 +88,9 @@ public:
     {
         // do we still have an iterator?
         if (!_iter) return false;
+
+        // update the position first, like the engine does: some iterators move to the element at this position
+        ++_iter->index;
 
         // move it forward
         _iter->funcs->move_forward(_iter);
@@ -173,7 +181,8 @@ private:
         Value val;
 
         // call the function to get the key
-        _iter->funcs->get_current_key(_iter, val._val);
+        if (_iter->funcs->get_current_key) _iter->funcs->get_current_key(_iter, val._val);
+        else ZVAL_LONG(val._val, _iter->index);
 
         // store the key
         _data.first = val;
